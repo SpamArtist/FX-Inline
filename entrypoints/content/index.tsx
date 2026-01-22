@@ -2,21 +2,21 @@ import CurrencyBox from "@/components/CurrencyBox/CurrencyBox";
 import { useCurrencyReducer } from "@/hooks/useCurrencyReducer";
 import { createRoot, Root } from "react-dom/client";
 import { ConvertorHOD } from "../../components/Convertor/Convertor";
-import contentBoxStyles from './content.css?inline';
+import contentBoxStyles from "./content.css?inline";
 
 export default defineContentScript({
   matches: ["<all_urls>"],
   cssInjectionMode: "manual",
   async main(ctx) {
-    console.log('here');
+    console.log("here");
 
     let popupRoot: HTMLDivElement | null = null;
     let reactRoot: Root | null = null;
 
-    const contentStyleTag = document.createElement('style');
-    contentStyleTag.id = 'content-styles';
+    const contentStyleTag = document.createElement("style");
+    contentStyleTag.id = "content-styles";
     contentStyleTag.textContent = contentBoxStyles;
-    if (!document.getElementById('content-styles')) {
+    if (!document.getElementById("content-styles")) {
       document.head.appendChild(contentStyleTag);
     }
 
@@ -29,47 +29,55 @@ export default defineContentScript({
       }
     }
 
-    function PopupCurrencies() {
+    function CurrencyConvertorPopupBox() {
       const [currencies, dispatch] = useCurrencyReducer();
 
       return (
         <ConvertorHOD>
           {currencies.map((currentCurrency) => (
-            <div key={currentCurrency.id} className='relative flex flex-col items-center w-72.5'>
+            <div
+              key={currentCurrency.id}
+              className="relative flex flex-col items-center w-72.5"
+            >
               <CurrencyBox
                 key={currentCurrency.id}
                 data={currentCurrency}
-                amountChange={(updatedAmount) => dispatch({
-                  type: 'amount-update',
-                  payload: { id: currentCurrency.id, amount: updatedAmount },
-                })}
-                currencyChange={(updatedCurrency) => dispatch({
-                  type: 'currency-update',
-                  payload: { id: currentCurrency.id, currencyCode: updatedCurrency }
-                })}
+                amountChange={(updatedAmount) =>
+                  dispatch({
+                    type: "amount-update",
+                    payload: { id: currentCurrency.id, amount: updatedAmount },
+                  })
+                }
+                currencyChange={(updatedCurrency) =>
+                  dispatch({
+                    type: "currency-update",
+                    payload: {
+                      id: currentCurrency.id,
+                      currencyCode: updatedCurrency,
+                    },
+                  })
+                }
               />
             </div>
           ))}
         </ConvertorHOD>
-      )
+      );
     }
 
     function showPopup(x: number, y: number, selectedText: string) {
       removePopup();
 
-      popupRoot = document.createElement('div');
-      popupRoot.id = 'popup-root';
-      popupRoot.style.position = 'absolute';
+      popupRoot = document.createElement("div");
+      popupRoot.id = "popup-root";
+      popupRoot.style.position = "absolute";
       popupRoot.style.top = `${y}px`;
       popupRoot.style.left = `${x}px`;
-      popupRoot.style.zIndex = '999999999999';
+      popupRoot.style.zIndex = "999999999999";
 
       document.body.appendChild(popupRoot);
 
       reactRoot = createRoot(popupRoot);
-      reactRoot.render((
-        <PopupCurrencies />
-      ));
+      reactRoot.render(<CurrencyConvertorPopupBox />);
     }
 
     document.addEventListener("mouseup", (e) => {
