@@ -3,18 +3,21 @@ import { ReactNode } from "react";
 import "./Convertor.css";
 
 type Props = {
+  shouldDisplayHeader: boolean;
   children: ReactNode;
 };
 
-export const ConvertorHOD = ({ children }: Props) => {
+export const ConvertorHOD = ({ shouldDisplayHeader, children }: Props) => {
   return (
-    <main className="bg-[darkslategray] text-[wheat] h-max">
-      <header className="py-2.5">
-        <h2 className="font-[system-ui]">Currency Convertor</h2>
-      </header>
-      <div className="relative flex flex-col items-center mb-2.5 mx-2.5 pb-[1.2em] py-0 bg-inherit text-[wheat]">
-        {children}
-      </div>
-    </main>
+    <div
+      className={`bg-[darkslategray] text-[wheat] h-max flex flex-col gap-[0.8em] ${shouldDisplayHeader ? "" : "rounded-md pt-[0.3em] pb-[0.875em] rounded-tl-none"}`}
+    >
+      {shouldDisplayHeader && (
+        <div className="py-2.5">
+          <h2 className="font-[system-ui]">Currency Convertor</h2>
+        </div>
+      )}
+      {children}
+    </div>
   );
 };

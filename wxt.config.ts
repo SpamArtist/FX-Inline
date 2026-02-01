@@ -16,9 +16,6 @@ export default defineConfig({
     // ],
   },
   vite: () => ({
-    css: {
-      postcss: "./postcss.config.js",
-    },
     plugins: [
       tailwindcss({
         optimize: {

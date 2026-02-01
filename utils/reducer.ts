@@ -1,36 +1,7 @@
 import currencies from "@/assets/currency.json";
-
-const BASE_CURRENCY = "EUR";
-
-// interface CurrencyState {
-//   id: string,
-//   currency: string,
-//   amount: string
-// }
-
-export const INITIAL_STATE = [
-  {
-    id: "1",
-    currency: "EUR",
-    logo: "🇪🇺",
-    seq: 1,
-    amount: "1",
-  },
-  {
-    id: "2",
-    currency: "INR",
-    logo: "🇮🇳",
-    seq: 2,
-    amount: "100",
-  },
-  // {
-  //   id: '3',
-  //   currency: 'JPY',
-  //   logo: '🇯🇵',
-  //   seq: 3,
-  //   amount: '184.47'
-  // }
-];
+import { ICurrencyState, IDispatchAction } from "@/utils/types";
+import { DEFAULT_BASE_CURRENCY } from "./constants";
+import { ActionType } from "./enums";
 
 const CONVERSION_RATES = {
   EUR: 1,
@@ -40,16 +11,16 @@ const CONVERSION_RATES = {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function reducer(
-  state: typeof INITIAL_STATE,
-  action: any,
-): typeof INITIAL_STATE {
+  state: ICurrencyState[],
+  action: IDispatchAction,
+): ICurrencyState[] {
   const _state = [...state];
   const updatedCurrencyIndex = _state.findIndex(
     (x) => x.id === action.payload?.id,
   );
 
   switch (action.type) {
-    case "amount-update":
+    case ActionType.AMOUNT_UPDATE:
       {
         _state.splice(updatedCurrencyIndex, 1, {
           ..._state[updatedCurrencyIndex],
@@ -57,7 +28,7 @@ export function reducer(
         });
       }
       break;
-    case "currency-update":
+    case ActionType.CURRENCY_UPDATE:
       {
         // TODO: Can be optimized
         const logo =
@@ -65,21 +36,22 @@ export function reducer(
             ?.logo || "";
         _state.splice(updatedCurrencyIndex, 1, {
           ..._state[updatedCurrencyIndex],
-          currency: action.payload.currencyCode,
-          logo,
+          code: action.payload.currency,
+          icon: logo,
         });
       }
       break;
-    case "currency-add":
+    case ActionType.CURRENCY_ADD:
       {
         _state.push({
-          ...INITIAL_STATE[0],
+          //TODO: Amount assignment is probably wrong
+          amount: "100",
+          ...DEFAULT_BASE_CURRENCY,
           seq: _state.length + 1,
-          id: (_state.length + 1).toString(),
         });
       }
       break;
-    case "currency-swap":
+    case ActionType.CURRENCY_SWAP:
       {
         _state[updatedCurrencyIndex].seq += 1;
         _state[updatedCurrencyIndex + 1].seq -= 1;
@@ -92,11 +64,11 @@ export function reducer(
 
   //TODO: When currency is updated it should only change other amounts according to the changed amount
   let baseRate = Number(_state[updatedCurrencyIndex].amount);
-  if (_state[updatedCurrencyIndex].currency !== BASE_CURRENCY) {
+  if (_state[updatedCurrencyIndex].code !== DEFAULT_BASE_CURRENCY.code) {
     baseRate =
       Number(_state[updatedCurrencyIndex].amount) /
       CONVERSION_RATES[
-        _state[updatedCurrencyIndex].currency as keyof typeof CONVERSION_RATES
+        _state[updatedCurrencyIndex].code as keyof typeof CONVERSION_RATES
       ];
   }
   return _state.map((currentState, i) => {
@@ -104,9 +76,8 @@ export function reducer(
       return {
         ...currentState,
         amount: String(
-          CONVERSION_RATES[
-            currentState.currency as keyof typeof CONVERSION_RATES
-          ] * baseRate,
+          CONVERSION_RATES[currentState.code as keyof typeof CONVERSION_RATES] *
+            baseRate,
         ),
       };
     }
