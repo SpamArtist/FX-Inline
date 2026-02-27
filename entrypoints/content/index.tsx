@@ -1,10 +1,9 @@
 import CurrencyBox from "@/components/CurrencyBox/CurrencyBox";
 import { useCurrencyReducer } from "@/hooks/useCurrencyReducer";
-import { ActionType } from "@/utils/enums";
+import { ActionType, CurrencyCode } from "@/utils/enums";
 import { createRoot, Root } from "react-dom/client";
 import { ConvertorHOD } from "../../components/Convertor/Convertor";
 import contentBoxStyles from "./content.css?inline";
-import { DEFAULT_ALT_CURRENCY } from "@/utils/constants";
 
 export default defineContentScript({
   matches: ["<all_urls>"],
@@ -67,7 +66,12 @@ export default defineContentScript({
       );
     }
 
-    function showPopup(x: number, y: number, selectedText: string) {
+    function showPopup(
+      x: number,
+      y: number,
+      amount: string,
+      currency?: CurrencyCode,
+    ) {
       removePopup();
 
       popupRoot = document.createElement("div");
@@ -99,7 +103,7 @@ export default defineContentScript({
 
       reactRoot = createRoot(reactContainer);
       reactRoot.render(
-        <CurrencyConvertorPopupBox number={selectedText} currency={"EUR"} />,
+        <CurrencyConvertorPopupBox number={amount} currency={"EUR"} />,
       );
     }
 
@@ -112,14 +116,23 @@ export default defineContentScript({
         const rect = range.getBoundingClientRect();
 
         // Position popup above the selection
-        const x = rect.left + rect.width;
+        const x = rect.left;
         const y = rect.top + rect.height + window.scrollY;
 
         console.log("selectedText", text);
-        // if (!Number.isNaN(Number(selectedText))) {
-        //   return;
-        // }
-        showPopup(x, y, text);
+
+        const { valid: isValid, value, currency } = parseCurrencyValue(text);
+        if (isValid) {
+          console.log("YESSSS", value, currency);
+          if (value) {
+            showPopup(
+              x,
+              y,
+              value?.toString(),
+              currency as CurrencyCode || CurrencyCode["UNITED STATES DOLLAR"],
+            );
+          }
+        }
       } else {
         removePopup();
       }
