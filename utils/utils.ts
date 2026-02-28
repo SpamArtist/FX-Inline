@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { CURRENCY_SYMBOLS, ISO_CODES } from "./constants";
 import { CurrencyCode, LocalStorageItem } from "./enums";
 
 export function cn(...inputs: ClassValue[]) {
@@ -45,10 +46,53 @@ export function getConversionRatesAgainstPreferedBaseCurrency(
   return CONVERSION_RATES[currency];
 }
 
-function isCurrencyToken(token: string): string | null {
+const CURRENCY_CODE_VALUES = new Set(Object.values(CurrencyCode));
+
+const CURRENCY_SYMBOL_TO_CODE: Partial<Record<string, CurrencyCode>> = {
+  $: CurrencyCode["UNITED STATES DOLLAR"],
+  "€": CurrencyCode.EURO,
+  "£": "GBP" as CurrencyCode,
+  "¥": CurrencyCode.JAPAN,
+  "₹": CurrencyCode.INDIA,
+  "₩": "KRW" as CurrencyCode,
+  "₪": "ILS" as CurrencyCode,
+  "₫": "VND" as CurrencyCode,
+  "₱": "PHP" as CurrencyCode,
+  "฿": "THB" as CurrencyCode,
+  "₦": "NGN" as CurrencyCode,
+  "₨": "PKR" as CurrencyCode,
+  "₭": "LAK" as CurrencyCode,
+  "₮": "MNT" as CurrencyCode,
+  "₽": "RUB" as CurrencyCode,
+  "₺": "TRY" as CurrencyCode,
+  "¢": "USD" as CurrencyCode,
+  "৳": "BDT" as CurrencyCode,
+  "ر.س": "SAR" as CurrencyCode,
+  "د.إ": "AED" as CurrencyCode,
+  "د.ك": "KWD" as CurrencyCode,
+  "ر.ع.": "OMR" as CurrencyCode,
+  "ل.د": "LYD" as CurrencyCode,
+  "ر.ق": "QAR" as CurrencyCode,
+};
+
+function toCurrencyCode(value: string): CurrencyCode | null {
+  return CURRENCY_CODE_VALUES.has(value as CurrencyCode)
+    ? (value as CurrencyCode)
+    : null;
+}
+
+function isCurrencyToken(token: string): CurrencyCode | null {
   const upper = token.toUpperCase();
-  if (ISO_CODES.has(upper)) return upper;
-  if (CURRENCY_SYMBOLS.has(token)) return token;
+
+  if (ISO_CODES.has(upper)) {
+    return toCurrencyCode(upper);
+  }
+
+  if (CURRENCY_SYMBOLS.has(token)) {
+    const mappedCode = CURRENCY_SYMBOL_TO_CODE[token];
+    return mappedCode ? toCurrencyCode(mappedCode) : null;
+  }
+
   return null;
 }
 
@@ -137,7 +181,7 @@ function parseFlexibleNumber(
 // -- MAIN -- //
 export function parseCurrencyValue(
   input: string,
-): { valid: boolean; value?: number; currency?: string | null } {
+): { valid: boolean; value?: number; currency?: CurrencyCode | null } {
   if (input == null) return { valid: false };
 
   const str = String(input);

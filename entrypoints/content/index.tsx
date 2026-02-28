@@ -70,7 +70,7 @@ export default defineContentScript({
       x: number,
       y: number,
       amount: string,
-      currency?: CurrencyCode,
+      currency: CurrencyCode,
     ) {
       removePopup();
 
@@ -103,7 +103,7 @@ export default defineContentScript({
 
       reactRoot = createRoot(reactContainer);
       reactRoot.render(
-        <CurrencyConvertorPopupBox number={amount} currency={"EUR"} />,
+        <CurrencyConvertorPopupBox number={amount} currency={currency} />,
       );
     }
 

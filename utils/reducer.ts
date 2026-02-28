@@ -1,7 +1,7 @@
 import currencies from "@/assets/currency.json";
 import { ICurrencyState, IDispatchAction } from "@/utils/types";
 import { DEFAULT_BASE_CURRENCY } from "./constants";
-import { ActionType } from "./enums";
+import { ActionType, CurrencyCode } from "./enums";
 
 const CONVERSION_RATES = {
   EUR: 1,
@@ -24,7 +24,7 @@ export function reducer(
       {
         _state.splice(updatedCurrencyIndex, 1, {
           ..._state[updatedCurrencyIndex],
-          amount: action.payload.amount,
+          amount: action.payload.amount as string,
         });
       }
       break;
@@ -32,11 +32,11 @@ export function reducer(
       {
         // TODO: Can be optimized
         const logo =
-          currencies.find((x) => x.code === action.payload.currencyCode)
+          currencies.find((x) => x.code === action.payload.currency)
             ?.logo || "";
         _state.splice(updatedCurrencyIndex, 1, {
           ..._state[updatedCurrencyIndex],
-          code: action.payload.currency,
+          code: action.payload.currency as CurrencyCode,
           icon: logo,
         });
       }
