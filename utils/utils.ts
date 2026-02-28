@@ -41,6 +41,7 @@ export function getConversionRatesAgainstPreferedBaseCurrency(
     [CurrencyCode.EURO]: 0.83768698,
     [CurrencyCode.INDIA]: 92.1,
     [CurrencyCode.JAPAN]: 153.28,
+    [CurrencyCode.VIETNAM]: 26044.99,
   };
 
   return CONVERSION_RATES[currency];

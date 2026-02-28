@@ -30,7 +30,7 @@ export default defineContentScript({
       currency,
     }: {
       number: string;
-      currency: string;
+      currency: CurrencyCode;
     }) {
       const [currencies, dispatch] = useCurrencyReducer({ number, currency });
 
@@ -124,12 +124,12 @@ export default defineContentScript({
         const { valid: isValid, value, currency } = parseCurrencyValue(text);
         if (isValid) {
           console.log("YESSSS", value, currency);
-          if (value) {
+          if (value !== undefined) {
             showPopup(
               x,
               y,
               value?.toString(),
-              currency as CurrencyCode || CurrencyCode["UNITED STATES DOLLAR"],
+              currency ?? CurrencyCode["UNITED STATES DOLLAR"],
             );
           }
         }

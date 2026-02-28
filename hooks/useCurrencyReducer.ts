@@ -1,11 +1,11 @@
+import currencies from "@/assets/currency.json";
 import { CURRENCY_CODE_MAP } from "@/utils/constants";
 import { CurrencyCode } from "@/utils/enums";
 import { reducer } from "@/utils/reducer";
 import { ICurrencyState } from "@/utils/types";
 import {
-    getConversionRatesAgainstPreferedBaseCurrency,
-    getPreferedAltCurrency,
-    getPreferedBaseCurrency,
+  getConversionRatesAgainstPreferedBaseCurrency,
+  getPreferedAltCurrency,
 } from "@/utils/utils";
 import { useReducer } from "react";
 
@@ -14,26 +14,66 @@ export const useCurrencyReducer = ({
   currency,
 }: {
   number: string;
-  currency: string;
+  currency: CurrencyCode;
 }) => {
+  const getCurrencyStateFromCode = (code: CurrencyCode) => {
+    const currencyFromMap = CURRENCY_CODE_MAP[code];
+    if (currencyFromMap) {
+      return currencyFromMap;
+    }
+
+    const currencyFromList = currencies.find((x) => x.code === code);
+
+    return {
+      code,
+      icon: currencyFromList?.logo || "",
+    };
+  };
+
+  const convertAmount = (
+    value: string,
+    sourceCurrency: CurrencyCode,
+    targetCurrency: CurrencyCode,
+  ): string => {
+    const numericValue = Number(value);
+    if (!Number.isFinite(numericValue)) return value;
+
+    const sourceRate =
+      getConversionRatesAgainstPreferedBaseCurrency(sourceCurrency);
+    const targetRate =
+      getConversionRatesAgainstPreferedBaseCurrency(targetCurrency);
+
+    if (
+      typeof sourceRate === "number" &&
+      sourceRate > 0 &&
+      typeof targetRate === "number"
+    ) {
+      return ((numericValue * targetRate) / sourceRate).toFixed(4);
+    }
+
+    return numericValue.toFixed(4);
+  };
+
   const initalState: ICurrencyState[] = [];
 
-  const preferedBaseCurrency = getPreferedBaseCurrency();
+  const baseCurrency = currency;
   const preferedAltCurrency = getPreferedAltCurrency();
+  const altCurrency =
+    baseCurrency === CurrencyCode.EURO
+      ? preferedAltCurrency === baseCurrency
+        ? CurrencyCode["UNITED STATES DOLLAR"]
+        : preferedAltCurrency
+      : CurrencyCode.EURO;
 
   initalState.push({
-    ...CURRENCY_CODE_MAP[preferedBaseCurrency],
+    ...getCurrencyStateFromCode(baseCurrency),
     seq: 1,
     amount: number,
   } as ICurrencyState);
   initalState.push({
-    ...CURRENCY_CODE_MAP[preferedAltCurrency],
+    ...getCurrencyStateFromCode(altCurrency),
     seq: 2,
-    amount: (
-      (getConversionRatesAgainstPreferedBaseCurrency(
-        preferedAltCurrency,
-      ) as number) * Number(number)
-    ).toFixed(4),
+    amount: convertAmount(number, baseCurrency, altCurrency),
   } as ICurrencyState);
 
   return useReducer(reducer, initalState);

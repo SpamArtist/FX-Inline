@@ -7,6 +7,7 @@ const CONVERSION_RATES = {
   EUR: 1,
   INR: 100,
   JPY: 184.47,
+  VND: 30734.00
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
