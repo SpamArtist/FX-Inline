@@ -1,50 +1,10 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { CURRENCY_SYMBOLS, ISO_CODES } from "./constants";
-import { CurrencyCode, LocalStorageItem } from "./enums";
+import { CurrencyCode } from "./enums";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
-}
-
-// TODO: Get active base currency from server
-export function getPreferedBaseCurrency(): CurrencyCode {
-  return (window.localStorage.getItem(
-    LocalStorageItem.PREFERED_BASE_CURRENCY,
-  ) || CurrencyCode["UNITED STATES DOLLAR"]) as CurrencyCode;
-}
-
-export function setPreferedBaseCurrency() {
-  window.localStorage.setItem(
-    LocalStorageItem.PREFERED_BASE_CURRENCY,
-    CurrencyCode["UNITED STATES DOLLAR"],
-  );
-}
-
-export function getPreferedAltCurrency(): CurrencyCode {
-  return (window.localStorage.getItem(LocalStorageItem.PREFERED_ALT_CURRENCY) ||
-    CurrencyCode.EURO) as CurrencyCode;
-}
-
-export function setPreferedAltCurrency() {
-  window.localStorage.setItem(
-    LocalStorageItem.PREFERED_BASE_CURRENCY,
-    CurrencyCode.EURO,
-  );
-}
-
-export function getConversionRatesAgainstPreferedBaseCurrency(
-  currency: CurrencyCode,
-) {
-  const CONVERSION_RATES: Partial<Record<CurrencyCode, number>> = {
-    [CurrencyCode["UNITED STATES DOLLAR"]]: 1,
-    [CurrencyCode.EURO]: 0.83768698,
-    [CurrencyCode.INDIA]: 92.1,
-    [CurrencyCode.JAPAN]: 153.28,
-    [CurrencyCode.VIETNAM]: 26044.99,
-  };
-
-  return CONVERSION_RATES[currency];
 }
 
 const CURRENCY_CODE_VALUES = new Set(Object.values(CurrencyCode));
@@ -75,6 +35,31 @@ const CURRENCY_SYMBOL_TO_CODE: Partial<Record<string, CurrencyCode>> = {
   "ل.د": "LYD" as CurrencyCode,
   "ر.ق": "QAR" as CurrencyCode,
 };
+
+const CURRENCY_TOKENS = [
+  ...Array.from(ISO_CODES).map((token) => ({
+    token,
+    isIso: true,
+  })),
+  ...Array.from(CURRENCY_SYMBOLS).map((token) => ({
+    token,
+    isIso: false,
+  })),
+].sort((a, b) => b.token.length - a.token.length);
+
+function escapeRegex(input: string) {
+  return input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+const symbolPattern = Array.from(CURRENCY_SYMBOLS)
+  .map(escapeRegex)
+  .sort((a, b) => b.length - a.length)
+  .join("|");
+
+const CURRENCY_SNIPPET_REGEX = new RegExp(
+  `(?:\\b[A-Za-z]{3}\\b\\s*[+-]?\\d[\\d,.]*|[+-]?\\d[\\d,.]*\\s*\\b[A-Za-z]{3}\\b|(?:${symbolPattern})\\s*[+-]?\\d[\\d,.]*|[+-]?\\d[\\d,.]*\\s*(?:${symbolPattern}))`,
+  "g",
+);
 
 function toCurrencyCode(value: string): CurrencyCode | null {
   return CURRENCY_CODE_VALUES.has(value as CurrencyCode)
@@ -107,7 +92,6 @@ function parseFlexibleNumber(
 
   let sign = 1;
 
-  // Sign
   const first = str.charCodeAt(i);
   if (first === 43) i++;
   else if (first === 45) {
@@ -125,24 +109,20 @@ function parseFlexibleNumber(
   for (; i < end; i++) {
     const c = str.charCodeAt(i);
 
-    // digit
     if (c >= 48 && c <= 57) {
       if (!seenDot) integerPart += str[i];
       else decimalPart += str[i];
       continue;
     }
 
-    // dot (only allowed once, and only as decimal)
     if (c === 46) {
-      if (seenDot) return null; // multiple dots
+      if (seenDot) return null;
       seenDot = true;
       continue;
     }
 
-    // comma
     if (c === 44) {
       if (seenDot) {
-        // comma not allowed after decimal dot
         return null;
       }
       seenComma = true;
@@ -155,88 +135,164 @@ function parseFlexibleNumber(
 
   if (!integerPart.length) return null;
 
-  // If both dot and comma exist → dot is decimal, comma is grouping
-  // If only commas exist:
-  //   - If one comma and 2 digits after → treat as decimal
-  //   - If multiple commas → treat as grouping
-
   if (!seenDot && seenComma && commaCount === 1) {
     const lastComma = str.lastIndexOf(",", end - 1);
     const digitsAfter = end - lastComma - 1;
 
     if (digitsAfter > 0 && digitsAfter <= 2) {
-      // treat as decimal
       const raw = str.slice(start, end).replace(",", ".");
       const num = Number(raw);
       return Number.isFinite(num) ? sign * num : null;
     }
   }
 
-  // Otherwise treat commas as grouping separators
   const normalized = integerPart + (decimalPart ? "." + decimalPart : "");
-
   const num = Number(normalized);
+
   return Number.isFinite(num) ? sign * num : null;
 }
 
-// -- MAIN -- //
+function parseWithTokenPrefix(input: string): {
+  value: number;
+  currency: CurrencyCode;
+} | null {
+  const upperInput = input.toUpperCase();
+
+  for (const tokenInfo of CURRENCY_TOKENS) {
+    const hasPrefix = tokenInfo.isIso
+      ? upperInput.startsWith(tokenInfo.token)
+      : input.startsWith(tokenInfo.token);
+
+    if (!hasPrefix) continue;
+
+    const parsedCurrency = isCurrencyToken(tokenInfo.token);
+    if (!parsedCurrency) continue;
+
+    const valueText = input.slice(tokenInfo.token.length).trim();
+    if (!valueText.length) continue;
+
+    const value = parseFlexibleNumber(valueText, 0, valueText.length);
+    if (value !== null) {
+      return {
+        value,
+        currency: parsedCurrency,
+      };
+    }
+  }
+
+  return null;
+}
+
+function parseWithTokenSuffix(input: string): {
+  value: number;
+  currency: CurrencyCode;
+} | null {
+  const upperInput = input.toUpperCase();
+
+  for (const tokenInfo of CURRENCY_TOKENS) {
+    const hasSuffix = tokenInfo.isIso
+      ? upperInput.endsWith(tokenInfo.token)
+      : input.endsWith(tokenInfo.token);
+
+    if (!hasSuffix) continue;
+
+    const parsedCurrency = isCurrencyToken(tokenInfo.token);
+    if (!parsedCurrency) continue;
+
+    const valueText = input.slice(0, input.length - tokenInfo.token.length).trim();
+    if (!valueText.length) continue;
+
+    const value = parseFlexibleNumber(valueText, 0, valueText.length);
+    if (value !== null) {
+      return {
+        value,
+        currency: parsedCurrency,
+      };
+    }
+  }
+
+  return null;
+}
+
 export function parseCurrencyValue(
   input: string,
 ): { valid: boolean; value?: number; currency?: CurrencyCode | null } {
   if (input == null) return { valid: false };
 
-  const str = String(input);
-  let start = 0;
-  let end = str.length;
+  const str = String(input).trim();
+  if (!str.length) return { valid: false };
 
-  // manual trim
-  while (start < end && str.charCodeAt(start) <= 32) start++;
-  while (end > start && str.charCodeAt(end - 1) <= 32) end--;
-
-  if (start >= end) return { valid: false };
-
-  // fast path: number only
-  const numOnly = parseFlexibleNumber(str, start, end);
-  if (numOnly !== null) {
-    return { valid: true, value: numOnly, currency: null };
+  const numericOnly = parseFlexibleNumber(str, 0, str.length);
+  if (numericOnly !== null) {
+    return { valid: true, value: numericOnly, currency: null };
   }
 
-  // find first space
-  let space = -1;
-  for (let i = start; i < end; i++) {
-    if (str.charCodeAt(i) === 32) {
-      space = i;
-      break;
-    }
+  const prefix = parseWithTokenPrefix(str);
+  if (prefix) {
+    return {
+      valid: true,
+      value: prefix.value,
+      currency: prefix.currency,
+    };
   }
 
-  if (space === -1) return { valid: false };
-
-  // prefix currency
-  const prefix = str.slice(start, space);
-  const prefixCurrency = isCurrencyToken(prefix);
-  if (prefixCurrency) {
-    const value = parseFlexibleNumber(str, space + 1, end);
-    if (value !== null) {
-      return { valid: true, value, currency: prefixCurrency };
-    }
-  }
-
-  // suffix currency
-  for (let i = end - 1; i > start; i--) {
-    if (str.charCodeAt(i) === 32) {
-      const suffix = str.slice(i + 1, end);
-      const suffixCurrency = isCurrencyToken(suffix);
-
-      if (suffixCurrency) {
-        const value = parseFlexibleNumber(str, start, i);
-        if (value !== null) {
-          return { valid: true, value, currency: suffixCurrency };
-        }
-      }
-      break;
-    }
+  const suffix = parseWithTokenSuffix(str);
+  if (suffix) {
+    return {
+      valid: true,
+      value: suffix.value,
+      currency: suffix.currency,
+    };
   }
 
   return { valid: false };
+}
+
+export type CurrencyTextMatch = {
+  raw: string;
+  start: number;
+  end: number;
+  value: number;
+  currency: CurrencyCode;
+};
+
+export function extractCurrencyTextMatches(input: string): CurrencyTextMatch[] {
+  if (!input?.length) return [];
+
+  CURRENCY_SNIPPET_REGEX.lastIndex = 0;
+
+  const matches: CurrencyTextMatch[] = [];
+
+  for (const candidate of input.matchAll(CURRENCY_SNIPPET_REGEX)) {
+    if (candidate.index === undefined) continue;
+
+    const raw = candidate[0];
+    const parsed = parseCurrencyValue(raw);
+
+    if (!parsed.valid || parsed.currency == null || parsed.value === undefined) {
+      continue;
+    }
+
+    matches.push({
+      raw,
+      start: candidate.index,
+      end: candidate.index + raw.length,
+      value: parsed.value,
+      currency: parsed.currency,
+    });
+  }
+
+  return matches;
+}
+
+export function formatAmountInCurrency(amount: number, currency: CurrencyCode): string {
+  try {
+    return new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  } catch {
+    return `${amount.toFixed(2)} ${currency}`;
+  }
 }

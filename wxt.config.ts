@@ -7,7 +7,8 @@ import { defineConfig } from "wxt";
 export default defineConfig({
   modules: ["@wxt-dev/module-react"],
   manifest: {
-    permissions: ["activeTab"],
+    permissions: ["activeTab", "storage", "alarms"],
+    host_permissions: ["https://open.er-api.com/*"],
     // content_scripts: [
     //   {
     //     css: ['./assets/tailwind.css'],

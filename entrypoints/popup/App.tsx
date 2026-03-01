@@ -1,21 +1,171 @@
 import PlusIcon from "@/assets/add_outline.svg";
 import SwapVerticalIcon from "@/assets/swap_vertical_outline.svg";
 import "@/assets/tailwind.css";
+import currencies from "@/assets/currency.json";
 import { ConvertorHOD } from "@/components/Convertor/Convertor";
 import CurrencyBox from "@/components/CurrencyBox/CurrencyBox";
 import { useCurrencyReducer } from "@/hooks/useCurrencyReducer";
+import {
+  DEFAULT_USER_SETTINGS,
+  getUserSettings,
+  updateUserSettings,
+  UserSettings,
+} from "@/utils/appStorage";
 import { ActionType, CurrencyCode } from "@/utils/enums";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import "./App.css";
 
+const DEFAULT_STARTING_CURRENCY = CurrencyCode["UNITED STATES DOLLAR"];
+
 function App() {
-  const [currencies, dispatch] = useCurrencyReducer({
+  const [currenciesState, dispatch] = useCurrencyReducer({
     number: "100",
-    currency: CurrencyCode.EURO,
+    currency: DEFAULT_STARTING_CURRENCY,
   });
+
+  const [settings, setSettings] = useState<UserSettings>(DEFAULT_USER_SETTINGS);
+  const [subscriptionTokenInput, setSubscriptionTokenInput] = useState("");
+  const [statusMessage, setStatusMessage] = useState("");
+
+  const currencyOptions = useMemo(
+    () =>
+      currencies
+        .map((entry) => ({
+          code: entry.code as CurrencyCode,
+          label: `${entry.logo ? `${entry.logo} ` : ""}${entry.code}`,
+        }))
+        .sort((a, b) => a.code.localeCompare(b.code)),
+    [],
+  );
+
+  useEffect(() => {
+    let canceled = false;
+
+    const loadSettings = async () => {
+      const persisted = await getUserSettings();
+      if (canceled) return;
+
+      setSettings(persisted);
+      setSubscriptionTokenInput(persisted.subscription.token || "");
+    };
+
+    loadSettings();
+
+    return () => {
+      canceled = true;
+    };
+  }, []);
+
+  async function onPreferredCurrencyChange(nextCurrency: CurrencyCode) {
+    const updated = await updateUserSettings({ preferredCurrency: nextCurrency });
+    setSettings(updated);
+    setStatusMessage(`Preferred currency updated to ${nextCurrency}.`);
+  }
+
+  async function onPlanChange(nextPlan: UserSettings["planTier"]) {
+    const updated = await updateUserSettings({ planTier: nextPlan });
+    setSettings(updated);
+
+    if (nextPlan === "free") {
+      setStatusMessage("Free plan enabled. Rates refresh once per market day.");
+      return;
+    }
+
+    setStatusMessage(
+      "Paid plan selected. Add a subscription token and activate paid access.",
+    );
+  }
+
+  async function onActivatePaidAccess(event: FormEvent) {
+    event.preventDefault();
+
+    if (!subscriptionTokenInput.trim()) {
+      setStatusMessage("Subscription token is required to activate paid access.");
+      return;
+    }
+
+    const updated = await updateUserSettings({
+      planTier: "paid",
+      subscription: {
+        token: subscriptionTokenInput.trim(),
+        isActive: true,
+      },
+    });
+
+    setSettings(updated);
+    setStatusMessage("Paid access activated. Rates now refresh continuously.");
+  }
+
+  async function onDowngradeToFree() {
+    const updated = await updateUserSettings({
+      planTier: "free",
+      subscription: {
+        ...settings.subscription,
+        isActive: false,
+      },
+    });
+
+    setSettings(updated);
+    setStatusMessage("Switched to free plan.");
+  }
+
   return (
     <ConvertorHOD shouldDisplayHeader>
+      <div className="settings-panel">
+        <label htmlFor="preferred-currency">Preferred currency</label>
+        <select
+          id="preferred-currency"
+          value={settings.preferredCurrency}
+          onChange={(event) =>
+            onPreferredCurrencyChange(event.target.value as CurrencyCode)
+          }
+        >
+          {currencyOptions.map((option) => (
+            <option key={option.code} value={option.code}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+
+        <label htmlFor="plan-tier">Plan</label>
+        <select
+          id="plan-tier"
+          value={settings.planTier}
+          onChange={(event) =>
+            onPlanChange(event.target.value as UserSettings["planTier"])
+          }
+        >
+          <option value="free">Free</option>
+          <option value="paid">Paid</option>
+        </select>
+
+        <form onSubmit={onActivatePaidAccess} className="subscription-form">
+          <label htmlFor="subscription-token">Subscription token</label>
+          <input
+            id="subscription-token"
+            type="password"
+            value={subscriptionTokenInput}
+            onChange={(event) => setSubscriptionTokenInput(event.target.value)}
+            placeholder="Paste paid subscription token"
+          />
+          <div className="subscription-actions">
+            <button type="submit">Activate Paid</button>
+            <button type="button" onClick={onDowngradeToFree}>
+              Use Free
+            </button>
+          </div>
+        </form>
+
+        <p className="plan-hint">
+          {settings.planTier === "paid" && settings.subscription.isActive
+            ? "Paid is active: latest rates are fetched frequently."
+            : "Free is active: one rate snapshot is used per market day."}
+        </p>
+        {statusMessage && <p className="status-message">{statusMessage}</p>}
+      </div>
+
       <div className="relative flex flex-col items-center mb-2.5 mx-2.5 pb-[1.2em] py-0 bg-inherit text-[wheat]">
-        {currencies.map((currentCurrency, i) => (
+        {currenciesState.map((currentCurrency, i) => (
           <div
             key={currentCurrency.id}
             className="relative flex flex-col items-center w-72.5"
@@ -43,7 +193,7 @@ function App() {
                 })
               }
             />
-            {i !== currencies.length - 1 && (
+            {i !== currenciesState.length - 1 && (
               <button
                 className="absolute -bottom-4 z-10 cursor-pointer"
                 onClick={() =>

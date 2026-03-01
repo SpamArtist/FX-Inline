@@ -1,4 +1,4 @@
-import { CurrencyCode } from "./enums";
+import { ActionType, CurrencyCode } from "./enums";
 
 export interface ICurrencyState {
   id?: string;

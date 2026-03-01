@@ -2,3 +2,62 @@
   text-align: center;
   width: 100%;
 }
+
+.settings-panel {
+  margin: 0.65rem;
+  padding: 0.75rem;
+  border: 1px solid rgba(245, 222, 179, 0.3);
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  text-align: left;
+}
+
+.settings-panel label {
+  font-size: 0.75rem;
+  color: #f7f0d9;
+}
+
+.settings-panel select,
+.settings-panel input {
+  width: 100%;
+  border-radius: 0.4rem;
+  border: 1px solid rgba(245, 222, 179, 0.35);
+  background: rgba(16, 43, 43, 0.9);
+  color: #f5deb3;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.8rem;
+}
+
+.subscription-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+
+.subscription-actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.subscription-actions button {
+  border: 1px solid rgba(245, 222, 179, 0.35);
+  border-radius: 0.4rem;
+  background: rgba(16, 43, 43, 0.95);
+  color: #f5deb3;
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 0.35rem 0.55rem;
+}
+
+.plan-hint,
+.status-message {
+  font-size: 0.72rem;
+  margin: 0.15rem 0 0;
+}
+
+.status-message {
+  color: #93c5fd;
+}

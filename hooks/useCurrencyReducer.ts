@@ -1,13 +1,106 @@
 import currencies from "@/assets/currency.json";
+import { getUserSettings } from "@/utils/appStorage";
 import { CURRENCY_CODE_MAP } from "@/utils/constants";
-import { CurrencyCode } from "@/utils/enums";
-import { reducer } from "@/utils/reducer";
-import { ICurrencyState } from "@/utils/types";
+import { ActionType, CurrencyCode } from "@/utils/enums";
 import {
-  getConversionRatesAgainstPreferedBaseCurrency,
-  getPreferedAltCurrency,
-} from "@/utils/utils";
-import { useReducer } from "react";
+  convertAmountWithSnapshot,
+  formatConvertedAmount,
+  getRatesForUser,
+  RateSnapshot,
+} from "@/utils/rates";
+import { ICurrencyState, IDispatchAction } from "@/utils/types";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+const DEFAULT_SECONDARY_CURRENCY = CurrencyCode.EURO;
+
+function createCurrencyId() {
+  return typeof crypto !== "undefined" && crypto.randomUUID
+    ? crypto.randomUUID()
+    : `currency-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+function getCurrencyStateFromCode(code: CurrencyCode) {
+  const currencyFromMap = CURRENCY_CODE_MAP[code];
+  if (currencyFromMap) {
+    return currencyFromMap;
+  }
+
+  const currencyFromList = currencies.find((x) => x.code === code);
+
+  return {
+    code,
+    icon: currencyFromList?.logo || "",
+  };
+}
+
+function resolveAltCurrency(
+  baseCurrency: CurrencyCode,
+  preferredCurrency: CurrencyCode,
+) {
+  if (preferredCurrency !== baseCurrency) {
+    return preferredCurrency;
+  }
+
+  return baseCurrency === CurrencyCode["UNITED STATES DOLLAR"]
+    ? DEFAULT_SECONDARY_CURRENCY
+    : CurrencyCode["UNITED STATES DOLLAR"];
+}
+
+function convertAmount(
+  value: string,
+  sourceCurrency: CurrencyCode,
+  targetCurrency: CurrencyCode,
+  snapshot: RateSnapshot | null,
+): string {
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue)) return value;
+
+  if (!snapshot) {
+    return numericValue.toFixed(4);
+  }
+
+  const converted = convertAmountWithSnapshot(
+    numericValue,
+    sourceCurrency,
+    targetCurrency,
+    snapshot,
+  );
+
+  return converted === null
+    ? numericValue.toFixed(4)
+    : formatConvertedAmount(converted);
+}
+
+function recalculateFromIndex(
+  state: ICurrencyState[],
+  updatedCurrencyIndex: number,
+  snapshot: RateSnapshot | null,
+): ICurrencyState[] {
+  if (updatedCurrencyIndex < 0 || updatedCurrencyIndex >= state.length) {
+    return state;
+  }
+
+  const sourceState = state[updatedCurrencyIndex];
+  const sourceAmount = Number(sourceState.amount);
+
+  if (!Number.isFinite(sourceAmount)) {
+    return state;
+  }
+
+  return state.map((current, index) => {
+    if (index === updatedCurrencyIndex) return current;
+
+    return {
+      ...current,
+      amount: convertAmount(
+        sourceState.amount,
+        sourceState.code,
+        current.code,
+        snapshot,
+      ),
+    };
+  });
+}
 
 export const useCurrencyReducer = ({
   number,
@@ -16,65 +109,148 @@ export const useCurrencyReducer = ({
   number: string;
   currency: CurrencyCode;
 }) => {
-  const getCurrencyStateFromCode = (code: CurrencyCode) => {
-    const currencyFromMap = CURRENCY_CODE_MAP[code];
-    if (currencyFromMap) {
-      return currencyFromMap;
-    }
+  const [rateSnapshot, setRateSnapshot] = useState<RateSnapshot | null>(null);
+  const [preferredCurrency, setPreferredCurrency] = useState<CurrencyCode>(
+    CurrencyCode["UNITED STATES DOLLAR"],
+  );
 
-    const currencyFromList = currencies.find((x) => x.code === code);
+  const appliedPreferredCurrencyRef = useRef(false);
 
-    return {
-      code,
-      icon: currencyFromList?.logo || "",
+  const [currenciesState, setCurrenciesState] = useState<ICurrencyState[]>(() => {
+    const altCurrency = resolveAltCurrency(currency, DEFAULT_SECONDARY_CURRENCY);
+
+    return [
+      {
+        id: createCurrencyId(),
+        ...getCurrencyStateFromCode(currency),
+        seq: 1,
+        amount: number,
+      },
+      {
+        id: createCurrencyId(),
+        ...getCurrencyStateFromCode(altCurrency),
+        seq: 2,
+        amount: number,
+      },
+    ];
+  });
+
+  useEffect(() => {
+    let canceled = false;
+
+    const loadSettingsAndRates = async () => {
+      try {
+        const settings = await getUserSettings();
+        const rates = await getRatesForUser(settings);
+
+        if (canceled) return;
+
+        setPreferredCurrency(settings.preferredCurrency);
+        setRateSnapshot(rates);
+      } catch {
+        if (canceled) return;
+        setRateSnapshot(null);
+      }
     };
-  };
 
-  const convertAmount = (
-    value: string,
-    sourceCurrency: CurrencyCode,
-    targetCurrency: CurrencyCode,
-  ): string => {
-    const numericValue = Number(value);
-    if (!Number.isFinite(numericValue)) return value;
+    loadSettingsAndRates();
 
-    const sourceRate =
-      getConversionRatesAgainstPreferedBaseCurrency(sourceCurrency);
-    const targetRate =
-      getConversionRatesAgainstPreferedBaseCurrency(targetCurrency);
+    return () => {
+      canceled = true;
+    };
+  }, []);
 
-    if (
-      typeof sourceRate === "number" &&
-      sourceRate > 0 &&
-      typeof targetRate === "number"
-    ) {
-      return ((numericValue * targetRate) / sourceRate).toFixed(4);
-    }
+  useEffect(() => {
+    if (!rateSnapshot) return;
 
-    return numericValue.toFixed(4);
-  };
+    setCurrenciesState((current) => recalculateFromIndex(current, 0, rateSnapshot));
+  }, [rateSnapshot]);
 
-  const initalState: ICurrencyState[] = [];
+  useEffect(() => {
+    if (appliedPreferredCurrencyRef.current) return;
 
-  const baseCurrency = currency;
-  const preferedAltCurrency = getPreferedAltCurrency();
-  const altCurrency =
-    baseCurrency === CurrencyCode.EURO
-      ? preferedAltCurrency === baseCurrency
-        ? CurrencyCode["UNITED STATES DOLLAR"]
-        : preferedAltCurrency
-      : CurrencyCode.EURO;
+    setCurrenciesState((current) => {
+      if (current.length < 2) return current;
 
-  initalState.push({
-    ...getCurrencyStateFromCode(baseCurrency),
-    seq: 1,
-    amount: number,
-  } as ICurrencyState);
-  initalState.push({
-    ...getCurrencyStateFromCode(altCurrency),
-    seq: 2,
-    amount: convertAmount(number, baseCurrency, altCurrency),
-  } as ICurrencyState);
+      const next = [...current];
+      const nextCurrency = resolveAltCurrency(
+        next[0].code,
+        preferredCurrency,
+      );
 
-  return useReducer(reducer, initalState);
+      next[1] = {
+        ...next[1],
+        ...getCurrencyStateFromCode(nextCurrency),
+        code: nextCurrency,
+      };
+
+      appliedPreferredCurrencyRef.current = true;
+      return recalculateFromIndex(next, 0, rateSnapshot);
+    });
+  }, [preferredCurrency, rateSnapshot]);
+
+  const dispatch = useCallback(
+    (action: IDispatchAction) => {
+      setCurrenciesState((state) => {
+        const nextState = [...state];
+        const updatedCurrencyIndex = nextState.findIndex(
+          (x) => x.id === action.payload?.id,
+        );
+
+        switch (action.type) {
+          case ActionType.AMOUNT_UPDATE:
+            if (updatedCurrencyIndex === -1) return nextState;
+            nextState.splice(updatedCurrencyIndex, 1, {
+              ...nextState[updatedCurrencyIndex],
+              amount: action.payload.amount as string,
+            });
+            return recalculateFromIndex(nextState, updatedCurrencyIndex, rateSnapshot);
+
+          case ActionType.CURRENCY_UPDATE:
+            if (updatedCurrencyIndex === -1) return nextState;
+            nextState.splice(updatedCurrencyIndex, 1, {
+              ...nextState[updatedCurrencyIndex],
+              ...getCurrencyStateFromCode(action.payload.currency as CurrencyCode),
+              code: action.payload.currency as CurrencyCode,
+            });
+            return recalculateFromIndex(nextState, updatedCurrencyIndex, rateSnapshot);
+
+          case ActionType.CURRENCY_ADD: {
+            const newCurrency = resolveAltCurrency(
+              nextState[0]?.code || CurrencyCode["UNITED STATES DOLLAR"],
+              preferredCurrency,
+            );
+
+            nextState.push({
+              id: createCurrencyId(),
+              amount: "100",
+              ...getCurrencyStateFromCode(newCurrency),
+              seq: nextState.length + 1,
+            });
+
+            return recalculateFromIndex(nextState, 0, rateSnapshot);
+          }
+
+          case ActionType.CURRENCY_SWAP:
+            if (
+              updatedCurrencyIndex === -1 ||
+              updatedCurrencyIndex === nextState.length - 1
+            ) {
+              return nextState;
+            }
+
+            nextState[updatedCurrencyIndex].seq += 1;
+            nextState[updatedCurrencyIndex + 1].seq -= 1;
+            nextState.sort((a, b) => a.seq - b.seq);
+            return nextState;
+
+          default:
+            return nextState;
+        }
+      });
+    },
+    [preferredCurrency, rateSnapshot],
+  );
+
+  return [currenciesState, dispatch] as const;
 };
