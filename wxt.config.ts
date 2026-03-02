@@ -5,6 +5,7 @@ import { defineConfig } from "wxt";
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
+  srcDir: "apps/extension",
   modules: ["@wxt-dev/module-react"],
   manifest: {
     permissions: ["activeTab", "storage", "alarms", "tabs"],
@@ -44,7 +45,8 @@ export default defineConfig({
     ],
     resolve: {
       alias: {
-        "@": path.resolve(__dirname, "./"), // or "./src" if using src directory
+        "@/packages": path.resolve(__dirname, "./packages"),
+        "@": path.resolve(__dirname, "./apps/extension"),
       },
     },
   }),

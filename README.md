@@ -7,10 +7,9 @@ This repository now contains:
 
 ## Project Layout
 
-- `entrypoints/`, `components/`, `utils/` -> extension app
+- `apps/extension/` -> extension app (assets, components, entrypoints, hooks, utils, tests)
 - `backend/src/` -> backend API
 - `packages/shared/` -> shared API contracts
-- `tests/unit/` -> unit tests
 - `docs/` -> roadmap + QA/security runbooks
 
 ## Commands

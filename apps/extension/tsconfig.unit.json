@@ -1,12 +1,16 @@
 {
-  "extends": "./tsconfig.json",
   "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "noEmit": false,
-    "allowImportingTsExtensions": false,
     "outDir": "./test-dist",
     "rootDir": ".",
-    "module": "ESNext",
-    "moduleResolution": "Bundler"
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true
   },
   "include": [
     "utils/utils.ts",
