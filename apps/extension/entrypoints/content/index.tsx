@@ -95,28 +95,77 @@ function stopEventPropagation(event: Event) {
   event.stopPropagation();
 }
 
-function ensureInlineConversionStyles() {
-  if (document.getElementById(INLINE_CONVERSION_STYLE_ID)) return;
+function parseRgbChannels(input: string): [number, number, number] | null {
+  const matched = input.match(
+    /rgba?\(\s*(\d{1,3})[\s,]+(\d{1,3})[\s,]+(\d{1,3})(?:[\s,\/]+[\d.]+)?\s*\)/i,
+  );
+  if (!matched) return null;
 
-  const styleTag = document.createElement("style");
-  styleTag.id = INLINE_CONVERSION_STYLE_ID;
+  const r = Number(matched[1]);
+  const g = Number(matched[2]);
+  const b = Number(matched[3]);
+
+  if (![r, g, b].every((value) => Number.isFinite(value) && value >= 0 && value <= 255)) {
+    return null;
+  }
+
+  return [r, g, b];
+}
+
+function toLinearRgb(channel: number): number {
+  const normalized = channel / 255;
+  if (normalized <= 0.04045) {
+    return normalized / 12.92;
+  }
+
+  return ((normalized + 0.055) / 1.055) ** 2.4;
+}
+
+function relativeLuminance([r, g, b]: [number, number, number]): number {
+  return 0.2126 * toLinearRgb(r) + 0.7152 * toLinearRgb(g) + 0.0722 * toLinearRgb(b);
+}
+
+function usesLightTextColor(node: Text): boolean {
+  const parent = node.parentElement;
+  if (!parent) return false;
+
+  const color = window.getComputedStyle(parent).color;
+  const rgb = parseRgbChannels(color);
+  if (!rgb) return false;
+
+  return relativeLuminance(rgb) >= 0.6;
+}
+
+function ensureInlineConversionStyles() {
+  let styleTag = document.getElementById(INLINE_CONVERSION_STYLE_ID) as
+    | HTMLStyleElement
+    | null;
+
+  if (!styleTag) {
+    styleTag = document.createElement("style");
+    styleTag.id = INLINE_CONVERSION_STYLE_ID;
+    document.head.appendChild(styleTag);
+  }
+
   styleTag.textContent = `
     :where(.${INLINE_CONVERSION_CLASS}) {
-      border-radius: 4px !important;
-      background-color: rgba(15, 23, 42, 0.12) !important;
-      color: #0f172a !important;
-      padding: 0 0.2em !important;
+      border-radius: 0 !important;
+      background-color: transparent !important;
+      color: inherit !important;
+      padding: 0 !important;
       white-space: normal !important;
     }
 
     :where(.${INLINE_CONVERSION_CLASS}) .ccx-converted-amount {
       font-weight: 600 !important;
-      color: #1d4ed8 !important;
+      color: var(--ccx-converted-color, currentColor) !important;
+      background-color: transparent !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      padding: 0 !important;
       margin-left: 0.1em !important;
     }
   `;
-
-  document.head.appendChild(styleTag);
 }
 
 function decoratePricesInTextNode(
@@ -126,6 +175,7 @@ function decoratePricesInTextNode(
 ): number {
   const text = textNode.nodeValue;
   if (!text?.trim()) return 0;
+  const lightTextContext = usesLightTextColor(textNode);
 
   const matches = extractCurrencyTextMatches(text);
   if (!matches.length) return 0;
@@ -164,6 +214,11 @@ function decoratePricesInTextNode(
     const wrapper = document.createElement("span");
     wrapper.className = INLINE_CONVERSION_CLASS;
     wrapper.setAttribute("data-original", match.raw);
+    if (lightTextContext) {
+      wrapper.style.setProperty("--ccx-converted-color", "#93c5fd");
+    } else {
+      wrapper.style.setProperty("--ccx-converted-color", "#355aa8");
+    }
 
     const convertedAmount = formatAmountInCurrency(converted, preferredCurrency);
     wrapper.textContent = `${match.raw} (`;
