@@ -1,0 +1,33 @@
+import { CurrencyCode } from "./enums";
+
+export type RateSnapshotLike = {
+  rates: Partial<Record<CurrencyCode, number>>;
+};
+
+export function convertAmountWithSnapshot(
+  amount: number,
+  sourceCurrency: CurrencyCode,
+  targetCurrency: CurrencyCode,
+  snapshot: RateSnapshotLike,
+): number | null {
+  const sourceRate = snapshot.rates[sourceCurrency];
+  const targetRate = snapshot.rates[targetCurrency];
+
+  if (
+    typeof sourceRate !== "number" ||
+    !Number.isFinite(sourceRate) ||
+    sourceRate <= 0
+  ) {
+    return null;
+  }
+
+  if (typeof targetRate !== "number" || !Number.isFinite(targetRate)) {
+    return null;
+  }
+
+  return (amount * targetRate) / sourceRate;
+}
+
+export function formatConvertedAmount(amount: number, precision = 4): string {
+  return amount.toFixed(precision);
+}

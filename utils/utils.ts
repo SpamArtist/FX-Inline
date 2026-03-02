@@ -56,9 +56,14 @@ const symbolPattern = Array.from(CURRENCY_SYMBOLS)
   .sort((a, b) => b.length - a.length)
   .join("|");
 
+const isoPattern = Array.from(ISO_CODES)
+  .map(escapeRegex)
+  .sort((a, b) => b.length - a.length)
+  .join("|");
+
 const CURRENCY_SNIPPET_REGEX = new RegExp(
-  `(?:\\b[A-Za-z]{3}\\b\\s*[+-]?\\d[\\d,.]*|[+-]?\\d[\\d,.]*\\s*\\b[A-Za-z]{3}\\b|(?:${symbolPattern})\\s*[+-]?\\d[\\d,.]*|[+-]?\\d[\\d,.]*\\s*(?:${symbolPattern}))`,
-  "g",
+  `(?:\\b(?:${isoPattern})\\b\\s*[+-]?\\d[\\d,.]*|[+-]?\\d[\\d,.]*\\s*\\b(?:${isoPattern})\\b|(?:${symbolPattern})\\s*[+-]?\\d[\\d,.]*|[+-]?\\d[\\d,.]*\\s*(?:${symbolPattern}))`,
+  "gi",
 );
 
 function toCurrencyCode(value: string): CurrencyCode | null {

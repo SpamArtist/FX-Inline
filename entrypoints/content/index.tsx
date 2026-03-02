@@ -1,11 +1,19 @@
+import { EntitlementPayload } from "@/packages/shared/contracts";
 import CurrencyBox from "@/components/CurrencyBox/CurrencyBox";
 import { useCurrencyReducer } from "@/hooks/useCurrencyReducer";
-import { getUserSettings, UserSettings } from "@/utils/appStorage";
+import {
+  getUserSettings,
+  SETTINGS_KEY,
+  updateUserSettings,
+  UserSettings,
+} from "@/utils/appStorage";
+import { getValidAccessToken } from "@/utils/accountService";
 import {
   convertAmountWithSnapshot,
   getRatesForUser,
   RateSnapshot,
 } from "@/utils/rates";
+import { recordUsageOnBackend } from "@/utils/backendClient";
 import {
   extractCurrencyTextMatches,
   formatAmountInCurrency,
@@ -19,7 +27,7 @@ import contentBoxStyles from "./content.css?inline";
 
 const INLINE_CONVERSION_CLASS = "ccx-inline-conversion";
 const INLINE_CONVERSION_STYLE_ID = "ccx-inline-conversion-style";
-const USER_SETTINGS_STORAGE_KEY = "local:user-settings";
+const USER_SETTINGS_STORAGE_KEY = SETTINGS_KEY;
 
 const SKIP_TAGS = new Set([
   "SCRIPT",
@@ -82,15 +90,15 @@ function decoratePricesInTextNode(
   textNode: Text,
   preferredCurrency: CurrencyCode,
   rateSnapshot: RateSnapshot,
-): boolean {
+): number {
   const text = textNode.nodeValue;
-  if (!text?.trim()) return false;
+  if (!text?.trim()) return 0;
 
   const matches = extractCurrencyTextMatches(text);
-  if (!matches.length) return false;
+  if (!matches.length) return 0;
 
   let cursor = 0;
-  let changed = false;
+  let conversionsApplied = 0;
   const fragment = document.createDocumentFragment();
 
   for (const match of matches) {
@@ -133,22 +141,22 @@ function decoratePricesInTextNode(
 
     fragment.append(wrapper);
     cursor = match.end;
-    changed = true;
+    conversionsApplied += 1;
   }
 
-  if (!changed) return false;
+  if (conversionsApplied === 0) return 0;
 
   fragment.append(text.slice(cursor));
   textNode.replaceWith(fragment);
 
-  return true;
+  return conversionsApplied;
 }
 
 function convertVisiblePrices(
   preferredCurrency: CurrencyCode,
   rateSnapshot: RateSnapshot,
   root: ParentNode = document.body,
-) {
+): number {
   ensureInlineConversionStyles();
   clearInlineConversions(root);
 
@@ -163,9 +171,17 @@ function convertVisiblePrices(
     textNodes.push(textNode);
   }
 
+  let totalConversions = 0;
+
   textNodes.forEach((node) => {
-    decoratePricesInTextNode(node, preferredCurrency, rateSnapshot);
+    totalConversions += decoratePricesInTextNode(
+      node,
+      preferredCurrency,
+      rateSnapshot,
+    );
   });
+
+  return totalConversions;
 }
 
 export default defineContentScript({
@@ -180,8 +196,14 @@ export default defineContentScript({
     let rateSnapshot: RateSnapshot | null = null;
 
     let conversionDebounceTimer: number | null = null;
+    let usageFlushTimer: number | null = null;
+    let hydrationRetryTimer: number | null = null;
     let isApplyingInlineConversion = false;
+    let isHydratingRates = false;
     let suppressMutationsUntil = 0;
+
+    let pendingInlineUsage = 0;
+    let pendingSelectionUsage = 0;
 
     function removePopup() {
       if (popupRoot && document.body.contains(popupRoot)) {
@@ -198,17 +220,111 @@ export default defineContentScript({
       rateSnapshot = await getRatesForUser(settings, { forceRefresh });
     }
 
+    async function hydrateSettingsAndRates(forceRefresh = false) {
+      if (isHydratingRates) return;
+      isHydratingRates = true;
+
+      try {
+        await refreshSettingsAndRates(forceRefresh);
+      } finally {
+        isHydratingRates = false;
+      }
+    }
+
+    function scheduleHydrationRetry() {
+      if (hydrationRetryTimer) return;
+
+      hydrationRetryTimer = window.setTimeout(() => {
+        hydrationRetryTimer = null;
+        scheduleInlineConversion();
+      }, 3000);
+    }
+
+    async function applyUsageEntitlement(entitlement: EntitlementPayload) {
+      const updated = await updateUserSettings({
+        entitlement: {
+          status: entitlement.status,
+          planTier: entitlement.planTier,
+          checkedAt: entitlement.checkedAt,
+          trialEndsAt: entitlement.trialEndsAt,
+          currentPeriodEnd: entitlement.currentPeriodEnd,
+          dailyLimit: entitlement.dailyLimit,
+          remainingToday: entitlement.remainingToday,
+        },
+      });
+
+      settings = updated;
+    }
+
+    function scheduleUsageFlush(inlineDelta = 0, selectionDelta = 0) {
+      pendingInlineUsage += Math.max(0, Math.floor(inlineDelta));
+      pendingSelectionUsage += Math.max(0, Math.floor(selectionDelta));
+
+      if (usageFlushTimer) {
+        window.clearTimeout(usageFlushTimer);
+      }
+
+      usageFlushTimer = window.setTimeout(async () => {
+        const inlineConversions = pendingInlineUsage;
+        const selectionConversions = pendingSelectionUsage;
+
+        pendingInlineUsage = 0;
+        pendingSelectionUsage = 0;
+
+        if (inlineConversions + selectionConversions <= 0) return;
+
+        try {
+          const token = await getValidAccessToken();
+          if (!token) return;
+
+          const usage = await recordUsageOnBackend(token, {
+            inlineConversions,
+            selectionConversions,
+          });
+
+          await applyUsageEntitlement(usage.entitlement);
+        } catch {
+          // Ignore usage network errors and continue local UX.
+        }
+      }, 1200);
+    }
+
     function scheduleInlineConversion() {
       if (conversionDebounceTimer) {
         window.clearTimeout(conversionDebounceTimer);
       }
 
       conversionDebounceTimer = window.setTimeout(() => {
-        if (!settings || !rateSnapshot) return;
+        if (!settings || !rateSnapshot) {
+          void hydrateSettingsAndRates()
+            .then(() => {
+              if (settings && rateSnapshot) {
+                scheduleInlineConversion();
+                return;
+              }
+
+              console.warn("[ccx] Missing settings/rates after hydration; retrying");
+              scheduleHydrationRetry();
+            })
+            .catch((error) => {
+              console.warn("[ccx] Failed to hydrate rates for inline conversion", error);
+              scheduleHydrationRetry();
+            });
+
+          return;
+        }
+
         isApplyingInlineConversion = true;
 
         try {
-          convertVisiblePrices(settings.preferredCurrency, rateSnapshot);
+          const conversions = convertVisiblePrices(
+            settings.preferredCurrency,
+            rateSnapshot,
+          );
+
+          if (conversions > 0) {
+            scheduleUsageFlush(conversions, 0);
+          }
         } finally {
           isApplyingInlineConversion = false;
           suppressMutationsUntil = Date.now() + 400;
@@ -297,10 +413,11 @@ export default defineContentScript({
 
     try {
       await refreshSettingsAndRates();
-      scheduleInlineConversion();
-    } catch {
+    } catch (error) {
+      console.warn("[ccx] Initial settings/rates hydration failed", error);
       // Keep selection popup functional even if rates are unavailable initially.
     }
+    scheduleInlineConversion();
 
     const settingsUnwatch = storage.watch<UserSettings | null>(
       USER_SETTINGS_STORAGE_KEY,
@@ -308,8 +425,8 @@ export default defineContentScript({
         try {
           await refreshSettingsAndRates(true);
           scheduleInlineConversion();
-        } catch {
-          // no-op
+        } catch (error) {
+          console.warn("[ccx] Failed to refresh settings/rates after storage update", error);
         }
       },
     );
@@ -330,7 +447,7 @@ export default defineContentScript({
       subtree: true,
     });
 
-    document.addEventListener("mouseup", (event) => {
+    document.addEventListener("mouseup", () => {
       const selection = window.getSelection();
       const text = selection?.toString().trim();
 
@@ -353,6 +470,7 @@ export default defineContentScript({
 
       const sourceCurrency = currency ?? CurrencyCode["UNITED STATES DOLLAR"];
       showPopup(x, y, value.toString(), sourceCurrency);
+      scheduleUsageFlush(0, 1);
     });
 
     document.addEventListener("mousedown", (event) => {
@@ -367,6 +485,14 @@ export default defineContentScript({
     window.addEventListener("beforeunload", () => {
       mutationObserver.disconnect();
       settingsUnwatch();
+
+      if (usageFlushTimer) {
+        window.clearTimeout(usageFlushTimer);
+      }
+
+      if (hydrationRetryTimer) {
+        window.clearTimeout(hydrationRetryTimer);
+      }
     });
   },
 });

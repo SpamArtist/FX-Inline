@@ -8,14 +8,33 @@ import { useCurrencyReducer } from "@/hooks/useCurrencyReducer";
 import {
   DEFAULT_USER_SETTINGS,
   getUserSettings,
+  hasAuthSession,
   updateUserSettings,
   UserSettings,
 } from "@/utils/appStorage";
+import {
+  authenticateWithBackend,
+  createCheckoutSession,
+  createCustomerPortalSession,
+  signOutFromBackend,
+  syncEntitlementWithBackend,
+} from "@/utils/accountService";
 import { ActionType, CurrencyCode } from "@/utils/enums";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { browser } from "wxt/browser";
+import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 
 const DEFAULT_STARTING_CURRENCY = CurrencyCode["UNITED STATES DOLLAR"];
+
+function toFriendlyDate(epochMs: number | null): string {
+  if (!epochMs) return "-";
+
+  try {
+    return new Date(epochMs).toLocaleDateString();
+  } catch {
+    return "-";
+  }
+}
 
 function App() {
   const [currenciesState, dispatch] = useCurrencyReducer({
@@ -24,8 +43,10 @@ function App() {
   });
 
   const [settings, setSettings] = useState<UserSettings>(DEFAULT_USER_SETTINGS);
-  const [subscriptionTokenInput, setSubscriptionTokenInput] = useState("");
+  const [emailInput, setEmailInput] = useState("");
+  const [passwordInput, setPasswordInput] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
+  const [isBusy, setIsBusy] = useState(false);
 
   const currencyOptions = useMemo(
     () =>
@@ -46,7 +67,7 @@ function App() {
       if (canceled) return;
 
       setSettings(persisted);
-      setSubscriptionTokenInput(persisted.subscription.token || "");
+      setEmailInput(persisted.auth.email || "");
     };
 
     loadSettings();
@@ -62,52 +83,97 @@ function App() {
     setStatusMessage(`Preferred currency updated to ${nextCurrency}.`);
   }
 
-  async function onPlanChange(nextPlan: UserSettings["planTier"]) {
-    const updated = await updateUserSettings({ planTier: nextPlan });
-    setSettings(updated);
-
-    if (nextPlan === "free") {
-      setStatusMessage("Free plan enabled. Rates refresh once per market day.");
+  async function runAuth(mode: "signup" | "signin") {
+    if (!emailInput.trim() || !passwordInput.trim()) {
+      setStatusMessage("Email and password are required.");
       return;
     }
 
-    setStatusMessage(
-      "Paid plan selected. Add a subscription token and activate paid access.",
-    );
-  }
+    setIsBusy(true);
 
-  async function onActivatePaidAccess(event: FormEvent) {
-    event.preventDefault();
+    try {
+      const updated = await authenticateWithBackend({
+        mode,
+        email: emailInput,
+        password: passwordInput,
+      });
 
-    if (!subscriptionTokenInput.trim()) {
-      setStatusMessage("Subscription token is required to activate paid access.");
-      return;
+      setSettings(updated);
+      setPasswordInput("");
+      setStatusMessage(
+        mode === "signup"
+          ? "Account created and signed in."
+          : "Signed in successfully.",
+      );
+    } catch (error) {
+      setStatusMessage(error instanceof Error ? error.message : "Authentication failed.");
+    } finally {
+      setIsBusy(false);
     }
-
-    const updated = await updateUserSettings({
-      planTier: "paid",
-      subscription: {
-        token: subscriptionTokenInput.trim(),
-        isActive: true,
-      },
-    });
-
-    setSettings(updated);
-    setStatusMessage("Paid access activated. Rates now refresh continuously.");
   }
 
-  async function onDowngradeToFree() {
-    const updated = await updateUserSettings({
-      planTier: "free",
-      subscription: {
-        ...settings.subscription,
-        isActive: false,
-      },
-    });
+  async function onRefreshEntitlement() {
+    setIsBusy(true);
 
-    setSettings(updated);
-    setStatusMessage("Switched to free plan.");
+    try {
+      const updated = await syncEntitlementWithBackend();
+      setSettings(updated);
+      setStatusMessage("Entitlement synced from backend.");
+    } catch (error) {
+      setStatusMessage(
+        error instanceof Error ? error.message : "Failed to sync entitlement.",
+      );
+    } finally {
+      setIsBusy(false);
+    }
   }
+
+  async function onSignOut() {
+    setIsBusy(true);
+
+    try {
+      const updated = await signOutFromBackend();
+      setSettings(updated);
+      setPasswordInput("");
+      setStatusMessage("Signed out. Free tier is active.");
+    } catch {
+      setStatusMessage("Failed to sign out cleanly, local session cleared.");
+    } finally {
+      setIsBusy(false);
+    }
+  }
+
+  async function onCheckout() {
+    setIsBusy(true);
+
+    try {
+      const session = await createCheckoutSession();
+      await browser.tabs.create({ url: session.checkoutUrl });
+      setStatusMessage("Opened checkout in a new tab.");
+    } catch (error) {
+      setStatusMessage(error instanceof Error ? error.message : "Failed to open checkout.");
+    } finally {
+      setIsBusy(false);
+    }
+  }
+
+  async function onManageBilling() {
+    setIsBusy(true);
+
+    try {
+      const session = await createCustomerPortalSession();
+      await browser.tabs.create({ url: session.portalUrl });
+      setStatusMessage("Opened billing portal in a new tab.");
+    } catch (error) {
+      setStatusMessage(
+        error instanceof Error ? error.message : "Failed to open billing portal.",
+      );
+    } finally {
+      setIsBusy(false);
+    }
+  }
+
+  const signedIn = hasAuthSession(settings);
 
   return (
     <ConvertorHOD shouldDisplayHeader>
@@ -127,39 +193,62 @@ function App() {
           ))}
         </select>
 
-        <label htmlFor="plan-tier">Plan</label>
-        <select
-          id="plan-tier"
-          value={settings.planTier}
-          onChange={(event) =>
-            onPlanChange(event.target.value as UserSettings["planTier"])
-          }
-        >
-          <option value="free">Free</option>
-          <option value="paid">Paid</option>
-        </select>
-
-        <form onSubmit={onActivatePaidAccess} className="subscription-form">
-          <label htmlFor="subscription-token">Subscription token</label>
+        <div className="auth-grid">
+          <label htmlFor="account-email">Email</label>
           <input
-            id="subscription-token"
-            type="password"
-            value={subscriptionTokenInput}
-            onChange={(event) => setSubscriptionTokenInput(event.target.value)}
-            placeholder="Paste paid subscription token"
+            id="account-email"
+            type="email"
+            value={emailInput}
+            onChange={(event) => setEmailInput(event.target.value)}
+            placeholder="you@example.com"
+            autoComplete="email"
           />
-          <div className="subscription-actions">
-            <button type="submit">Activate Paid</button>
-            <button type="button" onClick={onDowngradeToFree}>
-              Use Free
-            </button>
-          </div>
-        </form>
+
+          <label htmlFor="account-password">Password</label>
+          <input
+            id="account-password"
+            type="password"
+            value={passwordInput}
+            onChange={(event) => setPasswordInput(event.target.value)}
+            placeholder="At least 8 characters"
+            autoComplete="current-password"
+          />
+        </div>
+
+        <div className="subscription-actions">
+          <button type="button" disabled={isBusy} onClick={() => runAuth("signup")}>
+            Sign Up
+          </button>
+          <button type="button" disabled={isBusy} onClick={() => runAuth("signin")}>
+            Sign In
+          </button>
+          <button type="button" disabled={isBusy || !signedIn} onClick={onSignOut}>
+            Sign Out
+          </button>
+        </div>
+
+        <div className="subscription-actions">
+          <button type="button" disabled={isBusy || !signedIn} onClick={onRefreshEntitlement}>
+            Sync Plan
+          </button>
+          <button type="button" disabled={isBusy || !signedIn} onClick={onCheckout}>
+            Checkout
+          </button>
+          <button type="button" disabled={isBusy || !signedIn} onClick={onManageBilling}>
+            Billing Portal
+          </button>
+        </div>
 
         <p className="plan-hint">
-          {settings.planTier === "paid" && settings.subscription.isActive
-            ? "Paid is active: latest rates are fetched frequently."
-            : "Free is active: one rate snapshot is used per market day."}
+          Plan: <strong>{settings.entitlement.status}</strong> ({settings.entitlement.planTier})
+        </p>
+        <p className="plan-hint">
+          Trial ends: <strong>{toFriendlyDate(settings.entitlement.trialEndsAt)}</strong>
+        </p>
+        <p className="plan-hint">
+          Remaining today: <strong>{settings.entitlement.remainingToday ?? "-"}</strong> /
+          {" "}
+          {settings.entitlement.dailyLimit}
         </p>
         {statusMessage && <p className="status-message">{statusMessage}</p>}
       </div>

@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "allowImportingTsExtensions": false,
+    "outDir": "./test-dist",
+    "rootDir": ".",
+    "module": "ESNext",
+    "moduleResolution": "Bundler"
+  },
+  "include": [
+    "utils/utils.ts",
+    "utils/constants.ts",
+    "utils/enums.ts",
+    "utils/rateMath.ts",
+    "utils/ratePolicy.ts"
+  ]
+}

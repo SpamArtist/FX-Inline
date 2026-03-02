@@ -12,6 +12,10 @@
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
     "compile": "tsc --noEmit",
+    "backend:build": "tsc -p backend/tsconfig.json",
+    "backend:start": "npm run backend:build && node backend/dist/server.js",
+    "build:unit": "tsc -p tsconfig.unit.json",
+    "test:unit": "npm run build:unit && node --experimental-specifier-resolution=node --test tests/unit/*.test.mjs",
     "postinstall": "wxt prepare"
   },
   "dependencies": {

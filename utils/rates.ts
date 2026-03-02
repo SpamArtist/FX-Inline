@@ -1,6 +1,18 @@
 import { storage } from "wxt/utils/storage";
+import { getRatesFromBackend } from "./backendClient";
+import { getValidAccessToken } from "./accountService";
 import { hasPaidAccess, UserSettings } from "./appStorage";
 import { CurrencyCode } from "./enums";
+import {
+  getFreeTierMarketDayKey,
+  shouldUseFreeTierCache,
+  shouldUsePaidTierCache,
+} from "./ratePolicy";
+import {
+  convertAmountWithSnapshot,
+  formatConvertedAmount,
+  RateSnapshotLike,
+} from "./rateMath";
 
 const FREE_RATE_CACHE_KEY = "local:rate-cache-free";
 const PAID_RATE_CACHE_KEY = "local:rate-cache-paid";
@@ -13,11 +25,11 @@ type ExchangeApiResponse = {
   rates?: Record<string, number>;
 };
 
-export type RateSnapshot = {
+export type RateSnapshot = RateSnapshotLike & {
   base: CurrencyCode;
-  rates: Partial<Record<CurrencyCode, number>>;
   fetchedAt: number;
   marketDayKey?: string;
+  source?: string;
 };
 
 const freeRateCacheItem = storage.defineItem<RateSnapshot | null>(
@@ -33,45 +45,6 @@ const paidRateCacheItem = storage.defineItem<RateSnapshot | null>(
     fallback: null,
   },
 );
-
-function toEasternDate(now = new Date()): Date {
-  return new Date(now.toLocaleString("en-US", { timeZone: "America/New_York" }));
-}
-
-function getPreviousBusinessDay(date: Date): Date {
-  const copy = new Date(date);
-  copy.setDate(copy.getDate() - 1);
-
-  while (copy.getDay() === 0 || copy.getDay() === 6) {
-    copy.setDate(copy.getDate() - 1);
-  }
-
-  return copy;
-}
-
-function toDateKey(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-export function getFreeTierMarketDayKey(now = new Date()): string {
-  const easternNow = toEasternDate(now);
-
-  while (easternNow.getDay() === 0 || easternNow.getDay() === 6) {
-    easternNow.setDate(easternNow.getDate() - 1);
-  }
-
-  const marketOpen = new Date(easternNow);
-  marketOpen.setHours(9, 30, 0, 0);
-
-  if (easternNow < marketOpen) {
-    return toDateKey(getPreviousBusinessDay(easternNow));
-  }
-
-  return toDateKey(easternNow);
-}
 
 function isValidSnapshot(snapshot: RateSnapshot | null): snapshot is RateSnapshot {
   if (!snapshot) return false;
@@ -101,7 +74,26 @@ function normalizeRates(
   return normalized;
 }
 
-async function fetchLatestUsdSnapshot(): Promise<RateSnapshot> {
+function normalizeSnapshot(payload: {
+  base: string;
+  rates: Record<string, number>;
+  fetchedAt: number;
+  marketDayKey: string | null;
+  source: string;
+}): RateSnapshot {
+  return {
+    base: CurrencyCode["UNITED STATES DOLLAR"],
+    rates: normalizeRates(payload.rates),
+    fetchedAt:
+      typeof payload.fetchedAt === "number" && Number.isFinite(payload.fetchedAt)
+        ? payload.fetchedAt
+        : Date.now(),
+    marketDayKey: payload.marketDayKey || undefined,
+    source: payload.source,
+  };
+}
+
+async function fetchLatestUsdSnapshotFallback(): Promise<RateSnapshot> {
   const response = await fetch("https://open.er-api.com/v6/latest/USD");
 
   if (!response.ok) {
@@ -118,11 +110,26 @@ async function fetchLatestUsdSnapshot(): Promise<RateSnapshot> {
     base: CurrencyCode["UNITED STATES DOLLAR"],
     rates: normalizeRates(payload.rates),
     fetchedAt: Date.now(),
+    source: "extension-fallback-er-api",
+  };
+}
+
+async function fetchSnapshotFromBackend(forceRefresh = false): Promise<{
+  planTier: "free" | "paid";
+  snapshot: RateSnapshot;
+}> {
+  const accessToken = await getValidAccessToken();
+  const response = await getRatesFromBackend(accessToken, { forceRefresh });
+
+  return {
+    planTier: response.planTier,
+    snapshot: normalizeSnapshot(response.snapshot),
   };
 }
 
 export async function getFreeTierRates(opts?: {
   forceRefresh?: boolean;
+  allowBackend?: boolean;
 }): Promise<RateSnapshot> {
   const marketDayKey = getFreeTierMarketDayKey();
   const cached = await freeRateCacheItem.getValue();
@@ -130,26 +137,61 @@ export async function getFreeTierRates(opts?: {
   if (
     !opts?.forceRefresh &&
     isValidSnapshot(cached) &&
-    cached.marketDayKey === marketDayKey
+    shouldUseFreeTierCache(cached.marketDayKey)
   ) {
     return cached;
   }
 
+  if (!opts?.allowBackend) {
+    try {
+      const fallback = await fetchLatestUsdSnapshotFallback();
+      const fallbackWithDay: RateSnapshot = {
+        ...fallback,
+        marketDayKey,
+      };
+
+      await freeRateCacheItem.setValue(fallbackWithDay);
+      return fallbackWithDay;
+    } catch (error) {
+      if (isValidSnapshot(cached)) {
+        return cached;
+      }
+
+      throw error;
+    }
+  }
+
   try {
-    const fetched = await fetchLatestUsdSnapshot();
-    const snapshot: RateSnapshot = {
-      ...fetched,
+    const fetched = await fetchSnapshotFromBackend(Boolean(opts?.forceRefresh));
+
+    const normalizedFree: RateSnapshot = {
+      ...fetched.snapshot,
       marketDayKey,
     };
 
-    await freeRateCacheItem.setValue(snapshot);
-    return snapshot;
+    await freeRateCacheItem.setValue(normalizedFree);
+
+    if (fetched.planTier === "paid") {
+      await paidRateCacheItem.setValue({
+        ...fetched.snapshot,
+        marketDayKey: undefined,
+      });
+    }
+
+    return normalizedFree;
   } catch (error) {
     if (isValidSnapshot(cached)) {
       return cached;
     }
 
-    throw error;
+    const fallback = await fetchLatestUsdSnapshotFallback();
+    const fallbackWithDay: RateSnapshot = {
+      ...fallback,
+      marketDayKey,
+    };
+
+    await freeRateCacheItem.setValue(fallbackWithDay);
+    return fallbackWithDay;
   }
 }
 
@@ -161,15 +203,26 @@ export async function getPaidTierRates(opts?: {
   if (
     !opts?.forceRefresh &&
     isValidSnapshot(cached) &&
-    Date.now() - cached.fetchedAt <= PAID_REFRESH_TTL_MS
+    shouldUsePaidTierCache(cached.fetchedAt, PAID_REFRESH_TTL_MS)
   ) {
     return cached;
   }
 
   try {
-    const fetched = await fetchLatestUsdSnapshot();
-    await paidRateCacheItem.setValue(fetched);
-    return fetched;
+    const fetched = await fetchSnapshotFromBackend(Boolean(opts?.forceRefresh));
+
+    if (fetched.planTier === "paid") {
+      await paidRateCacheItem.setValue(fetched.snapshot);
+      return fetched.snapshot;
+    }
+
+    const downgradedSnapshot: RateSnapshot = {
+      ...fetched.snapshot,
+      marketDayKey: getFreeTierMarketDayKey(),
+    };
+
+    await freeRateCacheItem.setValue(downgradedSnapshot);
+    return downgradedSnapshot;
   } catch (error) {
     if (isValidSnapshot(cached)) {
       return cached;
@@ -187,33 +240,10 @@ export async function getRatesForUser(
     return getPaidTierRates(opts);
   }
 
-  return getFreeTierRates(opts);
+  return getFreeTierRates({
+    ...opts,
+    allowBackend: true,
+  });
 }
 
-export function convertAmountWithSnapshot(
-  amount: number,
-  sourceCurrency: CurrencyCode,
-  targetCurrency: CurrencyCode,
-  snapshot: RateSnapshot,
-): number | null {
-  const sourceRate = snapshot.rates[sourceCurrency];
-  const targetRate = snapshot.rates[targetCurrency];
-
-  if (
-    typeof sourceRate !== "number" ||
-    !Number.isFinite(sourceRate) ||
-    sourceRate <= 0
-  ) {
-    return null;
-  }
-
-  if (typeof targetRate !== "number" || !Number.isFinite(targetRate)) {
-    return null;
-  }
-
-  return (amount * targetRate) / sourceRate;
-}
-
-export function formatConvertedAmount(amount: number, precision = 4): string {
-  return amount.toFixed(precision);
-}
+export { convertAmountWithSnapshot, formatConvertedAmount, getFreeTierMarketDayKey };
