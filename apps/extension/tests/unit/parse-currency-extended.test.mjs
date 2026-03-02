@@ -13,6 +13,9 @@ test("parseCurrencyValue handles signs, separators, and lowercase iso", () => {
     ["USD 1.2 million", true, 1200000, "USD"],
     ["2 billions USD", true, 2000000000, "USD"],
     ["₫ 4.295 trillion", true, 4295000000000, "VND"],
+    ["USD 1.5 triliun", true, 1500000000000, "USD"],
+    ["₫ 1 nghìn tỷ", true, 1000000000000, "VND"],
+    ["VND 1 ngan ty", true, 1000000000000, "VND"],
   ];
 
   for (const [input, valid, value, currency] of cases) {
@@ -66,4 +69,52 @@ test("extractCurrencyTextMatches parses word magnitudes in listing snippets", ()
   expect(matches).toHaveLength(1);
   expect(matches[0].currency).toBe("VND");
   expect(matches[0].value).toBe(4295000000);
+});
+
+test("extractCurrencyTextMatches parses localized magnitude words", () => {
+  const matches = extractCurrencyTextMatches(
+    "Mức giá từ ₫ 3.65 tỷ đến ₫ 4.2 tỷ, có thể lên USD 2 miliar",
+  );
+
+  expect(matches).toHaveLength(3);
+  expect(matches[0].currency).toBe("VND");
+  expect(matches[0].value).toBe(3650000000);
+  expect(matches[1].currency).toBe("VND");
+  expect(matches[1].value).toBe(4200000000);
+  expect(matches[2].currency).toBe("USD");
+  expect(matches[2].value).toBe(2000000000);
+});
+
+test("locale profiles parse localized magnitudes with localeHint", () => {
+  const viParsed = parseCurrencyValue("₫ 3.65 tỷ", { localeHint: "vi-VN" });
+  const enParsed = parseCurrencyValue("₫ 3.65 tỷ", { localeHint: "en-US" });
+
+  expect(viParsed.valid).toBe(true);
+  expect(viParsed.value).toBe(3650000000);
+  expect(viParsed.currency).toBe("VND");
+
+  expect(enParsed.valid).toBe(false);
+});
+
+test("locale profiles support Chinese, Korean, Marathi, and Azerbaijani scales", () => {
+  const zhParsed = parseCurrencyValue("CNY 3.2亿", { localeHint: "zh-CN" });
+  const koParsed = parseCurrencyValue("KRW 7억", { localeHint: "ko-KR" });
+  const mrParsed = parseCurrencyValue("INR 2 कोटी", { localeHint: "mr-IN" });
+  const azParsed = parseCurrencyValue("AZN 1.5 milyard", { localeHint: "az-AZ" });
+
+  expect(zhParsed.valid).toBe(true);
+  expect(zhParsed.currency).toBe("CNY");
+  expect(zhParsed.value).toBe(320000000);
+
+  expect(koParsed.valid).toBe(true);
+  expect(koParsed.currency).toBe("KRW");
+  expect(koParsed.value).toBe(700000000);
+
+  expect(mrParsed.valid).toBe(true);
+  expect(mrParsed.currency).toBe("INR");
+  expect(mrParsed.value).toBe(20000000);
+
+  expect(azParsed.valid).toBe(true);
+  expect(azParsed.currency).toBe("AZN");
+  expect(azParsed.value).toBe(1500000000);
 });

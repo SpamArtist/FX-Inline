@@ -14,6 +14,10 @@ test("parseCurrencyValue supports roadmap formats", () => {
     ["USD 4.295 billion", true, 4295000000, "USD"],
     ["4.295 billion USD", true, 4295000000, "USD"],
     ["₫ 4.295 billion", true, 4295000000, "VND"],
+    ["₫ 3.65 tỷ", true, 3650000000, "VND"],
+    ["VND 850 triệu", true, 850000000, "VND"],
+    ["USD 2 miliar", true, 2000000000, "USD"],
+    ["₫3.65tỷ", true, 3650000000, "VND"],
     ["foo", false, undefined, undefined],
   ];
 
@@ -40,14 +44,16 @@ test("extractCurrencyTextMatches finds ISO/symbol snippets", () => {
 
 test("extractCurrencyTextMatches applies billion/million/trillion multipliers", () => {
   const matches = extractCurrencyTextMatches(
-    "Median price: ₫ 4.295 billion and backup USD 2 million and EUR 3 trillions",
+    "Median price: ₫ 4.295 billion and backup USD 2 million and EUR 3 trillions and VND 1.2 tỷ",
   );
 
-  expect(matches).toHaveLength(3);
+  expect(matches).toHaveLength(4);
   expect(matches[0].currency).toBe("VND");
   expect(matches[0].value).toBe(4295000000);
   expect(matches[1].currency).toBe("USD");
   expect(matches[1].value).toBe(2000000);
   expect(matches[2].currency).toBe("EUR");
   expect(matches[2].value).toBe(3000000000000);
+  expect(matches[3].currency).toBe("VND");
+  expect(matches[3].value).toBe(1200000000);
 });

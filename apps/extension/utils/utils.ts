@@ -2,20 +2,13 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { CURRENCY_SYMBOLS, ISO_CODES } from "./constants";
 import { CurrencyCode } from "./enums";
+import { getMagnitudeAliasMap } from "./magnitudeProfiles";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
 const CURRENCY_CODE_VALUES = new Set(Object.values(CurrencyCode));
-const MAGNITUDE_MULTIPLIER_BY_WORD: Record<string, number> = {
-  million: 1_000_000,
-  millions: 1_000_000,
-  billion: 1_000_000_000,
-  billions: 1_000_000_000,
-  trillion: 1_000_000_000_000,
-  trillions: 1_000_000_000_000,
-};
 
 const CURRENCY_SYMBOL_TO_CODE: Partial<Record<string, CurrencyCode>> = {
   $: CurrencyCode["UNITED STATES DOLLAR"],
@@ -59,6 +52,10 @@ function escapeRegex(input: string) {
   return input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function normalizeMagnitudeAlias(input: string): string {
+  return input.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
 const symbolPattern = Array.from(CURRENCY_SYMBOLS)
   .map(escapeRegex)
   .sort((a, b) => b.length - a.length)
@@ -69,17 +66,51 @@ const isoPattern = Array.from(ISO_CODES)
   .sort((a, b) => b.length - a.length)
   .join("|");
 
-const magnitudePattern = Object.keys(MAGNITUDE_MULTIPLIER_BY_WORD)
-  .map(escapeRegex)
-  .sort((a, b) => b.length - a.length)
-  .join("|");
+type ParserArtifacts = {
+  magnitudeMultiplierByAlias: Map<string, number>;
+  magnitudeSuffixRegex: RegExp;
+  currencySnippetRegex: RegExp;
+};
 
-const numberWithOptionalMagnitudePattern = `[+-]?\\d[\\d,.]*(?:\\s+(?:${magnitudePattern}))?`;
+const parserArtifactsCache = new Map<string, ParserArtifacts>();
 
-const CURRENCY_SNIPPET_REGEX = new RegExp(
-  `(?:\\b(?:${isoPattern})\\b\\s*${numberWithOptionalMagnitudePattern}|${numberWithOptionalMagnitudePattern}\\s*\\b(?:${isoPattern})\\b|(?:${symbolPattern})\\s*${numberWithOptionalMagnitudePattern}|${numberWithOptionalMagnitudePattern}\\s*(?:${symbolPattern}))`,
-  "gi",
-);
+function normalizeLocaleCacheKey(localeHint?: string | null): string {
+  return localeHint?.trim().toLowerCase() || "__all__";
+}
+
+function buildParserArtifacts(localeHint?: string | null): ParserArtifacts {
+  const magnitudeMultiplierByAlias = getMagnitudeAliasMap(localeHint);
+  const magnitudePattern = Array.from(magnitudeMultiplierByAlias.keys())
+    .map((alias) => escapeRegex(alias).replace(/\s+/g, "\\s+"))
+    .sort((a, b) => b.length - a.length)
+    .join("|");
+
+  const numberWithOptionalMagnitudePattern = `[+-]?\\d[\\d,.]*(?:\\s*(?:${magnitudePattern}))?`;
+  const currencySnippetRegex = new RegExp(
+    `(?:\\b(?:${isoPattern})\\b\\s*${numberWithOptionalMagnitudePattern}|${numberWithOptionalMagnitudePattern}\\s*\\b(?:${isoPattern})\\b|(?:${symbolPattern})\\s*${numberWithOptionalMagnitudePattern}|${numberWithOptionalMagnitudePattern}\\s*(?:${symbolPattern}))`,
+    "giu",
+  );
+  const magnitudeSuffixRegex = new RegExp(
+    `^(.+?)\\s*(${magnitudePattern})$`,
+    "iu",
+  );
+
+  return {
+    magnitudeMultiplierByAlias,
+    magnitudeSuffixRegex,
+    currencySnippetRegex,
+  };
+}
+
+function getParserArtifacts(localeHint?: string | null): ParserArtifacts {
+  const cacheKey = normalizeLocaleCacheKey(localeHint);
+  const cached = parserArtifactsCache.get(cacheKey);
+  if (cached) return cached;
+
+  const artifacts = buildParserArtifacts(localeHint);
+  parserArtifactsCache.set(cacheKey, artifacts);
+  return artifacts;
+}
 
 function toCurrencyCode(value: string): CurrencyCode | null {
   return CURRENCY_CODE_VALUES.has(value as CurrencyCode)
@@ -172,32 +203,36 @@ function parseFlexibleNumber(
   return Number.isFinite(num) ? sign * num : null;
 }
 
-function parseNumberWithOptionalMagnitude(input: string): number | null {
+function parseNumberWithOptionalMagnitudeForArtifacts(
+  input: string,
+  artifacts: ParserArtifacts,
+): number | null {
   const trimmed = input.trim();
   if (!trimmed.length) return null;
 
-  const magnitudeMatch = trimmed.match(
-    /^(.+?)\s+(million|millions|billion|billions|trillion|trillions)$/i,
-  );
+  const magnitudeMatch = trimmed.match(artifacts.magnitudeSuffixRegex);
 
   if (!magnitudeMatch) {
     return parseFlexibleNumber(trimmed, 0, trimmed.length);
   }
 
   const numberText = magnitudeMatch[1].trim();
-  const magnitudeWord = magnitudeMatch[2].toLowerCase();
+  const normalizedMagnitude = normalizeMagnitudeAlias(magnitudeMatch[2]);
   if (!numberText.length) return null;
 
   const baseValue = parseFlexibleNumber(numberText, 0, numberText.length);
   if (baseValue === null) return null;
 
-  const multiplier = MAGNITUDE_MULTIPLIER_BY_WORD[magnitudeWord];
+  const multiplier = artifacts.magnitudeMultiplierByAlias.get(normalizedMagnitude);
   if (multiplier === undefined) return null;
 
   return baseValue * multiplier;
 }
 
-function parseWithTokenPrefix(input: string): {
+function parseWithTokenPrefixForArtifacts(
+  input: string,
+  artifacts: ParserArtifacts,
+): {
   value: number;
   currency: CurrencyCode;
 } | null {
@@ -216,7 +251,7 @@ function parseWithTokenPrefix(input: string): {
     const valueText = input.slice(tokenInfo.token.length).trim();
     if (!valueText.length) continue;
 
-    const value = parseNumberWithOptionalMagnitude(valueText);
+    const value = parseNumberWithOptionalMagnitudeForArtifacts(valueText, artifacts);
     if (value !== null) {
       return {
         value,
@@ -228,7 +263,10 @@ function parseWithTokenPrefix(input: string): {
   return null;
 }
 
-function parseWithTokenSuffix(input: string): {
+function parseWithTokenSuffixForArtifacts(
+  input: string,
+  artifacts: ParserArtifacts,
+): {
   value: number;
   currency: CurrencyCode;
 } | null {
@@ -247,7 +285,7 @@ function parseWithTokenSuffix(input: string): {
     const valueText = input.slice(0, input.length - tokenInfo.token.length).trim();
     if (!valueText.length) continue;
 
-    const value = parseNumberWithOptionalMagnitude(valueText);
+    const value = parseNumberWithOptionalMagnitudeForArtifacts(valueText, artifacts);
     if (value !== null) {
       return {
         value,
@@ -259,20 +297,37 @@ function parseWithTokenSuffix(input: string): {
   return null;
 }
 
-export function parseCurrencyValue(
+type CurrencyParseOptions = {
+  localeHint?: string | null;
+};
+
+function resolveLocaleHint(options?: string | CurrencyParseOptions | null): string | null {
+  if (typeof options === "string") {
+    return options || null;
+  }
+
+  if (options && typeof options === "object") {
+    return options.localeHint || null;
+  }
+
+  return null;
+}
+
+function parseCurrencyValueWithArtifacts(
   input: string,
+  artifacts: ParserArtifacts,
 ): { valid: boolean; value?: number; currency?: CurrencyCode | null } {
   if (input == null) return { valid: false };
 
   const str = String(input).trim();
   if (!str.length) return { valid: false };
 
-  const numericOnly = parseNumberWithOptionalMagnitude(str);
+  const numericOnly = parseNumberWithOptionalMagnitudeForArtifacts(str, artifacts);
   if (numericOnly !== null) {
     return { valid: true, value: numericOnly, currency: null };
   }
 
-  const prefix = parseWithTokenPrefix(str);
+  const prefix = parseWithTokenPrefixForArtifacts(str, artifacts);
   if (prefix) {
     return {
       valid: true,
@@ -281,7 +336,7 @@ export function parseCurrencyValue(
     };
   }
 
-  const suffix = parseWithTokenSuffix(str);
+  const suffix = parseWithTokenSuffixForArtifacts(str, artifacts);
   if (suffix) {
     return {
       valid: true,
@@ -293,6 +348,15 @@ export function parseCurrencyValue(
   return { valid: false };
 }
 
+export function parseCurrencyValue(
+  input: string,
+  options?: string | CurrencyParseOptions | null,
+): { valid: boolean; value?: number; currency?: CurrencyCode | null } {
+  const localeHint = resolveLocaleHint(options);
+  const artifacts = getParserArtifacts(localeHint);
+  return parseCurrencyValueWithArtifacts(input, artifacts);
+}
+
 export type CurrencyTextMatch = {
   raw: string;
   start: number;
@@ -301,18 +365,24 @@ export type CurrencyTextMatch = {
   currency: CurrencyCode;
 };
 
-export function extractCurrencyTextMatches(input: string): CurrencyTextMatch[] {
+export function extractCurrencyTextMatches(
+  input: string,
+  options?: string | CurrencyParseOptions | null,
+): CurrencyTextMatch[] {
   if (!input?.length) return [];
 
-  CURRENCY_SNIPPET_REGEX.lastIndex = 0;
+  const localeHint = resolveLocaleHint(options);
+  const artifacts = getParserArtifacts(localeHint);
+
+  artifacts.currencySnippetRegex.lastIndex = 0;
 
   const matches: CurrencyTextMatch[] = [];
 
-  for (const candidate of input.matchAll(CURRENCY_SNIPPET_REGEX)) {
+  for (const candidate of input.matchAll(artifacts.currencySnippetRegex)) {
     if (candidate.index === undefined) continue;
 
     const raw = candidate[0];
-    const parsed = parseCurrencyValue(raw);
+    const parsed = parseCurrencyValueWithArtifacts(raw, artifacts);
 
     if (!parsed.valid || parsed.currency == null || parsed.value === undefined) {
       continue;

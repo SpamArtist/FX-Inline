@@ -107,7 +107,9 @@ export default defineContentScript({
       const x = rect.left + window.scrollX;
       const y = rect.top + rect.height + window.scrollY;
 
-      const { valid: isValid, value, currency } = parseCurrencyValue(text);
+      const { valid: isValid, value, currency } = parseCurrencyValue(text, {
+        localeHint: document.documentElement?.lang || null,
+      });
       if (!isValid || value === undefined) {
         popupController.removePopup();
         return;

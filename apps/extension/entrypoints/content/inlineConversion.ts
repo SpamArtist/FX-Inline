@@ -119,12 +119,13 @@ function decoratePricesInTextNode(
   textNode: Text,
   preferredCurrency: CurrencyCode,
   rateSnapshot: RateSnapshot,
+  localeHint: string | null,
 ): number {
   const text = textNode.nodeValue;
   if (!text?.trim()) return 0;
   const lightTextContext = usesLightTextColor(textNode);
 
-  const matches = extractCurrencyTextMatches(text);
+  const matches = extractCurrencyTextMatches(text, localeHint);
   if (!matches.length) return 0;
 
   const sortedMatches = [...matches].sort((a, b) => a.start - b.start);
@@ -199,6 +200,8 @@ export function convertVisiblePrices(
   },
 ): number {
   ensureInlineConversionStyles();
+  const localeHint = document.documentElement?.lang || null;
+
   if (options?.clearExisting !== false) {
     clearInlineConversions(root);
   }
@@ -227,6 +230,7 @@ export function convertVisiblePrices(
       node,
       preferredCurrency,
       rateSnapshot,
+      localeHint,
     );
   });
 
