@@ -11,12 +11,18 @@ function normalizeBaseUrl(raw: string): string {
   return raw.replace(/\/+$/, "");
 }
 
-export function getBackendBaseUrl(): string {
+function resolveBackendBaseUrl(): string {
   const env = import.meta.env as Record<string, string | undefined>;
 
   return normalizeBaseUrl(
     env.WXT_BACKEND_BASE_URL || env.VITE_BACKEND_BASE_URL || DEFAULT_BACKEND_BASE_URL,
   );
+}
+
+const BACKEND_BASE_URL = resolveBackendBaseUrl();
+
+export function getBackendBaseUrl(): string {
+  return BACKEND_BASE_URL;
 }
 
 async function requestJson<T>(

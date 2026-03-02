@@ -13,6 +13,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 const DEFAULT_SECONDARY_CURRENCY = CurrencyCode.EURO;
 
+const CURRENCY_LIST_BY_CODE = new Map(
+  currencies.map((currency) => [currency.code as CurrencyCode, currency]),
+);
+
 function createCurrencyId() {
   return typeof crypto !== "undefined" && crypto.randomUUID
     ? crypto.randomUUID()
@@ -25,7 +29,7 @@ function getCurrencyStateFromCode(code: CurrencyCode) {
     return currencyFromMap;
   }
 
-  const currencyFromList = currencies.find((x) => x.code === code);
+  const currencyFromList = CURRENCY_LIST_BY_CODE.get(code);
 
   return {
     code,

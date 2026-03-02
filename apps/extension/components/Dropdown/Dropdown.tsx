@@ -27,7 +27,11 @@ export default function Dropdown({
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         {options.map(({ label, value }) => (
-          <DropdownMenuItem onSelect={() => onSelect(value)} textValue={label}>
+          <DropdownMenuItem
+            key={value}
+            onSelect={() => onSelect(value)}
+            textValue={label}
+          >
             {label}
           </DropdownMenuItem>
         ))}

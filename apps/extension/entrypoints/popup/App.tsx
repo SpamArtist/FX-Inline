@@ -261,7 +261,6 @@ function App() {
           >
             <CurrencyBox
               isDisabled={false}
-              key={currentCurrency.id}
               data={currentCurrency}
               containerStyle="px-[0.8em] py-[1.5em] rounded-xl shadow-lg outline outline-black/5 dark:bg-white-800 dark:shadow-none dark:-outline-offset-1 dark:outline-white/10 gap-x-[0.5em]"
               dropDownContainerStyle="flex-[1.2] mt-[0.875em]"

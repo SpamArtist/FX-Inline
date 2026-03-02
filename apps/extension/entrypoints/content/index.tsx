@@ -72,8 +72,7 @@ function clearInlineConversions(root: ParentNode = document.body) {
     node.replaceWith(document.createTextNode(originalText));
   });
 
-  // FIX #1: Normalize the DOM after replacements to merge adjacent text nodes,
-  // preventing missed matches on subsequent passes.
+  // Merge adjacent text nodes after replacements so later passes parse correctly.
   if (root instanceof Element || root instanceof Document) {
     root.normalize();
   }
@@ -100,8 +99,6 @@ function ensureInlineConversionStyles() {
 
   const styleTag = document.createElement("style");
   styleTag.id = INLINE_CONVERSION_STYLE_ID;
-  // FIX #9: Use stronger specificity with :where() wrapper to reduce risk of
-  // page CSS overriding our injected styles in document.head.
   styleTag.textContent = `
     :where(.${INLINE_CONVERSION_CLASS}) {
       border-radius: 4px !important;
@@ -132,8 +129,7 @@ function decoratePricesInTextNode(
   const matches = extractCurrencyTextMatches(text);
   if (!matches.length) return 0;
 
-  // FIX #2: Sort matches by start position to guarantee correct cursor
-  // advancement and prevent skipped or mishandled overlapping matches.
+  // Keep a stable left-to-right order before cursor-based replacement.
   const sortedMatches = [...matches].sort((a, b) => a.start - b.start);
 
   let cursor = 0;
@@ -141,7 +137,6 @@ function decoratePricesInTextNode(
   const fragment = document.createDocumentFragment();
 
   for (const match of sortedMatches) {
-    // Skip truly overlapping matches (starts before where we left off).
     if (match.start < cursor) continue;
 
     fragment.append(text.slice(cursor, match.start));
@@ -211,9 +206,7 @@ function convertVisiblePrices(
     textNodes.push(textNode);
   }
 
-  // FIX #6: Warn in development if the node cap was hit so truncation is
-  // visible during testing rather than silently causing incomplete conversions.
-  if (textNodes.length >= MAX_NODES_PER_PASS) {
+  if (import.meta.env.DEV && textNodes.length >= MAX_NODES_PER_PASS) {
     console.warn(
       `[ccx] Hit MAX_NODES_PER_PASS (${MAX_NODES_PER_PASS}); some prices on this page may not be converted.`,
     );
@@ -237,7 +230,6 @@ export default defineContentScript({
   cssInjectionMode: "manual",
   async main() {
     let popupRoot: HTMLDivElement | null = null;
-    let shadowRoot: ShadowRoot | null = null;
     let reactRoot: Root | null = null;
 
     let settings: UserSettings | null = null;
@@ -248,12 +240,12 @@ export default defineContentScript({
     let hydrationRetryTimer: number | null = null;
     let settingsRefreshTimer: number | null = null;
     let isApplyingInlineConversion = false;
-    // FIX #8: Replace time-based mutation suppression with a reliable counter.
     let suppressMutationDepth = 0;
     let isHydratingRates = false;
 
     let pendingInlineUsage = 0;
     let pendingSelectionUsage = 0;
+    const usageEventsUrl = `${getBackendBaseUrl()}/usage/events`;
 
     function isExtensionUiEvent(event: Event): boolean {
       if (!popupRoot) return false;
@@ -284,7 +276,6 @@ export default defineContentScript({
         reactRoot?.unmount();
         document.body.removeChild(popupRoot);
         popupRoot = null;
-        shadowRoot = null;
         reactRoot = null;
       }
     }
@@ -294,8 +285,6 @@ export default defineContentScript({
       rateSnapshot = await getRatesForUser(settings, { forceRefresh });
     }
 
-    // FIX #5: Accept forceRefresh and bypass the in-flight guard when forced,
-    // so a forced refresh always runs rather than being silently dropped.
     async function hydrateSettingsAndRates(forceRefresh = false) {
       if (isHydratingRates && !forceRefresh) return;
       isHydratingRates = true;
@@ -332,9 +321,6 @@ export default defineContentScript({
       settings = updated;
     }
 
-    // FIX #3: Accept an explicit usage payload so callers can pass already-
-    // snapshotted counts. On failure, re-add the counts back to the pending
-    // totals so they are not silently dropped.
     async function flushUsage(inlineConversions: number, selectionConversions: number) {
       if (inlineConversions + selectionConversions <= 0) return;
 
@@ -400,7 +386,6 @@ export default defineContentScript({
         }
 
         isApplyingInlineConversion = true;
-        // FIX #8: Increment depth counter before DOM work.
         suppressMutationDepth += 1;
 
         try {
@@ -414,8 +399,6 @@ export default defineContentScript({
           }
         } finally {
           isApplyingInlineConversion = false;
-          // Decrement after a short delay to let the browser process DOM events
-          // triggered by our changes before re-enabling the observer.
           window.setTimeout(() => {
             suppressMutationDepth = Math.max(0, suppressMutationDepth - 1);
           }, 400);
@@ -486,7 +469,7 @@ export default defineContentScript({
       popupRoot = document.createElement("div");
       popupRoot.id = "popup-root";
 
-      shadowRoot = popupRoot.attachShadow({
+      const shadowRoot = popupRoot.attachShadow({
         mode: "open",
       });
 
@@ -503,7 +486,6 @@ export default defineContentScript({
 
       const reactContainer = document.createElement("div");
       reactContainer.id = "popup-react-container";
-      // FIX #4: classList is read-only; use className instead.
       reactContainer.className =
         "w-[18em] [box-shadow:0px_0px_3px_2px_wheat] rounded-md rounded-tl-none";
       shadowRoot.appendChild(reactContainer);
@@ -538,7 +520,6 @@ export default defineContentScript({
 
     const mutationObserver = new MutationObserver((mutations) => {
       if (isApplyingInlineConversion) return;
-      // FIX #8: Use counter-based guard instead of fragile time-based check.
       if (suppressMutationDepth > 0) return;
 
       if (!mutations.some((entry) => entry.addedNodes.length > 0)) {
@@ -595,8 +576,6 @@ export default defineContentScript({
     document.addEventListener("mouseup", onMouseUp);
     document.addEventListener("mousedown", onMouseDown);
 
-    // FIX #7: Flush any pending usage synchronously via sendBeacon before
-    // unload so conversions done just before navigation are not lost.
     window.addEventListener("beforeunload", () => {
       mutationObserver.disconnect();
       settingsUnwatch();
@@ -619,15 +598,14 @@ export default defineContentScript({
         window.clearTimeout(settingsRefreshTimer);
       }
 
-      // Attempt a best-effort keepalive flush for any usage accumulated since
-      // the last scheduled flush.
+      // Best-effort usage flush that survives navigation.
       const remainingInline = pendingInlineUsage;
       const remainingSelection = pendingSelectionUsage;
       const accessToken = settings?.auth.accessToken;
 
       if (remainingInline + remainingSelection > 0 && accessToken) {
         try {
-          void fetch(`${getBackendBaseUrl()}/usage/events`, {
+          void fetch(usageEventsUrl, {
             method: "POST",
             keepalive: true,
             headers: {

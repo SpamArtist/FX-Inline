@@ -64,6 +64,36 @@ const userSettingsItem = storage.defineItem<UserSettings>(SETTINGS_KEY, {
   fallback: DEFAULT_USER_SETTINGS,
 });
 
+function areAuthSessionsEqual(a: AuthSession, b: AuthSession): boolean {
+  return (
+    a.email === b.email &&
+    a.accessToken === b.accessToken &&
+    a.refreshToken === b.refreshToken &&
+    a.accessTokenExpiresAt === b.accessTokenExpiresAt &&
+    a.refreshTokenExpiresAt === b.refreshTokenExpiresAt
+  );
+}
+
+function areEntitlementsEqual(a: EntitlementState, b: EntitlementState): boolean {
+  return (
+    a.status === b.status &&
+    a.planTier === b.planTier &&
+    a.checkedAt === b.checkedAt &&
+    a.trialEndsAt === b.trialEndsAt &&
+    a.currentPeriodEnd === b.currentPeriodEnd &&
+    a.dailyLimit === b.dailyLimit &&
+    a.remainingToday === b.remainingToday
+  );
+}
+
+function areUserSettingsEqual(a: UserSettings, b: UserSettings): boolean {
+  return (
+    a.preferredCurrency === b.preferredCurrency &&
+    areAuthSessionsEqual(a.auth, b.auth) &&
+    areEntitlementsEqual(a.entitlement, b.entitlement)
+  );
+}
+
 function asCurrencyCode(value: unknown): CurrencyCode {
   if (typeof value !== "string") {
     return DEFAULT_USER_SETTINGS.preferredCurrency;
@@ -169,7 +199,7 @@ export async function getUserSettings(): Promise<UserSettings> {
   const stored = await userSettingsItem.getValue();
   const sanitized = sanitizeUserSettings(stored);
 
-  if (JSON.stringify(stored) !== JSON.stringify(sanitized)) {
+  if (!areUserSettingsEqual(stored, sanitized)) {
     await userSettingsItem.setValue(sanitized);
   }
 
