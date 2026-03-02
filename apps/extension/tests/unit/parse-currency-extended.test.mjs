@@ -55,6 +55,18 @@ test("extractCurrencyTextMatches supports mixed symbol and ISO snippets", () => 
   expect(matches[2].value).toBe(10);
 });
 
+test("extractCurrencyTextMatches supports compact ISO prices in YouTube-style text", () => {
+  const matches = extractCurrencyTextMatches(
+    "200USD/month Coliving in Da Nang and USD350/week",
+  );
+
+  expect(matches).toHaveLength(2);
+  expect(matches[0].currency).toBe("USD");
+  expect(matches[0].value).toBe(200);
+  expect(matches[1].currency).toBe("USD");
+  expect(matches[1].value).toBe(350);
+});
+
 test("extractCurrencyTextMatches parses large VND listing price snippets", () => {
   const matches = extractCurrencyTextMatches("₫ 45,000,000 / month");
 

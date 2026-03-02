@@ -66,6 +66,8 @@ const isoPattern = Array.from(ISO_CODES)
   .sort((a, b) => b.length - a.length)
   .join("|");
 
+const isoTokenPattern = `(?<!\\p{L})(?:${isoPattern})(?!\\p{L})`;
+
 type ParserArtifacts = {
   magnitudeMultiplierByAlias: Map<string, number>;
   magnitudeSuffixRegex: RegExp;
@@ -87,7 +89,7 @@ function buildParserArtifacts(localeHint?: string | null): ParserArtifacts {
 
   const numberWithOptionalMagnitudePattern = `[+-]?\\d[\\d,.]*(?:\\s*(?:${magnitudePattern}))?`;
   const currencySnippetRegex = new RegExp(
-    `(?:\\b(?:${isoPattern})\\b\\s*${numberWithOptionalMagnitudePattern}|${numberWithOptionalMagnitudePattern}\\s*\\b(?:${isoPattern})\\b|(?:${symbolPattern})\\s*${numberWithOptionalMagnitudePattern}|${numberWithOptionalMagnitudePattern}\\s*(?:${symbolPattern}))`,
+    `(?:${isoTokenPattern}\\s*${numberWithOptionalMagnitudePattern}|${numberWithOptionalMagnitudePattern}\\s*${isoTokenPattern}|(?:${symbolPattern})\\s*${numberWithOptionalMagnitudePattern}|${numberWithOptionalMagnitudePattern}\\s*(?:${symbolPattern}))`,
     "giu",
   );
   const magnitudeSuffixRegex = new RegExp(
