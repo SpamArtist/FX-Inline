@@ -1,5 +1,3 @@
-import test from "node:test";
-import assert from "node:assert/strict";
 import { parseCurrencyValue, extractCurrencyTextMatches } from "../../test-dist/utils/utils.js";
 
 test("parseCurrencyValue supports roadmap formats", () => {
@@ -18,11 +16,11 @@ test("parseCurrencyValue supports roadmap formats", () => {
 
   for (const [input, expectedValid, expectedValue, expectedCurrency] of cases) {
     const parsed = parseCurrencyValue(input);
-    assert.equal(parsed.valid, expectedValid, input);
+    expect(parsed.valid).toBe(expectedValid);
 
     if (expectedValid) {
-      assert.equal(parsed.value, expectedValue, input);
-      assert.equal(parsed.currency ?? null, expectedCurrency ?? null, input);
+      expect(parsed.value).toBe(expectedValue);
+      expect(parsed.currency ?? null).toBe(expectedCurrency ?? null);
     }
   }
 });
@@ -30,9 +28,9 @@ test("parseCurrencyValue supports roadmap formats", () => {
 test("extractCurrencyTextMatches finds ISO/symbol snippets", () => {
   const matches = extractCurrencyTextMatches("Deal: $100 and 200 eur today");
 
-  assert.equal(matches.length, 2);
-  assert.equal(matches[0].currency, "USD");
-  assert.equal(matches[0].value, 100);
-  assert.equal(matches[1].currency, "EUR");
-  assert.equal(matches[1].value, 200);
+  expect(matches).toHaveLength(2);
+  expect(matches[0].currency).toBe("USD");
+  expect(matches[0].value).toBe(100);
+  expect(matches[1].currency).toBe("EUR");
+  expect(matches[1].value).toBe(200);
 });

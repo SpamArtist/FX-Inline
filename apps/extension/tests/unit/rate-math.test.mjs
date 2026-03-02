@@ -1,5 +1,3 @@
-import test from "node:test";
-import assert from "node:assert/strict";
 import { convertAmountWithSnapshot, formatConvertedAmount } from "../../test-dist/utils/rateMath.js";
 
 const snapshot = {
@@ -15,17 +13,17 @@ test("convertAmountWithSnapshot converts across currencies", () => {
   const usd = convertAmountWithSnapshot(80, "EUR", "USD", snapshot);
   const jpy = convertAmountWithSnapshot(10, "USD", "JPY", snapshot);
 
-  assert.equal(eur, 80);
-  assert.equal(usd, 100);
-  assert.equal(jpy, 1100);
+  expect(eur).toBe(80);
+  expect(usd).toBe(100);
+  expect(jpy).toBe(1100);
 });
 
 test("convertAmountWithSnapshot rejects invalid source rate", () => {
   const result = convertAmountWithSnapshot(50, "GBP", "USD", snapshot);
-  assert.equal(result, null);
+  expect(result).toBeNull();
 });
 
 test("formatConvertedAmount uses expected precision", () => {
-  assert.equal(formatConvertedAmount(1.234567, 4), "1.2346");
-  assert.equal(formatConvertedAmount(1.2, 2), "1.20");
+  expect(formatConvertedAmount(1.234567, 4)).toBe("1.2346");
+  expect(formatConvertedAmount(1.2, 2)).toBe("1.20");
 });
