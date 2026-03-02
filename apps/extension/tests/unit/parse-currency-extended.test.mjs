@@ -48,3 +48,11 @@ test("extractCurrencyTextMatches supports mixed symbol and ISO snippets", () => 
   expect(matches[1].currency).toBe("CAD");
   expect(matches[2].value).toBe(10);
 });
+
+test("extractCurrencyTextMatches parses large VND listing price snippets", () => {
+  const matches = extractCurrencyTextMatches("₫ 45,000,000 / month");
+
+  expect(matches).toHaveLength(1);
+  expect(matches[0].currency).toBe("VND");
+  expect(matches[0].value).toBe(45000000);
+});

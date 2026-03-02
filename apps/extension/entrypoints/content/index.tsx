@@ -13,6 +13,7 @@ import {
   getRatesForUser,
   RateSnapshot,
 } from "@/utils/rates";
+import { collectMutationConversionRoots } from "@/utils/mutationRoots";
 import { getBackendBaseUrl, recordUsageOnBackend } from "@/utils/backendClient";
 import {
   extractCurrencyTextMatches,
@@ -414,21 +415,6 @@ export default defineContentScript({
       }, 200);
     }
 
-    function queueMutationRoot(node: Node | null) {
-      if (!node) return;
-      if (popupRoot && node === popupRoot) return;
-
-      if (node.nodeType === Node.TEXT_NODE) {
-        const parent = node.parentElement;
-        if (parent) pendingMutationRoots.add(parent);
-        return;
-      }
-
-      if (node instanceof Element || node instanceof DocumentFragment) {
-        pendingMutationRoots.add(node);
-      }
-    }
-
     function schedulePartialInlineConversion() {
       if (partialConversionTimer) {
         window.clearTimeout(partialConversionTimer);
@@ -596,22 +582,13 @@ export default defineContentScript({
       if (isApplyingInlineConversion) return;
       if (suppressMutationDepth > 0) return;
 
-      let hasRelevantMutation = false;
+      const roots = collectMutationConversionRoots(mutations, popupRoot);
+      if (!roots.length) return;
 
-      for (const mutation of mutations) {
-        if (mutation.type === "characterData") {
-          hasRelevantMutation = true;
-          queueMutationRoot(mutation.target);
-          continue;
-        }
-
-        if (mutation.addedNodes.length > 0) {
-          hasRelevantMutation = true;
-          mutation.addedNodes.forEach((node) => queueMutationRoot(node));
-        }
+      for (const root of roots) {
+        pendingMutationRoots.add(root);
       }
 
-      if (!hasRelevantMutation || pendingMutationRoots.size === 0) return;
       schedulePartialInlineConversion();
     });
 

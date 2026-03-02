@@ -16,6 +16,7 @@
     "utils/utils.ts",
     "utils/constants.ts",
     "utils/enums.ts",
+    "utils/mutationRoots.ts",
     "utils/rateMath.ts",
     "utils/ratePolicy.ts"
   ]
