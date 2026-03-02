@@ -191,24 +191,30 @@ function convertVisiblePrices(
   preferredCurrency: CurrencyCode,
   rateSnapshot: RateSnapshot,
   root: ParentNode = document.body,
+  options?: {
+    clearExisting?: boolean;
+    maxNodesPerPass?: number;
+  },
 ): number {
   ensureInlineConversionStyles();
-  clearInlineConversions(root);
+  if (options?.clearExisting !== false) {
+    clearInlineConversions(root);
+  }
 
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
 
   const textNodes: Text[] = [];
-  const MAX_NODES_PER_PASS = 1200;
+  const maxNodesPerPass = options?.maxNodesPerPass ?? 15000;
 
-  while (walker.nextNode() && textNodes.length < MAX_NODES_PER_PASS) {
+  while (walker.nextNode() && textNodes.length < maxNodesPerPass) {
     const textNode = walker.currentNode as Text;
     if (shouldSkipTextNode(textNode)) continue;
     textNodes.push(textNode);
   }
 
-  if (import.meta.env.DEV && textNodes.length >= MAX_NODES_PER_PASS) {
+  if (import.meta.env.DEV && textNodes.length >= maxNodesPerPass) {
     console.warn(
-      `[ccx] Hit MAX_NODES_PER_PASS (${MAX_NODES_PER_PASS}); some prices on this page may not be converted.`,
+      `[ccx] Hit MAX_NODES_PER_PASS (${maxNodesPerPass}); some prices on this page may not be converted.`,
     );
   }
 
@@ -236,6 +242,7 @@ export default defineContentScript({
     let rateSnapshot: RateSnapshot | null = null;
 
     let conversionDebounceTimer: number | null = null;
+    let partialConversionTimer: number | null = null;
     let usageFlushTimer: number | null = null;
     let hydrationRetryTimer: number | null = null;
     let settingsRefreshTimer: number | null = null;
@@ -246,6 +253,7 @@ export default defineContentScript({
     let pendingInlineUsage = 0;
     let pendingSelectionUsage = 0;
     const usageEventsUrl = `${getBackendBaseUrl()}/usage/events`;
+    const pendingMutationRoots = new Set<ParentNode>();
 
     function isExtensionUiEvent(event: Event): boolean {
       if (!popupRoot) return false;
@@ -406,6 +414,72 @@ export default defineContentScript({
       }, 200);
     }
 
+    function queueMutationRoot(node: Node | null) {
+      if (!node) return;
+      if (popupRoot && node === popupRoot) return;
+
+      if (node.nodeType === Node.TEXT_NODE) {
+        const parent = node.parentElement;
+        if (parent) pendingMutationRoots.add(parent);
+        return;
+      }
+
+      if (node instanceof Element || node instanceof DocumentFragment) {
+        pendingMutationRoots.add(node);
+      }
+    }
+
+    function schedulePartialInlineConversion() {
+      if (partialConversionTimer) {
+        window.clearTimeout(partialConversionTimer);
+      }
+
+      partialConversionTimer = window.setTimeout(() => {
+        partialConversionTimer = null;
+
+        if (!pendingMutationRoots.size) return;
+
+        if (!settings || !rateSnapshot) {
+          pendingMutationRoots.clear();
+          scheduleInlineConversion();
+          return;
+        }
+
+        const roots = Array.from(pendingMutationRoots);
+        pendingMutationRoots.clear();
+
+        isApplyingInlineConversion = true;
+        suppressMutationDepth += 1;
+
+        try {
+          let conversions = 0;
+
+          for (const root of roots) {
+            if (!(root instanceof Node) || !root.isConnected) continue;
+
+            conversions += convertVisiblePrices(
+              settings.preferredCurrency,
+              rateSnapshot,
+              root,
+              {
+                clearExisting: false,
+                maxNodesPerPass: 4000,
+              },
+            );
+          }
+
+          if (conversions > 0) {
+            scheduleUsageFlush(conversions, 0);
+          }
+        } finally {
+          isApplyingInlineConversion = false;
+          window.setTimeout(() => {
+            suppressMutationDepth = Math.max(0, suppressMutationDepth - 1);
+          }, 400);
+        }
+      }, 120);
+    }
+
     function scheduleInlineConversionFromSettingsUpdate() {
       if (settingsRefreshTimer) {
         window.clearTimeout(settingsRefreshTimer);
@@ -522,16 +596,29 @@ export default defineContentScript({
       if (isApplyingInlineConversion) return;
       if (suppressMutationDepth > 0) return;
 
-      if (!mutations.some((entry) => entry.addedNodes.length > 0)) {
-        return;
+      let hasRelevantMutation = false;
+
+      for (const mutation of mutations) {
+        if (mutation.type === "characterData") {
+          hasRelevantMutation = true;
+          queueMutationRoot(mutation.target);
+          continue;
+        }
+
+        if (mutation.addedNodes.length > 0) {
+          hasRelevantMutation = true;
+          mutation.addedNodes.forEach((node) => queueMutationRoot(node));
+        }
       }
 
-      scheduleInlineConversion();
+      if (!hasRelevantMutation || pendingMutationRoots.size === 0) return;
+      schedulePartialInlineConversion();
     });
 
     mutationObserver.observe(document.body, {
       childList: true,
       subtree: true,
+      characterData: true,
     });
 
     const onMouseUp = (event: MouseEvent) => {
@@ -588,6 +675,10 @@ export default defineContentScript({
 
       if (usageFlushTimer) {
         window.clearTimeout(usageFlushTimer);
+      }
+
+      if (partialConversionTimer) {
+        window.clearTimeout(partialConversionTimer);
       }
 
       if (hydrationRetryTimer) {
