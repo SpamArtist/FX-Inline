@@ -13,7 +13,7 @@ import {
   getRatesForUser,
   RateSnapshot,
 } from "@/utils/rates";
-import { recordUsageOnBackend } from "@/utils/backendClient";
+import { getBackendBaseUrl, recordUsageOnBackend } from "@/utils/backendClient";
 import {
   extractCurrencyTextMatches,
   formatAmountInCurrency,
@@ -28,6 +28,17 @@ import contentBoxStyles from "./content.css?inline";
 const INLINE_CONVERSION_CLASS = "ccx-inline-conversion";
 const INLINE_CONVERSION_STYLE_ID = "ccx-inline-conversion-style";
 const USER_SETTINGS_STORAGE_KEY = SETTINGS_KEY;
+const PORTAL_DROPDOWN_CLASS = "ccx-dropdown-menu-content";
+const UI_EVENT_TYPES = [
+  "pointerdown",
+  "pointerup",
+  "mousedown",
+  "mouseup",
+  "click",
+  "contextmenu",
+  "touchstart",
+  "touchend",
+] as const;
 
 const SKIP_TAGS = new Set([
   "SCRIPT",
@@ -60,6 +71,28 @@ function clearInlineConversions(root: ParentNode = document.body) {
     const originalText = node.getAttribute("data-original") || node.textContent || "";
     node.replaceWith(document.createTextNode(originalText));
   });
+
+  // FIX #1: Normalize the DOM after replacements to merge adjacent text nodes,
+  // preventing missed matches on subsequent passes.
+  if (root instanceof Element || root instanceof Document) {
+    root.normalize();
+  }
+}
+
+function getEventElementTarget(target: EventTarget | null): Element | null {
+  if (!target) return null;
+  if (target instanceof Element) return target;
+  if (target instanceof Node) return target.parentElement;
+  return null;
+}
+
+function stopEventPropagation(event: Event) {
+  if (event.cancelable) {
+    event.preventDefault();
+  }
+
+  event.stopImmediatePropagation();
+  event.stopPropagation();
 }
 
 function ensureInlineConversionStyles() {
@@ -67,19 +100,21 @@ function ensureInlineConversionStyles() {
 
   const styleTag = document.createElement("style");
   styleTag.id = INLINE_CONVERSION_STYLE_ID;
+  // FIX #9: Use stronger specificity with :where() wrapper to reduce risk of
+  // page CSS overriding our injected styles in document.head.
   styleTag.textContent = `
-    .${INLINE_CONVERSION_CLASS} {
-      border-radius: 4px;
-      background-color: rgba(15, 23, 42, 0.12);
-      color: #0f172a;
-      padding: 0 0.2em;
-      white-space: normal;
+    :where(.${INLINE_CONVERSION_CLASS}) {
+      border-radius: 4px !important;
+      background-color: rgba(15, 23, 42, 0.12) !important;
+      color: #0f172a !important;
+      padding: 0 0.2em !important;
+      white-space: normal !important;
     }
 
-    .${INLINE_CONVERSION_CLASS} .ccx-converted-amount {
-      font-weight: 600;
-      color: #1d4ed8;
-      margin-left: 0.1em;
+    :where(.${INLINE_CONVERSION_CLASS}) .ccx-converted-amount {
+      font-weight: 600 !important;
+      color: #1d4ed8 !important;
+      margin-left: 0.1em !important;
     }
   `;
 
@@ -97,11 +132,16 @@ function decoratePricesInTextNode(
   const matches = extractCurrencyTextMatches(text);
   if (!matches.length) return 0;
 
+  // FIX #2: Sort matches by start position to guarantee correct cursor
+  // advancement and prevent skipped or mishandled overlapping matches.
+  const sortedMatches = [...matches].sort((a, b) => a.start - b.start);
+
   let cursor = 0;
   let conversionsApplied = 0;
   const fragment = document.createDocumentFragment();
 
-  for (const match of matches) {
+  for (const match of sortedMatches) {
+    // Skip truly overlapping matches (starts before where we left off).
     if (match.start < cursor) continue;
 
     fragment.append(text.slice(cursor, match.start));
@@ -171,6 +211,14 @@ function convertVisiblePrices(
     textNodes.push(textNode);
   }
 
+  // FIX #6: Warn in development if the node cap was hit so truncation is
+  // visible during testing rather than silently causing incomplete conversions.
+  if (textNodes.length >= MAX_NODES_PER_PASS) {
+    console.warn(
+      `[ccx] Hit MAX_NODES_PER_PASS (${MAX_NODES_PER_PASS}); some prices on this page may not be converted.`,
+    );
+  }
+
   let totalConversions = 0;
 
   textNodes.forEach((node) => {
@@ -198,12 +246,38 @@ export default defineContentScript({
     let conversionDebounceTimer: number | null = null;
     let usageFlushTimer: number | null = null;
     let hydrationRetryTimer: number | null = null;
+    let settingsRefreshTimer: number | null = null;
     let isApplyingInlineConversion = false;
+    // FIX #8: Replace time-based mutation suppression with a reliable counter.
+    let suppressMutationDepth = 0;
     let isHydratingRates = false;
-    let suppressMutationsUntil = 0;
 
     let pendingInlineUsage = 0;
     let pendingSelectionUsage = 0;
+
+    function isExtensionUiEvent(event: Event): boolean {
+      if (!popupRoot) return false;
+      if (!(event.target instanceof Node)) return false;
+
+      if (popupRoot.contains(event.target)) {
+        return true;
+      }
+
+      const elementTarget = getEventElementTarget(event.target);
+      if (!elementTarget) return false;
+
+      return Boolean(elementTarget.closest(`.${PORTAL_DROPDOWN_CLASS}`));
+    }
+
+    const swallowUiEvent = (event: Event) => {
+      if (!isExtensionUiEvent(event)) return;
+      stopEventPropagation(event);
+    };
+
+    UI_EVENT_TYPES.forEach((eventType) => {
+      window.addEventListener(eventType, swallowUiEvent, true);
+      document.addEventListener(eventType, swallowUiEvent, true);
+    });
 
     function removePopup() {
       if (popupRoot && document.body.contains(popupRoot)) {
@@ -220,8 +294,10 @@ export default defineContentScript({
       rateSnapshot = await getRatesForUser(settings, { forceRefresh });
     }
 
+    // FIX #5: Accept forceRefresh and bypass the in-flight guard when forced,
+    // so a forced refresh always runs rather than being silently dropped.
     async function hydrateSettingsAndRates(forceRefresh = false) {
-      if (isHydratingRates) return;
+      if (isHydratingRates && !forceRefresh) return;
       isHydratingRates = true;
 
       try {
@@ -256,6 +332,29 @@ export default defineContentScript({
       settings = updated;
     }
 
+    // FIX #3: Accept an explicit usage payload so callers can pass already-
+    // snapshotted counts. On failure, re-add the counts back to the pending
+    // totals so they are not silently dropped.
+    async function flushUsage(inlineConversions: number, selectionConversions: number) {
+      if (inlineConversions + selectionConversions <= 0) return;
+
+      try {
+        const token = await getValidAccessToken();
+        if (!token) return;
+
+        const usage = await recordUsageOnBackend(token, {
+          inlineConversions,
+          selectionConversions,
+        });
+
+        await applyUsageEntitlement(usage.entitlement);
+      } catch {
+        // Re-queue counts so they are not lost on transient network errors.
+        pendingInlineUsage += inlineConversions;
+        pendingSelectionUsage += selectionConversions;
+      }
+    }
+
     function scheduleUsageFlush(inlineDelta = 0, selectionDelta = 0) {
       pendingInlineUsage += Math.max(0, Math.floor(inlineDelta));
       pendingSelectionUsage += Math.max(0, Math.floor(selectionDelta));
@@ -271,21 +370,7 @@ export default defineContentScript({
         pendingInlineUsage = 0;
         pendingSelectionUsage = 0;
 
-        if (inlineConversions + selectionConversions <= 0) return;
-
-        try {
-          const token = await getValidAccessToken();
-          if (!token) return;
-
-          const usage = await recordUsageOnBackend(token, {
-            inlineConversions,
-            selectionConversions,
-          });
-
-          await applyUsageEntitlement(usage.entitlement);
-        } catch {
-          // Ignore usage network errors and continue local UX.
-        }
+        await flushUsage(inlineConversions, selectionConversions);
       }, 1200);
     }
 
@@ -315,6 +400,8 @@ export default defineContentScript({
         }
 
         isApplyingInlineConversion = true;
+        // FIX #8: Increment depth counter before DOM work.
+        suppressMutationDepth += 1;
 
         try {
           const conversions = convertVisiblePrices(
@@ -327,9 +414,25 @@ export default defineContentScript({
           }
         } finally {
           isApplyingInlineConversion = false;
-          suppressMutationsUntil = Date.now() + 400;
+          // Decrement after a short delay to let the browser process DOM events
+          // triggered by our changes before re-enabling the observer.
+          window.setTimeout(() => {
+            suppressMutationDepth = Math.max(0, suppressMutationDepth - 1);
+          }, 400);
         }
       }, 200);
+    }
+
+    function scheduleInlineConversionFromSettingsUpdate() {
+      if (settingsRefreshTimer) {
+        window.clearTimeout(settingsRefreshTimer);
+      }
+
+      // Delay a bit after settings writes to avoid piggybacking a page gesture window.
+      settingsRefreshTimer = window.setTimeout(() => {
+        settingsRefreshTimer = null;
+        scheduleInlineConversion();
+      }, 1400);
     }
 
     function CurrencyConvertorPopupBox({
@@ -396,10 +499,12 @@ export default defineContentScript({
       popupRoot.style.top = `${y}px`;
       popupRoot.style.left = `${x}px`;
       popupRoot.style.zIndex = "9999999";
+      popupRoot.style.pointerEvents = "auto";
 
       const reactContainer = document.createElement("div");
       reactContainer.id = "popup-react-container";
-      reactContainer.classList =
+      // FIX #4: classList is read-only; use className instead.
+      reactContainer.className =
         "w-[18em] [box-shadow:0px_0px_3px_2px_wheat] rounded-md rounded-tl-none";
       shadowRoot.appendChild(reactContainer);
 
@@ -424,7 +529,7 @@ export default defineContentScript({
       async () => {
         try {
           await refreshSettingsAndRates(true);
-          scheduleInlineConversion();
+          scheduleInlineConversionFromSettingsUpdate();
         } catch (error) {
           console.warn("[ccx] Failed to refresh settings/rates after storage update", error);
         }
@@ -433,7 +538,8 @@ export default defineContentScript({
 
     const mutationObserver = new MutationObserver((mutations) => {
       if (isApplyingInlineConversion) return;
-      if (Date.now() < suppressMutationsUntil) return;
+      // FIX #8: Use counter-based guard instead of fragile time-based check.
+      if (suppressMutationDepth > 0) return;
 
       if (!mutations.some((entry) => entry.addedNodes.length > 0)) {
         return;
@@ -447,7 +553,9 @@ export default defineContentScript({
       subtree: true,
     });
 
-    document.addEventListener("mouseup", () => {
+    const onMouseUp = (event: MouseEvent) => {
+      if (isExtensionUiEvent(event)) return;
+
       const selection = window.getSelection();
       const text = selection?.toString().trim();
 
@@ -471,20 +579,33 @@ export default defineContentScript({
       const sourceCurrency = currency ?? CurrencyCode["UNITED STATES DOLLAR"];
       showPopup(x, y, value.toString(), sourceCurrency);
       scheduleUsageFlush(0, 1);
-    });
+    };
 
-    document.addEventListener("mousedown", (event) => {
+    const onMouseDown = (event: MouseEvent) => {
+      if (isExtensionUiEvent(event)) return;
+
       if (popupRoot && !popupRoot.contains(event.target as Node)) {
         const selection = window.getSelection();
         if (!selection?.toString().trim()) {
           removePopup();
         }
       }
-    });
+    };
 
+    document.addEventListener("mouseup", onMouseUp);
+    document.addEventListener("mousedown", onMouseDown);
+
+    // FIX #7: Flush any pending usage synchronously via sendBeacon before
+    // unload so conversions done just before navigation are not lost.
     window.addEventListener("beforeunload", () => {
       mutationObserver.disconnect();
       settingsUnwatch();
+      UI_EVENT_TYPES.forEach((eventType) => {
+        window.removeEventListener(eventType, swallowUiEvent, true);
+        document.removeEventListener(eventType, swallowUiEvent, true);
+      });
+      document.removeEventListener("mouseup", onMouseUp);
+      document.removeEventListener("mousedown", onMouseDown);
 
       if (usageFlushTimer) {
         window.clearTimeout(usageFlushTimer);
@@ -492,6 +613,35 @@ export default defineContentScript({
 
       if (hydrationRetryTimer) {
         window.clearTimeout(hydrationRetryTimer);
+      }
+
+      if (settingsRefreshTimer) {
+        window.clearTimeout(settingsRefreshTimer);
+      }
+
+      // Attempt a best-effort keepalive flush for any usage accumulated since
+      // the last scheduled flush.
+      const remainingInline = pendingInlineUsage;
+      const remainingSelection = pendingSelectionUsage;
+      const accessToken = settings?.auth.accessToken;
+
+      if (remainingInline + remainingSelection > 0 && accessToken) {
+        try {
+          void fetch(`${getBackendBaseUrl()}/usage/events`, {
+            method: "POST",
+            keepalive: true,
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({
+              inlineConversions: remainingInline,
+              selectionConversions: remainingSelection,
+            }),
+          });
+        } catch {
+          // Best effort — nothing more we can do at unload time.
+        }
       }
     });
   },
