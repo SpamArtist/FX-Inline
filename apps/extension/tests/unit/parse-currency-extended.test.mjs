@@ -10,6 +10,9 @@ test("parseCurrencyValue handles signs, separators, and lowercase iso", () => {
     ["+150 usd", true, 150, "USD"],
     ["42.5eur", true, 42.5, "EUR"],
     ["JPY 1,234", true, 1234, "JPY"],
+    ["USD 1.2 million", true, 1200000, "USD"],
+    ["2 billions USD", true, 2000000000, "USD"],
+    ["₫ 4.295 trillion", true, 4295000000000, "VND"],
   ];
 
   for (const [input, valid, value, currency] of cases) {
@@ -55,4 +58,12 @@ test("extractCurrencyTextMatches parses large VND listing price snippets", () =>
   expect(matches).toHaveLength(1);
   expect(matches[0].currency).toBe("VND");
   expect(matches[0].value).toBe(45000000);
+});
+
+test("extractCurrencyTextMatches parses word magnitudes in listing snippets", () => {
+  const matches = extractCurrencyTextMatches("Median price ₫ 4.295 billion");
+
+  expect(matches).toHaveLength(1);
+  expect(matches[0].currency).toBe("VND");
+  expect(matches[0].value).toBe(4295000000);
 });

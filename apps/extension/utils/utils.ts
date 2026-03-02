@@ -8,6 +8,14 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 const CURRENCY_CODE_VALUES = new Set(Object.values(CurrencyCode));
+const MAGNITUDE_MULTIPLIER_BY_WORD: Record<string, number> = {
+  million: 1_000_000,
+  millions: 1_000_000,
+  billion: 1_000_000_000,
+  billions: 1_000_000_000,
+  trillion: 1_000_000_000_000,
+  trillions: 1_000_000_000_000,
+};
 
 const CURRENCY_SYMBOL_TO_CODE: Partial<Record<string, CurrencyCode>> = {
   $: CurrencyCode["UNITED STATES DOLLAR"],
@@ -61,8 +69,15 @@ const isoPattern = Array.from(ISO_CODES)
   .sort((a, b) => b.length - a.length)
   .join("|");
 
+const magnitudePattern = Object.keys(MAGNITUDE_MULTIPLIER_BY_WORD)
+  .map(escapeRegex)
+  .sort((a, b) => b.length - a.length)
+  .join("|");
+
+const numberWithOptionalMagnitudePattern = `[+-]?\\d[\\d,.]*(?:\\s+(?:${magnitudePattern}))?`;
+
 const CURRENCY_SNIPPET_REGEX = new RegExp(
-  `(?:\\b(?:${isoPattern})\\b\\s*[+-]?\\d[\\d,.]*|[+-]?\\d[\\d,.]*\\s*\\b(?:${isoPattern})\\b|(?:${symbolPattern})\\s*[+-]?\\d[\\d,.]*|[+-]?\\d[\\d,.]*\\s*(?:${symbolPattern}))`,
+  `(?:\\b(?:${isoPattern})\\b\\s*${numberWithOptionalMagnitudePattern}|${numberWithOptionalMagnitudePattern}\\s*\\b(?:${isoPattern})\\b|(?:${symbolPattern})\\s*${numberWithOptionalMagnitudePattern}|${numberWithOptionalMagnitudePattern}\\s*(?:${symbolPattern}))`,
   "gi",
 );
 
@@ -157,6 +172,31 @@ function parseFlexibleNumber(
   return Number.isFinite(num) ? sign * num : null;
 }
 
+function parseNumberWithOptionalMagnitude(input: string): number | null {
+  const trimmed = input.trim();
+  if (!trimmed.length) return null;
+
+  const magnitudeMatch = trimmed.match(
+    /^(.+?)\s+(million|millions|billion|billions|trillion|trillions)$/i,
+  );
+
+  if (!magnitudeMatch) {
+    return parseFlexibleNumber(trimmed, 0, trimmed.length);
+  }
+
+  const numberText = magnitudeMatch[1].trim();
+  const magnitudeWord = magnitudeMatch[2].toLowerCase();
+  if (!numberText.length) return null;
+
+  const baseValue = parseFlexibleNumber(numberText, 0, numberText.length);
+  if (baseValue === null) return null;
+
+  const multiplier = MAGNITUDE_MULTIPLIER_BY_WORD[magnitudeWord];
+  if (multiplier === undefined) return null;
+
+  return baseValue * multiplier;
+}
+
 function parseWithTokenPrefix(input: string): {
   value: number;
   currency: CurrencyCode;
@@ -176,7 +216,7 @@ function parseWithTokenPrefix(input: string): {
     const valueText = input.slice(tokenInfo.token.length).trim();
     if (!valueText.length) continue;
 
-    const value = parseFlexibleNumber(valueText, 0, valueText.length);
+    const value = parseNumberWithOptionalMagnitude(valueText);
     if (value !== null) {
       return {
         value,
@@ -207,7 +247,7 @@ function parseWithTokenSuffix(input: string): {
     const valueText = input.slice(0, input.length - tokenInfo.token.length).trim();
     if (!valueText.length) continue;
 
-    const value = parseFlexibleNumber(valueText, 0, valueText.length);
+    const value = parseNumberWithOptionalMagnitude(valueText);
     if (value !== null) {
       return {
         value,
@@ -227,7 +267,7 @@ export function parseCurrencyValue(
   const str = String(input).trim();
   if (!str.length) return { valid: false };
 
-  const numericOnly = parseFlexibleNumber(str, 0, str.length);
+  const numericOnly = parseNumberWithOptionalMagnitude(str);
   if (numericOnly !== null) {
     return { valid: true, value: numericOnly, currency: null };
   }
