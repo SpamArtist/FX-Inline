@@ -5,6 +5,11 @@ import { recordUsageOnBackend } from "@/utils/backendClient";
 import { CurrencyCode } from "@/utils/enums";
 import { RateSnapshot, getRatesForUser } from "@/utils/rates";
 import { convertVisiblePrices } from "./inlineConversion";
+import {
+  addInlinePerfSample,
+  createInlineConversionPerfAggregate,
+  createPerfLogger,
+} from "./perfLogger";
 
 export type PendingUsageSnapshot = {
   inlineConversions: number;
@@ -23,6 +28,11 @@ export type ContentConversionRuntime = {
 };
 
 export function createContentConversionRuntime(): ContentConversionRuntime {
+  const perfLogger = createPerfLogger("ccx");
+  const perfLoggingEnabled = perfLogger.enabled;
+  const logPerf = perfLogger.log;
+  const roundMs = perfLogger.roundMs;
+
   let settings: Awaited<ReturnType<typeof getUserSettings>> | null = null;
   let rateSnapshot: RateSnapshot | null = null;
 
@@ -40,8 +50,19 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
   const pendingMutationRoots = new Set<ParentNode>();
 
   async function refreshSettingsAndRates(forceRefresh = false) {
+    const startedAt = perfLoggingEnabled ? performance.now() : 0;
+
     settings = await getUserSettings();
     rateSnapshot = await getRatesForUser(settings, { forceRefresh });
+
+    if (perfLoggingEnabled) {
+      logPerf("refreshSettingsAndRates", {
+        forceRefresh,
+        preferredCurrency: settings.preferredCurrency,
+        rateSource: rateSnapshot.source ?? "unknown",
+        durationMs: roundMs(performance.now() - startedAt),
+      });
+    }
   }
 
   async function hydrateSettingsAndRates(forceRefresh = false) {
@@ -85,6 +106,9 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
   async function flushUsage(inlineConversions: number, selectionConversions: number) {
     if (inlineConversions + selectionConversions <= 0) return;
 
+    const startedAt = perfLoggingEnabled ? performance.now() : 0;
+    let success = false;
+
     try {
       const token = await getValidAccessToken();
       if (!token) return;
@@ -95,10 +119,20 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
       });
 
       await applyUsageEntitlement(usage.entitlement);
+      success = true;
     } catch {
       // Re-queue counts so they are not lost on transient network errors.
       pendingInlineUsage += inlineConversions;
       pendingSelectionUsage += selectionConversions;
+    } finally {
+      if (perfLoggingEnabled) {
+        logPerf("flushUsage", {
+          inlineConversions,
+          selectionConversions,
+          success,
+          durationMs: roundMs(performance.now() - startedAt),
+        });
+      }
     }
   }
 
@@ -151,7 +185,28 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
 
       try {
         const preferredCurrency = settings.preferredCurrency as CurrencyCode;
-        const conversions = convertVisiblePrices(preferredCurrency, rateSnapshot);
+        const conversions = convertVisiblePrices(
+          preferredCurrency,
+          rateSnapshot,
+          document.body,
+          perfLoggingEnabled
+            ? {
+                onPerfSample: (sample) => {
+                  logPerf("inlineConversion.full", {
+                    preferredCurrency,
+                    conversions: sample.conversionsApplied,
+                    pendingMutationRoots: pendingMutationRoots.size,
+                    totalMs: roundMs(sample.totalMs),
+                    clearExistingMs: roundMs(sample.clearExistingMs),
+                    scanTextNodesMs: roundMs(sample.scanTextNodesMs),
+                    decorateNodesMs: roundMs(sample.decorateNodesMs),
+                    scannedTextNodes: sample.scannedTextNodes,
+                    reachedNodeLimit: sample.reachedNodeLimit,
+                  });
+                },
+              }
+            : undefined,
+        );
 
         if (conversions > 0) {
           scheduleUsageFlush(conversions, 0);
@@ -190,18 +245,43 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
       try {
         const preferredCurrency = settings.preferredCurrency as CurrencyCode;
         let conversions = 0;
+        let connectedRoots = 0;
+        const perfAggregate = perfLoggingEnabled
+          ? createInlineConversionPerfAggregate()
+          : null;
 
         for (const root of roots) {
           if (!(root instanceof Node) || !root.isConnected) continue;
+          connectedRoots += 1;
 
           conversions += convertVisiblePrices(preferredCurrency, rateSnapshot, root, {
             clearExisting: false,
             maxNodesPerPass: 4000,
+            onPerfSample: perfAggregate
+              ? (sample) => {
+                  addInlinePerfSample(perfAggregate, sample);
+                }
+              : undefined,
           });
         }
 
         if (conversions > 0) {
           scheduleUsageFlush(conversions, 0);
+        }
+
+        if (perfAggregate) {
+          logPerf("inlineConversion.partial", {
+            preferredCurrency,
+            rootsQueued: roots.length,
+            rootsProcessed: connectedRoots,
+            conversions,
+            totalMs: roundMs(perfAggregate.totalMs),
+            clearExistingMs: roundMs(perfAggregate.clearExistingMs),
+            scanTextNodesMs: roundMs(perfAggregate.scanTextNodesMs),
+            decorateNodesMs: roundMs(perfAggregate.decorateNodesMs),
+            scannedTextNodes: perfAggregate.scannedTextNodes,
+            reachedNodeLimitPasses: perfAggregate.reachedNodeLimitPasses,
+          });
         }
       } finally {
         isApplyingInlineConversion = false;
@@ -226,21 +306,43 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
 
   return {
     initialize: async () => {
+      const startedAt = perfLoggingEnabled ? performance.now() : 0;
+      let hydrated = false;
+
       try {
         await refreshSettingsAndRates();
+        hydrated = true;
       } catch (error) {
         console.warn("[ccx] Initial settings/rates hydration failed", error);
         // Keep selection popup functional even if rates are unavailable initially.
+      } finally {
+        if (perfLoggingEnabled) {
+          logPerf("initialize", {
+            hydrated,
+            durationMs: roundMs(performance.now() - startedAt),
+          });
+        }
       }
 
       scheduleInlineConversion();
     },
     onSettingsStorageUpdate: async () => {
+      const startedAt = perfLoggingEnabled ? performance.now() : 0;
+      let refreshed = false;
+
       try {
         await refreshSettingsAndRates(true);
+        refreshed = true;
         scheduleInlineConversionFromSettingsUpdate();
       } catch (error) {
         console.warn("[ccx] Failed to refresh settings/rates after storage update", error);
+      } finally {
+        if (perfLoggingEnabled) {
+          logPerf("onSettingsStorageUpdate", {
+            refreshed,
+            durationMs: roundMs(performance.now() - startedAt),
+          });
+        }
       }
     },
     enqueueMutationRoots: (roots) => {

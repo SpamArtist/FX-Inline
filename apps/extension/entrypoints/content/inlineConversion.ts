@@ -40,6 +40,17 @@ const SKIP_TAGS = new Set([
   "SVG",
 ]);
 
+export type InlineConversionPerfSample = {
+  totalMs: number;
+  clearExistingMs: number;
+  scanTextNodesMs: number;
+  decorateNodesMs: number;
+  scannedTextNodes: number;
+  conversionsApplied: number;
+  maxNodesPerPass: number;
+  reachedNodeLimit: boolean;
+};
+
 function shouldSkipTextNode(node: Text): boolean {
   const parent = node.parentElement;
 
@@ -246,15 +257,25 @@ export function convertVisiblePrices(
   options?: {
     clearExisting?: boolean;
     maxNodesPerPass?: number;
+    onPerfSample?: (sample: InlineConversionPerfSample) => void;
   },
 ): number {
+  const capturePerf = Boolean(options?.onPerfSample);
+  const totalStartedAt = capturePerf ? performance.now() : 0;
+
   ensureInlineConversionStyles();
   const localeHint = document.documentElement?.lang || null;
+  let clearExistingMs = 0;
 
   if (options?.clearExisting !== false) {
+    const clearStartedAt = capturePerf ? performance.now() : 0;
     clearInlineConversions(root);
+    if (capturePerf) {
+      clearExistingMs = performance.now() - clearStartedAt;
+    }
   }
 
+  const scanStartedAt = capturePerf ? performance.now() : 0;
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
 
   const textNodes: Text[] = [];
@@ -265,6 +286,7 @@ export function convertVisiblePrices(
     if (shouldSkipTextNode(textNode)) continue;
     textNodes.push(textNode);
   }
+  const scanTextNodesMs = capturePerf ? performance.now() - scanStartedAt : 0;
 
   if (import.meta.env.DEV && textNodes.length >= maxNodesPerPass) {
     console.warn(
@@ -273,6 +295,7 @@ export function convertVisiblePrices(
   }
 
   let totalConversions = 0;
+  const decorateStartedAt = capturePerf ? performance.now() : 0;
 
   textNodes.forEach((node) => {
     totalConversions += decoratePricesInTextNode(
@@ -282,6 +305,21 @@ export function convertVisiblePrices(
       localeHint,
     );
   });
+
+  if (capturePerf && options?.onPerfSample) {
+    const decorateNodesMs = performance.now() - decorateStartedAt;
+
+    options.onPerfSample({
+      totalMs: performance.now() - totalStartedAt,
+      clearExistingMs,
+      scanTextNodesMs,
+      decorateNodesMs,
+      scannedTextNodes: textNodes.length,
+      conversionsApplied: totalConversions,
+      maxNodesPerPass,
+      reachedNodeLimit: textNodes.length >= maxNodesPerPass,
+    });
+  }
 
   return totalConversions;
 }
