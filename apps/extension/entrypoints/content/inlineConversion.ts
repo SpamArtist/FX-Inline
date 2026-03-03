@@ -6,6 +6,25 @@ import { extractCurrencyTextMatches, formatAmountInCurrency } from "@/utils/util
 export const INLINE_CONVERSION_CLASS = "ccx-inline-conversion";
 const INLINE_CONVERSION_STYLE_ID = "ccx-inline-conversion-style";
 const INLINE_COMPACT_THRESHOLD = 1_000_000;
+const INLINE_CONVERSION_CSS = `
+  :where(.${INLINE_CONVERSION_CLASS}) {
+    border-radius: 0 !important;
+    background-color: transparent !important;
+    color: inherit !important;
+    padding: 0 !important;
+    white-space: normal !important;
+  }
+
+  :where(.${INLINE_CONVERSION_CLASS}) .ccx-converted-amount {
+    font-weight: 600 !important;
+    color: var(--ccx-converted-color, currentColor) !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin-left: 0.1em !important;
+  }
+`;
 
 const SKIP_TAGS = new Set([
   "SCRIPT",
@@ -94,27 +113,13 @@ function ensureInlineConversionStyles() {
     styleTag = document.createElement("style");
     styleTag.id = INLINE_CONVERSION_STYLE_ID;
     document.head.appendChild(styleTag);
+    styleTag.textContent = INLINE_CONVERSION_CSS;
+    return;
   }
 
-  styleTag.textContent = `
-    :where(.${INLINE_CONVERSION_CLASS}) {
-      border-radius: 0 !important;
-      background-color: transparent !important;
-      color: inherit !important;
-      padding: 0 !important;
-      white-space: normal !important;
-    }
-
-    :where(.${INLINE_CONVERSION_CLASS}) .ccx-converted-amount {
-      font-weight: 600 !important;
-      color: var(--ccx-converted-color, currentColor) !important;
-      background-color: transparent !important;
-      box-shadow: none !important;
-      border-radius: 0 !important;
-      padding: 0 !important;
-      margin-left: 0.1em !important;
-    }
-  `;
+  if (styleTag.textContent !== INLINE_CONVERSION_CSS) {
+    styleTag.textContent = INLINE_CONVERSION_CSS;
+  }
 }
 
 function decoratePricesInTextNode(
