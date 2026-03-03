@@ -217,15 +217,27 @@ function relativeLuminance([r, g, b]: [number, number, number]): number {
   return 0.2126 * toLinearRgb(r) + 0.7152 * toLinearRgb(g) + 0.0722 * toLinearRgb(b);
 }
 
-function usesLightTextColor(node: Text): boolean {
+function usesLightTextColor(
+  node: Text,
+  lightTextCache?: WeakMap<Element, boolean>,
+): boolean {
   const parent = node.parentElement;
   if (!parent) return false;
 
+  if (lightTextCache?.has(parent)) {
+    return lightTextCache.get(parent) ?? false;
+  }
+
   const color = window.getComputedStyle(parent).color;
   const rgb = parseRgbChannels(color);
-  if (!rgb) return false;
+  if (!rgb) {
+    lightTextCache?.set(parent, false);
+    return false;
+  }
 
-  return relativeLuminance(rgb) >= 0.6;
+  const isLightText = relativeLuminance(rgb) >= 0.6;
+  lightTextCache?.set(parent, isLightText);
+  return isLightText;
 }
 
 function ensureInlineConversionStyles() {
@@ -251,13 +263,14 @@ function decoratePricesInTextNode(
   preferredCurrency: CurrencyCode,
   rateSnapshot: RateSnapshot,
   localeHint: string | null,
+  lightTextCache?: WeakMap<Element, boolean>,
 ): number {
   const text = textNode.nodeValue;
   if (!text?.trim()) return 0;
-  const lightTextContext = usesLightTextColor(textNode);
 
   const matches = extractCurrencyTextMatches(text, localeHint);
   if (!matches.length) return 0;
+  const lightTextContext = usesLightTextColor(textNode, lightTextCache);
 
   const sortedMatches = [...matches].sort((a, b) => a.start - b.start);
 
@@ -356,6 +369,7 @@ export function convertVisiblePrices(
 
   const textNodes: Text[] = [];
   const maxNodesPerPass = options?.maxNodesPerPass ?? 15000;
+  const lightTextCache = new WeakMap<Element, boolean>();
 
   while (walker.nextNode() && textNodes.length < maxNodesPerPass) {
     const textNode = walker.currentNode as Text;
@@ -379,6 +393,7 @@ export function convertVisiblePrices(
       preferredCurrency,
       rateSnapshot,
       localeHint,
+      lightTextCache,
     );
   });
 
