@@ -10,15 +10,11 @@ import contentBoxStyles from "./content.css?inline";
 
 const USER_SETTINGS_STORAGE_KEY = SETTINGS_KEY;
 const PORTAL_DROPDOWN_CLASS = "ccx-dropdown-menu-content";
-const UI_EVENT_TYPES = [
+const UI_CAPTURE_EVENT_TYPES = [
   "pointerdown",
-  "pointerup",
   "mousedown",
-  "mouseup",
   "click",
   "contextmenu",
-  "touchstart",
-  "touchend",
 ] as const;
 
 function getEventElementTarget(target: EventTarget | null): Element | null {
@@ -44,6 +40,7 @@ export default defineContentScript({
     const popupController = createSelectionPopupController(contentBoxStyles);
     const conversionRuntime = createContentConversionRuntime();
     const usageEventsUrl = `${getBackendBaseUrl()}/usage/events`;
+    let uiCaptureActive = false;
 
     function isExtensionUiEvent(event: Event): boolean {
       if (!(event.target instanceof Node)) return false;
@@ -59,14 +56,28 @@ export default defineContentScript({
     }
 
     const swallowUiEvent = (event: Event) => {
+      if (!popupController.getRoot()) return;
       if (!isExtensionUiEvent(event)) return;
       stopEventPropagation(event);
     };
 
-    UI_EVENT_TYPES.forEach((eventType) => {
-      window.addEventListener(eventType, swallowUiEvent, true);
-      document.addEventListener(eventType, swallowUiEvent, true);
-    });
+    function setUiCaptureActive(next: boolean) {
+      if (uiCaptureActive === next) return;
+      uiCaptureActive = next;
+
+      UI_CAPTURE_EVENT_TYPES.forEach((eventType) => {
+        if (next) {
+          document.addEventListener(eventType, swallowUiEvent, true);
+        } else {
+          document.removeEventListener(eventType, swallowUiEvent, true);
+        }
+      });
+    }
+
+    function removePopupAndCapture() {
+      popupController.removePopup();
+      setUiCaptureActive(false);
+    }
 
     await conversionRuntime.initialize();
 
@@ -97,7 +108,7 @@ export default defineContentScript({
       const text = selection?.toString().trim();
 
       if (!text?.length || !selection?.rangeCount) {
-        popupController.removePopup();
+        removePopupAndCapture();
         return;
       }
 
@@ -111,12 +122,13 @@ export default defineContentScript({
         localeHint: document.documentElement?.lang || null,
       });
       if (!isValid || value === undefined) {
-        popupController.removePopup();
+        removePopupAndCapture();
         return;
       }
 
       const sourceCurrency = currency ?? CurrencyCode["UNITED STATES DOLLAR"];
       popupController.showPopup(x, y, value.toString(), sourceCurrency);
+      setUiCaptureActive(true);
       conversionRuntime.recordSelectionConversion();
     };
 
@@ -127,7 +139,7 @@ export default defineContentScript({
       if (popupRoot && !popupController.containsTarget(event.target as Node)) {
         const selection = window.getSelection();
         if (!selection?.toString().trim()) {
-          popupController.removePopup();
+          removePopupAndCapture();
         }
       }
     };
@@ -138,12 +150,9 @@ export default defineContentScript({
     window.addEventListener("beforeunload", () => {
       mutationObserver.disconnect();
       settingsUnwatch();
+      setUiCaptureActive(false);
       popupController.destroy();
       conversionRuntime.cleanup();
-      UI_EVENT_TYPES.forEach((eventType) => {
-        window.removeEventListener(eventType, swallowUiEvent, true);
-        document.removeEventListener(eventType, swallowUiEvent, true);
-      });
       document.removeEventListener("mouseup", onMouseUp);
       document.removeEventListener("mousedown", onMouseDown);
 
