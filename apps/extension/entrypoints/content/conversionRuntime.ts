@@ -38,6 +38,10 @@ function areAuthSessionsEqual(a: UserSettings["auth"], b: UserSettings["auth"]):
   );
 }
 
+function hasPaidAccessFromEntitlement(entitlement: UserSettings["entitlement"]): boolean {
+  return entitlement.status === "paid" || entitlement.status === "trial";
+}
+
 export type ContentConversionRuntime = {
   initialize: () => Promise<void>;
   onSettingsStorageUpdate: (
@@ -354,30 +358,50 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
     onSettingsStorageUpdate: async (newSettings, oldSettings) => {
       const startedAt = perfLoggingEnabled ? performance.now() : 0;
       let refreshed = false;
-      let skippedEntitlementOnlyUpdate = false;
+      let skippedRateRefresh = false;
+      let preferredCurrencyChanged = false;
+      let rateRelevantChanged = true;
 
       if (
         isUserSettingsSnapshot(newSettings) &&
-        isUserSettingsSnapshot(oldSettings) &&
-        newSettings.preferredCurrency === oldSettings.preferredCurrency &&
-        areAuthSessionsEqual(newSettings.auth, oldSettings.auth)
+        isUserSettingsSnapshot(oldSettings)
       ) {
         settings = newSettings;
-        skippedEntitlementOnlyUpdate = true;
 
-        if (perfLoggingEnabled) {
-          logPerf("onSettingsStorageUpdate", {
-            refreshed: false,
-            skippedEntitlementOnlyUpdate: true,
-            durationMs: roundMs(performance.now() - startedAt),
-          });
+        preferredCurrencyChanged =
+          newSettings.preferredCurrency !== oldSettings.preferredCurrency;
+        const authChanged = !areAuthSessionsEqual(newSettings.auth, oldSettings.auth);
+        const paidAccessChanged =
+          hasPaidAccessFromEntitlement(newSettings.entitlement) !==
+          hasPaidAccessFromEntitlement(oldSettings.entitlement);
+
+        rateRelevantChanged = authChanged || paidAccessChanged;
+
+        if (!rateRelevantChanged) {
+          skippedRateRefresh = true;
+
+          if (preferredCurrencyChanged) {
+            scheduleInlineConversionFromSettingsUpdate();
+          }
+
+          if (perfLoggingEnabled) {
+            logPerf("onSettingsStorageUpdate", {
+              refreshed: false,
+              skippedRateRefresh: true,
+              preferredCurrencyChanged,
+              rateRelevantChanged: false,
+              durationMs: roundMs(performance.now() - startedAt),
+            });
+          }
+
+          return;
         }
-
-        return;
+      } else if (isUserSettingsSnapshot(newSettings)) {
+        settings = newSettings;
       }
 
       try {
-        await refreshSettingsAndRates(true);
+        await refreshSettingsAndRates(false);
         refreshed = true;
         scheduleInlineConversionFromSettingsUpdate();
       } catch (error) {
@@ -386,7 +410,9 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
         if (perfLoggingEnabled) {
           logPerf("onSettingsStorageUpdate", {
             refreshed,
-            skippedEntitlementOnlyUpdate,
+            skippedRateRefresh,
+            preferredCurrencyChanged,
+            rateRelevantChanged,
             durationMs: roundMs(performance.now() - startedAt),
           });
         }
