@@ -4,6 +4,7 @@ import { extractCurrencyTextMatches, formatAmountInCurrency } from "@/utils/util
 
 export const INLINE_CONVERSION_CLASS = "ccx-inline-conversion";
 const INLINE_CONVERSION_STYLE_ID = "ccx-inline-conversion-style";
+const INLINE_COMPACT_THRESHOLD = 1_000_000;
 
 const SKIP_TAGS = new Set([
   "SCRIPT",
@@ -158,7 +159,13 @@ function decoratePricesInTextNode(
       continue;
     }
 
-    let convertedAmount = formatAmountInCurrency(converted, preferredCurrency);
+    const convertedUsesCompact = Math.abs(converted) >= INLINE_COMPACT_THRESHOLD;
+    const formattedConverted = formatAmountInCurrency(converted, preferredCurrency, {
+      localeHint,
+      compactLargeValues: true,
+      compactThreshold: INLINE_COMPACT_THRESHOLD,
+    });
+    let convertedAmount = convertedUsesCompact ? `~${formattedConverted}` : formattedConverted;
 
     if (match.rangeEndValue !== undefined) {
       const convertedRangeEnd = convertAmountWithSnapshot(
@@ -174,8 +181,16 @@ function decoratePricesInTextNode(
         continue;
       }
 
+      const rangeEndUsesCompact = Math.abs(convertedRangeEnd) >= INLINE_COMPACT_THRESHOLD;
+      const formattedRangeEnd = formatAmountInCurrency(convertedRangeEnd, preferredCurrency, {
+        localeHint,
+        compactLargeValues: true,
+        compactThreshold: INLINE_COMPACT_THRESHOLD,
+      });
+      const rangeApproximationPrefix =
+        convertedUsesCompact || rangeEndUsesCompact ? "~" : "";
       convertedAmount =
-        `${convertedAmount}–${formatAmountInCurrency(convertedRangeEnd, preferredCurrency)}`;
+        `${rangeApproximationPrefix}${formattedConverted}–${formattedRangeEnd}`;
     }
 
     const wrapper = document.createElement("span");

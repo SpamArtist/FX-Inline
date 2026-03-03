@@ -504,9 +504,35 @@ export function extractCurrencyTextMatches(
   return nonOverlappingMatches;
 }
 
-export function formatAmountInCurrency(amount: number, currency: CurrencyCode): string {
+type CurrencyFormatOptions = {
+  localeHint?: string | null;
+  compactLargeValues?: boolean;
+  compactThreshold?: number;
+};
+
+export function formatAmountInCurrency(
+  amount: number,
+  currency: CurrencyCode,
+  options?: CurrencyFormatOptions,
+): string {
+  const locale = options?.localeHint?.trim() || undefined;
+  const compactThreshold = options?.compactThreshold ?? 1_000_000;
+  const useCompact =
+    options?.compactLargeValues === true && Math.abs(amount) >= compactThreshold;
+
   try {
-    return new Intl.NumberFormat(undefined, {
+    if (useCompact) {
+      return new Intl.NumberFormat(locale, {
+        style: "currency",
+        currency,
+        notation: "compact",
+        compactDisplay: "short",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 1,
+      }).format(amount);
+    }
+
+    return new Intl.NumberFormat(locale, {
       style: "currency",
       currency,
       maximumFractionDigits: 2,
