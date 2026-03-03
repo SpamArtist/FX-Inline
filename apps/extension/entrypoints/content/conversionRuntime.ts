@@ -17,6 +17,10 @@ export type PendingUsageSnapshot = {
   selectionConversions: number;
 };
 
+const PARTIAL_CONVERSION_DEBOUNCE_MS = 120;
+const PARTIAL_CONVERSION_CONTINUE_MS = 28;
+const PARTIAL_CONVERSION_TIME_BUDGET_MS = 16;
+
 function isUserSettingsSnapshot(value: unknown): value is UserSettings {
   if (!value || typeof value !== "object") return false;
 
@@ -253,7 +257,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
     }, 200);
   }
 
-  function schedulePartialInlineConversion() {
+  function schedulePartialInlineConversion(delayMs = PARTIAL_CONVERSION_DEBOUNCE_MS) {
     if (partialConversionTimer) {
       window.clearTimeout(partialConversionTimer);
     }
@@ -279,11 +283,26 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
         const preferredCurrency = settings.preferredCurrency as CurrencyCode;
         let conversions = 0;
         let connectedRoots = 0;
+        let deferredRoots = 0;
+        const passStartedAt = performance.now();
         const perfAggregate = perfLoggingEnabled
           ? createInlineConversionPerfAggregate()
           : null;
 
-        for (const root of roots) {
+        for (let index = 0; index < roots.length; index += 1) {
+          if (
+            connectedRoots > 0 &&
+            performance.now() - passStartedAt >= PARTIAL_CONVERSION_TIME_BUDGET_MS
+          ) {
+            for (let remainderIndex = index; remainderIndex < roots.length; remainderIndex += 1) {
+              pendingMutationRoots.add(roots[remainderIndex]);
+              deferredRoots += 1;
+            }
+
+            break;
+          }
+
+          const root = roots[index];
           if (!(root instanceof Node) || !root.isConnected) continue;
           connectedRoots += 1;
 
@@ -302,11 +321,16 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
           scheduleUsageFlush(conversions, 0);
         }
 
+        if (deferredRoots > 0) {
+          schedulePartialInlineConversion(PARTIAL_CONVERSION_CONTINUE_MS);
+        }
+
         if (perfAggregate) {
           logPerf("inlineConversion.partial", {
             preferredCurrency,
             rootsQueued: roots.length,
             rootsProcessed: connectedRoots,
+            rootsDeferred: deferredRoots,
             conversions,
             totalMs: roundMs(perfAggregate.totalMs),
             clearExistingMs: roundMs(perfAggregate.clearExistingMs),
@@ -322,7 +346,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
           suppressMutationDepth = Math.max(0, suppressMutationDepth - 1);
         }, 400);
       }
-    }, 120);
+    }, delayMs);
   }
 
   function scheduleInlineConversionFromSettingsUpdate() {
