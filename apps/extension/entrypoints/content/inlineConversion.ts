@@ -4,6 +4,7 @@ import { RateSnapshot } from "@/utils/rates";
 import {
   extractCurrencyTextMatches,
   formatAmountInCurrency,
+  mayContainCurrencyToken,
   type CurrencyTextMatch,
 } from "@/utils/utils";
 
@@ -267,6 +268,7 @@ function decoratePricesInTextNode(
 ): number {
   const text = textNode.nodeValue;
   if (!text?.trim()) return 0;
+  if (!mayContainCurrencyToken(text)) return 0;
 
   const matches = extractCurrencyTextMatches(text, localeHint);
   if (!matches.length) return 0;

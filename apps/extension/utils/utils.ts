@@ -67,6 +67,11 @@ const isoPattern = Array.from(ISO_CODES)
   .join("|");
 
 const isoTokenPattern = `(?<!\\p{L})(?:${isoPattern})(?!\\p{L})`;
+const quickDigitRegex = /\d/u;
+const quickCurrencyTokenRegex = new RegExp(
+  `(?:${isoTokenPattern}|${symbolPattern})`,
+  "iu",
+);
 
 type ParserArtifacts = {
   magnitudeMultiplierByAlias: Map<string, number>;
@@ -502,6 +507,13 @@ export function extractCurrencyTextMatches(
   }
 
   return nonOverlappingMatches;
+}
+
+export function mayContainCurrencyToken(input: string): boolean {
+  if (!input?.length) return false;
+  if (!quickDigitRegex.test(input)) return false;
+
+  return quickCurrencyTokenRegex.test(input);
 }
 
 type CurrencyFormatOptions = {

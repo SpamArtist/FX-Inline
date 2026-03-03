@@ -1,6 +1,7 @@
 import {
   parseCurrencyValue,
   extractCurrencyTextMatches,
+  mayContainCurrencyToken,
 } from "../../test-dist/utils/utils.js";
 
 test("parseCurrencyValue handles signs, separators, and lowercase iso", () => {
@@ -132,6 +133,17 @@ test("extractCurrencyTextMatches parses shared-magnitude ranges with one currenc
   expect(matches[0].currency).toBe("JPY");
   expect(matches[0].value).toBe(6000000);
   expect(matches[0].rangeEndValue).toBe(13000000);
+});
+
+test("mayContainCurrencyToken quickly filters non-currency text", () => {
+  expect(mayContainCurrencyToken("No price here")).toBe(false);
+  expect(mayContainCurrencyToken("Release notes for 2026")).toBe(false);
+  expect(mayContainCurrencyToken("$$$")).toBe(false);
+
+  expect(mayContainCurrencyToken("Budget is $300")).toBe(true);
+  expect(mayContainCurrencyToken("Offer: eur 120")).toBe(true);
+  expect(mayContainCurrencyToken("Package: ¥6M")).toBe(true);
+  expect(mayContainCurrencyToken("الدفع د.إ 4500")).toBe(true);
 });
 
 test("locale profiles parse localized magnitudes with localeHint", () => {

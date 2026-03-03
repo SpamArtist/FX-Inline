@@ -1,11 +1,22 @@
 import { collectMutationConversionRoots } from "../../test-dist/utils/mutationRoots.js";
 
 function createElementNode(id) {
-  return { nodeType: 1, id };
+  return {
+    nodeType: 1,
+    id,
+    parentNode: null,
+    parentElement: null,
+  };
 }
 
 function createTextNode(parent, id) {
-  return { nodeType: 3, parentElement: parent, id };
+  return { nodeType: 3, parentElement: parent, parentNode: parent, id };
+}
+
+function linkParent(child, parent) {
+  child.parentNode = parent;
+  child.parentElement = parent?.nodeType === 1 ? parent : null;
+  return child;
 }
 
 function createMutationRecord({ type = "childList", target, addedNodes = [] }) {
@@ -52,4 +63,18 @@ test("collectMutationConversionRoots returns empty for unrelated mutations", () 
   );
 
   expect(roots).toHaveLength(0);
+});
+
+test("collectMutationConversionRoots collapses descendant roots under ancestor", () => {
+  const section = createElementNode("section");
+  const card = linkParent(createElementNode("card"), section);
+  const price = linkParent(createElementNode("price"), card);
+
+  const roots = collectMutationConversionRoots(
+    [createMutationRecord({ addedNodes: [card, price] })],
+    null,
+  );
+
+  expect(roots).toHaveLength(1);
+  expect(roots[0]).toBe(card);
 });
