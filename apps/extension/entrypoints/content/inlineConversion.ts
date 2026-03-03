@@ -140,6 +140,15 @@ function decoratePricesInTextNode(
 
     fragment.append(text.slice(cursor, match.start));
 
+    const isZeroValue =
+      match.value === 0 &&
+      (match.rangeEndValue === undefined || match.rangeEndValue === 0);
+    if (isZeroValue) {
+      fragment.append(match.raw);
+      cursor = match.end;
+      continue;
+    }
+
     if (match.currency === preferredCurrency) {
       fragment.append(match.raw);
       cursor = match.end;
