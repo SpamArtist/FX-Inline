@@ -11,6 +11,9 @@ test("parseCurrencyValue handles signs, separators, and lowercase iso", () => {
     ["42.5eur", true, 42.5, "EUR"],
     ["JPY 1,234", true, 1234, "JPY"],
     ["¥6M", true, 6000000, "JPY"],
+    ["¥6m", true, 6000000, "JPY"],
+    ["¥6M+", true, 6000000, "JPY"],
+    ["USD 350+", true, 350, "USD"],
     ["USD 1.2 million", true, 1200000, "USD"],
     ["2 billions USD", true, 2000000000, "USD"],
     ["₫ 4.295 trillion", true, 4295000000000, "VND"],
@@ -110,6 +113,25 @@ test("extractCurrencyTextMatches parses compact magnitude ranges in social text"
   expect(matches[1].raw).toBe("¥13M");
   expect(matches[1].currency).toBe("JPY");
   expect(matches[1].value).toBe(13000000);
+});
+
+test("extractCurrencyTextMatches parses compact values with trailing plus", () => {
+  const matches = extractCurrencyTextMatches("Comp range starts at ¥6M+ base");
+
+  expect(matches).toHaveLength(1);
+  expect(matches[0].raw).toBe("¥6M+");
+  expect(matches[0].currency).toBe("JPY");
+  expect(matches[0].value).toBe(6000000);
+});
+
+test("extractCurrencyTextMatches parses shared-magnitude ranges with one currency token", () => {
+  const matches = extractCurrencyTextMatches("Compensation: ¥6-13M base");
+
+  expect(matches).toHaveLength(1);
+  expect(matches[0].raw).toBe("¥6-13M");
+  expect(matches[0].currency).toBe("JPY");
+  expect(matches[0].value).toBe(6000000);
+  expect(matches[0].rangeEndValue).toBe(13000000);
 });
 
 test("locale profiles parse localized magnitudes with localeHint", () => {

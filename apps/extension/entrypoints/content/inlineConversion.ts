@@ -158,6 +158,26 @@ function decoratePricesInTextNode(
       continue;
     }
 
+    let convertedAmount = formatAmountInCurrency(converted, preferredCurrency);
+
+    if (match.rangeEndValue !== undefined) {
+      const convertedRangeEnd = convertAmountWithSnapshot(
+        match.rangeEndValue,
+        match.currency,
+        preferredCurrency,
+        rateSnapshot,
+      );
+
+      if (convertedRangeEnd === null) {
+        fragment.append(match.raw);
+        cursor = match.end;
+        continue;
+      }
+
+      convertedAmount =
+        `${convertedAmount}–${formatAmountInCurrency(convertedRangeEnd, preferredCurrency)}`;
+    }
+
     const wrapper = document.createElement("span");
     wrapper.className = INLINE_CONVERSION_CLASS;
     wrapper.setAttribute("data-original", match.raw);
@@ -167,7 +187,6 @@ function decoratePricesInTextNode(
       wrapper.style.setProperty("--ccx-converted-color", "#355aa8");
     }
 
-    const convertedAmount = formatAmountInCurrency(converted, preferredCurrency);
     wrapper.textContent = `${match.raw} (`;
 
     const convertedValueNode = document.createElement("span");

@@ -72,6 +72,7 @@ type ParserArtifacts = {
   magnitudeMultiplierByAlias: Map<string, number>;
   magnitudeSuffixRegex: RegExp;
   currencySnippetRegex: RegExp;
+  currencyRangeRegex: RegExp;
 };
 
 const parserArtifactsCache = new Map<string, ParserArtifacts>();
@@ -88,9 +89,16 @@ function buildParserArtifacts(localeHint?: string | null): ParserArtifacts {
     .join("|");
 
   const magnitudeTokenPattern = `(?:${magnitudePattern})(?=$|[^\\p{L}\\p{N}])`;
-  const numberWithOptionalMagnitudePattern = `[+-]?\\d[\\d,.]*(?:\\s*${magnitudeTokenPattern})?`;
+  const numberWithOptionalMagnitudePattern =
+    `[+-]?\\d[\\d,.]*(?:\\s*${magnitudeTokenPattern})?(?:\\s*\\+)?`;
+  const currencyTokenPattern = `(${isoTokenPattern}|(?:${symbolPattern}))`;
+  const rangeSeparatorPattern = "(?:-|–|—)";
   const currencySnippetRegex = new RegExp(
     `(?:${isoTokenPattern}\\s*${numberWithOptionalMagnitudePattern}|${numberWithOptionalMagnitudePattern}\\s*${isoTokenPattern}|(?:${symbolPattern})\\s*${numberWithOptionalMagnitudePattern}|${numberWithOptionalMagnitudePattern}\\s*(?:${symbolPattern}))`,
+    "giu",
+  );
+  const currencyRangeRegex = new RegExp(
+    `${currencyTokenPattern}\\s*(${numberWithOptionalMagnitudePattern})\\s*${rangeSeparatorPattern}\\s*(${numberWithOptionalMagnitudePattern})`,
     "giu",
   );
   const magnitudeSuffixRegex = new RegExp(
@@ -102,6 +110,7 @@ function buildParserArtifacts(localeHint?: string | null): ParserArtifacts {
     magnitudeMultiplierByAlias,
     magnitudeSuffixRegex,
     currencySnippetRegex,
+    currencyRangeRegex,
   };
 }
 
@@ -206,11 +215,15 @@ function parseFlexibleNumber(
   return Number.isFinite(num) ? sign * num : null;
 }
 
+function stripTrailingPlus(input: string): string {
+  return input.replace(/\s*\+\s*$/u, "").trim();
+}
+
 function parseNumberWithOptionalMagnitudeForArtifacts(
   input: string,
   artifacts: ParserArtifacts,
 ): number | null {
-  const trimmed = input.trim();
+  const trimmed = stripTrailingPlus(input);
   if (!trimmed.length) return null;
 
   const magnitudeMatch = trimmed.match(artifacts.magnitudeSuffixRegex);
@@ -366,6 +379,7 @@ export type CurrencyTextMatch = {
   end: number;
   value: number;
   currency: CurrencyCode;
+  rangeEndValue?: number;
 };
 
 export function extractCurrencyTextMatches(
@@ -378,6 +392,7 @@ export function extractCurrencyTextMatches(
   const artifacts = getParserArtifacts(localeHint);
 
   artifacts.currencySnippetRegex.lastIndex = 0;
+  artifacts.currencyRangeRegex.lastIndex = 0;
 
   const matches: CurrencyTextMatch[] = [];
 
@@ -400,7 +415,93 @@ export function extractCurrencyTextMatches(
     });
   }
 
-  return matches;
+  for (const candidate of input.matchAll(artifacts.currencyRangeRegex)) {
+    if (candidate.index === undefined) continue;
+
+    const raw = candidate[0];
+    const parsedCurrency = isCurrencyToken(candidate[1]);
+    if (!parsedCurrency) continue;
+
+    const firstValueText = candidate[2];
+    const secondValueText = candidate[3];
+    if (!firstValueText || !secondValueText) continue;
+
+    const normalizedFirstValueText = stripTrailingPlus(firstValueText);
+    const normalizedSecondValueText = stripTrailingPlus(secondValueText);
+
+    const firstHadMagnitude =
+      artifacts.magnitudeSuffixRegex.test(normalizedFirstValueText);
+    const secondHadMagnitude =
+      artifacts.magnitudeSuffixRegex.test(normalizedSecondValueText);
+
+    let firstValue = parseNumberWithOptionalMagnitudeForArtifacts(firstValueText, artifacts);
+    let secondValue = parseNumberWithOptionalMagnitudeForArtifacts(secondValueText, artifacts);
+
+    if (firstValue === null || secondValue === null) {
+      continue;
+    }
+
+    if (!firstHadMagnitude && secondHadMagnitude) {
+      const secondMagnitude = normalizedSecondValueText.match(artifacts.magnitudeSuffixRegex);
+      if (secondMagnitude) {
+        const alias = normalizeMagnitudeAlias(secondMagnitude[2]);
+        const multiplier = artifacts.magnitudeMultiplierByAlias.get(alias);
+        if (multiplier !== undefined) {
+          const base = parseFlexibleNumber(
+            normalizedFirstValueText,
+            0,
+            normalizedFirstValueText.length,
+          );
+          if (base !== null) {
+            firstValue = base * multiplier;
+          }
+        }
+      }
+    } else if (firstHadMagnitude && !secondHadMagnitude) {
+      const firstMagnitude = normalizedFirstValueText.match(artifacts.magnitudeSuffixRegex);
+      if (firstMagnitude) {
+        const alias = normalizeMagnitudeAlias(firstMagnitude[2]);
+        const multiplier = artifacts.magnitudeMultiplierByAlias.get(alias);
+        if (multiplier !== undefined) {
+          const base = parseFlexibleNumber(
+            normalizedSecondValueText,
+            0,
+            normalizedSecondValueText.length,
+          );
+          if (base !== null) {
+            secondValue = base * multiplier;
+          }
+        }
+      }
+    }
+
+    matches.push({
+      raw,
+      start: candidate.index,
+      end: candidate.index + raw.length,
+      value: firstValue,
+      rangeEndValue: secondValue,
+      currency: parsedCurrency,
+    });
+  }
+
+  const sortedMatches = matches.sort((a, b) => {
+    if (a.start !== b.start) return a.start - b.start;
+    const aLen = a.end - a.start;
+    const bLen = b.end - b.start;
+    return bLen - aLen;
+  });
+
+  const nonOverlappingMatches: CurrencyTextMatch[] = [];
+  let latestCoveredEnd = -1;
+
+  for (const match of sortedMatches) {
+    if (match.start < latestCoveredEnd) continue;
+    nonOverlappingMatches.push(match);
+    latestCoveredEnd = match.end;
+  }
+
+  return nonOverlappingMatches;
 }
 
 export function formatAmountInCurrency(amount: number, currency: CurrencyCode): string {
