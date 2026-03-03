@@ -14,16 +14,20 @@ const PROFILE_COMMON: MagnitudeProfile = {
   locale: "common",
   entries: [
     {
+      multiplier: 1_000,
+      aliases: ["k"],
+    },
+    {
       multiplier: 1_000_000,
-      aliases: ["mn"],
+      aliases: ["m", "mn", "mm"],
     },
     {
       multiplier: 1_000_000_000,
-      aliases: ["bn"],
+      aliases: ["b", "bn"],
     },
     {
       multiplier: 1_000_000_000_000,
-      aliases: ["tn"],
+      aliases: ["t", "tn"],
     },
   ],
 };

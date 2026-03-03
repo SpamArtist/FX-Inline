@@ -10,6 +10,7 @@ test("parseCurrencyValue handles signs, separators, and lowercase iso", () => {
     ["+150 usd", true, 150, "USD"],
     ["42.5eur", true, 42.5, "EUR"],
     ["JPY 1,234", true, 1234, "JPY"],
+    ["¥6M", true, 6000000, "JPY"],
     ["USD 1.2 million", true, 1200000, "USD"],
     ["2 billions USD", true, 2000000000, "USD"],
     ["₫ 4.295 trillion", true, 4295000000000, "VND"],
@@ -95,6 +96,20 @@ test("extractCurrencyTextMatches parses localized magnitude words", () => {
   expect(matches[1].value).toBe(4200000000);
   expect(matches[2].currency).toBe("USD");
   expect(matches[2].value).toBe(2000000000);
+});
+
+test("extractCurrencyTextMatches parses compact magnitude ranges in social text", () => {
+  const matches = extractCurrencyTextMatches(
+    "🇯🇵 Salary: ¥6M–¥13M | Hiring: Application Engineer",
+  );
+
+  expect(matches).toHaveLength(2);
+  expect(matches[0].raw).toBe("¥6M");
+  expect(matches[0].currency).toBe("JPY");
+  expect(matches[0].value).toBe(6000000);
+  expect(matches[1].raw).toBe("¥13M");
+  expect(matches[1].currency).toBe("JPY");
+  expect(matches[1].value).toBe(13000000);
 });
 
 test("locale profiles parse localized magnitudes with localeHint", () => {

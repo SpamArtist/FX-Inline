@@ -87,7 +87,8 @@ function buildParserArtifacts(localeHint?: string | null): ParserArtifacts {
     .sort((a, b) => b.length - a.length)
     .join("|");
 
-  const numberWithOptionalMagnitudePattern = `[+-]?\\d[\\d,.]*(?:\\s*(?:${magnitudePattern}))?`;
+  const magnitudeTokenPattern = `(?:${magnitudePattern})(?=$|[^\\p{L}\\p{N}])`;
+  const numberWithOptionalMagnitudePattern = `[+-]?\\d[\\d,.]*(?:\\s*${magnitudeTokenPattern})?`;
   const currencySnippetRegex = new RegExp(
     `(?:${isoTokenPattern}\\s*${numberWithOptionalMagnitudePattern}|${numberWithOptionalMagnitudePattern}\\s*${isoTokenPattern}|(?:${symbolPattern})\\s*${numberWithOptionalMagnitudePattern}|${numberWithOptionalMagnitudePattern}\\s*(?:${symbolPattern}))`,
     "giu",
