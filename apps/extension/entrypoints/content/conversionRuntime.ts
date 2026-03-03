@@ -218,8 +218,11 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
           preferredCurrency,
           rateSnapshot,
           document.body,
-          perfLoggingEnabled
-            ? {
+          {
+            clearExisting: false,
+            refreshExisting: true,
+            ...(perfLoggingEnabled
+              ? {
                 onPerfSample: (sample) => {
                   logPerf("inlineConversion.full", {
                     preferredCurrency,
@@ -234,7 +237,8 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
                   });
                 },
               }
-            : undefined,
+              : {}),
+          },
         );
 
         if (conversions > 0) {

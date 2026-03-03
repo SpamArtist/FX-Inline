@@ -1,7 +1,11 @@
 import { CurrencyCode } from "@/utils/enums";
 import { convertAmountWithSnapshot } from "@/utils/rateMath";
 import { RateSnapshot } from "@/utils/rates";
-import { extractCurrencyTextMatches, formatAmountInCurrency } from "@/utils/utils";
+import {
+  extractCurrencyTextMatches,
+  formatAmountInCurrency,
+  type CurrencyTextMatch,
+} from "@/utils/utils";
 
 export const INLINE_CONVERSION_CLASS = "ccx-inline-conversion";
 const INLINE_CONVERSION_STYLE_ID = "ccx-inline-conversion-style";
@@ -63,6 +67,7 @@ function shouldSkipTextNode(node: Text): boolean {
 
 function clearInlineConversions(root: ParentNode = document.body) {
   const convertedNodes = root.querySelectorAll(`span.${INLINE_CONVERSION_CLASS}`);
+  if (!convertedNodes.length) return 0;
 
   convertedNodes.forEach((node) => {
     const originalText = node.getAttribute("data-original") || node.textContent || "";
@@ -72,6 +77,114 @@ function clearInlineConversions(root: ParentNode = document.body) {
   if (root instanceof Element || root instanceof Document) {
     root.normalize();
   }
+
+  return convertedNodes.length;
+}
+
+function getConvertedAmountText(
+  match: Pick<CurrencyTextMatch, "value" | "rangeEndValue" | "currency">,
+  preferredCurrency: CurrencyCode,
+  rateSnapshot: RateSnapshot,
+  localeHint: string | null,
+): string | null {
+  const isZeroValue =
+    match.value === 0 &&
+    (match.rangeEndValue === undefined || match.rangeEndValue === 0);
+  if (isZeroValue) return null;
+  if (match.currency === preferredCurrency) return null;
+
+  const converted = convertAmountWithSnapshot(
+    match.value,
+    match.currency,
+    preferredCurrency,
+    rateSnapshot,
+  );
+
+  if (converted === null) return null;
+
+  const convertedUsesCompact = Math.abs(converted) >= INLINE_COMPACT_THRESHOLD;
+  const formattedConverted = formatAmountInCurrency(converted, preferredCurrency, {
+    localeHint,
+    compactLargeValues: true,
+    compactThreshold: INLINE_COMPACT_THRESHOLD,
+  });
+  let convertedAmount = convertedUsesCompact ? `~${formattedConverted}` : formattedConverted;
+
+  if (match.rangeEndValue !== undefined) {
+    const convertedRangeEnd = convertAmountWithSnapshot(
+      match.rangeEndValue,
+      match.currency,
+      preferredCurrency,
+      rateSnapshot,
+    );
+
+    if (convertedRangeEnd === null) return null;
+
+    const rangeEndUsesCompact = Math.abs(convertedRangeEnd) >= INLINE_COMPACT_THRESHOLD;
+    const formattedRangeEnd = formatAmountInCurrency(convertedRangeEnd, preferredCurrency, {
+      localeHint,
+      compactLargeValues: true,
+      compactThreshold: INLINE_COMPACT_THRESHOLD,
+    });
+    const rangeApproximationPrefix =
+      convertedUsesCompact || rangeEndUsesCompact ? "~" : "";
+    convertedAmount =
+      `${rangeApproximationPrefix}${formattedConverted}–${formattedRangeEnd}`;
+  }
+
+  return convertedAmount;
+}
+
+function refreshExistingInlineConversions(
+  preferredCurrency: CurrencyCode,
+  rateSnapshot: RateSnapshot,
+  root: ParentNode,
+  localeHint: string | null,
+): number {
+  const convertedNodes = root.querySelectorAll(`span.${INLINE_CONVERSION_CLASS}`);
+  if (!convertedNodes.length) return 0;
+
+  let refreshedConversions = 0;
+
+  convertedNodes.forEach((node) => {
+    const originalText = node.getAttribute("data-original") || node.textContent || "";
+    if (!originalText.trim()) {
+      node.replaceWith(document.createTextNode(originalText));
+      return;
+    }
+
+    const parsed = extractCurrencyTextMatches(originalText, localeHint);
+    const matched = parsed.find((item) => item.raw === originalText) || parsed[0];
+
+    if (!matched) {
+      node.replaceWith(document.createTextNode(originalText));
+      return;
+    }
+
+    const convertedAmount = getConvertedAmountText(
+      matched,
+      preferredCurrency,
+      rateSnapshot,
+      localeHint,
+    );
+
+    if (!convertedAmount) {
+      node.replaceWith(document.createTextNode(originalText));
+      return;
+    }
+
+    node.textContent = `${originalText} (`;
+
+    const convertedValueNode = document.createElement("span");
+    convertedValueNode.className = "ccx-converted-amount";
+    convertedValueNode.textContent = convertedAmount;
+
+    node.appendChild(convertedValueNode);
+    node.append(")");
+    refreshedConversions += 1;
+  });
+
+  return refreshedConversions;
 }
 
 function parseRgbChannels(input: string): [number, number, number] | null {
@@ -157,66 +270,16 @@ function decoratePricesInTextNode(
 
     fragment.append(text.slice(cursor, match.start));
 
-    const isZeroValue =
-      match.value === 0 &&
-      (match.rangeEndValue === undefined || match.rangeEndValue === 0);
-    if (isZeroValue) {
-      fragment.append(match.raw);
-      cursor = match.end;
-      continue;
-    }
-
-    if (match.currency === preferredCurrency) {
-      fragment.append(match.raw);
-      cursor = match.end;
-      continue;
-    }
-
-    const converted = convertAmountWithSnapshot(
-      match.value,
-      match.currency,
+    const convertedAmount = getConvertedAmountText(
+      match,
       preferredCurrency,
       rateSnapshot,
+      localeHint,
     );
-
-    if (converted === null) {
+    if (!convertedAmount) {
       fragment.append(match.raw);
       cursor = match.end;
       continue;
-    }
-
-    const convertedUsesCompact = Math.abs(converted) >= INLINE_COMPACT_THRESHOLD;
-    const formattedConverted = formatAmountInCurrency(converted, preferredCurrency, {
-      localeHint,
-      compactLargeValues: true,
-      compactThreshold: INLINE_COMPACT_THRESHOLD,
-    });
-    let convertedAmount = convertedUsesCompact ? `~${formattedConverted}` : formattedConverted;
-
-    if (match.rangeEndValue !== undefined) {
-      const convertedRangeEnd = convertAmountWithSnapshot(
-        match.rangeEndValue,
-        match.currency,
-        preferredCurrency,
-        rateSnapshot,
-      );
-
-      if (convertedRangeEnd === null) {
-        fragment.append(match.raw);
-        cursor = match.end;
-        continue;
-      }
-
-      const rangeEndUsesCompact = Math.abs(convertedRangeEnd) >= INLINE_COMPACT_THRESHOLD;
-      const formattedRangeEnd = formatAmountInCurrency(convertedRangeEnd, preferredCurrency, {
-        localeHint,
-        compactLargeValues: true,
-        compactThreshold: INLINE_COMPACT_THRESHOLD,
-      });
-      const rangeApproximationPrefix =
-        convertedUsesCompact || rangeEndUsesCompact ? "~" : "";
-      convertedAmount =
-        `${rangeApproximationPrefix}${formattedConverted}–${formattedRangeEnd}`;
     }
 
     const wrapper = document.createElement("span");
@@ -256,6 +319,7 @@ export function convertVisiblePrices(
   root: ParentNode = document.body,
   options?: {
     clearExisting?: boolean;
+    refreshExisting?: boolean;
     maxNodesPerPass?: number;
     onPerfSample?: (sample: InlineConversionPerfSample) => void;
   },
@@ -266,12 +330,24 @@ export function convertVisiblePrices(
   ensureInlineConversionStyles();
   const localeHint = document.documentElement?.lang || null;
   let clearExistingMs = 0;
+  let refreshedConversions = 0;
 
   if (options?.clearExisting !== false) {
     const clearStartedAt = capturePerf ? performance.now() : 0;
     clearInlineConversions(root);
     if (capturePerf) {
       clearExistingMs = performance.now() - clearStartedAt;
+    }
+  } else if (options?.refreshExisting) {
+    const refreshStartedAt = capturePerf ? performance.now() : 0;
+    refreshedConversions = refreshExistingInlineConversions(
+      preferredCurrency,
+      rateSnapshot,
+      root,
+      localeHint,
+    );
+    if (capturePerf) {
+      clearExistingMs = performance.now() - refreshStartedAt;
     }
   }
 
@@ -294,7 +370,7 @@ export function convertVisiblePrices(
     );
   }
 
-  let totalConversions = 0;
+  let totalConversions = refreshedConversions;
   const decorateStartedAt = capturePerf ? performance.now() : 0;
 
   textNodes.forEach((node) => {
