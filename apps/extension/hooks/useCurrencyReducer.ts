@@ -2,9 +2,8 @@ import currencies from "@/assets/currency.json";
 import { getUserSettings } from "@/utils/appStorage";
 import { CURRENCY_CODE_MAP } from "@/utils/constants";
 import { ActionType, CurrencyCode } from "@/utils/enums";
+import { convertAmountWithSnapshot, formatConvertedAmount } from "@/utils/rateMath";
 import {
-  convertAmountWithSnapshot,
-  formatConvertedAmount,
   getRatesForUser,
   RateSnapshot,
 } from "@/utils/rates";

@@ -8,11 +8,7 @@ import {
   shouldUseFreeTierCache,
   shouldUsePaidTierCache,
 } from "./ratePolicy";
-import {
-  convertAmountWithSnapshot,
-  formatConvertedAmount,
-  RateSnapshotLike,
-} from "./rateMath";
+import { RateSnapshotLike } from "./rateMath";
 
 const FREE_RATE_CACHE_KEY = "local:rate-cache-free";
 const PAID_RATE_CACHE_KEY = "local:rate-cache-paid";
@@ -245,5 +241,3 @@ export async function getRatesForUser(
     allowBackend: true,
   });
 }
-
-export { convertAmountWithSnapshot, formatConvertedAmount, getFreeTierMarketDayKey };

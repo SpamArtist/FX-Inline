@@ -1,5 +1,6 @@
 import { CurrencyCode } from "@/utils/enums";
-import { RateSnapshot, convertAmountWithSnapshot } from "@/utils/rates";
+import { convertAmountWithSnapshot } from "@/utils/rateMath";
+import { RateSnapshot } from "@/utils/rates";
 import { extractCurrencyTextMatches, formatAmountInCurrency } from "@/utils/utils";
 
 export const INLINE_CONVERSION_CLASS = "ccx-inline-conversion";

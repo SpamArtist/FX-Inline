@@ -33,12 +33,6 @@ export default defineConfig({
       extension_pages:
         "script-src 'self'; object-src 'self'; connect-src 'self' http://127.0.0.1:8787 http://localhost:8787 https://open.er-api.com http://127.0.0.1:3000 http://localhost:3000 ws://127.0.0.1:3000 ws://localhost:3000",
     },
-    // content_scripts: [
-    //   {
-    //     css: ['./assets/tailwind.css'],
-    //     matches: ['<all_urls>']
-    //   },
-    // ],
   },
   vite: () => ({
     plugins: [
