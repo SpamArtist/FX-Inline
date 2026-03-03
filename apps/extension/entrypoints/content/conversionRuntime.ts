@@ -1,5 +1,6 @@
 import { EntitlementPayload } from "@/packages/shared/contracts";
 import { getValidAccessToken } from "@/utils/accountService";
+import type { UserSettings } from "@/utils/appStorage";
 import { getUserSettings, updateUserSettings } from "@/utils/appStorage";
 import { recordUsageOnBackend } from "@/utils/backendClient";
 import { CurrencyCode } from "@/utils/enums";
@@ -16,9 +17,33 @@ export type PendingUsageSnapshot = {
   selectionConversions: number;
 };
 
+function isUserSettingsSnapshot(value: unknown): value is UserSettings {
+  if (!value || typeof value !== "object") return false;
+
+  const candidate = value as Partial<UserSettings>;
+  if (typeof candidate.preferredCurrency !== "string") return false;
+  if (!candidate.auth || typeof candidate.auth !== "object") return false;
+  if (!candidate.entitlement || typeof candidate.entitlement !== "object") return false;
+
+  return true;
+}
+
+function areAuthSessionsEqual(a: UserSettings["auth"], b: UserSettings["auth"]): boolean {
+  return (
+    a.email === b.email &&
+    a.accessToken === b.accessToken &&
+    a.refreshToken === b.refreshToken &&
+    a.accessTokenExpiresAt === b.accessTokenExpiresAt &&
+    a.refreshTokenExpiresAt === b.refreshTokenExpiresAt
+  );
+}
+
 export type ContentConversionRuntime = {
   initialize: () => Promise<void>;
-  onSettingsStorageUpdate: () => Promise<void>;
+  onSettingsStorageUpdate: (
+    newSettings?: UserSettings | null,
+    oldSettings?: UserSettings | null,
+  ) => Promise<void>;
   enqueueMutationRoots: (roots: ParentNode[]) => void;
   recordSelectionConversion: () => void;
   shouldIgnoreMutations: () => boolean;
@@ -326,9 +351,30 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
 
       scheduleInlineConversion();
     },
-    onSettingsStorageUpdate: async () => {
+    onSettingsStorageUpdate: async (newSettings, oldSettings) => {
       const startedAt = perfLoggingEnabled ? performance.now() : 0;
       let refreshed = false;
+      let skippedEntitlementOnlyUpdate = false;
+
+      if (
+        isUserSettingsSnapshot(newSettings) &&
+        isUserSettingsSnapshot(oldSettings) &&
+        newSettings.preferredCurrency === oldSettings.preferredCurrency &&
+        areAuthSessionsEqual(newSettings.auth, oldSettings.auth)
+      ) {
+        settings = newSettings;
+        skippedEntitlementOnlyUpdate = true;
+
+        if (perfLoggingEnabled) {
+          logPerf("onSettingsStorageUpdate", {
+            refreshed: false,
+            skippedEntitlementOnlyUpdate: true,
+            durationMs: roundMs(performance.now() - startedAt),
+          });
+        }
+
+        return;
+      }
 
       try {
         await refreshSettingsAndRates(true);
@@ -340,6 +386,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
         if (perfLoggingEnabled) {
           logPerf("onSettingsStorageUpdate", {
             refreshed,
+            skippedEntitlementOnlyUpdate,
             durationMs: roundMs(performance.now() - startedAt),
           });
         }
