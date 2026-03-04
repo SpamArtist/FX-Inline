@@ -1,8 +1,5 @@
-import { EntitlementPayload } from "@/packages/shared/contracts";
-import { getValidAccessToken } from "@/utils/accountService";
 import type { UserSettings } from "@/utils/appStorage";
-import { getUserSettings, updateUserSettings } from "@/utils/appStorage";
-import { recordUsageOnBackend } from "@/utils/backendClient";
+import { getUserSettings } from "@/utils/appStorage";
 import { CurrencyCode } from "@/utils/enums";
 import { RateSnapshot, getRatesForUser } from "@/utils/rates";
 import { convertVisiblePrices } from "./inlineConversion";
@@ -11,11 +8,6 @@ import {
   createInlineConversionPerfAggregate,
   createPerfLogger,
 } from "./perfLogger";
-
-export type PendingUsageSnapshot = {
-  inlineConversions: number;
-  selectionConversions: number;
-};
 
 const PARTIAL_CONVERSION_DEBOUNCE_MS = 120;
 const PARTIAL_CONVERSION_CONTINUE_MS = 28;
@@ -55,8 +47,6 @@ export type ContentConversionRuntime = {
   enqueueMutationRoots: (roots: ParentNode[]) => void;
   recordSelectionConversion: () => void;
   shouldIgnoreMutations: () => boolean;
-  getAccessTokenForUsage: () => string | null;
-  getPendingUsageSnapshot: () => PendingUsageSnapshot;
   cleanup: () => void;
 };
 
@@ -71,15 +61,12 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
 
   let conversionDebounceTimer: number | null = null;
   let partialConversionTimer: number | null = null;
-  let usageFlushTimer: number | null = null;
   let hydrationRetryTimer: number | null = null;
   let settingsRefreshTimer: number | null = null;
   let isApplyingInlineConversion = false;
   let suppressMutationDepth = 0;
   let isHydratingRates = false;
 
-  let pendingInlineUsage = 0;
-  let pendingSelectionUsage = 0;
   const pendingMutationRoots = new Set<ParentNode>();
 
   async function refreshSettingsAndRates(forceRefresh = false) {
@@ -118,76 +105,6 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
     }, 3000);
   }
 
-  async function applyUsageEntitlement(entitlement: EntitlementPayload) {
-    const updated = await updateUserSettings(
-      {
-        entitlement: {
-          status: entitlement.status,
-          planTier: entitlement.planTier,
-          checkedAt: entitlement.checkedAt,
-          trialEndsAt: entitlement.trialEndsAt,
-          currentPeriodEnd: entitlement.currentPeriodEnd,
-          dailyLimit: entitlement.dailyLimit,
-          remainingToday: entitlement.remainingToday,
-        },
-      },
-    );
-
-    settings = updated;
-  }
-
-  async function flushUsage(inlineConversions: number, selectionConversions: number) {
-    if (inlineConversions + selectionConversions <= 0) return;
-
-    const startedAt = perfLoggingEnabled ? performance.now() : 0;
-    let success = false;
-
-    try {
-      const token = await getValidAccessToken();
-      if (!token) return;
-
-      const usage = await recordUsageOnBackend(token, {
-        inlineConversions,
-        selectionConversions,
-      });
-
-      await applyUsageEntitlement(usage.entitlement);
-      success = true;
-    } catch {
-      // Re-queue counts so they are not lost on transient network errors.
-      pendingInlineUsage += inlineConversions;
-      pendingSelectionUsage += selectionConversions;
-    } finally {
-      if (perfLoggingEnabled) {
-        logPerf("flushUsage", {
-          inlineConversions,
-          selectionConversions,
-          success,
-          durationMs: roundMs(performance.now() - startedAt),
-        });
-      }
-    }
-  }
-
-  function scheduleUsageFlush(inlineDelta = 0, selectionDelta = 0) {
-    pendingInlineUsage += Math.max(0, Math.floor(inlineDelta));
-    pendingSelectionUsage += Math.max(0, Math.floor(selectionDelta));
-
-    if (usageFlushTimer) {
-      window.clearTimeout(usageFlushTimer);
-    }
-
-    usageFlushTimer = window.setTimeout(async () => {
-      const inlineConversions = pendingInlineUsage;
-      const selectionConversions = pendingSelectionUsage;
-
-      pendingInlineUsage = 0;
-      pendingSelectionUsage = 0;
-
-      await flushUsage(inlineConversions, selectionConversions);
-    }, 1200);
-  }
-
   function scheduleInlineConversion() {
     if (conversionDebounceTimer) {
       window.clearTimeout(conversionDebounceTimer);
@@ -218,7 +135,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
 
       try {
         const preferredCurrency = settings.preferredCurrency as CurrencyCode;
-        const conversions = convertVisiblePrices(
+        convertVisiblePrices(
           preferredCurrency,
           rateSnapshot,
           document.body,
@@ -244,10 +161,6 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
               : {}),
           },
         );
-
-        if (conversions > 0) {
-          scheduleUsageFlush(conversions, 0);
-        }
       } finally {
         isApplyingInlineConversion = false;
         window.setTimeout(() => {
@@ -315,10 +228,6 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
                 }
               : undefined,
           });
-        }
-
-        if (conversions > 0) {
-          scheduleUsageFlush(conversions, 0);
         }
 
         if (deferredRoots > 0) {
@@ -455,22 +364,11 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
 
       schedulePartialInlineConversion();
     },
-    recordSelectionConversion: () => {
-      scheduleUsageFlush(0, 1);
-    },
+    recordSelectionConversion: () => {},
     shouldIgnoreMutations: () => {
       return isApplyingInlineConversion || suppressMutationDepth > 0;
     },
-    getAccessTokenForUsage: () => settings?.auth.accessToken ?? null,
-    getPendingUsageSnapshot: () => ({
-      inlineConversions: pendingInlineUsage,
-      selectionConversions: pendingSelectionUsage,
-    }),
     cleanup: () => {
-      if (usageFlushTimer) {
-        window.clearTimeout(usageFlushTimer);
-      }
-
       if (partialConversionTimer) {
         window.clearTimeout(partialConversionTimer);
       }

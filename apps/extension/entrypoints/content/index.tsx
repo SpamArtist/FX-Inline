@@ -1,5 +1,4 @@
 import { SETTINGS_KEY } from "@/utils/appStorage";
-import { getBackendBaseUrl } from "@/utils/backendClient";
 import { CurrencyCode } from "@/utils/enums";
 import { collectMutationConversionRoots } from "@/utils/mutationRoots";
 import { parseCurrencyValue } from "@/utils/utils";
@@ -39,7 +38,6 @@ export default defineContentScript({
   async main() {
     const popupController = createSelectionPopupController(contentBoxStyles);
     const conversionRuntime = createContentConversionRuntime();
-    const usageEventsUrl = `${getBackendBaseUrl()}/usage/events`;
     let uiCaptureActive = false;
 
     function isExtensionUiEvent(event: Event): boolean {
@@ -155,30 +153,6 @@ export default defineContentScript({
       conversionRuntime.cleanup();
       document.removeEventListener("mouseup", onMouseUp);
       document.removeEventListener("mousedown", onMouseDown);
-
-      // Best-effort usage flush that survives navigation.
-      const { inlineConversions, selectionConversions } =
-        conversionRuntime.getPendingUsageSnapshot();
-      const accessToken = conversionRuntime.getAccessTokenForUsage();
-
-      if (inlineConversions + selectionConversions > 0 && accessToken) {
-        try {
-          void fetch(usageEventsUrl, {
-            method: "POST",
-            keepalive: true,
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-            body: JSON.stringify({
-              inlineConversions,
-              selectionConversions,
-            }),
-          });
-        } catch {
-          // Best effort — nothing more we can do at unload time.
-        }
-      }
     });
   },
 });

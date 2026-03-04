@@ -6,6 +6,7 @@ import {
 } from "@/packages/shared/contracts";
 import { storage } from "wxt/utils/storage";
 import { CurrencyCode } from "./enums";
+import { AUTH_FEATURES_ENABLED, PAID_FEATURES_ENABLED } from "./featureFlags";
 
 export type AuthSession = {
   email: string | null;
@@ -128,6 +129,10 @@ function asNullableNumber(value: unknown): number | null {
 }
 
 function sanitizeAuth(value: Partial<AuthSession> | null | undefined): AuthSession {
+  if (!AUTH_FEATURES_ENABLED) {
+    return DEFAULT_USER_SETTINGS.auth;
+  }
+
   return {
     email:
       typeof value?.email === "string" && value.email.trim().length > 0
@@ -150,6 +155,21 @@ function sanitizeEntitlement(
   value: Partial<EntitlementState> | null | undefined,
   legacyPaidActive: boolean,
 ): EntitlementState {
+  if (!PAID_FEATURES_ENABLED) {
+    return {
+      ...DEFAULT_USER_SETTINGS.entitlement,
+      dailyLimit:
+        typeof value?.dailyLimit === "number" && value.dailyLimit > 0
+          ? Math.floor(value.dailyLimit)
+          : DEFAULT_USER_SETTINGS.entitlement.dailyLimit,
+      remainingToday:
+        typeof value?.remainingToday === "number" && Number.isFinite(value.remainingToday)
+          ? Math.max(0, Math.floor(value.remainingToday))
+          : null,
+      checkedAt: asNullableNumber(value?.checkedAt),
+    };
+  }
+
   const status = asEntitlementStatus(value?.status, legacyPaidActive);
   const planTier =
     status === "paid" || status === "trial"
@@ -235,10 +255,14 @@ export async function updateUserSettings(
 }
 
 export function hasAuthSession(settings: UserSettings): boolean {
+  if (!AUTH_FEATURES_ENABLED) return false;
+
   return Boolean(settings.auth.accessToken && settings.auth.refreshToken);
 }
 
 export function hasPaidAccess(settings: UserSettings): boolean {
+  if (!PAID_FEATURES_ENABLED) return false;
+
   return (
     settings.entitlement.status === "paid" || settings.entitlement.status === "trial"
   );

@@ -1,13 +1,13 @@
 import { storage } from "wxt/utils/storage";
-import { getRatesFromBackend } from "./backendClient";
-import { getValidAccessToken } from "./accountService";
 import { hasPaidAccess, UserSettings } from "./appStorage";
 import { CurrencyCode } from "./enums";
+import { PAID_FEATURES_ENABLED } from "./featureFlags";
 import {
   getFreeTierMarketDayKey,
   shouldUseFreeTierCache,
   shouldUsePaidTierCache,
 } from "./ratePolicy";
+import { fetchRatesFromBackend } from "./ratesClient";
 import { RateSnapshotLike } from "./rateMath";
 
 const FREE_RATE_CACHE_KEY = "local:rate-cache-free";
@@ -114,8 +114,7 @@ async function fetchSnapshotFromBackend(forceRefresh = false): Promise<{
   planTier: "free" | "paid";
   snapshot: RateSnapshot;
 }> {
-  const accessToken = await getValidAccessToken();
-  const response = await getRatesFromBackend(accessToken, { forceRefresh });
+  const response = await fetchRatesFromBackend(null, { forceRefresh });
 
   return {
     planTier: response.planTier,
@@ -167,7 +166,7 @@ export async function getFreeTierRates(opts?: {
 
     await freeRateCacheItem.setValue(normalizedFree);
 
-    if (fetched.planTier === "paid") {
+    if (PAID_FEATURES_ENABLED && fetched.planTier === "paid") {
       await paidRateCacheItem.setValue({
         ...fetched.snapshot,
         marketDayKey: undefined,
@@ -194,6 +193,13 @@ export async function getFreeTierRates(opts?: {
 export async function getPaidTierRates(opts?: {
   forceRefresh?: boolean;
 }): Promise<RateSnapshot> {
+  if (!PAID_FEATURES_ENABLED) {
+    return getFreeTierRates({
+      forceRefresh: opts?.forceRefresh,
+      allowBackend: true,
+    });
+  }
+
   const cached = await paidRateCacheItem.getValue();
 
   if (
@@ -232,7 +238,7 @@ export async function getRatesForUser(
   settings: UserSettings,
   opts?: { forceRefresh?: boolean },
 ): Promise<RateSnapshot> {
-  if (hasPaidAccess(settings)) {
+  if (PAID_FEATURES_ENABLED && hasPaidAccess(settings)) {
     return getPaidTierRates(opts);
   }
 

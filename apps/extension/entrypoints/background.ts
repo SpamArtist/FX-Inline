@@ -1,22 +1,11 @@
 import { getUserSettings } from "@/utils/appStorage";
 import { getRatesForUser } from "@/utils/rates";
-import {
-  refreshAuthSessionIfNeeded,
-  syncEntitlementWithBackend,
-} from "@/utils/accountService";
 import { browser } from "wxt/browser";
 
 const RATE_REFRESH_ALARM = "ccx-refresh-rates";
 const RATE_REFRESH_INTERVAL_MINUTES = 30;
 
 async function refreshRatesForCurrentPlan(forceRefresh = false) {
-  try {
-    await refreshAuthSessionIfNeeded();
-    await syncEntitlementWithBackend();
-  } catch {
-    // Continue with cached/local fallback behavior when auth sync fails.
-  }
-
   const settings = await getUserSettings();
   await getRatesForUser(settings, { forceRefresh });
 }
