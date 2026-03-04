@@ -56,6 +56,8 @@ function normalizeMagnitudeAlias(input: string): string {
   return input.trim().toLowerCase().replace(/\s+/g, " ");
 }
 
+const groupingSpaceRegex = /[\u00A0\u202F ]/gu;
+
 const symbolPattern = Array.from(CURRENCY_SYMBOLS)
   .map(escapeRegex)
   .sort((a, b) => b.length - a.length)
@@ -95,7 +97,7 @@ function buildParserArtifacts(localeHint?: string | null): ParserArtifacts {
 
   const magnitudeTokenPattern = `(?:${magnitudePattern})(?=$|[^\\p{L}\\p{N}])`;
   const numberWithOptionalMagnitudePattern =
-    `[+-]?\\d[\\d,.]*(?:\\s*${magnitudeTokenPattern})?(?:\\s*\\+)?`;
+    `[+-]?\\d[\\d,.\\u00A0\\u202F ]*(?:\\s*${magnitudeTokenPattern})?(?:\\s*\\+)?`;
   const currencyTokenPattern = `(${isoTokenPattern}|(?:${symbolPattern}))`;
   const rangeSeparatorPattern = "(?:-|–|—)";
   const currencySnippetRegex = new RegExp(
@@ -183,6 +185,24 @@ function parseFlexibleNumber(
       continue;
     }
 
+    if (c === 32 || c === 160 || c === 8239) {
+      const previousCode = i > start ? str.charCodeAt(i - 1) : null;
+      const nextCode = i + 1 < end ? str.charCodeAt(i + 1) : null;
+      const surroundedByDigits =
+        previousCode !== null &&
+        nextCode !== null &&
+        previousCode >= 48 &&
+        previousCode <= 57 &&
+        nextCode >= 48 &&
+        nextCode <= 57;
+
+      if (seenDot || !surroundedByDigits) {
+        return null;
+      }
+
+      continue;
+    }
+
     if (c === 46) {
       if (seenDot) return null;
       seenDot = true;
@@ -204,12 +224,16 @@ function parseFlexibleNumber(
   if (!integerPart.length) return null;
 
   if (!seenDot && seenComma && commaCount === 1) {
-    const lastComma = str.lastIndexOf(",", end - 1);
-    const digitsAfter = end - lastComma - 1;
+    const raw = str.slice(start, end);
+    const lastComma = raw.lastIndexOf(",");
+    const decimalText = raw.slice(lastComma + 1).replace(groupingSpaceRegex, "");
+    const digitsAfter = decimalText.length;
 
     if (digitsAfter > 0 && digitsAfter <= 2) {
-      const raw = str.slice(start, end).replace(",", ".");
-      const num = Number(raw);
+      const normalizedDecimalRaw = raw
+        .replace(groupingSpaceRegex, "")
+        .replace(",", ".");
+      const num = Number(normalizedDecimalRaw);
       return Number.isFinite(num) ? sign * num : null;
     }
   }

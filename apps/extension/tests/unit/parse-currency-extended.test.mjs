@@ -21,6 +21,8 @@ test("parseCurrencyValue handles signs, separators, and lowercase iso", () => {
     ["USD 1.5 triliun", true, 1500000000000, "USD"],
     ["₫ 1 nghìn tỷ", true, 1000000000000, "VND"],
     ["VND 1 ngan ty", true, 1000000000000, "VND"],
+    ["1 000 000 ₫", true, 1000000, "VND"],
+    ["1\u00A0000\u00A0000\u00A0₫", true, 1000000, "VND"],
   ];
 
   for (const [input, valid, value, currency] of cases) {
@@ -78,6 +80,16 @@ test("extractCurrencyTextMatches parses large VND listing price snippets", () =>
   expect(matches).toHaveLength(1);
   expect(matches[0].currency).toBe("VND");
   expect(matches[0].value).toBe(45000000);
+});
+
+test("extractCurrencyTextMatches parses grouped spaces with trailing currency symbol", () => {
+  const text = "Mais de 1\u00A0000\u00A0000\u00A0₫ por pessoa";
+  const matches = extractCurrencyTextMatches(text);
+
+  expect(matches).toHaveLength(1);
+  expect(matches[0].raw).toBe("1\u00A0000\u00A0000\u00A0₫");
+  expect(matches[0].currency).toBe("VND");
+  expect(matches[0].value).toBe(1000000);
 });
 
 test("extractCurrencyTextMatches parses word magnitudes in listing snippets", () => {
