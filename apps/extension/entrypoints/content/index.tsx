@@ -1,5 +1,5 @@
 import { SETTINGS_KEY } from "@/utils/appStorage";
-import { CurrencyCode } from "@/utils/enums";
+import { DEFAULT_STARTING_CURRENCY } from "@/utils/constants";
 import { collectMutationConversionRoots } from "@/utils/mutationRoots";
 import { parseCurrencyValue } from "@/utils/utils";
 import { storage } from "wxt/utils/storage";
@@ -124,7 +124,7 @@ export default defineContentScript({
         return;
       }
 
-      const sourceCurrency = currency ?? CurrencyCode["UNITED STATES DOLLAR"];
+      const sourceCurrency = currency ?? DEFAULT_STARTING_CURRENCY;
       popupController.showPopup(x, y, value.toString(), sourceCurrency);
       setUiCaptureActive(true);
       conversionRuntime.recordSelectionConversion();

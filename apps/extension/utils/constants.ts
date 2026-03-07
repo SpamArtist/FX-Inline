@@ -1,8 +1,9 @@
 import { CurrencyCode } from "./enums";
 
+export const DEFAULT_STARTING_CURRENCY = CurrencyCode["EURO"];
+
 export const CurrencyIcon = {
-  [CurrencyCode["UNITED STATES DOLLAR"]]: "$",
-  [CurrencyCode.EURO]: "€",
+  [DEFAULT_STARTING_CURRENCY]: "$",
   [CurrencyCode.INDIA]: "🇮🇳",
 };
 
@@ -25,21 +26,15 @@ export const CURRENCY_CODE_MAP: Partial<
     }
   >
 > = {
-  [CurrencyCode["UNITED STATES DOLLAR"]]: {
-    code: CurrencyCode["UNITED STATES DOLLAR"],
-    icon: CurrencyIcon[CurrencyCode["UNITED STATES DOLLAR"]],
-  },
-  [CurrencyCode.EURO]: {
-    code: CurrencyCode.EURO,
-    icon: CurrencyIcon[CurrencyCode.EURO],
+  [DEFAULT_STARTING_CURRENCY]: {
+    code: DEFAULT_STARTING_CURRENCY,
+    icon: CurrencyIcon[DEFAULT_STARTING_CURRENCY],
   },
   [CurrencyCode.INDIA]: {
     code: CurrencyCode.INDIA,
     icon: CurrencyIcon[CurrencyCode.INDIA],
   },
 };
-
-
 export const ISO_CODES = new Set([
   "AED",
   "AFN",

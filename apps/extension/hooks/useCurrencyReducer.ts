@@ -1,6 +1,6 @@
 import currencies from "@/assets/currency.json";
 import { getUserSettings } from "@/utils/appStorage";
-import { CURRENCY_CODE_MAP } from "@/utils/constants";
+import { CURRENCY_CODE_MAP, DEFAULT_STARTING_CURRENCY } from "@/utils/constants";
 import { ActionType, CurrencyCode } from "@/utils/enums";
 import { convertAmountWithSnapshot, formatConvertedAmount } from "@/utils/rateMath";
 import {
@@ -44,9 +44,9 @@ function resolveAltCurrency(
     return preferredCurrency;
   }
 
-  return baseCurrency === CurrencyCode["UNITED STATES DOLLAR"]
+  return baseCurrency === DEFAULT_STARTING_CURRENCY
     ? DEFAULT_SECONDARY_CURRENCY
-    : CurrencyCode["UNITED STATES DOLLAR"];
+    : DEFAULT_STARTING_CURRENCY;
 }
 
 function convertAmount(
@@ -114,7 +114,7 @@ export const useCurrencyReducer = ({
 }) => {
   const [rateSnapshot, setRateSnapshot] = useState<RateSnapshot | null>(null);
   const [preferredCurrency, setPreferredCurrency] = useState<CurrencyCode>(
-    CurrencyCode["UNITED STATES DOLLAR"],
+    DEFAULT_STARTING_CURRENCY,
   );
 
   const appliedPreferredCurrencyRef = useRef(false);
@@ -220,7 +220,7 @@ export const useCurrencyReducer = ({
 
           case ActionType.CURRENCY_ADD: {
             const newCurrency = resolveAltCurrency(
-              nextState[0]?.code || CurrencyCode["UNITED STATES DOLLAR"],
+              nextState[0]?.code || DEFAULT_STARTING_CURRENCY,
               preferredCurrency,
             );
 

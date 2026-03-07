@@ -5,6 +5,7 @@ import {
   PlanTier,
 } from "@/packages/shared/contracts";
 import { storage } from "wxt/utils/storage";
+import { DEFAULT_STARTING_CURRENCY } from "./constants";
 import { CurrencyCode } from "./enums";
 import { AUTH_FEATURES_ENABLED, PAID_FEATURES_ENABLED } from "./featureFlags";
 
@@ -42,7 +43,7 @@ const SETTINGS_KEY = "local:user-settings";
 const VALID_CURRENCY_CODES = new Set(Object.values(CurrencyCode));
 
 const DEFAULT_USER_SETTINGS: UserSettings = {
-  preferredCurrency: CurrencyCode["UNITED STATES DOLLAR"],
+  preferredCurrency: DEFAULT_STARTING_CURRENCY,
   auth: {
     email: null,
     accessToken: null,

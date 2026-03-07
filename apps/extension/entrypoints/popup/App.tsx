@@ -1,14 +1,12 @@
-import PlusIcon from "@/assets/add_outline.svg";
 import SwapVerticalIcon from "@/assets/swap_vertical_outline.svg";
 import "@/assets/tailwind.css";
 import { ConvertorHOD } from "@/components/Convertor/Convertor";
 import CurrencyBox from "@/components/CurrencyBox/CurrencyBox";
 import { useCurrencyReducer } from "@/hooks/useCurrencyReducer";
-import { ActionType, CurrencyCode } from "@/utils/enums";
+import { DEFAULT_STARTING_CURRENCY } from "@/utils/constants";
+import { ActionType } from "@/utils/enums";
 import { browser } from "wxt/browser";
 import "./App.css";
-
-const DEFAULT_STARTING_CURRENCY = CurrencyCode["UNITED STATES DOLLAR"];
 
 function App() {
   const [currenciesState, dispatch] = useCurrencyReducer({
