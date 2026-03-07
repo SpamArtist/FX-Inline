@@ -2,19 +2,9 @@ import { CurrencyCode } from "./enums";
 
 export const DEFAULT_STARTING_CURRENCY = CurrencyCode["EURO"];
 
-export const CurrencyIcon = {
-  [DEFAULT_STARTING_CURRENCY]: "$",
+const CURRENCY_ICON = {
+  [DEFAULT_STARTING_CURRENCY]: "€",
   [CurrencyCode.INDIA]: "🇮🇳",
-};
-
-export const DEFAULT_BASE_CURRENCY = {
-  code: CurrencyCode.EURO,
-  logo: CurrencyIcon[CurrencyCode.EURO],
-};
-
-export const DEFAULT_ALT_CURRENCY = {
-  code: CurrencyCode.INDIA,
-  logo: CurrencyIcon[CurrencyCode.INDIA],
 };
 
 export const CURRENCY_CODE_MAP: Partial<
@@ -28,11 +18,11 @@ export const CURRENCY_CODE_MAP: Partial<
 > = {
   [DEFAULT_STARTING_CURRENCY]: {
     code: DEFAULT_STARTING_CURRENCY,
-    icon: CurrencyIcon[DEFAULT_STARTING_CURRENCY],
+    icon: CURRENCY_ICON[DEFAULT_STARTING_CURRENCY],
   },
   [CurrencyCode.INDIA]: {
     code: CurrencyCode.INDIA,
-    icon: CurrencyIcon[CurrencyCode.INDIA],
+    icon: CURRENCY_ICON[CurrencyCode.INDIA],
   },
 };
 export const ISO_CODES = new Set([

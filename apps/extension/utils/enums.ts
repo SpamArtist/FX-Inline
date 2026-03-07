@@ -5,11 +5,6 @@ export enum ActionType {
   CURRENCY_SWAP = "currency-swap",
 }
 
-export enum LocalStorageItem {
-  PREFERED_BASE_CURRENCY = "prefered-base-currency",
-  PREFERED_ALT_CURRENCY = "prefered-alt-currency",
-}
-
 export enum CurrencyCode {
   "AFGHANISTAN" = "AFN",
   "ALBANIA" = "ALL",

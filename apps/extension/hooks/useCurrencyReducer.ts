@@ -8,18 +8,19 @@ import {
   RateSnapshot,
 } from "@/utils/rates";
 import { ICurrencyState, IDispatchAction } from "@/utils/types";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-const DEFAULT_SECONDARY_CURRENCY = CurrencyCode.EURO;
+const DEFAULT_SECONDARY_CURRENCY = CurrencyCode["UNITED STATES DOLLAR"];
 
 const CURRENCY_LIST_BY_CODE = new Map(
   currencies.map((currency) => [currency.code as CurrencyCode, currency]),
 );
 
+let currencyIdCounter = 0;
+
 function createCurrencyId() {
-  return typeof crypto !== "undefined" && crypto.randomUUID
-    ? crypto.randomUUID()
-    : `currency-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  currencyIdCounter += 1;
+  return `currency-${currencyIdCounter}`;
 }
 
 function getCurrencyStateFromCode(code: CurrencyCode) {
@@ -117,8 +118,6 @@ export const useCurrencyReducer = ({
     DEFAULT_STARTING_CURRENCY,
   );
 
-  const appliedPreferredCurrencyRef = useRef(false);
-
   const [currenciesState, setCurrenciesState] = useState<ICurrencyState[]>(() => {
     const altCurrency = resolveAltCurrency(currency, DEFAULT_SECONDARY_CURRENCY);
 
@@ -170,16 +169,16 @@ export const useCurrencyReducer = ({
   }, [rateSnapshot]);
 
   useEffect(() => {
-    if (appliedPreferredCurrencyRef.current) return;
-
     setCurrenciesState((current) => {
       if (current.length < 2) return current;
 
-      const next = [...current];
       const nextCurrency = resolveAltCurrency(
-        next[0].code,
+        current[0].code,
         preferredCurrency,
       );
+      if (current[1].code === nextCurrency) return current;
+
+      const next = [...current];
 
       next[1] = {
         ...next[1],
@@ -187,7 +186,6 @@ export const useCurrencyReducer = ({
         code: nextCurrency,
       };
 
-      appliedPreferredCurrencyRef.current = true;
       return recalculateFromIndex(next, 0, rateSnapshot);
     });
   }, [preferredCurrency, rateSnapshot]);
