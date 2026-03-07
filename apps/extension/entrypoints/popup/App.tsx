@@ -74,17 +74,6 @@ function App() {
             )}
           </div>
         ))}
-        <button
-          className="absolute -bottom-4 z-10 cursor-pointer"
-          onClick={() =>
-            dispatch({
-              type: ActionType.CURRENCY_ADD,
-              payload: {},
-            })
-          }
-        >
-          <PlusIcon />
-        </button>
       </div>
 
       <footer className="popup-options-footer">
