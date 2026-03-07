@@ -14,16 +14,25 @@ function App() {
   const [settings, setSettings] = useState<UserSettings>(DEFAULT_USER_SETTINGS);
   const [statusMessage, setStatusMessage] = useState("");
 
-  const currencyOptions = useMemo(
-    () =>
-      currencies
-        .map((entry) => ({
-          code: entry.code as CurrencyCode,
-          label: `${entry.logo ? `${entry.logo} ` : ""}${entry.code}`,
-        }))
-        .sort((a, b) => a.code.localeCompare(b.code)),
-    [],
-  );
+  const currencyOptions = useMemo(() => {
+    const displayNames =
+      typeof Intl.DisplayNames === "function"
+        ? new Intl.DisplayNames(["en"], { type: "currency" })
+        : null;
+
+    return currencies
+      .map((entry) => {
+        const code = entry.code as CurrencyCode;
+        const currencyName =
+          displayNames?.of(code)?.trim() || entry.name?.trim() || code;
+
+        return {
+          code,
+          label: `${entry.logo ? `${entry.logo} ` : ""}${code} - ${currencyName}`,
+        };
+      })
+      .sort((a, b) => a.code.localeCompare(b.code));
+  }, []);
 
   useEffect(() => {
     let canceled = false;
@@ -43,6 +52,7 @@ function App() {
   }, []);
 
   async function onPreferredCurrencyChange(nextCurrency: CurrencyCode) {
+    if (settings.preferredCurrency === nextCurrency) return;
     const updated = await updateUserSettings({ preferredCurrency: nextCurrency });
     setSettings(updated);
     setStatusMessage(`Preferred currency updated to ${nextCurrency}.`);
