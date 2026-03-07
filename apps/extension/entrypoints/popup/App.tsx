@@ -88,7 +88,7 @@ function App() {
       </div>
 
       <footer className="popup-options-footer">
-        <span className="popup-options-muted">© {currentYear} Currency Converter</span>
+        <span className="popup-options-muted">© {currentYear} FX Inline</span>
         <span className="popup-options-separator"> - </span>
         <button type="button" className="popup-options-link" onClick={onOpenSettings}>
           Extension Options

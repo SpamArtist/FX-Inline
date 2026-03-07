@@ -60,7 +60,7 @@ function App() {
 
   return (
     <main className="options-shell">
-      <h1 className="options-title">Currency Converter Settings</h1>
+      <h1 className="options-title">FX Inline Settings</h1>
       <p className="options-subtitle">
         Manage your preferred currency.
       </p>

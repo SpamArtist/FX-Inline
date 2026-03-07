@@ -14,7 +14,7 @@ export const ConvertorHOD = ({ shouldDisplayHeader, children }: Props) => {
     >
       {shouldDisplayHeader && (
         <div className="py-2.5">
-          <h2 className="font-[system-ui]">Currency Convertor</h2>
+          <h2 className="font-[system-ui]">FX Inline</h2>
         </div>
       )}
       {children}
