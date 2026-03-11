@@ -33,6 +33,26 @@ test("parseCurrencyValue handles signs, separators, and lowercase iso", () => {
   }
 });
 
+test("parseCurrencyValue supports lakh/lac/crore/cr with currency prefix and suffix", () => {
+  const cases = [
+    ["1 Lakh INR", 100000, "INR"],
+    ["1 Lac INR", 100000, "INR"],
+    ["INR 1 Lakh", 100000, "INR"],
+    ["INR 1 Lac", 100000, "INR"],
+    ["1 Crore INR", 10000000, "INR"],
+    ["1 Cr INR", 10000000, "INR"],
+    ["INR 1 Crore", 10000000, "INR"],
+    ["INR 1 Cr", 10000000, "INR"],
+  ];
+
+  for (const [input, value, currency] of cases) {
+    const parsed = parseCurrencyValue(input);
+    expect(parsed.valid).toBe(true);
+    expect(parsed.value).toBe(value);
+    expect(parsed.currency).toBe(currency);
+  }
+});
+
 test("parseCurrencyValue rejects malformed or incomplete values", () => {
   const invalids = ["USD", "and 100", "100..50", "foo bar", "12.3.4 USD"];
 
@@ -145,6 +165,34 @@ test("extractCurrencyTextMatches parses shared-magnitude ranges with one currenc
   expect(matches[0].currency).toBe("JPY");
   expect(matches[0].value).toBe(6000000);
   expect(matches[0].rangeEndValue).toBe(13000000);
+});
+
+test("extractCurrencyTextMatches parses mixed lakh/lac/crore/cr snippets", () => {
+  const matches = extractCurrencyTextMatches(
+    "Examples: 1 Lakh INR, 1 Lac INR, INR 1 Lakh, INR 1 Lac, 1 Crore INR, 1 Cr INR, INR 1 Crore, INR 1 Cr.",
+  );
+
+  expect(matches).toHaveLength(8);
+  expect(matches.map((match) => match.currency)).toEqual([
+    "INR",
+    "INR",
+    "INR",
+    "INR",
+    "INR",
+    "INR",
+    "INR",
+    "INR",
+  ]);
+  expect(matches.map((match) => match.value)).toEqual([
+    100000,
+    100000,
+    100000,
+    100000,
+    10000000,
+    10000000,
+    10000000,
+    10000000,
+  ]);
 });
 
 test("mayContainCurrencyToken quickly filters non-currency text", () => {

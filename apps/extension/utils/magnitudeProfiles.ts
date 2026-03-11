@@ -36,8 +36,16 @@ const PROFILE_EN: MagnitudeProfile = {
   locale: "en",
   entries: [
     {
+      multiplier: 100_000,
+      aliases: ["lakh", "lac", "lakhs", "lacs"],
+    },
+    {
       multiplier: 1_000_000,
       aliases: ["million", "millions"],
+    },
+    {
+      multiplier: 10_000_000,
+      aliases: ["crore", "crores", "cr"],
     },
     {
       multiplier: 1_000_000_000,
