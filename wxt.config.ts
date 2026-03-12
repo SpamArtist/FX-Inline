@@ -1,7 +1,37 @@
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
+import type { OutputBundle } from "rollup";
 import vitePluginSvgr from "vite-plugin-svgr";
 import { defineConfig } from "wxt";
+
+function hardenFirefoxInnerHtmlAssignments() {
+  return {
+    name: "harden-firefox-innerhtml-assignments",
+    apply: "build" as const,
+    enforce: "post" as const,
+    generateBundle(_options: unknown, bundle: OutputBundle) {
+      const scriptTemplatePattern =
+        /\b([\w$]+)=([\w$]+)\.createElement\("div"\),\1\.innerHTML="<script><\\\/script>",\1=\1\.removeChild\(\1\.firstChild\)/g;
+      const dynamicInnerHtmlPattern =
+        /\.innerHTML=([\w$]+)\}\}break;case"(multiple|children)"/g;
+
+      for (const output of Object.values(bundle)) {
+        if (output.type !== "chunk") continue;
+
+        const patchedCode = output.code
+          .replace(scriptTemplatePattern, '$1=$2.createElement("script")')
+          .replace(
+            dynamicInnerHtmlPattern,
+            '.textContent=$1}}break;case"$2"',
+          );
+
+        if (patchedCode !== output.code) {
+          output.code = patchedCode;
+        }
+      }
+    },
+  };
+}
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
@@ -60,6 +90,7 @@ export default defineConfig({
         },
         include: "**/*.svg",
       }),
+      hardenFirefoxInnerHtmlAssignments(),
     ],
     resolve: {
       alias: {
