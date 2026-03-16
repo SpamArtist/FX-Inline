@@ -210,9 +210,20 @@ function parseFlexibleNumber(
     }
 
     if (c === 44) {
-      if (seenDot) {
+      const previousCode = i > start ? str.charCodeAt(i - 1) : null;
+      const nextCode = i + 1 < end ? str.charCodeAt(i + 1) : null;
+      const surroundedByDigits =
+        previousCode !== null &&
+        nextCode !== null &&
+        previousCode >= 48 &&
+        previousCode <= 57 &&
+        nextCode >= 48 &&
+        nextCode <= 57;
+
+      if (seenDot || !surroundedByDigits) {
         return null;
       }
+
       seenComma = true;
       commaCount++;
       continue;

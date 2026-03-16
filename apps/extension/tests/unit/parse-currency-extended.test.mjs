@@ -62,6 +62,14 @@ test("parseCurrencyValue rejects malformed or incomplete values", () => {
   }
 });
 
+test("parseCurrencyValue rejects comma-delimited prose before ISO words", () => {
+  const parsed = parseCurrencyValue("27, all");
+  expect(parsed.valid).toBe(false);
+
+  const matches = extractCurrencyTextMatches("From March 13 to 27, all users");
+  expect(matches).toHaveLength(0);
+});
+
 test("extractCurrencyTextMatches ignores non-ISO words and catches real currencies", () => {
   const matches = extractCurrencyTextMatches(
     "Words and 200 apples; offer usd 30 and ₹50 now",
