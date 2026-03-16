@@ -1,15 +1,12 @@
-# Currency Conversion Extension + SaaS Backend
+# Currency Conversion Extension
 
 This repository now contains:
 
 - Browser extension (WXT + React)
-- Local SaaS backend (auth, entitlements, billing hooks, usage limits, admin ops)
 
 ## Project Layout
 
 - `apps/extension/` -> extension app (assets, components, entrypoints, hooks, utils, tests)
-- `backend/src/` -> backend API
-- `packages/shared/` -> shared API contracts
 - `docs/` -> roadmap + QA/security runbooks
 
 ## Commands
@@ -17,15 +14,8 @@ This repository now contains:
 - `npm run dev` -> extension development
 - `npm run build` -> extension build
 - `npm run compile` -> TypeScript check
-- `npm run backend:start` -> build + run backend
 - `npm run test:unit` -> unit tests
-
-## Backend Environment
-
-Copy values from `backend/.env.example` into your environment before running backend in non-dev setups.
 
 ## Important Notes
 
-- Extension rate fetching is now client-side only (public FX providers); it does not depend on custom backend APIs.
-- Stripe endpoints run in mock mode when Stripe env vars are absent.
-- In this sandbox, opening a listening port is blocked, so backend runtime must be validated on your local machine.
+- Extension rate fetching is client-side only (public FX providers).

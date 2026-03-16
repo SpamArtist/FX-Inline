@@ -93,7 +93,6 @@ export default defineConfig({
     ],
     resolve: {
       alias: {
-        "@/packages": path.resolve(__dirname, "./packages"),
         "@": path.resolve(__dirname, "./apps/extension"),
       },
     },

@@ -5,7 +5,6 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@/packages/*": ["./packages/*"],
       "@/*": ["./apps/extension/*"]
     }
   }

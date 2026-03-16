@@ -1,13 +1,28 @@
-import {
-  AuthPayload,
-  EntitlementPayload,
-  EntitlementStatus,
-  PlanTier,
-} from "@/packages/shared/contracts";
 import { storage } from "wxt/utils/storage";
 import { DEFAULT_STARTING_CURRENCY } from "./constants";
 import { CurrencyCode } from "./enums";
 import { AUTH_FEATURES_ENABLED, PAID_FEATURES_ENABLED } from "./featureFlags";
+
+export type PlanTier = "free" | "paid";
+
+export type EntitlementStatus = "free" | "paid" | "trial" | "canceled";
+
+export type AuthPayload = {
+  accessToken: string;
+  refreshToken: string;
+  accessTokenExpiresAt: number;
+  refreshTokenExpiresAt: number;
+};
+
+export type EntitlementPayload = {
+  status: EntitlementStatus;
+  planTier: PlanTier;
+  trialEndsAt: number | null;
+  currentPeriodEnd: number | null;
+  checkedAt: number;
+  dailyLimit: number;
+  remainingToday: number | null;
+};
 
 export type AuthSession = {
   email: string | null;
