@@ -3,7 +3,7 @@
 This repository now contains:
 
 - Browser extension (WXT + React)
-- Local SaaS backend (auth, entitlements, billing hooks, rates hardening, usage limits, admin ops)
+- Local SaaS backend (auth, entitlements, billing hooks, usage limits, admin ops)
 
 ## Project Layout
 
@@ -26,5 +26,6 @@ Copy values from `backend/.env.example` into your environment before running bac
 
 ## Important Notes
 
+- Extension rate fetching is now client-side only (public FX providers); it does not depend on custom backend APIs.
 - Stripe endpoints run in mock mode when Stripe env vars are absent.
 - In this sandbox, opening a listening port is blocked, so backend runtime must be validated on your local machine.

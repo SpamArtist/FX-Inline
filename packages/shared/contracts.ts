@@ -28,17 +28,6 @@ export type AuthResponsePayload = {
   entitlement: EntitlementPayload;
 };
 
-export type RatesResponsePayload = {
-  snapshot: {
-    base: string;
-    rates: Record<string, number>;
-    fetchedAt: number;
-    marketDayKey: string | null;
-    source: string;
-  };
-  planTier: PlanTier;
-};
-
 export type UsageResponsePayload = {
   limited: boolean;
   consumedToday: number;

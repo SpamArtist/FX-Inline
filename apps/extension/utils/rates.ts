@@ -7,7 +7,6 @@ import {
   shouldUseFreeTierCache,
   shouldUsePaidTierCache,
 } from "./ratePolicy";
-import { fetchRatesFromBackend } from "./ratesClient";
 import { RateSnapshotLike } from "./rateMath";
 
 const FREE_RATE_CACHE_KEY = "local:rate-cache-free";
@@ -20,6 +19,43 @@ type ExchangeApiResponse = {
   result?: string;
   rates?: Record<string, number>;
 };
+
+type ExchangeRateApiResponse = {
+  rates?: Record<string, number>;
+};
+
+type RateProvider = {
+  name: string;
+  url: string;
+  parse: (payload: unknown) => Record<string, number>;
+};
+
+const RATE_PROVIDERS: RateProvider[] = [
+  {
+    name: "client-er-api",
+    url: "https://open.er-api.com/v6/latest/USD",
+    parse: (payload) => {
+      const data = payload as ExchangeApiResponse;
+      if (data.result !== "success" || !data.rates) {
+        throw new Error("Rate API returned an invalid payload");
+      }
+
+      return data.rates;
+    },
+  },
+  {
+    name: "client-exchange-rate-api",
+    url: "https://api.exchangerate-api.com/v4/latest/USD",
+    parse: (payload) => {
+      const data = payload as ExchangeRateApiResponse;
+      if (!data.rates) {
+        throw new Error("ExchangeRate API returned an invalid payload");
+      }
+
+      return data.rates;
+    },
+  },
+];
 
 export type RateSnapshot = RateSnapshotLike & {
   base: CurrencyCode;
@@ -70,61 +106,38 @@ function normalizeRates(
   return normalized;
 }
 
-function normalizeSnapshot(payload: {
-  base: string;
-  rates: Record<string, number>;
-  fetchedAt: number;
-  marketDayKey: string | null;
-  source: string;
-}): RateSnapshot {
-  return {
-    base: CurrencyCode["UNITED STATES DOLLAR"],
-    rates: normalizeRates(payload.rates),
-    fetchedAt:
-      typeof payload.fetchedAt === "number" && Number.isFinite(payload.fetchedAt)
-        ? payload.fetchedAt
-        : Date.now(),
-    marketDayKey: payload.marketDayKey || undefined,
-    source: payload.source,
-  };
-}
+async function fetchLatestUsdSnapshotFromClient(): Promise<RateSnapshot> {
+  let lastError: Error | null = null;
 
-async function fetchLatestUsdSnapshotFallback(): Promise<RateSnapshot> {
-  const response = await fetch("https://open.er-api.com/v6/latest/USD");
+  for (const provider of RATE_PROVIDERS) {
+    try {
+      const response = await fetch(provider.url);
 
-  if (!response.ok) {
-    throw new Error(`Rate API request failed with status ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`${provider.name} failed with status ${response.status}`);
+      }
+
+      const payload = (await response.json()) as unknown;
+      const parsedRates = provider.parse(payload);
+      const normalizedRates = normalizeRates(parsedRates);
+
+      return {
+        base: CurrencyCode["UNITED STATES DOLLAR"],
+        rates: normalizedRates,
+        fetchedAt: Date.now(),
+        source: provider.name,
+      };
+    } catch (error) {
+      lastError =
+        error instanceof Error ? error : new Error("Rate provider request failed");
+    }
   }
 
-  const payload = (await response.json()) as ExchangeApiResponse;
-
-  if (payload.result !== "success" || !payload.rates) {
-    throw new Error("Rate API returned an invalid payload");
-  }
-
-  return {
-    base: CurrencyCode["UNITED STATES DOLLAR"],
-    rates: normalizeRates(payload.rates),
-    fetchedAt: Date.now(),
-    source: "extension-fallback-er-api",
-  };
-}
-
-async function fetchSnapshotFromBackend(forceRefresh = false): Promise<{
-  planTier: "free" | "paid";
-  snapshot: RateSnapshot;
-}> {
-  const response = await fetchRatesFromBackend(null, { forceRefresh });
-
-  return {
-    planTier: response.planTier,
-    snapshot: normalizeSnapshot(response.snapshot),
-  };
+  throw lastError || new Error("All client-side rate providers failed");
 }
 
 export async function getFreeTierRates(opts?: {
   forceRefresh?: boolean;
-  allowBackend?: boolean;
 }): Promise<RateSnapshot> {
   const marketDayKey = getFreeTierMarketDayKey();
   const cached = await freeRateCacheItem.getValue();
@@ -137,56 +150,21 @@ export async function getFreeTierRates(opts?: {
     return cached;
   }
 
-  if (!opts?.allowBackend) {
-    try {
-      const fallback = await fetchLatestUsdSnapshotFallback();
-      const fallbackWithDay: RateSnapshot = {
-        ...fallback,
-        marketDayKey,
-      };
-
-      await freeRateCacheItem.setValue(fallbackWithDay);
-      return fallbackWithDay;
-    } catch (error) {
-      if (isValidSnapshot(cached)) {
-        return cached;
-      }
-
-      throw error;
-    }
-  }
-
   try {
-    const fetched = await fetchSnapshotFromBackend(Boolean(opts?.forceRefresh));
-
-    const normalizedFree: RateSnapshot = {
-      ...fetched.snapshot,
+    const fetched = await fetchLatestUsdSnapshotFromClient();
+    const snapshotWithMarketDay: RateSnapshot = {
+      ...fetched,
       marketDayKey,
     };
 
-    await freeRateCacheItem.setValue(normalizedFree);
-
-    if (PAID_FEATURES_ENABLED && fetched.planTier === "paid") {
-      await paidRateCacheItem.setValue({
-        ...fetched.snapshot,
-        marketDayKey: undefined,
-      });
-    }
-
-    return normalizedFree;
+    await freeRateCacheItem.setValue(snapshotWithMarketDay);
+    return snapshotWithMarketDay;
   } catch (error) {
     if (isValidSnapshot(cached)) {
       return cached;
     }
 
-    const fallback = await fetchLatestUsdSnapshotFallback();
-    const fallbackWithDay: RateSnapshot = {
-      ...fallback,
-      marketDayKey,
-    };
-
-    await freeRateCacheItem.setValue(fallbackWithDay);
-    return fallbackWithDay;
+    throw error;
   }
 }
 
@@ -196,7 +174,6 @@ export async function getPaidTierRates(opts?: {
   if (!PAID_FEATURES_ENABLED) {
     return getFreeTierRates({
       forceRefresh: opts?.forceRefresh,
-      allowBackend: true,
     });
   }
 
@@ -211,26 +188,25 @@ export async function getPaidTierRates(opts?: {
   }
 
   try {
-    const fetched = await fetchSnapshotFromBackend(Boolean(opts?.forceRefresh));
-
-    if (fetched.planTier === "paid") {
-      await paidRateCacheItem.setValue(fetched.snapshot);
-      return fetched.snapshot;
-    }
-
-    const downgradedSnapshot: RateSnapshot = {
-      ...fetched.snapshot,
-      marketDayKey: getFreeTierMarketDayKey(),
-    };
-
-    await freeRateCacheItem.setValue(downgradedSnapshot);
-    return downgradedSnapshot;
+    const fetched = await fetchLatestUsdSnapshotFromClient();
+    await paidRateCacheItem.setValue(fetched);
+    return fetched;
   } catch (error) {
     if (isValidSnapshot(cached)) {
       return cached;
     }
 
-    throw error;
+    const fallbackFree = await getFreeTierRates({
+      forceRefresh: opts?.forceRefresh,
+    });
+
+    const paidFallback: RateSnapshot = {
+      ...fallbackFree,
+      marketDayKey: undefined,
+    };
+
+    await paidRateCacheItem.setValue(paidFallback);
+    return paidFallback;
   }
 }
 
@@ -242,8 +218,5 @@ export async function getRatesForUser(
     return getPaidTierRates(opts);
   }
 
-  return getFreeTierRates({
-    ...opts,
-    allowBackend: true,
-  });
+  return getFreeTierRates(opts);
 }

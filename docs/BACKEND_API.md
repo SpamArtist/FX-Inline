@@ -2,6 +2,8 @@
 
 Base URL (default local): `http://127.0.0.1:8787`
 
+Current extension builds fetch FX rates client-side and do not require these backend APIs for conversion.
+
 ## Auth
 
 - `POST /auth/signup` `{ email, password }`
