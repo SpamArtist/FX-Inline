@@ -1,4 +1,3 @@
-import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 import type { OutputBundle } from "rollup";
 import vitePluginSvgr from "vite-plugin-svgr";
@@ -74,11 +73,6 @@ export default defineConfig({
   },
   vite: () => ({
     plugins: [
-      tailwindcss({
-        optimize: {
-          minify: true,
-        },
-      }),
       vitePluginSvgr({
         svgrOptions: {
           // svgr options

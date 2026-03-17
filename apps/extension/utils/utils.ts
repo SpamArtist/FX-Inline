@@ -1,11 +1,10 @@
 import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
 import { CURRENCY_SYMBOLS, ISO_CODES } from "./constants";
 import { CurrencyCode } from "./enums";
 import { getMagnitudeAliasMap } from "./magnitudeProfiles";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+  return clsx(inputs);
 }
 
 const CURRENCY_CODE_VALUES = new Set(Object.values(CurrencyCode));

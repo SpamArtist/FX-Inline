@@ -1,4 +1,3 @@
-import "@/assets/tailwind.css";
 import currencies from "@/assets/currency.json";
 import {
   DEFAULT_USER_SETTINGS,
@@ -63,8 +62,6 @@ function App() {
         <div className="ccx-options-brand">
           <span className="ccx-shell__title">FX INLINE</span>
         </div>
-        <h1 className="ccx-options-title">FX Inline Settings</h1>
-        <p className="ccx-options-subtitle">Manage your preferred currency.</p>
 
         <div className="ccx-options-field">
           <label className="ccx-options-label" htmlFor="preferred-currency">

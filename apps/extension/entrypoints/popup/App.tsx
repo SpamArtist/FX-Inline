@@ -1,4 +1,3 @@
-import "@/assets/tailwind.css";
 import { ConvertorHOD } from "@/components/Convertor/Convertor";
 import CurrencyBox from "@/components/CurrencyBox/CurrencyBox";
 import { useCurrencyReducer } from "@/hooks/useCurrencyReducer";

@@ -1,4 +1,3 @@
-import "@/assets/tailwind.css";
 import { ReactNode } from "react";
 import "./Convertor.css";
 

@@ -1,7 +1,6 @@
-@import "tailwindcss";
-
 :root {
   color-scheme: dark;
+  font-size: clamp(12px, 0.7vw + 10px, 18px);
 }
 
 html,
