@@ -74,6 +74,8 @@ const quickCurrencyTokenRegex = new RegExp(
   `(?:${isoTokenPattern}|${symbolPattern})`,
   "iu",
 );
+const thousandMagnitudeHintRegex =
+  /\d[\d,.\u00A0\u202F ]*\s*[kK](?=$|[^\p{L}\p{N}])/u;
 
 type ParserArtifacts = {
   magnitudeMultiplierByAlias: Map<string, number>;
@@ -549,6 +551,11 @@ export function mayContainCurrencyToken(input: string): boolean {
   if (!quickDigitRegex.test(input)) return false;
 
   return quickCurrencyTokenRegex.test(input);
+}
+
+export function hasThousandMagnitudeHint(input: string): boolean {
+  if (!input?.length) return false;
+  return thousandMagnitudeHintRegex.test(input);
 }
 
 type CurrencyFormatOptions = {

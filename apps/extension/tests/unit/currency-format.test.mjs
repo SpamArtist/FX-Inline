@@ -32,3 +32,15 @@ test("formatAmountInCurrency compacts large values with regional locale units", 
   expect(formatted).toContain("Md");
   expect(formatted).not.toContain("34167440000");
 });
+
+test("formatAmountInCurrency can compact six-figure values into K", () => {
+  const formatted = formatAmountInCurrency(145000, "EUR", {
+    localeHint: "en-US",
+    compactLargeValues: true,
+    compactThreshold: 100000,
+  });
+
+  expect(formatted).toContain("€");
+  expect(formatted).toContain("K");
+  expect(formatted).not.toContain("145,000");
+});

@@ -4,13 +4,14 @@ import { RateSnapshot } from "@/utils/rates";
 import {
   extractCurrencyTextMatches,
   formatAmountInCurrency,
+  hasThousandMagnitudeHint,
   mayContainCurrencyToken,
   type CurrencyTextMatch,
 } from "@/utils/utils";
 
 export const INLINE_CONVERSION_CLASS = "ccx-inline-conversion";
 const INLINE_CONVERSION_STYLE_ID = "ccx-inline-conversion-style";
-const INLINE_COMPACT_THRESHOLD = 1_000_000;
+const INLINE_COMPACT_THRESHOLD = 100_000;
 const INLINE_CONVERSION_CSS = `
   :where(.${INLINE_CONVERSION_CLASS}) {
     border-radius: 0 !important;
@@ -83,7 +84,7 @@ function clearInlineConversions(root: ParentNode = document.body) {
 }
 
 function getConvertedAmountText(
-  match: Pick<CurrencyTextMatch, "value" | "rangeEndValue" | "currency">,
+  match: Pick<CurrencyTextMatch, "raw" | "value" | "rangeEndValue" | "currency">,
   preferredCurrency: CurrencyCode,
   rateSnapshot: RateSnapshot,
   localeHint: string | null,
@@ -103,11 +104,14 @@ function getConvertedAmountText(
 
   if (converted === null) return null;
 
-  const convertedUsesCompact = Math.abs(converted) >= INLINE_COMPACT_THRESHOLD;
+  const compactThreshold = hasThousandMagnitudeHint(match.raw)
+    ? 1_000
+    : INLINE_COMPACT_THRESHOLD;
+  const convertedUsesCompact = Math.abs(converted) >= compactThreshold;
   const formattedConverted = formatAmountInCurrency(converted, preferredCurrency, {
     localeHint,
     compactLargeValues: true,
-    compactThreshold: INLINE_COMPACT_THRESHOLD,
+    compactThreshold,
   });
   let convertedAmount = convertedUsesCompact ? `~${formattedConverted}` : formattedConverted;
 
@@ -121,11 +125,11 @@ function getConvertedAmountText(
 
     if (convertedRangeEnd === null) return null;
 
-    const rangeEndUsesCompact = Math.abs(convertedRangeEnd) >= INLINE_COMPACT_THRESHOLD;
+    const rangeEndUsesCompact = Math.abs(convertedRangeEnd) >= compactThreshold;
     const formattedRangeEnd = formatAmountInCurrency(convertedRangeEnd, preferredCurrency, {
       localeHint,
       compactLargeValues: true,
-      compactThreshold: INLINE_COMPACT_THRESHOLD,
+      compactThreshold,
     });
     const rangeApproximationPrefix =
       convertedUsesCompact || rangeEndUsesCompact ? "~" : "";

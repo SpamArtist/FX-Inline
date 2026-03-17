@@ -1,6 +1,7 @@
 import {
   parseCurrencyValue,
   extractCurrencyTextMatches,
+  hasThousandMagnitudeHint,
   mayContainCurrencyToken,
 } from "../../test-dist/utils/utils.js";
 
@@ -212,6 +213,16 @@ test("mayContainCurrencyToken quickly filters non-currency text", () => {
   expect(mayContainCurrencyToken("Offer: eur 120")).toBe(true);
   expect(mayContainCurrencyToken("Package: ¥6M")).toBe(true);
   expect(mayContainCurrencyToken("الدفع د.إ 4500")).toBe(true);
+});
+
+test("hasThousandMagnitudeHint detects K-style magnitudes only when tied to a number", () => {
+  expect(hasThousandMagnitudeHint("USD 100K")).toBe(true);
+  expect(hasThousandMagnitudeHint("Comp: ¥6K-¥13K")).toBe(true);
+  expect(hasThousandMagnitudeHint("Comp: ¥6-13K")).toBe(true);
+
+  expect(hasThousandMagnitudeHint("SEK 100")).toBe(false);
+  expect(hasThousandMagnitudeHint("PKR 5000")).toBe(false);
+  expect(hasThousandMagnitudeHint("No magnitude here")).toBe(false);
 });
 
 test("locale profiles parse localized magnitudes with localeHint", () => {
