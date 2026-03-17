@@ -6,6 +6,7 @@ import { storage } from "wxt/utils/storage";
 import { createContentConversionRuntime } from "./conversionRuntime";
 import { createSelectionPopupController } from "./selectionPopup";
 import contentBoxStyles from "./content.css?inline";
+import converterThemeStyles from "@/styles/converter-theme.css?inline";
 
 const USER_SETTINGS_STORAGE_KEY = SETTINGS_KEY;
 const PORTAL_DROPDOWN_CLASS = "ccx-dropdown-menu-content";
@@ -36,7 +37,9 @@ export default defineContentScript({
   matches: ["<all_urls>"],
   cssInjectionMode: "manual",
   async main() {
-    const popupController = createSelectionPopupController(contentBoxStyles);
+    const popupController = createSelectionPopupController(
+      `${converterThemeStyles}\n${contentBoxStyles}`,
+    );
     const conversionRuntime = createContentConversionRuntime();
     let uiCaptureActive = false;
 

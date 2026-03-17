@@ -1,10 +1,10 @@
-import SwapVerticalIcon from "@/assets/swap_vertical_outline.svg";
 import "@/assets/tailwind.css";
 import { ConvertorHOD } from "@/components/Convertor/Convertor";
 import CurrencyBox from "@/components/CurrencyBox/CurrencyBox";
 import { useCurrencyReducer } from "@/hooks/useCurrencyReducer";
 import { DEFAULT_STARTING_CURRENCY } from "@/utils/constants";
 import { ActionType } from "@/utils/enums";
+import { ArrowLeftRight, Cog } from "lucide-react";
 import { browser } from "wxt/browser";
 import "./App.css";
 
@@ -25,63 +25,98 @@ function App() {
     }
   }
 
+  const sourceCurrency = currenciesState[0];
+  const targetCurrency = currenciesState[1];
+
+  function onSwapCurrencies() {
+    if (!sourceCurrency?.id) return;
+
+    dispatch({
+      type: ActionType.CURRENCY_SWAP,
+      payload: {
+        id: sourceCurrency.id,
+      },
+    });
+  }
+
   return (
-    <ConvertorHOD shouldDisplayHeader>
-      <div className="relative flex flex-col items-center mb-2.5 mx-2.5 pb-[1.2em] py-0 bg-inherit text-[wheat]">
-        {currenciesState.map((currentCurrency, i) => (
-          <div
-            key={currentCurrency.id}
-            className="relative flex flex-col items-center w-72.5"
+    <main className="ccx-popup-page">
+      <ConvertorHOD
+        variant="popup"
+        headerActions={(
+          <button
+            type="button"
+            className="ccx-settings-button"
+            onClick={onOpenSettings}
+            aria-label="Open extension options"
+            title="Open extension options"
           >
+            <Cog size={16} aria-hidden />
+          </button>
+        )}
+      >
+        {sourceCurrency && targetCurrency ? (
+          <div className="ccx-converter-layout ccx-popup-layout">
+            <button
+              type="button"
+              className="ccx-converter-swap"
+              onClick={onSwapCurrencies}
+              aria-label="Swap currencies"
+              title="Swap currencies"
+            >
+              <ArrowLeftRight size={16} aria-hidden />
+            </button>
+
             <CurrencyBox
-              isDisabled={false}
-              data={currentCurrency}
-              containerStyle="px-[0.8em] py-[1.5em] rounded-xl shadow-lg outline outline-black/5 dark:bg-white-800 dark:shadow-none dark:-outline-offset-1 dark:outline-white/10 gap-x-[0.5em]"
-              dropDownContainerStyle="flex-[1.2] mt-[0.875em]"
-              inputContainerStyle="flex flex-col gap-[0.35em] flex-3"
+              variant="popup"
+              isCurrencySelectable
+              amountPresentationMode="displayThenEdit"
+              data={sourceCurrency}
               amountChange={(updatedAmount) =>
                 dispatch({
                   type: ActionType.AMOUNT_UPDATE,
-                  payload: { id: currentCurrency.id, amount: updatedAmount },
+                  payload: { id: sourceCurrency.id, amount: updatedAmount },
                 })
               }
               currencyChange={(updatedCurrency) =>
                 dispatch({
                   type: ActionType.CURRENCY_UPDATE,
                   payload: {
-                    id: currentCurrency.id,
+                    id: sourceCurrency.id,
                     currency: updatedCurrency,
                   },
                 })
               }
             />
-            {i !== currenciesState.length - 1 && (
-              <button
-                className="absolute -bottom-4 z-10 cursor-pointer"
-                onClick={() =>
-                  dispatch({
-                    type: ActionType.CURRENCY_SWAP,
-                    payload: {
-                      id: currentCurrency.id,
-                    },
-                  })
-                }
-              >
-                <SwapVerticalIcon />
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
 
-      <footer className="popup-options-footer">
-        <span className="popup-options-muted">© {currentYear} FX Inline</span>
-        <span className="popup-options-separator"> - </span>
-        <button type="button" className="popup-options-link" onClick={onOpenSettings}>
-          Extension Options
-        </button>
-      </footer>
-    </ConvertorHOD>
+            <div className="ccx-converter-divider" aria-hidden />
+
+            <CurrencyBox
+              variant="popup"
+              isCurrencySelectable
+              amountPresentationMode="displayThenEdit"
+              data={targetCurrency}
+              amountChange={(updatedAmount) =>
+                dispatch({
+                  type: ActionType.AMOUNT_UPDATE,
+                  payload: { id: targetCurrency.id, amount: updatedAmount },
+                })
+              }
+              currencyChange={(updatedCurrency) =>
+                dispatch({
+                  type: ActionType.CURRENCY_UPDATE,
+                  payload: {
+                    id: targetCurrency.id,
+                    currency: updatedCurrency,
+                  },
+                })
+              }
+            />
+          </div>
+        ) : null}
+        <p className="ccx-popup-meta">© {currentYear} FX Inline</p>
+      </ConvertorHOD>
+    </main>
   );
 }
 

@@ -20,34 +20,60 @@ function CurrencyConvertorPopupBox({
   currency: CurrencyCode;
 }) {
   const [currencies, dispatch] = useCurrencyReducer({ number, currency });
+  const sourceCurrency = currencies[0];
+  const targetCurrency = currencies[1];
 
   return (
-    <ConvertorHOD shouldDisplayHeader={false}>
-      {currencies.map((currentCurrency) => (
-        <CurrencyBox
-          key={currentCurrency.id}
-          isDisabled
-          containerStyle="px-[0.8em] border-[none] outline-[none] gap-x-[0.5em]"
-          dropDownContainerStyle="flex-[1] mt-[1.5em] max-w-[4.286em]"
-          inputContainerStyle="flex flex-col flex-[1.2] gap-[0.35em]"
-          data={currentCurrency}
-          amountChange={(updatedAmount) =>
-            dispatch({
-              type: ActionType.AMOUNT_UPDATE,
-              payload: { id: currentCurrency.id, amount: updatedAmount },
-            })
-          }
-          currencyChange={(updatedCurrency) =>
-            dispatch({
-              type: ActionType.CURRENCY_UPDATE,
-              payload: {
-                id: currentCurrency.id,
-                currency: updatedCurrency,
-              },
-            })
-          }
-        />
-      ))}
+    <ConvertorHOD variant="selection">
+      {sourceCurrency && targetCurrency ? (
+        <div className="ccx-converter-layout ccx-converter-layout--selection">
+          <CurrencyBox
+            variant="selection"
+            isCurrencySelectable={false}
+            amountPresentationMode="displayThenEdit"
+            data={sourceCurrency}
+            amountChange={(updatedAmount) =>
+              dispatch({
+                type: ActionType.AMOUNT_UPDATE,
+                payload: { id: sourceCurrency.id, amount: updatedAmount },
+              })
+            }
+            currencyChange={(updatedCurrency) =>
+              dispatch({
+                type: ActionType.CURRENCY_UPDATE,
+                payload: {
+                  id: sourceCurrency.id,
+                  currency: updatedCurrency,
+                },
+              })
+            }
+          />
+
+          <div className="ccx-converter-divider" aria-hidden />
+
+          <CurrencyBox
+            variant="selection"
+            isCurrencySelectable={false}
+            amountPresentationMode="displayThenEdit"
+            data={targetCurrency}
+            amountChange={(updatedAmount) =>
+              dispatch({
+                type: ActionType.AMOUNT_UPDATE,
+                payload: { id: targetCurrency.id, amount: updatedAmount },
+              })
+            }
+            currencyChange={(updatedCurrency) =>
+              dispatch({
+                type: ActionType.CURRENCY_UPDATE,
+                payload: {
+                  id: targetCurrency.id,
+                  currency: updatedCurrency,
+                },
+              })
+            }
+          />
+        </div>
+      ) : null}
     </ConvertorHOD>
   );
 }
@@ -95,8 +121,7 @@ export function createSelectionPopupController(
 
     const reactContainer = document.createElement("div");
     reactContainer.id = "popup-react-container";
-    reactContainer.className =
-      "w-[18em] [box-shadow:0px_0px_3px_2px_wheat] rounded-md rounded-tl-none";
+    reactContainer.className = "ccx-selection-popup-host";
     shadowRoot.appendChild(reactContainer);
 
     document.body.appendChild(popupRoot);

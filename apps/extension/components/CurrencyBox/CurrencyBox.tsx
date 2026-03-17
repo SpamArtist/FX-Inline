@@ -1,59 +1,178 @@
+import {
+  cancelAmountEdit,
+  commitAmountDraft,
+  formatCurrencyHeadlineAmount,
+  getCurrencyDisplayName,
+  getNextAmountDraft,
+} from "@/utils/currencyPresentation";
 import { CurrencyCode } from "@/utils/enums";
 import { ICurrencyState } from "@/utils/types";
-import { type ChangeEvent } from "react";
+import { ChangeEvent, KeyboardEvent, useEffect, useMemo, useRef, useState } from "react";
 import CurrencyDropdown from "../CurrencyDropdown/CurrencyDropdown";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
+
+export type CurrencyBoxVariant = "popup" | "selection";
+export type AmountPresentationMode = "displayThenEdit" | "directInput";
 
 type Props = {
   data: ICurrencyState;
-  isDisabled: boolean;
-  containerStyle: string;
-  dropDownContainerStyle: string;
-  inputContainerStyle: string;
+  variant: CurrencyBoxVariant;
+  isCurrencySelectable: boolean;
+  amountPresentationMode?: AmountPresentationMode;
+  localeHint?: string | null;
   amountChange: (amount: string) => void;
   currencyChange: (currency: CurrencyCode) => void;
 };
 
 function CurrencyBox({
   data,
-  isDisabled = true,
-  containerStyle,
-  dropDownContainerStyle,
-  inputContainerStyle,
+  variant,
+  isCurrencySelectable,
+  amountPresentationMode = "displayThenEdit",
+  localeHint,
   amountChange,
   currencyChange,
 }: Props) {
-  function onAmountChange(e: ChangeEvent<HTMLInputElement>) {
-    if (/^[0-9]{0,}\.?[0-9]{0,4}$/.test(e.target.value)) {
-      amountChange(e.target.value);
+  const [isEditingAmount, setIsEditingAmount] = useState(false);
+  const [draftAmount, setDraftAmount] = useState(data.amount);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const skipBlurCommitRef = useRef(false);
+
+  useEffect(() => {
+    if (!isEditingAmount) {
+      setDraftAmount(data.amount);
+    }
+  }, [data.amount, isEditingAmount]);
+
+  useEffect(() => {
+    if (!isEditingAmount) return;
+
+    inputRef.current?.focus();
+    inputRef.current?.select();
+  }, [isEditingAmount]);
+
+  const resolvedLocale = useMemo(() => {
+    if (localeHint && localeHint.trim().length > 0) {
+      return localeHint;
+    }
+
+    if (typeof navigator === "undefined") {
+      return "en";
+    }
+
+    return navigator.language || "en";
+  }, [localeHint]);
+
+  const displayAmount = useMemo(
+    () => formatCurrencyHeadlineAmount(data.amount, data.code, resolvedLocale),
+    [data.amount, data.code, resolvedLocale],
+  );
+
+  const currencyName = useMemo(
+    () => getCurrencyDisplayName(data.code, resolvedLocale),
+    [data.code, resolvedLocale],
+  );
+
+  const shouldDisplayInput =
+    amountPresentationMode === "directInput" || isEditingAmount;
+
+  function beginAmountEdit() {
+    if (amountPresentationMode !== "displayThenEdit") return;
+
+    skipBlurCommitRef.current = false;
+    setDraftAmount(data.amount);
+    setIsEditingAmount(true);
+  }
+
+  function handleAmountChange(event: ChangeEvent<HTMLInputElement>) {
+    const nextDraft = getNextAmountDraft(draftAmount, event.target.value);
+    if (nextDraft === draftAmount) return;
+
+    setDraftAmount(nextDraft);
+
+    if (amountPresentationMode === "directInput") {
+      amountChange(nextDraft);
+    }
+  }
+
+  function finalizeAmountEdit() {
+    if (amountPresentationMode === "directInput") return;
+    if (skipBlurCommitRef.current) {
+      skipBlurCommitRef.current = false;
+      return;
+    }
+
+    const committedAmount = commitAmountDraft(draftAmount, data.amount);
+    setDraftAmount(committedAmount);
+    setIsEditingAmount(false);
+
+    if (committedAmount !== data.amount) {
+      amountChange(committedAmount);
+    }
+  }
+
+  function revertAmountEdit() {
+    if (amountPresentationMode === "directInput") return;
+
+    skipBlurCommitRef.current = true;
+    setDraftAmount(cancelAmountEdit(data.amount));
+    setIsEditingAmount(false);
+  }
+
+  function onAmountInputKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "Enter") {
+      finalizeAmountEdit();
+      return;
+    }
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      revertAmountEdit();
     }
   }
 
   return (
-    <div className={`flex items-center ${containerStyle}`}>
-      <div className={dropDownContainerStyle}>
+    <section className={`ccx-currency-box ccx-currency-box--${variant}`}>
+      <div className="ccx-currency-box__top">
+        <p className="ccx-currency-box__name">{currencyName}</p>
         <CurrencyDropdown
-          isDisabled={isDisabled}
-          selectedOption={data.icon + " " + data.code}
+          isDisabled={!isCurrencySelectable}
+          selectedCurrency={data.code}
+          selectedIcon={data.icon}
           onCurrencySelection={currencyChange}
         />
       </div>
-      <div className={inputContainerStyle}>
-        <Label
-          htmlFor={data.id}
-          className="text-gray-500 dark:text-gray-400 text-[0.875em]"
-        >
-          Amount
-        </Label>
-        <Input
-          id={data.id}
-          type="text"
-          onChange={onAmountChange}
-          value={data.amount}
-        />
+
+      <div className="ccx-currency-box__amount-area">
+        {shouldDisplayInput ? (
+          <input
+            ref={inputRef}
+            className="ccx-currency-box__amount-input"
+            type="text"
+            inputMode="decimal"
+            value={draftAmount}
+            onChange={handleAmountChange}
+            onBlur={finalizeAmountEdit}
+            onKeyDown={onAmountInputKeyDown}
+            aria-label={`${currencyName} amount`}
+          />
+        ) : (
+          <button
+            type="button"
+            className="ccx-currency-box__amount-display"
+            onClick={beginAmountEdit}
+            aria-label={`Edit ${currencyName} amount`}
+          >
+            {displayAmount}
+          </button>
+        )}
       </div>
-    </div>
+
+      <p className="ccx-currency-box__amount-meta">
+        {amountPresentationMode === "displayThenEdit"
+          ? "Click amount to edit"
+          : "Amount updates instantly"}
+      </p>
+    </section>
   );
 }
 

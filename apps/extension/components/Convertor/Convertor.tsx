@@ -2,22 +2,32 @@ import "@/assets/tailwind.css";
 import { ReactNode } from "react";
 import "./Convertor.css";
 
+export type ConverterShellVariant = "popup" | "selection";
+
 type Props = {
-  shouldDisplayHeader: boolean;
+  variant: ConverterShellVariant;
+  title?: string;
+  headerActions?: ReactNode;
   children: ReactNode;
 };
 
-export const ConvertorHOD = ({ shouldDisplayHeader, children }: Props) => {
+export const ConvertorHOD = ({
+  variant,
+  title = "FX INLINE",
+  headerActions,
+  children,
+}: Props) => {
   return (
-    <div
-      className={`bg-[darkslategray] text-[wheat] h-max flex flex-col gap-[0.8em] ${shouldDisplayHeader ? "" : "rounded-md pt-[0.3em] pb-[0.875em] rounded-tl-none"}`}
-    >
-      {shouldDisplayHeader && (
-        <div className="py-2.5">
-          <h2 className="font-[system-ui]">FX Inline</h2>
-        </div>
-      )}
-      {children}
-    </div>
+    <section className={`ccx-theme ccx-shell ccx-shell--${variant}`}>
+      <div className="ccx-shell__inner">
+        <header className="ccx-shell__header">
+          <h2 className="ccx-shell__title">{title}</h2>
+          {headerActions ? (
+            <div className="ccx-shell__header-actions">{headerActions}</div>
+          ) : null}
+        </header>
+        {children}
+      </div>
+    </section>
   );
 };

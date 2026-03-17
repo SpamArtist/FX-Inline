@@ -8,7 +8,6 @@ import {
 } from "@/utils/appStorage";
 import { CurrencyCode } from "@/utils/enums";
 import { useEffect, useMemo, useState } from "react";
-import "../popup/App.css";
 
 function App() {
   const [settings, setSettings] = useState<UserSettings>(DEFAULT_USER_SETTINGS);
@@ -59,29 +58,35 @@ function App() {
   }
 
   return (
-    <main className="options-shell">
-      <h1 className="options-title">FX Inline Settings</h1>
-      <p className="options-subtitle">
-        Manage your preferred currency.
-      </p>
+    <main className="ccx-theme ccx-options-page">
+      <section className="ccx-options-card">
+        <div className="ccx-options-brand">
+          <span className="ccx-shell__title">FX INLINE</span>
+        </div>
+        <h1 className="ccx-options-title">FX Inline Settings</h1>
+        <p className="ccx-options-subtitle">Manage your preferred currency.</p>
 
-      <div className="settings-panel">
-        <label htmlFor="preferred-currency">Preferred currency</label>
-        <select
-          id="preferred-currency"
-          value={settings.preferredCurrency}
-          onChange={(event) =>
-            void onPreferredCurrencyChange(event.target.value as CurrencyCode)
-          }
-        >
-          {currencyOptions.map((option) => (
-            <option key={option.code} value={option.code}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        {statusMessage && <p className="status-message">{statusMessage}</p>}
-      </div>
+        <div className="ccx-options-field">
+          <label className="ccx-options-label" htmlFor="preferred-currency">
+            Preferred Currency
+          </label>
+          <select
+            className="ccx-options-select"
+            id="preferred-currency"
+            value={settings.preferredCurrency}
+            onChange={(event) =>
+              void onPreferredCurrencyChange(event.target.value as CurrencyCode)
+            }
+          >
+            {currencyOptions.map((option) => (
+              <option key={option.code} value={option.code}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          {statusMessage && <p className="ccx-options-status">{statusMessage}</p>}
+        </div>
+      </section>
     </main>
   );
 }

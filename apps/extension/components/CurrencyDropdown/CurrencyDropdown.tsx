@@ -1,27 +1,35 @@
+import { getCurrencyIcon } from "@/utils/currencyPresentation";
 import { CurrencyCode } from "@/utils/enums";
 import currencies from "../../assets/currency.json";
 import Dropdown from "../Dropdown/Dropdown";
 
 type Props = {
   isDisabled?: boolean;
-  selectedOption: string;
+  selectedCurrency: CurrencyCode;
+  selectedIcon?: string;
   onCurrencySelection: (currency: CurrencyCode) => void;
 };
 
 function CurrencyDropdown({
-  selectedOption,
+  selectedCurrency,
+  selectedIcon,
   isDisabled = false,
   onCurrencySelection,
 }: Props) {
-  const currencyOptions = currencies.map((x) => ({
-    label: `${x.logo} ${x.code}`,
-    value: x.code,
+  const currencyOptions = currencies.map((entry) => ({
+    label: entry.code,
+    value: entry.code,
+    icon: entry.logo,
   }));
 
   return (
     <Dropdown
       isDisabled={isDisabled}
-      displayOption={selectedOption}
+      displayOption={{
+        label: selectedCurrency,
+        value: selectedCurrency,
+        icon: selectedIcon || getCurrencyIcon(selectedCurrency),
+      }}
       options={currencyOptions}
       onSelect={(currency) => onCurrencySelection(currency as CurrencyCode)}
     />
