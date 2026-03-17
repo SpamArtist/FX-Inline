@@ -1,12 +1,7 @@
 import currencies from "../assets/currency.json";
 import { CurrencyCode } from "./enums";
 import { formatAmountInCurrency } from "./utils";
-
-type CurrencyListEntry = {
-  code: CurrencyCode;
-  logo?: string;
-  name?: string;
-};
+import type { CurrencyListEntry } from "./currencyPresentation.types";
 
 const CURRENCY_BY_CODE = new Map<CurrencyCode, CurrencyListEntry>(
   (currencies as CurrencyListEntry[]).map((entry) => [entry.code, entry]),

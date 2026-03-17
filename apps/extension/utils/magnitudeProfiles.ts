@@ -1,14 +1,4 @@
-export type MagnitudeEntry = {
-  multiplier: number;
-  aliases: readonly string[];
-};
-
-export type MagnitudeProfile = {
-  locale: string;
-  entries: readonly MagnitudeEntry[];
-  // Use for locales where terms collide with other language scales.
-  requiresLocaleHint?: boolean;
-};
+import type { MagnitudeProfile } from "./magnitudeProfiles.types";
 
 const PROFILE_COMMON: MagnitudeProfile = {
   locale: "common",

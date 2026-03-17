@@ -1,8 +1,5 @@
 import { CurrencyCode } from "./enums";
-
-export type RateSnapshotLike = {
-  rates: Partial<Record<CurrencyCode, number>>;
-};
+import type { RateSnapshotLike } from "./rateMath.types";
 
 export function convertAmountWithSnapshot(
   amount: number,

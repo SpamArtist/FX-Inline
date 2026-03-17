@@ -2,6 +2,13 @@ import { clsx, type ClassValue } from "clsx";
 import { CURRENCY_SYMBOLS, ISO_CODES } from "./constants";
 import { CurrencyCode } from "./enums";
 import { getMagnitudeAliasMap } from "./magnitudeProfiles";
+import type {
+  CurrencyFormatOptions,
+  CurrencyParseOptions,
+  CurrencyTextMatch,
+  CurrencyValueParseResult,
+  ParserArtifacts,
+} from "./currencyUtils.types";
 
 export function cn(...inputs: ClassValue[]) {
   return clsx(inputs);
@@ -75,13 +82,6 @@ const quickCurrencyTokenRegex = new RegExp(
 );
 const thousandMagnitudeHintRegex =
   /\d[\d,.\u00A0\u202F ]*\s*[kK](?=$|[^\p{L}\p{N}])/u;
-
-type ParserArtifacts = {
-  magnitudeMultiplierByAlias: Map<string, number>;
-  magnitudeSuffixRegex: RegExp;
-  currencySnippetRegex: RegExp;
-  currencyRangeRegex: RegExp;
-};
 
 const parserArtifactsCache = new Map<string, ParserArtifacts>();
 
@@ -354,10 +354,6 @@ function parseWithTokenSuffixForArtifacts(
   return null;
 }
 
-type CurrencyParseOptions = {
-  localeHint?: string | null;
-};
-
 function resolveLocaleHint(options?: string | CurrencyParseOptions | null): string | null {
   if (typeof options === "string") {
     return options || null;
@@ -373,7 +369,7 @@ function resolveLocaleHint(options?: string | CurrencyParseOptions | null): stri
 function parseCurrencyValueWithArtifacts(
   input: string,
   artifacts: ParserArtifacts,
-): { valid: boolean; value?: number; currency?: CurrencyCode | null } {
+): CurrencyValueParseResult {
   if (input == null) return { valid: false };
 
   const str = String(input).trim();
@@ -408,20 +404,11 @@ function parseCurrencyValueWithArtifacts(
 export function parseCurrencyValue(
   input: string,
   options?: string | CurrencyParseOptions | null,
-): { valid: boolean; value?: number; currency?: CurrencyCode | null } {
+): CurrencyValueParseResult {
   const localeHint = resolveLocaleHint(options);
   const artifacts = getParserArtifacts(localeHint);
   return parseCurrencyValueWithArtifacts(input, artifacts);
 }
-
-export type CurrencyTextMatch = {
-  raw: string;
-  start: number;
-  end: number;
-  value: number;
-  currency: CurrencyCode;
-  rangeEndValue?: number;
-};
 
 export function extractCurrencyTextMatches(
   input: string,
@@ -556,12 +543,6 @@ export function hasThousandMagnitudeHint(input: string): boolean {
   if (!input?.length) return false;
   return thousandMagnitudeHintRegex.test(input);
 }
-
-type CurrencyFormatOptions = {
-  localeHint?: string | null;
-  compactLargeValues?: boolean;
-  compactThreshold?: number;
-};
 
 const currencyFormatterCache = new Map<string, Intl.NumberFormat | null>();
 

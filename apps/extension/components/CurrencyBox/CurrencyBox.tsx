@@ -5,23 +5,10 @@ import {
   getCurrencyDisplayName,
   getNextAmountDraft,
 } from "@/utils/currencyPresentation";
-import { CurrencyCode } from "@/utils/enums";
-import { ICurrencyState } from "@/utils/types";
 import { ChangeEvent, KeyboardEvent, useEffect, useMemo, useRef, useState } from "react";
 import CurrencyDropdown from "../CurrencyDropdown/CurrencyDropdown";
-
-export type CurrencyBoxVariant = "popup" | "selection";
-export type AmountPresentationMode = "displayThenEdit" | "directInput";
-
-type Props = {
-  data: ICurrencyState;
-  variant: CurrencyBoxVariant;
-  isCurrencySelectable: boolean;
-  amountPresentationMode?: AmountPresentationMode;
-  localeHint?: string | null;
-  amountChange: (amount: string) => void;
-  currencyChange: (currency: CurrencyCode) => void;
-};
+import type { CurrencyBoxProps } from "./CurrencyBox.types";
+export type { AmountPresentationMode, CurrencyBoxVariant } from "./CurrencyBox.types";
 
 function CurrencyBox({
   data,
@@ -31,7 +18,7 @@ function CurrencyBox({
   localeHint,
   amountChange,
   currencyChange,
-}: Props) {
+}: CurrencyBoxProps) {
   const [isEditingAmount, setIsEditingAmount] = useState(false);
   const [draftAmount, setDraftAmount] = useState(data.amount);
   const inputRef = useRef<HTMLInputElement | null>(null);

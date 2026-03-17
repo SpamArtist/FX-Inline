@@ -1,12 +1,13 @@
 import { CurrencyCode } from "@/utils/enums";
 import { convertAmountWithSnapshot } from "@/utils/rateMath";
-import { RateSnapshot } from "@/utils/rates";
+import type { CurrencyTextMatch } from "@/utils/currencyUtils.types";
+import type { RateSnapshot } from "@/utils/rates.types";
+import type { InlineConversionPerfSample } from "./content.types";
 import {
   extractCurrencyTextMatches,
   formatAmountInCurrency,
   hasThousandMagnitudeHint,
   mayContainCurrencyToken,
-  type CurrencyTextMatch,
 } from "@/utils/utils";
 
 export const INLINE_CONVERSION_CLASS = "ccx-inline-conversion";
@@ -45,17 +46,6 @@ const SKIP_TAGS = new Set([
   "PRE",
   "SVG",
 ]);
-
-export type InlineConversionPerfSample = {
-  totalMs: number;
-  clearExistingMs: number;
-  scanTextNodesMs: number;
-  decorateNodesMs: number;
-  scannedTextNodes: number;
-  conversionsApplied: number;
-  maxNodesPerPass: number;
-  reachedNodeLimit: boolean;
-};
 
 function shouldSkipTextNode(node: Text): boolean {
   const parent = node.parentElement;

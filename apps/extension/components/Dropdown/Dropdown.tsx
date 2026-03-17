@@ -5,26 +5,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import type { DropdownProps } from "./Dropdown.types";
+export type { DropdownOption } from "./Dropdown.types";
 
-type DropdownOption = {
-  label: string;
-  value: string;
-  icon?: string;
-};
-
-type Props = {
-  isDisabled?: boolean;
-  displayOption: DropdownOption;
-  options: DropdownOption[];
-  onSelect: (option: string) => void;
-};
-
-export default function Dropdown({
+export default function Dropdown<TValue extends string>({
   isDisabled = false,
   displayOption,
   options,
   onSelect,
-}: Props) {
+}: DropdownProps<TValue>) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="ccx-dropdown-trigger" disabled={isDisabled}>

@@ -1,5 +1,5 @@
 import path from "path";
-import type { OutputBundle } from "rollup";
+import type { OutputBundle, OutputOptions } from "rollup";
 import vitePluginSvgr from "vite-plugin-svgr";
 import { defineConfig } from "wxt";
 
@@ -8,7 +8,7 @@ function hardenFirefoxInnerHtmlAssignments() {
     name: "harden-firefox-innerhtml-assignments",
     apply: "build" as const,
     enforce: "post" as const,
-    generateBundle(_options: unknown, bundle: OutputBundle) {
+    generateBundle(_options: OutputOptions, bundle: OutputBundle) {
       const scriptTemplatePattern =
         /\b([\w$]+)=([\w$]+)\.createElement\("div"\),\1\.innerHTML="<script><\\\/script>",\1=\1\.removeChild\(\1\.firstChild\)/g;
       const dynamicInnerHtmlPattern =

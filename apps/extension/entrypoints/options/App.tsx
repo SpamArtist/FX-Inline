@@ -3,10 +3,10 @@ import {
   DEFAULT_USER_SETTINGS,
   getUserSettings,
   updateUserSettings,
-  UserSettings,
 } from "@/utils/appStorage";
 import { CurrencyCode } from "@/utils/enums";
 import { useEffect, useMemo, useState } from "react";
+import type { UserSettings } from "@/utils/appStorage.types";
 
 function App() {
   const [settings, setSettings] = useState<UserSettings>(DEFAULT_USER_SETTINGS);

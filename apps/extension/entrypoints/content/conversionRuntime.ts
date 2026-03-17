@@ -1,6 +1,8 @@
-import type { UserSettings } from "@/utils/appStorage";
+import type { UserSettings } from "@/utils/appStorage.types";
 import { getUserSettings } from "@/utils/appStorage";
-import { RateSnapshot, getRates } from "@/utils/rates";
+import type { ContentConversionRuntime } from "./content.types";
+import type { RateSnapshot } from "@/utils/rates.types";
+import { getRates } from "@/utils/rates";
 import { convertVisiblePrices } from "./inlineConversion";
 import {
   addInlinePerfSample,
@@ -18,17 +20,7 @@ function isUserSettingsSnapshot(
   return typeof value?.preferredCurrency === "string";
 }
 
-export type ContentConversionRuntime = {
-  initialize: () => Promise<void>;
-  onSettingsStorageUpdate: (
-    newSettings?: UserSettings | null,
-    oldSettings?: UserSettings | null,
-  ) => Promise<void>;
-  enqueueMutationRoots: (roots: ParentNode[]) => void;
-  recordSelectionConversion: () => void;
-  shouldIgnoreMutations: () => boolean;
-  cleanup: () => void;
-};
+export type { ContentConversionRuntime } from "./content.types";
 
 export function createContentConversionRuntime(): ContentConversionRuntime {
   const perfLogger = createPerfLogger("ccx");
@@ -59,7 +51,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
       logPerf("refreshSettingsAndRates", {
         forceRefresh,
         preferredCurrency: settings.preferredCurrency,
-        rateSource: rateSnapshot.source ?? "unknown",
+        rateSource: rateSnapshot.source ?? "unavailable",
         durationMs: roundMs(performance.now() - startedAt),
       });
     }

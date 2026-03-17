@@ -1,28 +1,19 @@
 import { storage } from "wxt/utils/storage";
 import { CurrencyCode } from "./enums";
+import type { JsonObject, JsonValue } from "./json.types";
 import { getMarketDayKey, shouldUseMarketDayCache } from "./ratePolicy";
-import { RateSnapshotLike } from "./rateMath";
+import type {
+  ExchangeApiResponse,
+  ExchangeRateApiResponse,
+  RateProvider,
+  RateSnapshot,
+} from "./rates.types";
 
 const RATE_CACHE_KEY = "local:rate-cache";
 
 const VALID_CURRENCY_CODES: ReadonlySet<string> = new Set(
   Object.values(CurrencyCode),
 );
-
-type ExchangeApiResponse = {
-  result?: string;
-  rates?: Record<string, unknown>;
-};
-
-type ExchangeRateApiResponse = {
-  rates?: Record<string, unknown>;
-};
-
-type RateProvider = {
-  name: string;
-  url: string;
-  parse: (payload: unknown) => Record<string, number>;
-};
 
 const RATE_PROVIDERS: RateProvider[] = [
   {
@@ -59,23 +50,16 @@ const RATE_PROVIDERS: RateProvider[] = [
   },
 ];
 
-export type RateSnapshot = RateSnapshotLike & {
-  base: CurrencyCode;
-  fetchedAt: number;
-  marketDayKey?: string;
-  source?: string;
-};
-
 const rateCacheItem = storage.defineItem<RateSnapshot | null>(RATE_CACHE_KEY, {
   fallback: null,
 });
 
-function isObjectRecord(value: unknown): value is Record<string, unknown> {
-  return Boolean(value) && typeof value === "object";
+function isObjectRecord(value: JsonValue | undefined): value is JsonObject {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
 function parseNumberRecord(
-  value: Record<string, unknown> | undefined,
+  value: JsonObject | undefined,
 ): Record<string, number> | null {
   if (!value) return null;
 
@@ -96,7 +80,7 @@ function parseNumberRecord(
   return parsed;
 }
 
-function isExchangeApiResponse(payload: unknown): payload is ExchangeApiResponse {
+function isExchangeApiResponse(payload: JsonValue): payload is ExchangeApiResponse {
   return (
     isObjectRecord(payload) &&
     payload.result === "success" &&
@@ -104,7 +88,9 @@ function isExchangeApiResponse(payload: unknown): payload is ExchangeApiResponse
   );
 }
 
-function isExchangeRateApiResponse(payload: unknown): payload is ExchangeRateApiResponse {
+function isExchangeRateApiResponse(
+  payload: JsonValue,
+): payload is ExchangeRateApiResponse {
   return isObjectRecord(payload) && (payload.rates === undefined || isObjectRecord(payload.rates));
 }
 
@@ -151,7 +137,7 @@ async function fetchLatestUsdSnapshotFromClient(): Promise<RateSnapshot> {
         throw new Error(`${provider.name} failed with status ${response.status}`);
       }
 
-      const payload: unknown = await response.json();
+      const payload = (await response.json()) as JsonValue;
       const parsedRates = provider.parse(payload);
       const normalizedRates = normalizeRates(parsedRates);
 

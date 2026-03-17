@@ -2,23 +2,13 @@ import CurrencyBox from "@/components/CurrencyBox/CurrencyBox";
 import { ConvertorHOD } from "@/components/Convertor/Convertor";
 import { useCurrencyReducer } from "@/hooks/useCurrencyReducer";
 import { ActionType, CurrencyCode } from "@/utils/enums";
+import type {
+  SelectionPopupBoxProps,
+  SelectionPopupController,
+} from "./content.types";
 import { createRoot, Root } from "react-dom/client";
 
-type SelectionPopupController = {
-  showPopup: (x: number, y: number, amount: string, currency: CurrencyCode) => void;
-  removePopup: () => void;
-  containsTarget: (target: Node) => boolean;
-  getRoot: () => HTMLDivElement | null;
-  destroy: () => void;
-};
-
-function CurrencyConvertorPopupBox({
-  number,
-  currency,
-}: {
-  number: string;
-  currency: CurrencyCode;
-}) {
+function CurrencyConvertorPopupBox({ number, currency }: SelectionPopupBoxProps) {
   const [currencies, dispatch] = useCurrencyReducer({ number, currency });
   const sourceCurrency = currencies[0];
   const targetCurrency = currencies[1];

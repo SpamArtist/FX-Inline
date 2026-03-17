@@ -1,10 +1,7 @@
 import { storage } from "wxt/utils/storage";
 import { DEFAULT_STARTING_CURRENCY } from "./constants";
 import { CurrencyCode } from "./enums";
-
-export type UserSettings = {
-  preferredCurrency: CurrencyCode;
-};
+import type { UserSettings } from "./appStorage.types";
 
 const SETTINGS_KEY = "local:user-settings";
 
@@ -24,7 +21,7 @@ function isCurrencyCode(value: string): value is CurrencyCode {
   return VALID_CURRENCY_CODES.has(value);
 }
 
-function asCurrencyCode(value: unknown): CurrencyCode {
+function asCurrencyCode(value: string | null | undefined): CurrencyCode {
   if (typeof value !== "string") {
     return DEFAULT_USER_SETTINGS.preferredCurrency;
   }

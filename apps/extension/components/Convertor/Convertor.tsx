@@ -1,21 +1,14 @@
-import { ReactNode } from "react";
+import type { ConverterShellVariant, ConvertorHodProps } from "./Convertor.types";
 import "./Convertor.css";
 
-export type ConverterShellVariant = "popup" | "selection";
-
-type Props = {
-  variant: ConverterShellVariant;
-  title?: string;
-  headerActions?: ReactNode;
-  children: ReactNode;
-};
+export type { ConverterShellVariant } from "./Convertor.types";
 
 export const ConvertorHOD = ({
   variant,
   title = "FX INLINE",
   headerActions,
   children,
-}: Props) => {
+}: ConvertorHodProps) => {
   return (
     <section className={`ccx-theme ccx-shell ccx-shell--${variant}`}>
       <div className="ccx-shell__inner">

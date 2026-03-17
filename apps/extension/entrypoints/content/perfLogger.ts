@@ -1,31 +1,12 @@
+import type {
+  InlineConversionPerfAggregate,
+  InlinePerfSample,
+  PerfLogger,
+} from "./perfLogger.types";
+
+export type { InlineConversionPerfAggregate, PerfLogger } from "./perfLogger.types";
+
 const PERF_DEBUG_STORAGE_KEY = "ccx:perf";
-
-type PerfPayload = Record<string, unknown>;
-type InlinePerfSample = {
-  totalMs: number;
-  clearExistingMs: number;
-  scanTextNodesMs: number;
-  decorateNodesMs: number;
-  scannedTextNodes: number;
-  conversionsApplied: number;
-  reachedNodeLimit: boolean;
-};
-
-export type InlineConversionPerfAggregate = {
-  totalMs: number;
-  clearExistingMs: number;
-  scanTextNodesMs: number;
-  decorateNodesMs: number;
-  scannedTextNodes: number;
-  conversionsApplied: number;
-  reachedNodeLimitPasses: number;
-};
-
-export type PerfLogger = {
-  enabled: boolean;
-  log: (event: string, payload: PerfPayload) => void;
-  roundMs: (value: number) => number;
-};
 
 function isPerfLoggingEnabled(): boolean {
   if (import.meta.env.DEV) return true;

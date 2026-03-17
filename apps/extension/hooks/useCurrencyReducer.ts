@@ -3,10 +3,8 @@ import { getUserSettings } from "@/utils/appStorage";
 import { CURRENCY_CODE_MAP, DEFAULT_STARTING_CURRENCY } from "@/utils/constants";
 import { ActionType, CurrencyCode } from "@/utils/enums";
 import { convertAmountWithSnapshot, formatConvertedAmount } from "@/utils/rateMath";
-import {
-  getRates,
-  RateSnapshot,
-} from "@/utils/rates";
+import type { RateSnapshot } from "@/utils/rates.types";
+import { getRates } from "@/utils/rates";
 import { ICurrencyState, IDispatchAction } from "@/utils/types";
 import { useCallback, useEffect, useState } from "react";
 

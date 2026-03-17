@@ -22,17 +22,11 @@ function isNodeContainedBy(ancestor: ParentNode, node: ParentNode): boolean {
     return contains.call(ancestor as Node, node as Node);
   }
 
-  let cursor: Node | null =
-    ((node as unknown as { parentNode?: Node | null }).parentNode ??
-      (node as unknown as { parentElement?: Element | null }).parentElement ??
-      null);
+  let cursor: Node | null = (node as Node).parentNode;
 
   while (cursor) {
     if (cursor === (ancestor as Node)) return true;
-    cursor =
-      (cursor as { parentNode?: Node | null }).parentNode ??
-      (cursor as { parentElement?: Element | null }).parentElement ??
-      null;
+    cursor = cursor.parentNode;
   }
 
   return false;
