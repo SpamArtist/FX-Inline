@@ -69,41 +69,9 @@
   font-size: 0.8rem;
 }
 
-.auth-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-}
-
-.subscription-actions {
-  display: flex;
-  gap: 0.35rem;
-  flex-wrap: wrap;
-}
-
-.subscription-actions button {
-  border: 1px solid rgba(245, 222, 179, 0.35);
-  border-radius: 0.4rem;
-  background: rgba(16, 43, 43, 0.95);
-  color: #f5deb3;
-  cursor: pointer;
-  font-size: 0.75rem;
-  padding: 0.35rem 0.55rem;
-}
-
-.subscription-actions button:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
-
-.plan-hint,
 .status-message {
   font-size: 0.72rem;
   margin: 0.15rem 0 0;
-}
-
-.plan-hint strong {
-  color: #dbeafe;
 }
 
 .status-message {

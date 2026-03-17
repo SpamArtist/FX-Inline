@@ -1,7 +1,6 @@
 import type { UserSettings } from "@/utils/appStorage";
 import { getUserSettings } from "@/utils/appStorage";
-import { CurrencyCode } from "@/utils/enums";
-import { RateSnapshot, getRatesForUser } from "@/utils/rates";
+import { RateSnapshot, getRates } from "@/utils/rates";
 import { convertVisiblePrices } from "./inlineConversion";
 import {
   addInlinePerfSample,
@@ -13,29 +12,10 @@ const PARTIAL_CONVERSION_DEBOUNCE_MS = 120;
 const PARTIAL_CONVERSION_CONTINUE_MS = 28;
 const PARTIAL_CONVERSION_TIME_BUDGET_MS = 16;
 
-function isUserSettingsSnapshot(value: unknown): value is UserSettings {
-  if (!value || typeof value !== "object") return false;
-
-  const candidate = value as Partial<UserSettings>;
-  if (typeof candidate.preferredCurrency !== "string") return false;
-  if (!candidate.auth || typeof candidate.auth !== "object") return false;
-  if (!candidate.entitlement || typeof candidate.entitlement !== "object") return false;
-
-  return true;
-}
-
-function areAuthSessionsEqual(a: UserSettings["auth"], b: UserSettings["auth"]): boolean {
-  return (
-    a.email === b.email &&
-    a.accessToken === b.accessToken &&
-    a.refreshToken === b.refreshToken &&
-    a.accessTokenExpiresAt === b.accessTokenExpiresAt &&
-    a.refreshTokenExpiresAt === b.refreshTokenExpiresAt
-  );
-}
-
-function hasPaidAccessFromEntitlement(entitlement: UserSettings["entitlement"]): boolean {
-  return entitlement.status === "paid" || entitlement.status === "trial";
+function isUserSettingsSnapshot(
+  value: UserSettings | null | undefined,
+): value is UserSettings {
+  return typeof value?.preferredCurrency === "string";
 }
 
 export type ContentConversionRuntime = {
@@ -73,7 +53,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
     const startedAt = perfLoggingEnabled ? performance.now() : 0;
 
     settings = await getUserSettings();
-    rateSnapshot = await getRatesForUser(settings, { forceRefresh });
+    rateSnapshot = await getRates({ forceRefresh });
 
     if (perfLoggingEnabled) {
       logPerf("refreshSettingsAndRates", {
@@ -134,7 +114,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
       suppressMutationDepth += 1;
 
       try {
-        const preferredCurrency = settings.preferredCurrency as CurrencyCode;
+        const preferredCurrency = settings.preferredCurrency;
         convertVisiblePrices(
           preferredCurrency,
           rateSnapshot,
@@ -193,7 +173,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
       suppressMutationDepth += 1;
 
       try {
-        const preferredCurrency = settings.preferredCurrency as CurrencyCode;
+        const preferredCurrency = settings.preferredCurrency;
         let conversions = 0;
         let connectedRoots = 0;
         let deferredRoots = 0;
@@ -295,28 +275,18 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
     onSettingsStorageUpdate: async (newSettings, oldSettings) => {
       const startedAt = perfLoggingEnabled ? performance.now() : 0;
       let refreshed = false;
-      let skippedRateRefresh = false;
       let preferredCurrencyChanged = false;
-      let rateRelevantChanged = true;
+      let missingRateSnapshot = false;
 
       if (
         isUserSettingsSnapshot(newSettings) &&
         isUserSettingsSnapshot(oldSettings)
       ) {
         settings = newSettings;
-
         preferredCurrencyChanged =
           newSettings.preferredCurrency !== oldSettings.preferredCurrency;
-        const authChanged = !areAuthSessionsEqual(newSettings.auth, oldSettings.auth);
-        const paidAccessChanged =
-          hasPaidAccessFromEntitlement(newSettings.entitlement) !==
-          hasPaidAccessFromEntitlement(oldSettings.entitlement);
 
-        rateRelevantChanged = authChanged || paidAccessChanged;
-
-        if (!rateRelevantChanged) {
-          skippedRateRefresh = true;
-
+        if (rateSnapshot) {
           if (preferredCurrencyChanged) {
             scheduleInlineConversionFromSettingsUpdate();
           }
@@ -324,18 +294,36 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
           if (perfLoggingEnabled) {
             logPerf("onSettingsStorageUpdate", {
               refreshed: false,
-              skippedRateRefresh: true,
+              missingRateSnapshot: false,
               preferredCurrencyChanged,
-              rateRelevantChanged: false,
               durationMs: roundMs(performance.now() - startedAt),
             });
           }
 
           return;
         }
-      } else if (isUserSettingsSnapshot(newSettings)) {
-        settings = newSettings;
       }
+
+      if (isUserSettingsSnapshot(newSettings)) {
+        settings = newSettings;
+
+        if (rateSnapshot) {
+          scheduleInlineConversionFromSettingsUpdate();
+
+          if (perfLoggingEnabled) {
+            logPerf("onSettingsStorageUpdate", {
+              refreshed: false,
+              missingRateSnapshot: false,
+              preferredCurrencyChanged: true,
+              durationMs: roundMs(performance.now() - startedAt),
+            });
+          }
+
+          return;
+        }
+      }
+
+      missingRateSnapshot = true;
 
       try {
         await refreshSettingsAndRates(false);
@@ -347,9 +335,8 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
         if (perfLoggingEnabled) {
           logPerf("onSettingsStorageUpdate", {
             refreshed,
-            skippedRateRefresh,
+            missingRateSnapshot,
             preferredCurrencyChanged,
-            rateRelevantChanged,
             durationMs: roundMs(performance.now() - startedAt),
           });
         }

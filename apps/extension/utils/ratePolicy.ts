@@ -20,7 +20,7 @@ function toDateKey(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
-export function getFreeTierMarketDayKey(now = new Date()): string {
+export function getMarketDayKey(now = new Date()): string {
   const easternNow = toEasternDate(now);
 
   while (easternNow.getDay() === 0 || easternNow.getDay() === 6) {
@@ -37,7 +37,7 @@ export function getFreeTierMarketDayKey(now = new Date()): string {
   return toDateKey(easternNow);
 }
 
-export function shouldUsePaidTierCache(
+export function shouldUseTtlCache(
   fetchedAt: number,
   ttlMs: number,
   now = Date.now(),
@@ -45,9 +45,9 @@ export function shouldUsePaidTierCache(
   return now - fetchedAt <= ttlMs;
 }
 
-export function shouldUseFreeTierCache(
+export function shouldUseMarketDayCache(
   marketDayKey: string | undefined,
   now = new Date(),
 ): boolean {
-  return Boolean(marketDayKey && marketDayKey === getFreeTierMarketDayKey(now));
+  return Boolean(marketDayKey && marketDayKey === getMarketDayKey(now));
 }

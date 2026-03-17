@@ -4,7 +4,7 @@ import { CURRENCY_CODE_MAP, DEFAULT_STARTING_CURRENCY } from "@/utils/constants"
 import { ActionType, CurrencyCode } from "@/utils/enums";
 import { convertAmountWithSnapshot, formatConvertedAmount } from "@/utils/rateMath";
 import {
-  getRatesForUser,
+  getRates,
   RateSnapshot,
 } from "@/utils/rates";
 import { ICurrencyState, IDispatchAction } from "@/utils/types";
@@ -143,7 +143,7 @@ export const useCurrencyReducer = ({
     const loadSettingsAndRates = async () => {
       try {
         const settings = await getUserSettings();
-        const rates = await getRatesForUser(settings);
+        const rates = await getRates();
 
         if (canceled) return;
 
