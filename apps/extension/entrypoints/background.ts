@@ -4,10 +4,6 @@ import { browser } from "wxt/browser";
 const RATE_REFRESH_ALARM = "ccx-refresh-rates";
 const RATE_REFRESH_INTERVAL_MINUTES = 30;
 
-async function refreshRates(forceRefresh = false) {
-  await getRates({ forceRefresh });
-}
-
 async function scheduleRateRefreshAlarm() {
   await browser.alarms.clear(RATE_REFRESH_ALARM);
 
@@ -16,20 +12,23 @@ async function scheduleRateRefreshAlarm() {
   });
 }
 
+async function initializeRateRefresh(forceRefresh = false) {
+  await scheduleRateRefreshAlarm();
+  await getRates({ forceRefresh });
+}
+
 export default defineBackground(() => {
   browser.runtime.onInstalled.addListener(async () => {
-    await scheduleRateRefreshAlarm();
-    await refreshRates(true);
+    await initializeRateRefresh(true);
   });
 
   browser.runtime.onStartup.addListener(async () => {
-    await scheduleRateRefreshAlarm();
-    await refreshRates();
+    await initializeRateRefresh();
   });
 
   browser.alarms.onAlarm.addListener(async (alarm) => {
     if (alarm.name !== RATE_REFRESH_ALARM) return;
 
-    await refreshRates();
+    await getRates();
   });
 });

@@ -14,9 +14,9 @@ export const ConvertorHOD = ({
       <div className="ccx-shell__inner">
         <header className="ccx-shell__header">
           <h2 className="ccx-shell__title">{title}</h2>
-          {headerActions ? (
+          {headerActions && (
             <div className="ccx-shell__header-actions">{headerActions}</div>
-          ) : null}
+          )}
         </header>
         {children}
       </div>

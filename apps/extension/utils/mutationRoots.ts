@@ -15,17 +15,18 @@ function getNodeDepth(node: ParentNode): number {
 }
 
 function isNodeContainedBy(ancestor: ParentNode, node: ParentNode): boolean {
-  if (ancestor === node) return true;
+  const ancestorNode = ancestor as Node;
+  const nodeAsNode = node as Node;
+  if (ancestorNode === nodeAsNode) return true;
 
-  const contains = (ancestor as Node).contains;
-  if (typeof contains === "function") {
-    return contains.call(ancestor as Node, node as Node);
+  if (typeof ancestorNode.contains === "function") {
+    return ancestorNode.contains(nodeAsNode);
   }
 
-  let cursor: Node | null = (node as Node).parentNode;
+  let cursor: Node | null = nodeAsNode.parentNode;
 
   while (cursor) {
-    if (cursor === (ancestor as Node)) return true;
+    if (cursor === ancestorNode) return true;
     cursor = cursor.parentNode;
   }
 
@@ -65,10 +66,10 @@ export function collectMutationConversionRoots(
 
     if (!mutation.addedNodes.length) continue;
 
-    mutation.addedNodes.forEach((node) => {
+    for (const node of mutation.addedNodes) {
       const root = toConversionRoot(node, popupRoot);
       if (root) roots.add(root);
-    });
+    }
   }
 
   const sortedRoots = Array.from(roots).sort(

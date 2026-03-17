@@ -41,6 +41,37 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
 
   const pendingMutationRoots = new Set<ParentNode>();
 
+  function releaseMutationSuppression() {
+    isApplyingInlineConversion = false;
+    window.setTimeout(() => {
+      suppressMutationDepth = Math.max(0, suppressMutationDepth - 1);
+    }, 400);
+  }
+
+  function clearTimer(timer: number | null): number | null {
+    if (timer) {
+      window.clearTimeout(timer);
+    }
+
+    return null;
+  }
+
+  function logSettingsStorageUpdate(
+    startedAt: number,
+    payload: {
+      refreshed: boolean;
+      missingRateSnapshot: boolean;
+      preferredCurrencyChanged: boolean;
+    },
+  ) {
+    if (!perfLoggingEnabled) return;
+
+    logPerf("onSettingsStorageUpdate", {
+      ...payload,
+      durationMs: roundMs(performance.now() - startedAt),
+    });
+  }
+
   async function refreshSettingsAndRates(forceRefresh = false) {
     const startedAt = perfLoggingEnabled ? performance.now() : 0;
 
@@ -134,10 +165,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
           },
         );
       } finally {
-        isApplyingInlineConversion = false;
-        window.setTimeout(() => {
-          suppressMutationDepth = Math.max(0, suppressMutationDepth - 1);
-        }, 400);
+        releaseMutationSuppression();
       }
     }, 200);
   }
@@ -222,10 +250,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
           });
         }
       } finally {
-        isApplyingInlineConversion = false;
-        window.setTimeout(() => {
-          suppressMutationDepth = Math.max(0, suppressMutationDepth - 1);
-        }, 400);
+        releaseMutationSuppression();
       }
     }, delayMs);
   }
@@ -269,48 +294,35 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
       let refreshed = false;
       let preferredCurrencyChanged = false;
       let missingRateSnapshot = false;
+      const normalizedNewSettings = isUserSettingsSnapshot(newSettings)
+        ? newSettings
+        : null;
+      const normalizedOldSettings = isUserSettingsSnapshot(oldSettings)
+        ? oldSettings
+        : null;
 
-      if (
-        isUserSettingsSnapshot(newSettings) &&
-        isUserSettingsSnapshot(oldSettings)
-      ) {
-        settings = newSettings;
+      if (normalizedNewSettings && normalizedOldSettings) {
+        settings = normalizedNewSettings;
         preferredCurrencyChanged =
-          newSettings.preferredCurrency !== oldSettings.preferredCurrency;
+          normalizedNewSettings.preferredCurrency !== normalizedOldSettings.preferredCurrency;
+      }
+
+      if (normalizedNewSettings) {
+        settings = normalizedNewSettings;
+        const shouldScheduleInlineConversion =
+          preferredCurrencyChanged || !normalizedOldSettings;
+        preferredCurrencyChanged = shouldScheduleInlineConversion;
 
         if (rateSnapshot) {
-          if (preferredCurrencyChanged) {
+          if (shouldScheduleInlineConversion) {
             scheduleInlineConversionFromSettingsUpdate();
           }
 
-          if (perfLoggingEnabled) {
-            logPerf("onSettingsStorageUpdate", {
-              refreshed: false,
-              missingRateSnapshot: false,
-              preferredCurrencyChanged,
-              durationMs: roundMs(performance.now() - startedAt),
-            });
-          }
-
-          return;
-        }
-      }
-
-      if (isUserSettingsSnapshot(newSettings)) {
-        settings = newSettings;
-
-        if (rateSnapshot) {
-          scheduleInlineConversionFromSettingsUpdate();
-
-          if (perfLoggingEnabled) {
-            logPerf("onSettingsStorageUpdate", {
-              refreshed: false,
-              missingRateSnapshot: false,
-              preferredCurrencyChanged: true,
-              durationMs: roundMs(performance.now() - startedAt),
-            });
-          }
-
+          logSettingsStorageUpdate(startedAt, {
+            refreshed: false,
+            missingRateSnapshot: false,
+            preferredCurrencyChanged: shouldScheduleInlineConversion,
+          });
           return;
         }
       }
@@ -324,14 +336,11 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
       } catch (error) {
         console.warn("[ccx] Failed to refresh settings/rates after storage update", error);
       } finally {
-        if (perfLoggingEnabled) {
-          logPerf("onSettingsStorageUpdate", {
-            refreshed,
-            missingRateSnapshot,
-            preferredCurrencyChanged,
-            durationMs: roundMs(performance.now() - startedAt),
-          });
-        }
+        logSettingsStorageUpdate(startedAt, {
+          refreshed,
+          missingRateSnapshot,
+          preferredCurrencyChanged,
+        });
       }
     },
     enqueueMutationRoots: (roots) => {
@@ -348,17 +357,10 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
       return isApplyingInlineConversion || suppressMutationDepth > 0;
     },
     cleanup: () => {
-      if (partialConversionTimer) {
-        window.clearTimeout(partialConversionTimer);
-      }
-
-      if (hydrationRetryTimer) {
-        window.clearTimeout(hydrationRetryTimer);
-      }
-
-      if (settingsRefreshTimer) {
-        window.clearTimeout(settingsRefreshTimer);
-      }
+      conversionDebounceTimer = clearTimer(conversionDebounceTimer);
+      partialConversionTimer = clearTimer(partialConversionTimer);
+      hydrationRetryTimer = clearTimer(hydrationRetryTimer);
+      settingsRefreshTimer = clearTimer(settingsRefreshTimer);
     },
   };
 }

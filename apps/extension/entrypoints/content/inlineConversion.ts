@@ -49,22 +49,35 @@ const SKIP_TAGS = new Set([
 
 function shouldSkipTextNode(node: Text): boolean {
   const parent = node.parentElement;
+  return (
+    !parent ||
+    SKIP_TAGS.has(parent.tagName) ||
+    Boolean(parent.closest(`.${INLINE_CONVERSION_CLASS}`))
+  );
+}
 
-  if (!parent) return true;
-  if (SKIP_TAGS.has(parent.tagName)) return true;
-  if (parent.closest(`.${INLINE_CONVERSION_CLASS}`)) return true;
+function getOriginalText(node: Element): string {
+  return node.getAttribute("data-original") || node.textContent || "";
+}
 
-  return false;
+function replaceWithOriginalText(node: Element, fallbackText?: string) {
+  node.replaceWith(document.createTextNode(fallbackText ?? getOriginalText(node)));
+}
+
+function applyConvertedAmountColor(wrapper: HTMLSpanElement, useLightColor: boolean) {
+  wrapper.style.setProperty(
+    "--ccx-converted-color",
+    useLightColor ? "#93c5fd" : "#355aa8",
+  );
 }
 
 function clearInlineConversions(root: ParentNode = document.body) {
   const convertedNodes = root.querySelectorAll(`span.${INLINE_CONVERSION_CLASS}`);
   if (!convertedNodes.length) return 0;
 
-  convertedNodes.forEach((node) => {
-    const originalText = node.getAttribute("data-original") || node.textContent || "";
-    node.replaceWith(document.createTextNode(originalText));
-  });
+  for (const node of convertedNodes) {
+    replaceWithOriginalText(node);
+  }
 
   if (root instanceof Element || root instanceof Document) {
     root.normalize();
@@ -141,19 +154,19 @@ function refreshExistingInlineConversions(
 
   let refreshedConversions = 0;
 
-  convertedNodes.forEach((node) => {
-    const originalText = node.getAttribute("data-original") || node.textContent || "";
+  for (const node of convertedNodes) {
+    const originalText = getOriginalText(node);
     if (!originalText.trim()) {
-      node.replaceWith(document.createTextNode(originalText));
-      return;
+      replaceWithOriginalText(node, originalText);
+      continue;
     }
 
     const parsed = extractCurrencyTextMatches(originalText, localeHint);
     const matched = parsed.find((item) => item.raw === originalText) || parsed[0];
 
     if (!matched) {
-      node.replaceWith(document.createTextNode(originalText));
-      return;
+      replaceWithOriginalText(node, originalText);
+      continue;
     }
 
     const convertedAmount = getConvertedAmountText(
@@ -164,8 +177,8 @@ function refreshExistingInlineConversions(
     );
 
     if (!convertedAmount) {
-      node.replaceWith(document.createTextNode(originalText));
-      return;
+      replaceWithOriginalText(node, originalText);
+      continue;
     }
 
     node.textContent = `${originalText} (`;
@@ -177,7 +190,7 @@ function refreshExistingInlineConversions(
     node.appendChild(convertedValueNode);
     node.append(")");
     refreshedConversions += 1;
-  });
+  }
 
   return refreshedConversions;
 }
@@ -294,11 +307,7 @@ function decoratePricesInTextNode(
     const wrapper = document.createElement("span");
     wrapper.className = INLINE_CONVERSION_CLASS;
     wrapper.setAttribute("data-original", match.raw);
-    if (lightTextContext) {
-      wrapper.style.setProperty("--ccx-converted-color", "#93c5fd");
-    } else {
-      wrapper.style.setProperty("--ccx-converted-color", "#355aa8");
-    }
+    applyConvertedAmountColor(wrapper, lightTextContext);
 
     wrapper.textContent = `${match.raw} (`;
 

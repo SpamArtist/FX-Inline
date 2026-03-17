@@ -23,6 +23,7 @@ function CurrencyBox({
   const [draftAmount, setDraftAmount] = useState(data.amount);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const skipBlurCommitRef = useRef(false);
+  const isDirectInput = amountPresentationMode === "directInput";
 
   useEffect(() => {
     if (!isEditingAmount) {
@@ -59,8 +60,7 @@ function CurrencyBox({
     [data.code, resolvedLocale],
   );
 
-  const shouldDisplayInput =
-    amountPresentationMode === "directInput" || isEditingAmount;
+  const shouldDisplayInput = isDirectInput || isEditingAmount;
 
   function beginAmountEdit() {
     if (amountPresentationMode !== "displayThenEdit") return;
@@ -76,13 +76,13 @@ function CurrencyBox({
 
     setDraftAmount(nextDraft);
 
-    if (amountPresentationMode === "directInput") {
+    if (isDirectInput) {
       amountChange(nextDraft);
     }
   }
 
   function finalizeAmountEdit() {
-    if (amountPresentationMode === "directInput") return;
+    if (isDirectInput) return;
     if (skipBlurCommitRef.current) {
       skipBlurCommitRef.current = false;
       return;
@@ -98,7 +98,7 @@ function CurrencyBox({
   }
 
   function revertAmountEdit() {
-    if (amountPresentationMode === "directInput") return;
+    if (isDirectInput) return;
 
     skipBlurCommitRef.current = true;
     setDraftAmount(cancelAmountEdit(data.amount));

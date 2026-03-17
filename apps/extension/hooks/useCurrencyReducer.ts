@@ -23,27 +23,18 @@ function createCurrencyId() {
 
 function getCurrencyStateFromCode(code: CurrencyCode) {
   const currencyFromMap = CURRENCY_CODE_MAP[code];
-  if (currencyFromMap) {
-    return currencyFromMap;
-  }
+  if (currencyFromMap) return currencyFromMap;
 
-  const currencyFromList = CURRENCY_LIST_BY_CODE.get(code);
-
-  return {
-    code,
-    icon: currencyFromList?.logo || "",
-  };
+  return { code, icon: CURRENCY_LIST_BY_CODE.get(code)?.logo || "" };
 }
 
 function resolveAltCurrency(
   baseCurrency: CurrencyCode,
   preferredCurrency: CurrencyCode,
 ) {
-  if (preferredCurrency !== baseCurrency) {
-    return preferredCurrency;
-  }
-
-  return baseCurrency === DEFAULT_STARTING_CURRENCY
+  return preferredCurrency !== baseCurrency
+    ? preferredCurrency
+    : baseCurrency === DEFAULT_STARTING_CURRENCY
     ? DEFAULT_SECONDARY_CURRENCY
     : DEFAULT_STARTING_CURRENCY;
 }
@@ -104,6 +95,16 @@ function recalculateFromIndex(
   });
 }
 
+function replaceCurrencyStateAt(
+  state: ICurrencyState[],
+  index: number,
+  nextItem: ICurrencyState,
+): ICurrencyState[] {
+  const next = [...state];
+  next[index] = nextItem;
+  return next;
+}
+
 export const useCurrencyReducer = ({
   number,
   currency,
@@ -148,8 +149,9 @@ export const useCurrencyReducer = ({
         setPreferredCurrency(settings.preferredCurrency);
         setRateSnapshot(rates);
       } catch {
-        if (canceled) return;
-        setRateSnapshot(null);
+        if (!canceled) {
+          setRateSnapshot(null);
+        }
       }
     };
 
@@ -191,30 +193,33 @@ export const useCurrencyReducer = ({
   const dispatch = useCallback(
     (action: IDispatchAction) => {
       setCurrenciesState((state) => {
-        const nextState = [...state];
-        const updatedCurrencyIndex = nextState.findIndex(
+        const updatedCurrencyIndex = state.findIndex(
           (x) => x.id === action.payload?.id,
         );
 
         switch (action.type) {
-          case ActionType.AMOUNT_UPDATE:
-            if (updatedCurrencyIndex === -1) return nextState;
-            nextState.splice(updatedCurrencyIndex, 1, {
-              ...nextState[updatedCurrencyIndex],
+          case ActionType.AMOUNT_UPDATE: {
+            if (updatedCurrencyIndex === -1) return state;
+            const nextState = replaceCurrencyStateAt(state, updatedCurrencyIndex, {
+              ...state[updatedCurrencyIndex],
               amount: action.payload.amount as string,
             });
             return recalculateFromIndex(nextState, updatedCurrencyIndex, rateSnapshot);
+          }
 
-          case ActionType.CURRENCY_UPDATE:
-            if (updatedCurrencyIndex === -1) return nextState;
-            nextState.splice(updatedCurrencyIndex, 1, {
-              ...nextState[updatedCurrencyIndex],
+          case ActionType.CURRENCY_UPDATE: {
+            if (updatedCurrencyIndex === -1) return state;
+            const nextCurrency = action.payload.currency as CurrencyCode;
+            const nextState = replaceCurrencyStateAt(state, updatedCurrencyIndex, {
+              ...state[updatedCurrencyIndex],
               ...getCurrencyStateFromCode(action.payload.currency as CurrencyCode),
-              code: action.payload.currency as CurrencyCode,
+              code: nextCurrency,
             });
             return recalculateFromIndex(nextState, updatedCurrencyIndex, rateSnapshot);
+          }
 
           case ActionType.CURRENCY_ADD: {
+            const nextState = [...state];
             const newCurrency = resolveAltCurrency(
               nextState[0]?.code || DEFAULT_STARTING_CURRENCY,
               preferredCurrency,
@@ -233,18 +238,19 @@ export const useCurrencyReducer = ({
           case ActionType.CURRENCY_SWAP:
             if (
               updatedCurrencyIndex === -1 ||
-              updatedCurrencyIndex === nextState.length - 1
+              updatedCurrencyIndex === state.length - 1
             ) {
-              return nextState;
+              return state;
             }
 
+            const nextState = [...state];
             nextState[updatedCurrencyIndex].seq += 1;
             nextState[updatedCurrencyIndex + 1].seq -= 1;
             nextState.sort((a, b) => a.seq - b.seq);
             return nextState;
 
           default:
-            return nextState;
+            return state;
         }
       });
     },
