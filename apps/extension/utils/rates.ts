@@ -65,6 +65,7 @@ function parseNumberRecord(
   if (!value) return null;
 
   const parsed: Record<string, number> = {};
+  let hasValidEntry = false;
 
   for (const [key, entryValue] of Object.entries(value)) {
     if (typeof entryValue !== "number" || !Number.isFinite(entryValue)) {
@@ -72,9 +73,10 @@ function parseNumberRecord(
     }
 
     parsed[key] = entryValue;
+    hasValidEntry = true;
   }
 
-  if (!Object.keys(parsed).length) {
+  if (!hasValidEntry) {
     return null;
   }
 
@@ -138,6 +140,7 @@ async function fetchRateProviderPayload(url: string): Promise<JsonValue> {
       method: "GET",
       cache: "no-store",
       credentials: "omit",
+      referrerPolicy: "no-referrer",
       redirect: "error",
       signal: controller.signal,
     });

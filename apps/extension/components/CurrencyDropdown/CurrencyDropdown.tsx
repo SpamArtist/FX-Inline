@@ -1,10 +1,15 @@
 import { getCurrencyIcon } from "@/utils/currencyPresentation";
 import { CurrencyCode } from "@/utils/enums";
-import { useMemo } from "react";
 import currencies from "../../assets/currency.json";
 import Dropdown from "../Dropdown/Dropdown";
 import type { DropdownOption } from "../Dropdown/Dropdown.types";
 import type { CurrencyDropdownProps } from "./CurrencyDropdown.types";
+
+const CURRENCY_OPTIONS: DropdownOption<CurrencyCode>[] = currencies.map((entry) => ({
+  label: entry.code,
+  value: entry.code as CurrencyCode,
+  icon: entry.logo,
+}));
 
 function CurrencyDropdown({
   selectedCurrency,
@@ -12,16 +17,6 @@ function CurrencyDropdown({
   isDisabled = false,
   onCurrencySelection,
 }: CurrencyDropdownProps) {
-  const currencyOptions = useMemo<DropdownOption<CurrencyCode>[]>(
-    () =>
-      currencies.map((entry) => ({
-        label: entry.code,
-        value: entry.code as CurrencyCode,
-        icon: entry.logo,
-      })),
-    [],
-  );
-
   return (
     <Dropdown
       isDisabled={isDisabled}
@@ -30,7 +25,7 @@ function CurrencyDropdown({
         value: selectedCurrency,
         icon: selectedIcon || getCurrencyIcon(selectedCurrency),
       }}
-      options={currencyOptions}
+      options={CURRENCY_OPTIONS}
       onSelect={onCurrencySelection}
     />
   );

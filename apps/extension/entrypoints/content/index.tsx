@@ -149,7 +149,7 @@ export default defineContentScript({
     document.addEventListener("mouseup", onMouseUp);
     document.addEventListener("mousedown", onMouseDown);
 
-    window.addEventListener("beforeunload", () => {
+    const onBeforeUnload = () => {
       mutationObserver.disconnect();
       settingsUnwatch();
       setUiCaptureActive(false);
@@ -157,6 +157,9 @@ export default defineContentScript({
       conversionRuntime.cleanup();
       document.removeEventListener("mouseup", onMouseUp);
       document.removeEventListener("mousedown", onMouseDown);
-    });
+      window.removeEventListener("beforeunload", onBeforeUnload);
+    };
+
+    window.addEventListener("beforeunload", onBeforeUnload);
   },
 });

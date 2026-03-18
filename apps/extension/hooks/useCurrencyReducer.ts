@@ -13,6 +13,9 @@ const DEFAULT_SECONDARY_CURRENCY = CurrencyCode["UNITED STATES DOLLAR"];
 const CURRENCY_LIST_BY_CODE = new Map(
   currencies.map((currency) => [currency.code as CurrencyCode, currency]),
 );
+const VALID_CURRENCY_CODES: ReadonlySet<string> = new Set(
+  Object.values(CurrencyCode),
+);
 
 let currencyIdCounter = 0;
 
@@ -37,6 +40,10 @@ function resolveAltCurrency(
     : baseCurrency === DEFAULT_STARTING_CURRENCY
     ? DEFAULT_SECONDARY_CURRENCY
     : DEFAULT_STARTING_CURRENCY;
+}
+
+function asCurrencyCode(value: string | undefined): CurrencyCode | null {
+  return value && VALID_CURRENCY_CODES.has(value) ? (value as CurrencyCode) : null;
 }
 
 function convertAmount(
@@ -200,19 +207,24 @@ export const useCurrencyReducer = ({
         switch (action.type) {
           case ActionType.AMOUNT_UPDATE: {
             if (updatedCurrencyIndex === -1) return state;
+            const nextAmount = action.payload.amount;
+            if (typeof nextAmount !== "string") return state;
+
             const nextState = replaceCurrencyStateAt(state, updatedCurrencyIndex, {
               ...state[updatedCurrencyIndex],
-              amount: action.payload.amount as string,
+              amount: nextAmount,
             });
             return recalculateFromIndex(nextState, updatedCurrencyIndex, rateSnapshot);
           }
 
           case ActionType.CURRENCY_UPDATE: {
             if (updatedCurrencyIndex === -1) return state;
-            const nextCurrency = action.payload.currency as CurrencyCode;
+            const nextCurrency = asCurrencyCode(action.payload.currency);
+            if (!nextCurrency) return state;
+
             const nextState = replaceCurrencyStateAt(state, updatedCurrencyIndex, {
               ...state[updatedCurrencyIndex],
-              ...getCurrencyStateFromCode(action.payload.currency as CurrencyCode),
+              ...getCurrencyStateFromCode(nextCurrency),
               code: nextCurrency,
             });
             return recalculateFromIndex(nextState, updatedCurrencyIndex, rateSnapshot);

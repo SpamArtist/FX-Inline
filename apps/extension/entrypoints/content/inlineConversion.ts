@@ -46,6 +46,8 @@ const SKIP_TAGS = new Set([
   "PRE",
   "SVG",
 ]);
+const RGB_CHANNEL_REGEX =
+  /rgba?\(\s*(\d{1,3})[\s,]+(\d{1,3})[\s,]+(\d{1,3})(?:[\s,\/]+[\d.]+)?\s*\)/i;
 
 function shouldSkipTextNode(node: Text): boolean {
   const parent = node.parentElement;
@@ -196,16 +198,24 @@ function refreshExistingInlineConversions(
 }
 
 function parseRgbChannels(input: string): [number, number, number] | null {
-  const matched = input.match(
-    /rgba?\(\s*(\d{1,3})[\s,]+(\d{1,3})[\s,]+(\d{1,3})(?:[\s,\/]+[\d.]+)?\s*\)/i,
-  );
+  const matched = input.match(RGB_CHANNEL_REGEX);
   if (!matched) return null;
 
   const r = Number(matched[1]);
   const g = Number(matched[2]);
   const b = Number(matched[3]);
 
-  if (![r, g, b].every((value) => Number.isFinite(value) && value >= 0 && value <= 255)) {
+  if (
+    !Number.isFinite(r) ||
+    !Number.isFinite(g) ||
+    !Number.isFinite(b) ||
+    r < 0 ||
+    r > 255 ||
+    g < 0 ||
+    g > 255 ||
+    b < 0 ||
+    b > 255
+  ) {
     return null;
   }
 
@@ -281,13 +291,11 @@ function decoratePricesInTextNode(
   if (!matches.length) return 0;
   const lightTextContext = usesLightTextColor(textNode, lightTextCache);
 
-  const sortedMatches = [...matches].sort((a, b) => a.start - b.start);
-
   let cursor = 0;
   let conversionsApplied = 0;
   const fragment = document.createDocumentFragment();
 
-  for (const match of sortedMatches) {
+  for (const match of matches) {
     if (match.start < cursor) continue;
 
     fragment.append(text.slice(cursor, match.start));
@@ -392,7 +400,7 @@ export function convertVisiblePrices(
   let totalConversions = refreshedConversions;
   const decorateStartedAt = capturePerf ? performance.now() : 0;
 
-  textNodes.forEach((node) => {
+  for (const node of textNodes) {
     totalConversions += decoratePricesInTextNode(
       node,
       preferredCurrency,
@@ -400,7 +408,7 @@ export function convertVisiblePrices(
       localeHint,
       lightTextCache,
     );
-  });
+  }
 
   if (capturePerf && options?.onPerfSample) {
     const decorateNodesMs = performance.now() - decorateStartedAt;

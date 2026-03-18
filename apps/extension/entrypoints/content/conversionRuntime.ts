@@ -49,7 +49,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
   }
 
   function clearTimer(timer: number | null): number | null {
-    if (timer) {
+    if (timer !== null) {
       window.clearTimeout(timer);
     }
 
@@ -100,7 +100,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
   }
 
   function scheduleHydrationRetry() {
-    if (hydrationRetryTimer) return;
+    if (hydrationRetryTimer !== null) return;
 
     hydrationRetryTimer = window.setTimeout(() => {
       hydrationRetryTimer = null;
@@ -109,11 +109,13 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
   }
 
   function scheduleInlineConversion() {
-    if (conversionDebounceTimer) {
+    if (conversionDebounceTimer !== null) {
       window.clearTimeout(conversionDebounceTimer);
     }
 
     conversionDebounceTimer = window.setTimeout(() => {
+      conversionDebounceTimer = null;
+
       if (!settings || !rateSnapshot) {
         void hydrateSettingsAndRates()
           .then(() => {
@@ -171,7 +173,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
   }
 
   function schedulePartialInlineConversion(delayMs = PARTIAL_CONVERSION_DEBOUNCE_MS) {
-    if (partialConversionTimer) {
+    if (partialConversionTimer !== null) {
       window.clearTimeout(partialConversionTimer);
     }
 
@@ -256,7 +258,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
   }
 
   function scheduleInlineConversionFromSettingsUpdate() {
-    if (settingsRefreshTimer) {
+    if (settingsRefreshTimer !== null) {
       window.clearTimeout(settingsRefreshTimer);
     }
 
@@ -361,6 +363,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
       partialConversionTimer = clearTimer(partialConversionTimer);
       hydrationRetryTimer = clearTimer(hydrationRetryTimer);
       settingsRefreshTimer = clearTimer(settingsRefreshTimer);
+      pendingMutationRoots.clear();
     },
   };
 }

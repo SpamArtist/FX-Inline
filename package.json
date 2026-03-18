@@ -2,7 +2,7 @@
   "name": "FX Inline",
   "private": true,
   "description": "FX Inline converts prices directly on webpages into your preferred currency, so you can compare costs without leaving the page.",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "type": "module",
   "scripts": {
     "dev": "wxt",
