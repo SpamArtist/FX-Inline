@@ -62,7 +62,7 @@ export default defineConfig({
           "48": "icon/48.png",
         },
       },
-      permissions: ["activeTab", "storage", "alarms", "tabs"],
+      permissions: ["storage", "alarms"],
       host_permissions: [
         "https://open.er-api.com/*",
         "https://api.exchangerate-api.com/*",
