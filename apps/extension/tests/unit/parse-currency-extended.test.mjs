@@ -71,6 +71,29 @@ test("parseCurrencyValue rejects comma-delimited prose before ISO words", () => 
   expect(matches).toHaveLength(0);
 });
 
+test("extractCurrencyTextMatches ignores lowercase/titlecase word-like ISO codes", () => {
+  const matches = extractCurrencyTextMatches(
+    "Top 10 and all 5 and try 3 with 8 mad and 12 top picks",
+  );
+
+  expect(matches).toHaveLength(0);
+});
+
+test("extractCurrencyTextMatches keeps uppercase word-like ISO codes", () => {
+  const matches = extractCurrencyTextMatches(
+    "TOP 10 and ALL 5 and TRY 3 with 8 MAD for fares",
+  );
+
+  expect(matches).toHaveLength(4);
+  expect(matches.map((match) => match.currency)).toEqual([
+    "TOP",
+    "ALL",
+    "TRY",
+    "MAD",
+  ]);
+  expect(matches.map((match) => match.value)).toEqual([10, 5, 3, 8]);
+});
+
 test("extractCurrencyTextMatches ignores non-ISO words and catches real currencies", () => {
   const matches = extractCurrencyTextMatches(
     "Words and 200 apples; offer usd 30 and ₹50 now",

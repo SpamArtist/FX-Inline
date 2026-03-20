@@ -54,6 +54,24 @@ const CURRENCY_TOKENS = [
   })),
 ].sort((a, b) => b.token.length - a.token.length);
 
+const WORD_LIKE_ISO_CODES = new Set<CurrencyCode>(
+  [
+    "ALL",
+    "TOP",
+    "TRY",
+    "MAD",
+    "BAM",
+    "BOB",
+    "COP",
+    "CUP",
+    "GEL",
+    "PEN",
+  ].flatMap((code) => {
+    const parsed = toCurrencyCode(code);
+    return parsed ? [parsed] : [];
+  }),
+);
+
 function escapeRegex(input: string) {
   return input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -84,6 +102,7 @@ const thousandMagnitudeHintRegex =
   /\d[\d,.\u00A0\u202F ]*\s*[kK](?=$|[^\p{L}\p{N}])/u;
 
 const parserArtifactsCache = new Map<string, ParserArtifacts>();
+const wordLikeCurrencyTokenRegexCache = new Map<CurrencyCode, RegExp>();
 
 function normalizeLocaleCacheKey(localeHint?: string | null): string {
   return localeHint?.trim().toLowerCase() || "__all__";
@@ -136,6 +155,32 @@ function toCurrencyCode(value: string): CurrencyCode | null {
   return CURRENCY_CODE_VALUES.has(value as CurrencyCode)
     ? (value as CurrencyCode)
     : null;
+}
+
+function getWordLikeCurrencyTokenRegex(currency: CurrencyCode): RegExp {
+  const cached = wordLikeCurrencyTokenRegexCache.get(currency);
+  if (cached) return cached;
+
+  const regex = new RegExp(
+    `(?<!\\p{L})${escapeRegex(currency)}(?!\\p{L})`,
+    "iu",
+  );
+  wordLikeCurrencyTokenRegexCache.set(currency, regex);
+  return regex;
+}
+
+function shouldSkipWordLikeCurrencyByCasing(
+  raw: string,
+  currency: CurrencyCode,
+): boolean {
+  if (!WORD_LIKE_ISO_CODES.has(currency)) return false;
+
+  const tokenRegex = getWordLikeCurrencyTokenRegex(currency);
+  const matchedToken = raw.match(tokenRegex)?.[0];
+  if (!matchedToken) return false;
+
+  // Word-like ISO codes should be explicit in uppercase to avoid prose false positives.
+  return matchedToken !== currency;
 }
 
 function isCurrencyToken(token: string): CurrencyCode | null {
@@ -400,6 +445,9 @@ export function extractCurrencyTextMatches(
     if (!parsed.valid || parsed.currency == null || parsed.value === undefined) {
       continue;
     }
+    if (shouldSkipWordLikeCurrencyByCasing(raw, parsed.currency)) {
+      continue;
+    }
 
     matches.push({
       raw,
@@ -416,6 +464,9 @@ export function extractCurrencyTextMatches(
     const raw = candidate[0];
     const parsedCurrency = isCurrencyToken(candidate[1]);
     if (!parsedCurrency) continue;
+    if (shouldSkipWordLikeCurrencyByCasing(candidate[1], parsedCurrency)) {
+      continue;
+    }
 
     const firstValueText = candidate[2];
     const secondValueText = candidate[3];
