@@ -47,11 +47,21 @@ const SKIP_TAGS = new Set([
   "SVG",
 ]);
 
+const EDITABLE_CONTEXT_SELECTOR = [
+  "input",
+  "textarea",
+  "select",
+  '[contenteditable]:not([contenteditable="false"])',
+  '[role="textbox"]',
+].join(",");
+
 function shouldSkipTextNode(node: Text): boolean {
   const parent = node.parentElement;
 
   if (!parent) return true;
   if (SKIP_TAGS.has(parent.tagName)) return true;
+  if (parent.isContentEditable) return true;
+  if (parent.closest(EDITABLE_CONTEXT_SELECTOR)) return true;
   if (parent.closest(`.${INLINE_CONVERSION_CLASS}`)) return true;
 
   return false;
