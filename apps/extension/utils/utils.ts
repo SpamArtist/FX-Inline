@@ -331,9 +331,10 @@ function parseNumberWithOptionalMagnitudeForArtifacts(
   return baseValue * multiplier;
 }
 
-function parseWithTokenPrefixForArtifacts(
+function parseWithTokenForArtifacts(
   input: string,
   artifacts: ParserArtifacts,
+  position: "prefix" | "suffix",
 ): {
   value: number;
   currency: CurrencyCode;
@@ -341,50 +342,23 @@ function parseWithTokenPrefixForArtifacts(
   const upperInput = input.toUpperCase();
 
   for (const tokenInfo of CURRENCY_TOKENS) {
-    const hasPrefix = tokenInfo.isIso
-      ? upperInput.startsWith(tokenInfo.token)
-      : input.startsWith(tokenInfo.token);
+    const hasToken = tokenInfo.isIso
+      ? position === "prefix"
+        ? upperInput.startsWith(tokenInfo.token)
+        : upperInput.endsWith(tokenInfo.token)
+      : position === "prefix"
+        ? input.startsWith(tokenInfo.token)
+        : input.endsWith(tokenInfo.token);
 
-    if (!hasPrefix) continue;
-
-    const parsedCurrency = isCurrencyToken(tokenInfo.token);
-    if (!parsedCurrency) continue;
-
-    const valueText = input.slice(tokenInfo.token.length).trim();
-    if (!valueText.length) continue;
-
-    const value = parseNumberWithOptionalMagnitudeForArtifacts(valueText, artifacts);
-    if (value !== null) {
-      return {
-        value,
-        currency: parsedCurrency,
-      };
-    }
-  }
-
-  return null;
-}
-
-function parseWithTokenSuffixForArtifacts(
-  input: string,
-  artifacts: ParserArtifacts,
-): {
-  value: number;
-  currency: CurrencyCode;
-} | null {
-  const upperInput = input.toUpperCase();
-
-  for (const tokenInfo of CURRENCY_TOKENS) {
-    const hasSuffix = tokenInfo.isIso
-      ? upperInput.endsWith(tokenInfo.token)
-      : input.endsWith(tokenInfo.token);
-
-    if (!hasSuffix) continue;
+    if (!hasToken) continue;
 
     const parsedCurrency = isCurrencyToken(tokenInfo.token);
     if (!parsedCurrency) continue;
 
-    const valueText = input.slice(0, input.length - tokenInfo.token.length).trim();
+    const valueText =
+      position === "prefix"
+        ? input.slice(tokenInfo.token.length).trim()
+        : input.slice(0, input.length - tokenInfo.token.length).trim();
     if (!valueText.length) continue;
 
     const value = parseNumberWithOptionalMagnitudeForArtifacts(valueText, artifacts);
@@ -400,15 +374,8 @@ function parseWithTokenSuffixForArtifacts(
 }
 
 function resolveLocaleHint(options?: string | CurrencyParseOptions | null): string | null {
-  if (typeof options === "string") {
-    return options || null;
-  }
-
-  if (options && typeof options === "object") {
-    return options.localeHint || null;
-  }
-
-  return null;
+  if (typeof options === "string") return options || null;
+  return options?.localeHint || null;
 }
 
 function parseCurrencyValueWithArtifacts(
@@ -425,7 +392,7 @@ function parseCurrencyValueWithArtifacts(
     return { valid: true, value: numericOnly, currency: null };
   }
 
-  const prefix = parseWithTokenPrefixForArtifacts(str, artifacts);
+  const prefix = parseWithTokenForArtifacts(str, artifacts, "prefix");
   if (prefix) {
     return {
       valid: true,
@@ -434,7 +401,7 @@ function parseCurrencyValueWithArtifacts(
     };
   }
 
-  const suffix = parseWithTokenSuffixForArtifacts(str, artifacts);
+  const suffix = parseWithTokenForArtifacts(str, artifacts, "suffix");
   if (suffix) {
     return {
       valid: true,
@@ -584,15 +551,13 @@ export function extractCurrencyTextMatches(
 }
 
 export function mayContainCurrencyToken(input: string): boolean {
-  if (!input?.length) return false;
-  if (!quickDigitRegex.test(input)) return false;
-
-  return quickCurrencyTokenRegex.test(input);
+  return Boolean(input?.length) &&
+    quickDigitRegex.test(input) &&
+    quickCurrencyTokenRegex.test(input);
 }
 
 export function hasThousandMagnitudeHint(input: string): boolean {
-  if (!input?.length) return false;
-  return thousandMagnitudeHintRegex.test(input);
+  return Boolean(input?.length) && thousandMagnitudeHintRegex.test(input);
 }
 
 const currencyFormatterCache = new Map<string, Intl.NumberFormat | null>();

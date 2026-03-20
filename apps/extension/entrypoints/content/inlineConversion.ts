@@ -46,6 +46,8 @@ const SKIP_TAGS = new Set([
   "PRE",
   "SVG",
 ]);
+const RGB_CHANNEL_REGEX =
+  /rgba?\(\s*(\d{1,3})[\s,]+(\d{1,3})[\s,]+(\d{1,3})(?:[\s,\/]+[\d.]+)?\s*\)/i;
 
 const EDITABLE_CONTEXT_SELECTOR = [
   "input",
@@ -57,7 +59,6 @@ const EDITABLE_CONTEXT_SELECTOR = [
 
 function shouldSkipTextNode(node: Text): boolean {
   const parent = node.parentElement;
-
   if (!parent) return true;
   if (SKIP_TAGS.has(parent.tagName)) return true;
   if (parent.isContentEditable) return true;
@@ -67,14 +68,35 @@ function shouldSkipTextNode(node: Text): boolean {
   return false;
 }
 
+function getOriginalText(node: Element): string {
+  return node.getAttribute("data-original") || node.textContent || "";
+}
+
+function replaceWithOriginalText(node: Element, fallbackText?: string) {
+  node.replaceWith(
+    document.createTextNode(fallbackText ?? getOriginalText(node)),
+  );
+}
+
+function applyConvertedAmountColor(
+  wrapper: HTMLSpanElement,
+  useLightColor: boolean,
+) {
+  wrapper.style.setProperty(
+    "--ccx-converted-color",
+    useLightColor ? "#93c5fd" : "#355aa8",
+  );
+}
+
 function clearInlineConversions(root: ParentNode = document.body) {
-  const convertedNodes = root.querySelectorAll(`span.${INLINE_CONVERSION_CLASS}`);
+  const convertedNodes = root.querySelectorAll(
+    `span.${INLINE_CONVERSION_CLASS}`,
+  );
   if (!convertedNodes.length) return 0;
 
-  convertedNodes.forEach((node) => {
-    const originalText = node.getAttribute("data-original") || node.textContent || "";
-    node.replaceWith(document.createTextNode(originalText));
-  });
+  for (const node of convertedNodes) {
+    replaceWithOriginalText(node);
+  }
 
   if (root instanceof Element || root instanceof Document) {
     root.normalize();
@@ -84,7 +106,10 @@ function clearInlineConversions(root: ParentNode = document.body) {
 }
 
 function getConvertedAmountText(
-  match: Pick<CurrencyTextMatch, "raw" | "value" | "rangeEndValue" | "currency">,
+  match: Pick<
+    CurrencyTextMatch,
+    "raw" | "value" | "rangeEndValue" | "currency"
+  >,
   preferredCurrency: CurrencyCode,
   rateSnapshot: RateSnapshot,
   localeHint: string | null,
@@ -108,12 +133,18 @@ function getConvertedAmountText(
     ? 1_000
     : INLINE_COMPACT_THRESHOLD;
   const convertedUsesCompact = Math.abs(converted) >= compactThreshold;
-  const formattedConverted = formatAmountInCurrency(converted, preferredCurrency, {
-    localeHint,
-    compactLargeValues: true,
-    compactThreshold,
-  });
-  let convertedAmount = convertedUsesCompact ? `~${formattedConverted}` : formattedConverted;
+  const formattedConverted = formatAmountInCurrency(
+    converted,
+    preferredCurrency,
+    {
+      localeHint,
+      compactLargeValues: true,
+      compactThreshold,
+    },
+  );
+  let convertedAmount = convertedUsesCompact
+    ? `~${formattedConverted}`
+    : formattedConverted;
 
   if (match.rangeEndValue !== undefined) {
     const convertedRangeEnd = convertAmountWithSnapshot(
@@ -126,15 +157,18 @@ function getConvertedAmountText(
     if (convertedRangeEnd === null) return null;
 
     const rangeEndUsesCompact = Math.abs(convertedRangeEnd) >= compactThreshold;
-    const formattedRangeEnd = formatAmountInCurrency(convertedRangeEnd, preferredCurrency, {
-      localeHint,
-      compactLargeValues: true,
-      compactThreshold,
-    });
+    const formattedRangeEnd = formatAmountInCurrency(
+      convertedRangeEnd,
+      preferredCurrency,
+      {
+        localeHint,
+        compactLargeValues: true,
+        compactThreshold,
+      },
+    );
     const rangeApproximationPrefix =
       convertedUsesCompact || rangeEndUsesCompact ? "~" : "";
-    convertedAmount =
-      `${rangeApproximationPrefix}${formattedConverted}–${formattedRangeEnd}`;
+    convertedAmount = `${rangeApproximationPrefix}${formattedConverted}–${formattedRangeEnd}`;
   }
 
   return convertedAmount;
@@ -146,24 +180,27 @@ function refreshExistingInlineConversions(
   root: ParentNode,
   localeHint: string | null,
 ): number {
-  const convertedNodes = root.querySelectorAll(`span.${INLINE_CONVERSION_CLASS}`);
+  const convertedNodes = root.querySelectorAll(
+    `span.${INLINE_CONVERSION_CLASS}`,
+  );
   if (!convertedNodes.length) return 0;
 
   let refreshedConversions = 0;
 
-  convertedNodes.forEach((node) => {
-    const originalText = node.getAttribute("data-original") || node.textContent || "";
+  for (const node of convertedNodes) {
+    const originalText = getOriginalText(node);
     if (!originalText.trim()) {
-      node.replaceWith(document.createTextNode(originalText));
-      return;
+      replaceWithOriginalText(node, originalText);
+      continue;
     }
 
     const parsed = extractCurrencyTextMatches(originalText, localeHint);
-    const matched = parsed.find((item) => item.raw === originalText) || parsed[0];
+    const matched =
+      parsed.find((item) => item.raw === originalText) || parsed[0];
 
     if (!matched) {
-      node.replaceWith(document.createTextNode(originalText));
-      return;
+      replaceWithOriginalText(node, originalText);
+      continue;
     }
 
     const convertedAmount = getConvertedAmountText(
@@ -174,8 +211,8 @@ function refreshExistingInlineConversions(
     );
 
     if (!convertedAmount) {
-      node.replaceWith(document.createTextNode(originalText));
-      return;
+      replaceWithOriginalText(node, originalText);
+      continue;
     }
 
     node.textContent = `${originalText} (`;
@@ -187,22 +224,30 @@ function refreshExistingInlineConversions(
     node.appendChild(convertedValueNode);
     node.append(")");
     refreshedConversions += 1;
-  });
+  }
 
   return refreshedConversions;
 }
 
 function parseRgbChannels(input: string): [number, number, number] | null {
-  const matched = input.match(
-    /rgba?\(\s*(\d{1,3})[\s,]+(\d{1,3})[\s,]+(\d{1,3})(?:[\s,\/]+[\d.]+)?\s*\)/i,
-  );
+  const matched = input.match(RGB_CHANNEL_REGEX);
   if (!matched) return null;
 
   const r = Number(matched[1]);
   const g = Number(matched[2]);
   const b = Number(matched[3]);
 
-  if (![r, g, b].every((value) => Number.isFinite(value) && value >= 0 && value <= 255)) {
+  if (
+    !Number.isFinite(r) ||
+    !Number.isFinite(g) ||
+    !Number.isFinite(b) ||
+    r < 0 ||
+    r > 255 ||
+    g < 0 ||
+    g > 255 ||
+    b < 0 ||
+    b > 255
+  ) {
     return null;
   }
 
@@ -219,7 +264,9 @@ function toLinearRgb(channel: number): number {
 }
 
 function relativeLuminance([r, g, b]: [number, number, number]): number {
-  return 0.2126 * toLinearRgb(r) + 0.7152 * toLinearRgb(g) + 0.0722 * toLinearRgb(b);
+  return (
+    0.2126 * toLinearRgb(r) + 0.7152 * toLinearRgb(g) + 0.0722 * toLinearRgb(b)
+  );
 }
 
 function usesLightTextColor(
@@ -246,9 +293,9 @@ function usesLightTextColor(
 }
 
 function ensureInlineConversionStyles() {
-  let styleTag = document.getElementById(INLINE_CONVERSION_STYLE_ID) as
-    | HTMLStyleElement
-    | null;
+  let styleTag = document.getElementById(
+    INLINE_CONVERSION_STYLE_ID,
+  ) as HTMLStyleElement | null;
 
   if (!styleTag) {
     styleTag = document.createElement("style");
@@ -278,13 +325,11 @@ function decoratePricesInTextNode(
   if (!matches.length) return 0;
   const lightTextContext = usesLightTextColor(textNode, lightTextCache);
 
-  const sortedMatches = [...matches].sort((a, b) => a.start - b.start);
-
   let cursor = 0;
   let conversionsApplied = 0;
   const fragment = document.createDocumentFragment();
 
-  for (const match of sortedMatches) {
+  for (const match of matches) {
     if (match.start < cursor) continue;
 
     fragment.append(text.slice(cursor, match.start));
@@ -304,11 +349,7 @@ function decoratePricesInTextNode(
     const wrapper = document.createElement("span");
     wrapper.className = INLINE_CONVERSION_CLASS;
     wrapper.setAttribute("data-original", match.raw);
-    if (lightTextContext) {
-      wrapper.style.setProperty("--ccx-converted-color", "#93c5fd");
-    } else {
-      wrapper.style.setProperty("--ccx-converted-color", "#355aa8");
-    }
+    applyConvertedAmountColor(wrapper, lightTextContext);
 
     wrapper.textContent = `${match.raw} (`;
 
@@ -393,7 +434,7 @@ export function convertVisiblePrices(
   let totalConversions = refreshedConversions;
   const decorateStartedAt = capturePerf ? performance.now() : 0;
 
-  textNodes.forEach((node) => {
+  for (const node of textNodes) {
     totalConversions += decoratePricesInTextNode(
       node,
       preferredCurrency,
@@ -401,7 +442,7 @@ export function convertVisiblePrices(
       localeHint,
       lightTextCache,
     );
-  });
+  }
 
   if (capturePerf && options?.onPerfSample) {
     const decorateNodesMs = performance.now() - decorateStartedAt;

@@ -26,8 +26,7 @@ function getDisplayNames(locale: string): Intl.DisplayNames | null {
 }
 
 function resolveLocale(localeHint?: string | null): string {
-  const trimmed = localeHint?.trim();
-  return trimmed && trimmed.length > 0 ? trimmed : "en";
+  return localeHint?.trim() || "en";
 }
 
 export function getCurrencyDisplayName(
@@ -64,21 +63,14 @@ export function isAmountDraftValid(value: string): boolean {
 }
 
 export function getNextAmountDraft(currentDraft: string, nextDraft: string): string {
-  if (!isAmountDraftValid(nextDraft)) {
-    return currentDraft;
-  }
-
-  return nextDraft;
+  return isAmountDraftValid(nextDraft) ? nextDraft : currentDraft;
 }
 
 export function commitAmountDraft(draft: string, currentAmount: string): string {
   const normalizedDraft = draft.trim();
-
-  if (!normalizedDraft.length) {
-    return currentAmount;
-  }
-
-  return isAmountDraftValid(normalizedDraft) ? normalizedDraft : currentAmount;
+  return normalizedDraft.length && isAmountDraftValid(normalizedDraft)
+    ? normalizedDraft
+    : currentAmount;
 }
 
 export function cancelAmountEdit(currentAmount: string): string {
@@ -92,12 +84,10 @@ export function formatCurrencyHeadlineAmount(
 ): string {
   const numericValue = Number(rawAmount);
 
-  if (!Number.isFinite(numericValue)) {
-    return rawAmount;
-  }
+  if (!Number.isFinite(numericValue)) return rawAmount;
 
   return formatAmountInCurrency(numericValue, currency, {
-    localeHint: localeHint || null,
+    localeHint: localeHint ?? null,
     compactLargeValues: false,
   });
 }

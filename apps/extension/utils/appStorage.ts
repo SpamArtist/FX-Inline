@@ -17,40 +17,41 @@ const userSettingsItem = storage.defineItem<UserSettings>(SETTINGS_KEY, {
   fallback: DEFAULT_USER_SETTINGS,
 });
 
-function isCurrencyCode(value: string): value is CurrencyCode {
-  return VALID_CURRENCY_CODES.has(value);
+function asCurrencyCode(value: string | null | undefined): CurrencyCode {
+  return typeof value === "string" && VALID_CURRENCY_CODES.has(value)
+    ? (value as CurrencyCode)
+    : DEFAULT_USER_SETTINGS.preferredCurrency;
 }
 
-function asCurrencyCode(value: string | null | undefined): CurrencyCode {
-  if (typeof value !== "string") {
-    return DEFAULT_USER_SETTINGS.preferredCurrency;
-  }
-
-  if (!isCurrencyCode(value)) {
-    return DEFAULT_USER_SETTINGS.preferredCurrency;
-  }
-
-  return value;
+function hasCanonicalUserSettingsShape(value: UserSettings): boolean {
+  return (
+    Object.keys(value).length === 1 &&
+    Object.prototype.hasOwnProperty.call(value, "preferredCurrency")
+  );
 }
 
 export function sanitizeUserSettings(value: Partial<UserSettings> | null): UserSettings {
-  const source = value || {};
-
   return {
-    preferredCurrency: asCurrencyCode(source.preferredCurrency),
+    preferredCurrency: asCurrencyCode(value?.preferredCurrency),
   };
+}
+
+async function persistSanitizedUserSettings(
+  value: Partial<UserSettings>,
+): Promise<UserSettings> {
+  const sanitized = sanitizeUserSettings(value);
+  await userSettingsItem.setValue(sanitized);
+  return sanitized;
 }
 
 export async function getUserSettings(): Promise<UserSettings> {
   const stored = await userSettingsItem.getValue();
   const sanitized = sanitizeUserSettings(stored);
-  const hasCanonicalShape =
-    Object.keys(stored).length === 1 &&
-    Object.prototype.hasOwnProperty.call(stored, "preferredCurrency");
-  const shouldPersistSanitized =
-    stored.preferredCurrency !== sanitized.preferredCurrency || !hasCanonicalShape;
 
-  if (shouldPersistSanitized) {
+  if (
+    stored.preferredCurrency !== sanitized.preferredCurrency ||
+    !hasCanonicalUserSettingsShape(stored)
+  ) {
     await userSettingsItem.setValue(sanitized);
   }
 
@@ -58,22 +59,16 @@ export async function getUserSettings(): Promise<UserSettings> {
 }
 
 export async function setUserSettings(settings: UserSettings): Promise<UserSettings> {
-  const sanitized = sanitizeUserSettings(settings);
-  await userSettingsItem.setValue(sanitized);
-  return sanitized;
+  return persistSanitizedUserSettings(settings);
 }
 
 export async function updateUserSettings(
   patch: Partial<UserSettings>,
 ): Promise<UserSettings> {
-  const current = await getUserSettings();
-  const next = sanitizeUserSettings({
-    ...current,
+  return persistSanitizedUserSettings({
+    ...(await getUserSettings()),
     ...patch,
   });
-
-  await userSettingsItem.setValue(next);
-  return next;
 }
 
 export { DEFAULT_USER_SETTINGS, SETTINGS_KEY };

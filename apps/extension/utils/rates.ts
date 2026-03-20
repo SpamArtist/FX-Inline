@@ -10,6 +10,7 @@ import type {
 } from "./rates.types";
 
 const RATE_CACHE_KEY = "local:rate-cache";
+const RATE_FETCH_TIMEOUT_MS = 8_000;
 
 const VALID_CURRENCY_CODES: ReadonlySet<string> = new Set(
   Object.values(CurrencyCode),
@@ -64,6 +65,7 @@ function parseNumberRecord(
   if (!value) return null;
 
   const parsed: Record<string, number> = {};
+  let hasValidEntry = false;
 
   for (const [key, entryValue] of Object.entries(value)) {
     if (typeof entryValue !== "number" || !Number.isFinite(entryValue)) {
@@ -71,9 +73,10 @@ function parseNumberRecord(
     }
 
     parsed[key] = entryValue;
+    hasValidEntry = true;
   }
 
-  if (!Object.keys(parsed).length) {
+  if (!hasValidEntry) {
     return null;
   }
 
@@ -126,18 +129,38 @@ function normalizeRates(
   return normalized;
 }
 
+async function fetchRateProviderPayload(url: string): Promise<JsonValue> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => {
+    controller.abort();
+  }, RATE_FETCH_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      cache: "no-store",
+      credentials: "omit",
+      referrerPolicy: "no-referrer",
+      redirect: "error",
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Request failed with status ${response.status}`);
+    }
+
+    return (await response.json()) as JsonValue;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
 async function fetchLatestUsdSnapshotFromClient(): Promise<RateSnapshot> {
   let lastError: Error | null = null;
 
   for (const provider of RATE_PROVIDERS) {
     try {
-      const response = await fetch(provider.url);
-
-      if (!response.ok) {
-        throw new Error(`${provider.name} failed with status ${response.status}`);
-      }
-
-      const payload = (await response.json()) as JsonValue;
+      const payload = await fetchRateProviderPayload(provider.url);
       const parsedRates = provider.parse(payload);
       const normalizedRates = normalizeRates(parsedRates);
 
@@ -148,8 +171,8 @@ async function fetchLatestUsdSnapshotFromClient(): Promise<RateSnapshot> {
         source: provider.name,
       };
     } catch (error) {
-      lastError =
-        error instanceof Error ? error : new Error("Rate provider request failed");
+      const cause = error instanceof Error ? error.message : "Unknown failure";
+      lastError = new Error(`${provider.name} request failed: ${cause}`);
     }
   }
 

@@ -66,13 +66,13 @@ export default defineContentScript({
       if (uiCaptureActive === next) return;
       uiCaptureActive = next;
 
-      UI_CAPTURE_EVENT_TYPES.forEach((eventType) => {
+      for (const eventType of UI_CAPTURE_EVENT_TYPES) {
         if (next) {
           document.addEventListener(eventType, swallowUiEvent, true);
         } else {
           document.removeEventListener(eventType, swallowUiEvent, true);
         }
-      });
+      }
     }
 
     function removePopupAndCapture() {
@@ -135,9 +135,10 @@ export default defineContentScript({
 
     const onMouseDown = (event: MouseEvent) => {
       if (isExtensionUiEvent(event)) return;
+      if (!(event.target instanceof Node)) return;
 
       const popupRoot = popupController.getRoot();
-      if (popupRoot && !popupController.containsTarget(event.target as Node)) {
+      if (popupRoot && !popupController.containsTarget(event.target)) {
         const selection = window.getSelection();
         if (!selection?.toString().trim()) {
           removePopupAndCapture();
@@ -148,7 +149,7 @@ export default defineContentScript({
     document.addEventListener("mouseup", onMouseUp);
     document.addEventListener("mousedown", onMouseDown);
 
-    window.addEventListener("beforeunload", () => {
+    const onBeforeUnload = () => {
       mutationObserver.disconnect();
       settingsUnwatch();
       setUiCaptureActive(false);
@@ -156,6 +157,9 @@ export default defineContentScript({
       conversionRuntime.cleanup();
       document.removeEventListener("mouseup", onMouseUp);
       document.removeEventListener("mousedown", onMouseDown);
-    });
+      window.removeEventListener("beforeunload", onBeforeUnload);
+    };
+
+    window.addEventListener("beforeunload", onBeforeUnload);
   },
 });

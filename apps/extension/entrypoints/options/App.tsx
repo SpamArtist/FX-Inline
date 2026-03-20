@@ -5,7 +5,7 @@ import {
   updateUserSettings,
 } from "@/utils/appStorage";
 import { CurrencyCode } from "@/utils/enums";
-import { useEffect, useMemo, useState } from "react";
+import { type ChangeEvent, useEffect, useMemo, useState } from "react";
 import type { UserSettings } from "@/utils/appStorage.types";
 
 function App() {
@@ -56,6 +56,12 @@ function App() {
     setStatusMessage(`Preferred currency updated to ${nextCurrency}.`);
   }
 
+  function handlePreferredCurrencyInputChange(
+    event: ChangeEvent<HTMLSelectElement>,
+  ) {
+    void onPreferredCurrencyChange(event.target.value as CurrencyCode);
+  }
+
   return (
     <main className="ccx-theme ccx-options-page">
       <section className="ccx-options-card">
@@ -71,9 +77,7 @@ function App() {
             className="ccx-options-select"
             id="preferred-currency"
             value={settings.preferredCurrency}
-            onChange={(event) =>
-              void onPreferredCurrencyChange(event.target.value as CurrencyCode)
-            }
+            onChange={handlePreferredCurrencyInputChange}
           >
             {currencyOptions.map((option) => (
               <option key={option.code} value={option.code}>

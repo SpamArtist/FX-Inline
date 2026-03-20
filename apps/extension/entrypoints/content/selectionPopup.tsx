@@ -13,6 +13,25 @@ function CurrencyConvertorPopupBox({ number, currency }: SelectionPopupBoxProps)
   const sourceCurrency = currencies[0];
   const targetCurrency = currencies[1];
 
+  function updateAmount(id: string | undefined, amount: string) {
+    if (!id) return;
+    dispatch({
+      type: ActionType.AMOUNT_UPDATE,
+      payload: { id, amount },
+    });
+  }
+
+  function updateCurrency(id: string | undefined, nextCurrency: CurrencyCode) {
+    if (!id) return;
+    dispatch({
+      type: ActionType.CURRENCY_UPDATE,
+      payload: {
+        id,
+        currency: nextCurrency,
+      },
+    });
+  }
+
   return (
     <ConvertorHOD variant="selection">
       {sourceCurrency && targetCurrency ? (
@@ -22,20 +41,9 @@ function CurrencyConvertorPopupBox({ number, currency }: SelectionPopupBoxProps)
             isCurrencySelectable={false}
             amountPresentationMode="displayThenEdit"
             data={sourceCurrency}
-            amountChange={(updatedAmount) =>
-              dispatch({
-                type: ActionType.AMOUNT_UPDATE,
-                payload: { id: sourceCurrency.id, amount: updatedAmount },
-              })
-            }
+            amountChange={(updatedAmount) => updateAmount(sourceCurrency.id, updatedAmount)}
             currencyChange={(updatedCurrency) =>
-              dispatch({
-                type: ActionType.CURRENCY_UPDATE,
-                payload: {
-                  id: sourceCurrency.id,
-                  currency: updatedCurrency,
-                },
-              })
+              updateCurrency(sourceCurrency.id, updatedCurrency)
             }
           />
 
@@ -46,20 +54,9 @@ function CurrencyConvertorPopupBox({ number, currency }: SelectionPopupBoxProps)
             isCurrencySelectable={false}
             amountPresentationMode="displayThenEdit"
             data={targetCurrency}
-            amountChange={(updatedAmount) =>
-              dispatch({
-                type: ActionType.AMOUNT_UPDATE,
-                payload: { id: targetCurrency.id, amount: updatedAmount },
-              })
-            }
+            amountChange={(updatedAmount) => updateAmount(targetCurrency.id, updatedAmount)}
             currencyChange={(updatedCurrency) =>
-              dispatch({
-                type: ActionType.CURRENCY_UPDATE,
-                payload: {
-                  id: targetCurrency.id,
-                  currency: updatedCurrency,
-                },
-              })
+              updateCurrency(targetCurrency.id, updatedCurrency)
             }
           />
         </div>
@@ -75,12 +72,12 @@ export function createSelectionPopupController(
   let reactRoot: Root | null = null;
 
   function removePopup() {
-    if (popupRoot && document.body.contains(popupRoot)) {
-      reactRoot?.unmount();
-      document.body.removeChild(popupRoot);
-      popupRoot = null;
-      reactRoot = null;
-    }
+    if (!popupRoot || !document.body.contains(popupRoot)) return;
+
+    reactRoot?.unmount();
+    document.body.removeChild(popupRoot);
+    popupRoot = null;
+    reactRoot = null;
   }
 
   function showPopup(

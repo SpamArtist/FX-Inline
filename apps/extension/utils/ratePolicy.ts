@@ -2,11 +2,16 @@ function toEasternDate(now = new Date()): Date {
   return new Date(now.toLocaleString("en-US", { timeZone: "America/New_York" }));
 }
 
+function isWeekend(date: Date): boolean {
+  const day = date.getDay();
+  return day === 0 || day === 6;
+}
+
 function getPreviousBusinessDay(date: Date): Date {
   const copy = new Date(date);
   copy.setDate(copy.getDate() - 1);
 
-  while (copy.getDay() === 0 || copy.getDay() === 6) {
+  while (isWeekend(copy)) {
     copy.setDate(copy.getDate() - 1);
   }
 
@@ -23,7 +28,7 @@ function toDateKey(date: Date): string {
 export function getMarketDayKey(now = new Date()): string {
   const easternNow = toEasternDate(now);
 
-  while (easternNow.getDay() === 0 || easternNow.getDay() === 6) {
+  while (isWeekend(easternNow)) {
     easternNow.setDate(easternNow.getDate() - 1);
   }
 
@@ -49,5 +54,5 @@ export function shouldUseMarketDayCache(
   marketDayKey: string | undefined,
   now = new Date(),
 ): boolean {
-  return Boolean(marketDayKey && marketDayKey === getMarketDayKey(now));
+  return marketDayKey === getMarketDayKey(now);
 }

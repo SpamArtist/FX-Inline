@@ -2,7 +2,7 @@ import { ConvertorHOD } from "@/components/Convertor/Convertor";
 import CurrencyBox from "@/components/CurrencyBox/CurrencyBox";
 import { useCurrencyReducer } from "@/hooks/useCurrencyReducer";
 import { DEFAULT_STARTING_CURRENCY } from "@/utils/constants";
-import { ActionType } from "@/utils/enums";
+import { ActionType, type CurrencyCode } from "@/utils/enums";
 import { ArrowLeftRight, Cog } from "lucide-react";
 import { browser } from "wxt/browser";
 import "./App.css";
@@ -34,6 +34,25 @@ function App() {
       type: ActionType.CURRENCY_SWAP,
       payload: {
         id: sourceCurrency.id,
+      },
+    });
+  }
+
+  function updateAmount(id: string | undefined, amount: string) {
+    if (!id) return;
+    dispatch({
+      type: ActionType.AMOUNT_UPDATE,
+      payload: { id, amount },
+    });
+  }
+
+  function updateCurrency(id: string | undefined, currency: CurrencyCode) {
+    if (!id) return;
+    dispatch({
+      type: ActionType.CURRENCY_UPDATE,
+      payload: {
+        id,
+        currency,
       },
     });
   }
@@ -71,20 +90,9 @@ function App() {
               isCurrencySelectable
               amountPresentationMode="displayThenEdit"
               data={sourceCurrency}
-              amountChange={(updatedAmount) =>
-                dispatch({
-                  type: ActionType.AMOUNT_UPDATE,
-                  payload: { id: sourceCurrency.id, amount: updatedAmount },
-                })
-              }
+              amountChange={(updatedAmount) => updateAmount(sourceCurrency.id, updatedAmount)}
               currencyChange={(updatedCurrency) =>
-                dispatch({
-                  type: ActionType.CURRENCY_UPDATE,
-                  payload: {
-                    id: sourceCurrency.id,
-                    currency: updatedCurrency,
-                  },
-                })
+                updateCurrency(sourceCurrency.id, updatedCurrency)
               }
             />
 
@@ -95,20 +103,9 @@ function App() {
               isCurrencySelectable
               amountPresentationMode="displayThenEdit"
               data={targetCurrency}
-              amountChange={(updatedAmount) =>
-                dispatch({
-                  type: ActionType.AMOUNT_UPDATE,
-                  payload: { id: targetCurrency.id, amount: updatedAmount },
-                })
-              }
+              amountChange={(updatedAmount) => updateAmount(targetCurrency.id, updatedAmount)}
               currencyChange={(updatedCurrency) =>
-                dispatch({
-                  type: ActionType.CURRENCY_UPDATE,
-                  payload: {
-                    id: targetCurrency.id,
-                    currency: updatedCurrency,
-                  },
-                })
+                updateCurrency(targetCurrency.id, updatedCurrency)
               }
             />
           </div>

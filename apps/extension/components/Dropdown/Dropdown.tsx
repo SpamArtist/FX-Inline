@@ -8,6 +8,8 @@ import {
 import type { DropdownProps } from "./Dropdown.types";
 export type { DropdownOption } from "./Dropdown.types";
 
+const CURRENCY_ICON_FALLBACK = "$";
+
 export default function Dropdown<TValue extends string>({
   isDisabled = false,
   displayOption,
@@ -18,7 +20,7 @@ export default function Dropdown<TValue extends string>({
     <DropdownMenu>
       <DropdownMenuTrigger className="ccx-dropdown-trigger" disabled={isDisabled}>
         <span className="ccx-dropdown-trigger__icon" aria-hidden>
-          {displayOption.icon || "$"}
+          {displayOption.icon || CURRENCY_ICON_FALLBACK}
         </span>
         <span className="ccx-dropdown-trigger__label">{displayOption.label}</span>
         {!isDisabled && <ChevronDown className="ccx-dropdown-trigger__arrow" aria-hidden />}
@@ -32,7 +34,7 @@ export default function Dropdown<TValue extends string>({
             textValue={label}
           >
             <span className="ccx-dropdown-item__icon" aria-hidden>
-              {icon || "$"}
+              {icon || CURRENCY_ICON_FALLBACK}
             </span>
             <span>{label}</span>
           </DropdownMenuItem>
