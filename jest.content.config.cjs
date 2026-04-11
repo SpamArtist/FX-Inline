@@ -8,6 +8,5 @@ module.exports = {
   moduleNameMapper: {
     "^@/(.*)\\.json$": "<rootDir>/apps/extension/test-dist/$1.json",
     "^@/(.*)$": "<rootDir>/apps/extension/test-dist/$1.js",
-    "\\.(css)$": "<rootDir>/apps/extension/tests/content/style-mock.cjs",
   }
 };
