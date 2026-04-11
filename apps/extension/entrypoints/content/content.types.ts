@@ -31,8 +31,3 @@ export type SelectionPopupController = {
   getRoot: () => HTMLDivElement | null;
   destroy: () => void;
 };
-
-export type SelectionPopupBoxProps = {
-  number: string;
-  currency: CurrencyCode;
-};
