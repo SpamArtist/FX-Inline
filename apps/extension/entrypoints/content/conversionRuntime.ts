@@ -1,5 +1,9 @@
 import type { UserSettings } from "@/utils/appStorage.types";
 import type { RateSnapshot } from "@/utils/rates.types";
+import {
+  getOriginFromUrl,
+  isAutoConversionEnabledForOrigin,
+} from "@/utils/appStorage";
 import type { ContentConversionRuntime } from "./content.types";
 import {
   FULL_CONVERSION_DEBOUNCE_MS,
@@ -30,6 +34,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
     roundMs,
     logSettingsStorageUpdate,
   } = createRuntimePerfContext("ccx");
+  const currentPageOrigin = getOriginFromUrl(window.location.href);
 
   let settings: UserSettings | null = null;
   let rateSnapshot: RateSnapshot | null = null;
@@ -52,12 +57,9 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
     rateSnapshot = next;
   }
 
-  function isGlobalAutoConversionEnabled(next: UserSettings | null): boolean {
-    return next?.globalAutoConversionEnabled !== false;
-  }
-
   function isAutoConversionEnabledForCurrentPage(next: UserSettings | null): boolean {
-    return isGlobalAutoConversionEnabled(next);
+    if (!next) return false;
+    return isAutoConversionEnabledForOrigin(next, currentPageOrigin);
   }
 
   function getIsHydratingRates() {
@@ -322,13 +324,13 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
 
       if (normalizedNewSettings) {
         settings = normalizedNewSettings;
-        const globalAutoConversionChanged =
-          Boolean(normalizedOldSettings) &&
-          isGlobalAutoConversionEnabled(normalizedNewSettings) !==
-            isGlobalAutoConversionEnabled(normalizedOldSettings);
+        const autoConversionChanged = normalizedOldSettings
+          ? isAutoConversionEnabledForOrigin(normalizedNewSettings, currentPageOrigin) !==
+            isAutoConversionEnabledForOrigin(normalizedOldSettings, currentPageOrigin)
+          : false;
         const shouldScheduleInlineConversion =
           preferredCurrencyChanged ||
-          globalAutoConversionChanged ||
+          autoConversionChanged ||
           !normalizedOldSettings;
         preferredCurrencyChanged = shouldScheduleInlineConversion;
 
