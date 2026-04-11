@@ -18,6 +18,7 @@ import {
 import { createRuntimePerfContext } from "./conversionRuntime/logging";
 import { runPartialConversionPass } from "./conversionRuntime/partialPass";
 import { clearTimer } from "./conversionRuntime/timers";
+import { clearInlineConversions } from "./inlineConversion/conversionNodes";
 import { convertVisiblePrices } from "./inlineConversion";
 
 export type { ContentConversionRuntime } from "./content.types";
@@ -49,6 +50,14 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
 
   function setRateSnapshot(next: RateSnapshot) {
     rateSnapshot = next;
+  }
+
+  function isGlobalAutoConversionEnabled(next: UserSettings | null): boolean {
+    return next?.globalAutoConversionEnabled !== false;
+  }
+
+  function isAutoConversionEnabledForCurrentPage(next: UserSettings | null): boolean {
+    return isGlobalAutoConversionEnabled(next);
   }
 
   function getIsHydratingRates() {
@@ -103,7 +112,32 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
     conversionDebounceTimer = window.setTimeout(() => {
       conversionDebounceTimer = null;
 
-      if (!settings || !rateSnapshot) {
+      if (!settings) {
+        void hydrateRuntimeSettingsAndRates()
+          .then(() => {
+            if (settings) {
+              scheduleInlineConversion();
+              return;
+            }
+
+            console.warn("[ccx] Missing settings/rates after hydration; retrying");
+            scheduleHydrationRetry();
+          })
+          .catch((error) => {
+            console.warn("[ccx] Failed to hydrate rates for inline conversion", error);
+            scheduleHydrationRetry();
+          });
+
+        return;
+      }
+
+      if (!isAutoConversionEnabledForCurrentPage(settings)) {
+        pendingMutationRoots.clear();
+        clearInlineConversions(document.body);
+        return;
+      }
+
+      if (!rateSnapshot) {
         void hydrateRuntimeSettingsAndRates()
           .then(() => {
             if (settings && rateSnapshot) {
@@ -169,7 +203,18 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
 
       if (!pendingMutationRoots.size) return;
 
-      if (!settings || !rateSnapshot) {
+      if (!settings) {
+        pendingMutationRoots.clear();
+        scheduleInlineConversion();
+        return;
+      }
+
+      if (!isAutoConversionEnabledForCurrentPage(settings)) {
+        pendingMutationRoots.clear();
+        return;
+      }
+
+      if (!rateSnapshot) {
         pendingMutationRoots.clear();
         scheduleInlineConversion();
         return;
@@ -277,8 +322,14 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
 
       if (normalizedNewSettings) {
         settings = normalizedNewSettings;
+        const globalAutoConversionChanged =
+          Boolean(normalizedOldSettings) &&
+          isGlobalAutoConversionEnabled(normalizedNewSettings) !==
+            isGlobalAutoConversionEnabled(normalizedOldSettings);
         const shouldScheduleInlineConversion =
-          preferredCurrencyChanged || !normalizedOldSettings;
+          preferredCurrencyChanged ||
+          globalAutoConversionChanged ||
+          !normalizedOldSettings;
         preferredCurrencyChanged = shouldScheduleInlineConversion;
 
         if (rateSnapshot) {

@@ -11,6 +11,7 @@ const VALID_CURRENCY_CODES: ReadonlySet<string> = new Set(
 
 const DEFAULT_USER_SETTINGS: UserSettings = {
   preferredCurrency: DEFAULT_STARTING_CURRENCY,
+  globalAutoConversionEnabled: true,
 };
 
 const userSettingsItem = storage.defineItem<UserSettings>(SETTINGS_KEY, {
@@ -23,16 +24,26 @@ function asCurrencyCode(value: string | null | undefined): CurrencyCode {
     : DEFAULT_USER_SETTINGS.preferredCurrency;
 }
 
+function asGlobalAutoConversionEnabled(value: unknown): boolean {
+  return typeof value === "boolean"
+    ? value
+    : DEFAULT_USER_SETTINGS.globalAutoConversionEnabled;
+}
+
 function hasCanonicalUserSettingsShape(value: UserSettings): boolean {
   return (
-    Object.keys(value).length === 1 &&
-    Object.prototype.hasOwnProperty.call(value, "preferredCurrency")
+    Object.keys(value).length === 2 &&
+    Object.prototype.hasOwnProperty.call(value, "preferredCurrency") &&
+    Object.prototype.hasOwnProperty.call(value, "globalAutoConversionEnabled")
   );
 }
 
 export function sanitizeUserSettings(value: Partial<UserSettings> | null): UserSettings {
   return {
     preferredCurrency: asCurrencyCode(value?.preferredCurrency),
+    globalAutoConversionEnabled: asGlobalAutoConversionEnabled(
+      value?.globalAutoConversionEnabled,
+    ),
   };
 }
 
@@ -50,6 +61,7 @@ export async function getUserSettings(): Promise<UserSettings> {
 
   if (
     stored.preferredCurrency !== sanitized.preferredCurrency ||
+    stored.globalAutoConversionEnabled !== sanitized.globalAutoConversionEnabled ||
     !hasCanonicalUserSettingsShape(stored)
   ) {
     await userSettingsItem.setValue(sanitized);

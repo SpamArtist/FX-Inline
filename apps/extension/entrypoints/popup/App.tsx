@@ -1,9 +1,16 @@
 import { ConvertorHOD } from "@/components/Convertor/Convertor";
 import CurrencyBox from "@/components/CurrencyBox/CurrencyBox";
 import { useCurrencyReducer } from "@/hooks/useCurrencyReducer";
+import {
+  DEFAULT_USER_SETTINGS,
+  getUserSettings,
+  updateUserSettings,
+} from "@/utils/appStorage";
 import { DEFAULT_STARTING_CURRENCY } from "@/utils/constants";
 import { ActionType, type CurrencyCode } from "@/utils/enums";
+import SwitchIcon from "@/assets/switch.svg";
 import { ArrowLeftRight, Cog } from "lucide-react";
+import { useEffect, useState } from "react";
 import { browser } from "wxt/browser";
 import "./App.css";
 
@@ -12,6 +19,10 @@ function App() {
     number: "100",
     currency: DEFAULT_STARTING_CURRENCY,
   });
+  const [globalAutoConversionEnabled, setGlobalAutoConversionEnabled] = useState(
+    DEFAULT_USER_SETTINGS.globalAutoConversionEnabled,
+  );
+  const [isGlobalTogglePending, setIsGlobalTogglePending] = useState(false);
   const currentYear = new Date().getFullYear();
 
   async function onOpenSettings() {
@@ -21,6 +32,48 @@ function App() {
       await browser.tabs.create({
         url: browser.runtime.getURL("/options.html"),
       });
+    }
+  }
+
+  useEffect(() => {
+    let canceled = false;
+
+    const loadSettings = async () => {
+      const persisted = await getUserSettings();
+      if (canceled) return;
+      setGlobalAutoConversionEnabled(
+        persisted.globalAutoConversionEnabled !== false,
+      );
+    };
+
+    void loadSettings();
+
+    return () => {
+      canceled = true;
+    };
+  }, []);
+
+  async function onToggleGlobalAutoConversion() {
+    if (isGlobalTogglePending) return;
+
+    const nextGlobalAutoConversionEnabled = !globalAutoConversionEnabled;
+    setGlobalAutoConversionEnabled(nextGlobalAutoConversionEnabled);
+    setIsGlobalTogglePending(true);
+
+    try {
+      const persisted = await updateUserSettings({
+        globalAutoConversionEnabled: nextGlobalAutoConversionEnabled,
+      });
+      setGlobalAutoConversionEnabled(
+        persisted.globalAutoConversionEnabled !== false,
+      );
+    } catch {
+      const fallback = await getUserSettings();
+      setGlobalAutoConversionEnabled(
+        fallback.globalAutoConversionEnabled !== false,
+      );
+    } finally {
+      setIsGlobalTogglePending(false);
     }
   }
 
@@ -62,15 +115,30 @@ function App() {
       <ConvertorHOD
         variant="popup"
         headerActions={(
-          <button
-            type="button"
-            className="ccx-settings-button"
-            onClick={onOpenSettings}
-            aria-label="Open extension options"
-            title="Open extension options"
-          >
-            <Cog size={16} aria-hidden />
-          </button>
+          <>
+            <button
+              type="button"
+              className={`ccx-settings-button ccx-toggle-button ${
+                globalAutoConversionEnabled ? "is-on" : "is-off"
+              }`}
+              onClick={onToggleGlobalAutoConversion}
+              disabled={isGlobalTogglePending}
+              aria-label={`Global auto conversion ${globalAutoConversionEnabled ? "on" : "off"}`}
+              title={`Global auto conversion: ${globalAutoConversionEnabled ? "On" : "Off"}`}
+            >
+              <SwitchIcon aria-hidden />
+            </button>
+
+            <button
+              type="button"
+              className="ccx-settings-button"
+              onClick={onOpenSettings}
+              aria-label="Open extension options"
+              title="Open extension options"
+            >
+              <Cog size={16} aria-hidden />
+            </button>
+          </>
         )}
       >
         {sourceCurrency && targetCurrency ? (
