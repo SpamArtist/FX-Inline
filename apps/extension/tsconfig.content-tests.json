@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "./test-dist",
+    "rootDir": ".",
+    "allowImportingTsExtensions": false,
+    "types": ["vite/client"]
+  },
+  "include": [
+    "entrypoints/content/*.ts",
+    "utils/**/*.ts"
+  ]
+}
