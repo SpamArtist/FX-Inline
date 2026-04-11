@@ -199,6 +199,15 @@ test("extractCurrencyTextMatches parses shared-magnitude ranges with one currenc
   expect(matches[0].rangeEndValue).toBe(13000000);
 });
 
+test("extractCurrencyTextMatches ignores year-range carryover before real prices", () => {
+  const matches = extractCurrencyTextMatches("Revenue; 2023-24 $446,641,957.");
+
+  expect(matches).toHaveLength(1);
+  expect(matches[0].currency).toBe("USD");
+  expect(matches[0].value).toBe(446641957);
+  expect(matches[0].raw.startsWith("$446,641,957")).toBe(true);
+});
+
 test("extractCurrencyTextMatches parses mixed lakh/lac/crore/cr snippets", () => {
   const matches = extractCurrencyTextMatches(
     "Examples: 1 Lakh INR, 1 Lac INR, INR 1 Lakh, INR 1 Lac, 1 Crore INR, 1 Cr INR, INR 1 Crore, INR 1 Cr.",

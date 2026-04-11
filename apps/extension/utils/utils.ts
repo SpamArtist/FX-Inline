@@ -118,10 +118,12 @@ function buildParserArtifacts(localeHint?: string | null): ParserArtifacts {
   const magnitudeTokenPattern = `(?:${magnitudePattern})(?=$|[^\\p{L}\\p{N}])`;
   const numberWithOptionalMagnitudePattern =
     `[+-]?\\d[\\d,.\\u00A0\\u202F ]*(?:\\s*${magnitudeTokenPattern})?(?:\\s*\\+)?`;
+  const boundedNumberWithOptionalMagnitudePattern =
+    `(?<![\\p{N}\\-–—])${numberWithOptionalMagnitudePattern}`;
   const currencyTokenPattern = `(${isoTokenPattern}|(?:${symbolPattern}))`;
   const rangeSeparatorPattern = "(?:-|–|—)";
   const currencySnippetRegex = new RegExp(
-    `(?:${isoTokenPattern}\\s*${numberWithOptionalMagnitudePattern}|${numberWithOptionalMagnitudePattern}\\s*${isoTokenPattern}|(?:${symbolPattern})\\s*${numberWithOptionalMagnitudePattern}|${numberWithOptionalMagnitudePattern}\\s*(?:${symbolPattern}))`,
+    `(?:${isoTokenPattern}\\s*${numberWithOptionalMagnitudePattern}|${boundedNumberWithOptionalMagnitudePattern}\\s*${isoTokenPattern}|(?:${symbolPattern})\\s*${numberWithOptionalMagnitudePattern}|${boundedNumberWithOptionalMagnitudePattern}\\s*(?:${symbolPattern}))`,
     "giu",
   );
   const currencyRangeRegex = new RegExp(
