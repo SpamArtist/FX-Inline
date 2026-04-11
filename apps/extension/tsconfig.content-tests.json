@@ -9,6 +9,7 @@
   },
   "include": [
     "entrypoints/content/*.ts",
+    "entrypoints/content/selectionPopup/**/*.ts",
     "utils/**/*.ts"
   ]
 }
