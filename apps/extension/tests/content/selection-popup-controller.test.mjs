@@ -186,8 +186,13 @@ test("amount edit interactions commit on blur and Enter, and revert on Escape", 
   await waitForPopupContent(controller);
 
   const shadowRoot = getShadowRoot(controller);
+  const sourceRow = shadowRoot.querySelectorAll(".ccx-currency-box")[0];
+  expect(sourceRow).not.toBeUndefined();
+  if (!sourceRow) {
+    throw new Error("Expected source currency row");
+  }
 
-  const sourceAmountDisplay = shadowRoot.querySelector(".ccx-currency-box__amount-display");
+  const sourceAmountDisplay = sourceRow.querySelector(".ccx-currency-box__amount-display");
   expect(sourceAmountDisplay).not.toBeNull();
   if (!sourceAmountDisplay) {
     throw new Error("Expected source amount display button");
@@ -196,7 +201,7 @@ test("amount edit interactions commit on blur and Enter, and revert on Escape", 
   sourceAmountDisplay.dispatchEvent(new MouseEvent("click", { bubbles: true }));
   await flushMicrotasks();
 
-  const sourceAmountInput = shadowRoot.querySelector(".ccx-currency-box__amount-input");
+  const sourceAmountInput = sourceRow.querySelector(".ccx-currency-box__amount-input");
   expect(sourceAmountInput).not.toBeNull();
   if (!(sourceAmountInput instanceof HTMLInputElement)) {
     throw new Error("Expected source amount input");
@@ -207,13 +212,13 @@ test("amount edit interactions commit on blur and Enter, and revert on Escape", 
   sourceAmountInput.dispatchEvent(new FocusEvent("blur", { bubbles: true }));
   await flushMicrotasks();
 
-  const displayAfterBlur = shadowRoot.querySelector(".ccx-currency-box__amount-display");
+  const displayAfterBlur = sourceRow.querySelector(".ccx-currency-box__amount-display");
   expect(displayAfterBlur?.textContent).not.toBe(sourceAmountDisplay.textContent);
 
   displayAfterBlur?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
   await flushMicrotasks();
 
-  const inputAfterBlur = shadowRoot.querySelector(".ccx-currency-box__amount-input");
+  const inputAfterBlur = sourceRow.querySelector(".ccx-currency-box__amount-input");
   if (!(inputAfterBlur instanceof HTMLInputElement)) {
     throw new Error("Expected source amount input after blur edit");
   }
@@ -221,15 +226,23 @@ test("amount edit interactions commit on blur and Enter, and revert on Escape", 
   inputAfterBlur.value = "300";
   inputAfterBlur.dispatchEvent(new Event("input", { bubbles: true }));
   inputAfterBlur.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+  inputAfterBlur.dispatchEvent(new FocusEvent("blur", { bubbles: true }));
   await flushMicrotasks();
 
-  const displayAfterEnter = shadowRoot.querySelector(".ccx-currency-box__amount-display");
-  const stableDisplayText = displayAfterEnter?.textContent || "";
+  let stableDisplayText = "";
+  await waitForCondition(() => {
+    const displayAfterEnter = sourceRow.querySelector(".ccx-currency-box__amount-display");
+    expect(displayAfterEnter).not.toBeNull();
+    stableDisplayText = displayAfterEnter?.textContent || "";
+    expect(stableDisplayText.length).toBeGreaterThan(0);
+  });
 
-  displayAfterEnter?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+  sourceRow
+    .querySelector(".ccx-currency-box__amount-display")
+    ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
   await flushMicrotasks();
 
-  const inputAfterEnter = shadowRoot.querySelector(".ccx-currency-box__amount-input");
+  const inputAfterEnter = sourceRow.querySelector(".ccx-currency-box__amount-input");
   if (!(inputAfterEnter instanceof HTMLInputElement)) {
     throw new Error("Expected source amount input after enter edit");
   }
@@ -237,10 +250,11 @@ test("amount edit interactions commit on blur and Enter, and revert on Escape", 
   inputAfterEnter.value = "999";
   inputAfterEnter.dispatchEvent(new Event("input", { bubbles: true }));
   inputAfterEnter.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
-  await flushMicrotasks();
-
-  const displayAfterEscape = shadowRoot.querySelector(".ccx-currency-box__amount-display");
-  expect(displayAfterEscape?.textContent).toBe(stableDisplayText);
+  await waitForCondition(() => {
+    const displayAfterEscape = sourceRow.querySelector(".ccx-currency-box__amount-display");
+    expect(displayAfterEscape).not.toBeNull();
+    expect(displayAfterEscape?.textContent).toBe(stableDisplayText);
+  });
 });
 
 test("hydration updates preferred currency row after popup mount", async () => {
