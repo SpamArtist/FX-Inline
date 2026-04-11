@@ -14,6 +14,7 @@
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
     "preview:website": "vite preview --config apps/website/vite.config.mjs",
+    "lint": "eslint .",
     "compile": "tsc --noEmit",
     "build:unit": "tsc -p apps/extension/tsconfig.unit.json",
     "build:content-tests": "tsc -p apps/extension/tsconfig.content-tests.json",

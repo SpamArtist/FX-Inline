@@ -45,7 +45,7 @@ export const SKIP_TAGS = new Set([
 ]);
 
 export const RGB_CHANNEL_REGEX =
-  /rgba?\(\s*(\d{1,3})[\s,]+(\d{1,3})[\s,]+(\d{1,3})(?:[\s,\/]+[\d.]+)?\s*\)/i;
+  /rgba?\(\s*(\d{1,3})[\s,]+(\d{1,3})[\s,]+(\d{1,3})(?:[\s,/]+[\d.]+)?\s*\)/i;
 export const DIGIT_REGEX = /\d/u;
 
 export const EDITABLE_CONTEXT_SELECTOR = [
