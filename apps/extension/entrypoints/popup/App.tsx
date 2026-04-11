@@ -166,19 +166,6 @@ function App() {
             <button
               type="button"
               className={`ccx-settings-button ccx-toggle-button ${
-                globalAutoConversionEnabled ? "is-on" : "is-off"
-              }`}
-              onClick={onToggleGlobalAutoConversion}
-              disabled={isGlobalTogglePending}
-              aria-label={`Global auto conversion ${globalAutoConversionEnabled ? "on" : "off"}`}
-              title={`Global auto conversion: ${globalAutoConversionEnabled ? "On" : "Off"}`}
-            >
-              <SwitchIcon aria-hidden />
-            </button>
-
-            <button
-              type="button"
-              className={`ccx-settings-button ccx-toggle-button ${
                 localAutoConversionEnabled ? "is-on" : "is-off"
               }`}
               onClick={onToggleLocalAutoConversion}
@@ -191,6 +178,19 @@ function App() {
                   }`
                   : "Local auto conversion is unavailable on this page"
               }
+            >
+              <SwitchIcon aria-hidden />
+            </button>
+
+            <button
+              type="button"
+              className={`ccx-settings-button ccx-toggle-button ${
+                globalAutoConversionEnabled ? "is-on" : "is-off"
+              }`}
+              onClick={onToggleGlobalAutoConversion}
+              disabled={isGlobalTogglePending}
+              aria-label={`Global auto conversion ${globalAutoConversionEnabled ? "on" : "off"}`}
+              title={`Global auto conversion: ${globalAutoConversionEnabled ? "On" : "Off"}`}
             >
               <SwitchIcon aria-hidden />
             </button>
