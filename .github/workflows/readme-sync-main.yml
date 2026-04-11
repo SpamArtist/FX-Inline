@@ -1,0 +1,52 @@
+name: README Sync Main
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  readme-sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Sync README
+        run: npm run readme:sync
+
+      - name: Open PR For README Changes
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: docs: sync README snapshot
+          branch: chore/readme-sync
+          delete-branch: true
+          title: "docs: sync README snapshot"
+          body: |
+            Automated README synchronization after changes landed on `main`.
+
+            This PR was created by `.github/workflows/readme-sync-main.yml`.
+          add-paths: |
+            README.md
+          labels: |
+            documentation
+            automation
