@@ -30,6 +30,25 @@
   outline: none;
 }
 
+.ccx-popup-page .ccx-toggle-button {
+  color: #4ade80;
+}
+
+.ccx-popup-page .ccx-toggle-button.is-off {
+  color: #ef4444;
+}
+
+.ccx-popup-page .ccx-toggle-button[disabled] {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.ccx-popup-page .ccx-toggle-button svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
 .ccx-popup-layout .ccx-converter-swap {
   top: 50%;
   left: 50%;

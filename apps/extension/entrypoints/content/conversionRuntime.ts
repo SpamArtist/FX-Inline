@@ -1,5 +1,9 @@
 import type { UserSettings } from "@/utils/appStorage.types";
 import type { RateSnapshot } from "@/utils/rates.types";
+import {
+  getOriginFromUrl,
+  isAutoConversionEnabledForOrigin,
+} from "@/utils/appStorage";
 import type { ContentConversionRuntime } from "./content.types";
 import {
   FULL_CONVERSION_DEBOUNCE_MS,
@@ -18,6 +22,7 @@ import {
 import { createRuntimePerfContext } from "./conversionRuntime/logging";
 import { runPartialConversionPass } from "./conversionRuntime/partialPass";
 import { clearTimer } from "./conversionRuntime/timers";
+import { suppressInlineConversions } from "./inlineConversion/conversionNodes";
 import { convertVisiblePrices } from "./inlineConversion";
 
 export type { ContentConversionRuntime } from "./content.types";
@@ -29,6 +34,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
     roundMs,
     logSettingsStorageUpdate,
   } = createRuntimePerfContext("ccx");
+  const currentPageOrigin = getOriginFromUrl(window.location.href);
 
   let settings: UserSettings | null = null;
   let rateSnapshot: RateSnapshot | null = null;
@@ -49,6 +55,11 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
 
   function setRateSnapshot(next: RateSnapshot) {
     rateSnapshot = next;
+  }
+
+  function isAutoConversionEnabledForCurrentPage(next: UserSettings | null): boolean {
+    if (!next) return false;
+    return isAutoConversionEnabledForOrigin(next, currentPageOrigin);
   }
 
   function getIsHydratingRates() {
@@ -103,7 +114,32 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
     conversionDebounceTimer = window.setTimeout(() => {
       conversionDebounceTimer = null;
 
-      if (!settings || !rateSnapshot) {
+      if (!settings) {
+        void hydrateRuntimeSettingsAndRates()
+          .then(() => {
+            if (settings) {
+              scheduleInlineConversion();
+              return;
+            }
+
+            console.warn("[ccx] Missing settings/rates after hydration; retrying");
+            scheduleHydrationRetry();
+          })
+          .catch((error) => {
+            console.warn("[ccx] Failed to hydrate rates for inline conversion", error);
+            scheduleHydrationRetry();
+          });
+
+        return;
+      }
+
+      if (!isAutoConversionEnabledForCurrentPage(settings)) {
+        pendingMutationRoots.clear();
+        suppressInlineConversions(document.body);
+        return;
+      }
+
+      if (!rateSnapshot) {
         void hydrateRuntimeSettingsAndRates()
           .then(() => {
             if (settings && rateSnapshot) {
@@ -169,7 +205,18 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
 
       if (!pendingMutationRoots.size) return;
 
-      if (!settings || !rateSnapshot) {
+      if (!settings) {
+        pendingMutationRoots.clear();
+        scheduleInlineConversion();
+        return;
+      }
+
+      if (!isAutoConversionEnabledForCurrentPage(settings)) {
+        pendingMutationRoots.clear();
+        return;
+      }
+
+      if (!rateSnapshot) {
         pendingMutationRoots.clear();
         scheduleInlineConversion();
         return;
@@ -260,7 +307,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
     onSettingsStorageUpdate: async (newSettings, oldSettings) => {
       const startedAt = perfLoggingEnabled ? performance.now() : 0;
       let refreshed = false;
-      let preferredCurrencyChanged = false;
+      let shouldScheduleInlineConversion = false;
       let missingRateSnapshot = false;
       const normalizedNewSettings = isUserSettingsSnapshot(newSettings)
         ? newSettings
@@ -269,25 +316,39 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
         ? oldSettings
         : null;
 
-      if (normalizedNewSettings && normalizedOldSettings) {
-        settings = normalizedNewSettings;
-        preferredCurrencyChanged =
-          normalizedNewSettings.preferredCurrency !== normalizedOldSettings.preferredCurrency;
-      }
-
       if (normalizedNewSettings) {
         settings = normalizedNewSettings;
-        const shouldScheduleInlineConversion =
-          preferredCurrencyChanged || !normalizedOldSettings;
-        preferredCurrencyChanged = shouldScheduleInlineConversion;
+        const preferredCurrencyChanged = normalizedOldSettings
+          ? normalizedNewSettings.preferredCurrency !== normalizedOldSettings.preferredCurrency
+          : false;
+        const autoConversionChanged = normalizedOldSettings
+          ? isAutoConversionEnabledForOrigin(normalizedNewSettings, currentPageOrigin) !==
+            isAutoConversionEnabledForOrigin(normalizedOldSettings, currentPageOrigin)
+          : false;
+        const autoConversionEnabled =
+          isAutoConversionEnabledForOrigin(normalizedNewSettings, currentPageOrigin);
+
+        shouldScheduleInlineConversion =
+          preferredCurrencyChanged ||
+          autoConversionChanged ||
+          !normalizedOldSettings;
 
         if (rateSnapshot) {
+          if (autoConversionEnabled && shouldScheduleInlineConversion) {
+            try {
+              await refreshRuntimeSettingsAndRates(false);
+              refreshed = true;
+            } catch (error) {
+              console.warn("[ccx] Failed to refresh rates after settings update", error);
+            }
+          }
+
           if (shouldScheduleInlineConversion) {
             scheduleInlineConversionFromSettingsUpdate();
           }
 
           logSettingsStorageUpdate(startedAt, {
-            refreshed: false,
+            refreshed,
             missingRateSnapshot: false,
             preferredCurrencyChanged: shouldScheduleInlineConversion,
           });
@@ -307,7 +368,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
         logSettingsStorageUpdate(startedAt, {
           refreshed,
           missingRateSnapshot,
-          preferredCurrencyChanged,
+          preferredCurrencyChanged: shouldScheduleInlineConversion,
         });
       }
     },
