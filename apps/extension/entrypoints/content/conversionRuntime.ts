@@ -1,34 +1,36 @@
 import type { UserSettings } from "@/utils/appStorage.types";
-import { getUserSettings } from "@/utils/appStorage";
-import type { ContentConversionRuntime } from "./content.types";
 import type { RateSnapshot } from "@/utils/rates.types";
-import { getRates } from "@/utils/rates";
-import { convertVisiblePrices } from "./inlineConversion";
+import type { ContentConversionRuntime } from "./content.types";
 import {
-  addInlinePerfSample,
-  createInlineConversionPerfAggregate,
-  createPerfLogger,
-} from "./perfLogger";
-
-const PARTIAL_CONVERSION_DEBOUNCE_MS = 120;
-const PARTIAL_CONVERSION_CONTINUE_MS = 28;
-const PARTIAL_CONVERSION_TIME_BUDGET_MS = 16;
-
-function isUserSettingsSnapshot(
-  value: UserSettings | null | undefined,
-): value is UserSettings {
-  return typeof value?.preferredCurrency === "string";
-}
+  FULL_CONVERSION_DEBOUNCE_MS,
+  HYDRATION_RETRY_MS,
+  MUTATION_SUPPRESSION_RELEASE_MS,
+  PARTIAL_CONVERSION_CONTINUE_MS,
+  PARTIAL_CONVERSION_DEBOUNCE_MS,
+  PARTIAL_CONVERSION_TIME_BUDGET_MS,
+  SETTINGS_UPDATE_CONVERSION_DELAY_MS,
+} from "./conversionRuntime/constants";
+import { isUserSettingsSnapshot } from "./conversionRuntime/guards";
+import {
+  hydrateSettingsAndRates,
+  refreshSettingsAndRates,
+} from "./conversionRuntime/hydration";
+import { createRuntimePerfContext } from "./conversionRuntime/logging";
+import { runPartialConversionPass } from "./conversionRuntime/partialPass";
+import { clearTimer } from "./conversionRuntime/timers";
+import { convertVisiblePrices } from "./inlineConversion";
 
 export type { ContentConversionRuntime } from "./content.types";
 
 export function createContentConversionRuntime(): ContentConversionRuntime {
-  const perfLogger = createPerfLogger("ccx");
-  const perfLoggingEnabled = perfLogger.enabled;
-  const logPerf = perfLogger.log;
-  const roundMs = perfLogger.roundMs;
+  const {
+    perfLoggingEnabled,
+    logPerf,
+    roundMs,
+    logSettingsStorageUpdate,
+  } = createRuntimePerfContext("ccx");
 
-  let settings: Awaited<ReturnType<typeof getUserSettings>> | null = null;
+  let settings: UserSettings | null = null;
   let rateSnapshot: RateSnapshot | null = null;
 
   let conversionDebounceTimer: number | null = null;
@@ -41,62 +43,47 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
 
   const pendingMutationRoots = new Set<ParentNode>();
 
+  function setSettings(next: UserSettings) {
+    settings = next;
+  }
+
+  function setRateSnapshot(next: RateSnapshot) {
+    rateSnapshot = next;
+  }
+
+  function getIsHydratingRates() {
+    return isHydratingRates;
+  }
+
+  function setIsHydratingRates(next: boolean) {
+    isHydratingRates = next;
+  }
+
+  async function refreshRuntimeSettingsAndRates(forceRefresh = false) {
+    await refreshSettingsAndRates({
+      forceRefresh,
+      perfLoggingEnabled,
+      logPerf,
+      roundMs,
+      setSettings,
+      setRateSnapshot,
+    });
+  }
+
+  async function hydrateRuntimeSettingsAndRates(forceRefresh = false) {
+    await hydrateSettingsAndRates({
+      forceRefresh,
+      getIsHydratingRates,
+      setIsHydratingRates,
+      refresh: refreshRuntimeSettingsAndRates,
+    });
+  }
+
   function releaseMutationSuppression() {
     isApplyingInlineConversion = false;
     window.setTimeout(() => {
       suppressMutationDepth = Math.max(0, suppressMutationDepth - 1);
-    }, 400);
-  }
-
-  function clearTimer(timer: number | null): number | null {
-    if (timer !== null) {
-      window.clearTimeout(timer);
-    }
-
-    return null;
-  }
-
-  function logSettingsStorageUpdate(
-    startedAt: number,
-    payload: {
-      refreshed: boolean;
-      missingRateSnapshot: boolean;
-      preferredCurrencyChanged: boolean;
-    },
-  ) {
-    if (!perfLoggingEnabled) return;
-
-    logPerf("onSettingsStorageUpdate", {
-      ...payload,
-      durationMs: roundMs(performance.now() - startedAt),
-    });
-  }
-
-  async function refreshSettingsAndRates(forceRefresh = false) {
-    const startedAt = perfLoggingEnabled ? performance.now() : 0;
-
-    settings = await getUserSettings();
-    rateSnapshot = await getRates({ forceRefresh });
-
-    if (perfLoggingEnabled) {
-      logPerf("refreshSettingsAndRates", {
-        forceRefresh,
-        preferredCurrency: settings.preferredCurrency,
-        rateSource: rateSnapshot.source ?? "unavailable",
-        durationMs: roundMs(performance.now() - startedAt),
-      });
-    }
-  }
-
-  async function hydrateSettingsAndRates(forceRefresh = false) {
-    if (isHydratingRates && !forceRefresh) return;
-    isHydratingRates = true;
-
-    try {
-      await refreshSettingsAndRates(forceRefresh);
-    } finally {
-      isHydratingRates = false;
-    }
+    }, MUTATION_SUPPRESSION_RELEASE_MS);
   }
 
   function scheduleHydrationRetry() {
@@ -105,7 +92,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
     hydrationRetryTimer = window.setTimeout(() => {
       hydrationRetryTimer = null;
       scheduleInlineConversion();
-    }, 3000);
+    }, HYDRATION_RETRY_MS);
   }
 
   function scheduleInlineConversion() {
@@ -117,7 +104,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
       conversionDebounceTimer = null;
 
       if (!settings || !rateSnapshot) {
-        void hydrateSettingsAndRates()
+        void hydrateRuntimeSettingsAndRates()
           .then(() => {
             if (settings && rateSnapshot) {
               scheduleInlineConversion();
@@ -169,7 +156,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
       } finally {
         releaseMutationSuppression();
       }
-    }, 200);
+    }, FULL_CONVERSION_DEBOUNCE_MS);
   }
 
   function schedulePartialInlineConversion(delayMs = PARTIAL_CONVERSION_DEBOUNCE_MS) {
@@ -196,41 +183,20 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
 
       try {
         const preferredCurrency = settings.preferredCurrency;
-        let conversions = 0;
-        let connectedRoots = 0;
-        let deferredRoots = 0;
-        const passStartedAt = performance.now();
-        const perfAggregate = perfLoggingEnabled
-          ? createInlineConversionPerfAggregate()
-          : null;
 
-        for (let index = 0; index < roots.length; index += 1) {
-          if (
-            connectedRoots > 0 &&
-            performance.now() - passStartedAt >= PARTIAL_CONVERSION_TIME_BUDGET_MS
-          ) {
-            for (let remainderIndex = index; remainderIndex < roots.length; remainderIndex += 1) {
-              pendingMutationRoots.add(roots[remainderIndex]);
-              deferredRoots += 1;
-            }
-
-            break;
-          }
-
-          const root = roots[index];
-          if (!(root instanceof Node) || !root.isConnected) continue;
-          connectedRoots += 1;
-
-          conversions += convertVisiblePrices(preferredCurrency, rateSnapshot, root, {
-            clearExisting: false,
-            maxNodesPerPass: 4000,
-            onPerfSample: perfAggregate
-              ? (sample) => {
-                  addInlinePerfSample(perfAggregate, sample);
-                }
-              : undefined,
-          });
-        }
+        const {
+          conversions,
+          connectedRoots,
+          deferredRoots,
+          perfAggregate,
+        } = runPartialConversionPass(
+          roots,
+          pendingMutationRoots,
+          preferredCurrency,
+          rateSnapshot,
+          perfLoggingEnabled,
+          PARTIAL_CONVERSION_TIME_BUDGET_MS,
+        );
 
         if (deferredRoots > 0) {
           schedulePartialInlineConversion(PARTIAL_CONVERSION_CONTINUE_MS);
@@ -266,7 +232,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
     settingsRefreshTimer = window.setTimeout(() => {
       settingsRefreshTimer = null;
       scheduleInlineConversion();
-    }, 1400);
+    }, SETTINGS_UPDATE_CONVERSION_DELAY_MS);
   }
 
   return {
@@ -275,7 +241,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
       let hydrated = false;
 
       try {
-        await refreshSettingsAndRates();
+        await refreshRuntimeSettingsAndRates();
         hydrated = true;
       } catch (error) {
         console.warn("[ccx] Initial settings/rates hydration failed", error);
@@ -332,7 +298,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
       missingRateSnapshot = true;
 
       try {
-        await refreshSettingsAndRates(false);
+        await refreshRuntimeSettingsAndRates(false);
         refreshed = true;
         scheduleInlineConversionFromSettingsUpdate();
       } catch (error) {

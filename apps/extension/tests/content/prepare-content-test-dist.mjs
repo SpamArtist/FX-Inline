@@ -4,6 +4,7 @@ const targetFiles = [
   "apps/extension/test-dist/entrypoints/content/inlineConversion.js",
   "apps/extension/test-dist/entrypoints/content/conversionRuntime.js",
   "apps/extension/test-dist/entrypoints/content/perfLogger.js",
+  "apps/extension/test-dist/entrypoints/content/perfLogger/logger.js",
 ];
 
 for (const targetFile of targetFiles) {
