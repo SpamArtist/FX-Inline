@@ -22,7 +22,7 @@ import {
 import { createRuntimePerfContext } from "./conversionRuntime/logging";
 import { runPartialConversionPass } from "./conversionRuntime/partialPass";
 import { clearTimer } from "./conversionRuntime/timers";
-import { clearInlineConversions } from "./inlineConversion/conversionNodes";
+import { suppressInlineConversions } from "./inlineConversion/conversionNodes";
 import { convertVisiblePrices } from "./inlineConversion";
 
 export type { ContentConversionRuntime } from "./content.types";
@@ -135,7 +135,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
 
       if (!isAutoConversionEnabledForCurrentPage(settings)) {
         pendingMutationRoots.clear();
-        clearInlineConversions(document.body);
+        suppressInlineConversions(document.body);
         return;
       }
 
@@ -307,7 +307,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
     onSettingsStorageUpdate: async (newSettings, oldSettings) => {
       const startedAt = perfLoggingEnabled ? performance.now() : 0;
       let refreshed = false;
-      let preferredCurrencyChanged = false;
+      let shouldScheduleInlineConversion = false;
       let missingRateSnapshot = false;
       const normalizedNewSettings = isUserSettingsSnapshot(newSettings)
         ? newSettings
@@ -316,31 +316,39 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
         ? oldSettings
         : null;
 
-      if (normalizedNewSettings && normalizedOldSettings) {
-        settings = normalizedNewSettings;
-        preferredCurrencyChanged =
-          normalizedNewSettings.preferredCurrency !== normalizedOldSettings.preferredCurrency;
-      }
-
       if (normalizedNewSettings) {
         settings = normalizedNewSettings;
+        const preferredCurrencyChanged = normalizedOldSettings
+          ? normalizedNewSettings.preferredCurrency !== normalizedOldSettings.preferredCurrency
+          : false;
         const autoConversionChanged = normalizedOldSettings
           ? isAutoConversionEnabledForOrigin(normalizedNewSettings, currentPageOrigin) !==
             isAutoConversionEnabledForOrigin(normalizedOldSettings, currentPageOrigin)
           : false;
-        const shouldScheduleInlineConversion =
+        const autoConversionEnabled =
+          isAutoConversionEnabledForOrigin(normalizedNewSettings, currentPageOrigin);
+
+        shouldScheduleInlineConversion =
           preferredCurrencyChanged ||
           autoConversionChanged ||
           !normalizedOldSettings;
-        preferredCurrencyChanged = shouldScheduleInlineConversion;
 
         if (rateSnapshot) {
+          if (autoConversionEnabled && shouldScheduleInlineConversion) {
+            try {
+              await refreshRuntimeSettingsAndRates(false);
+              refreshed = true;
+            } catch (error) {
+              console.warn("[ccx] Failed to refresh rates after settings update", error);
+            }
+          }
+
           if (shouldScheduleInlineConversion) {
             scheduleInlineConversionFromSettingsUpdate();
           }
 
           logSettingsStorageUpdate(startedAt, {
-            refreshed: false,
+            refreshed,
             missingRateSnapshot: false,
             preferredCurrencyChanged: shouldScheduleInlineConversion,
           });
@@ -360,7 +368,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
         logSettingsStorageUpdate(startedAt, {
           refreshed,
           missingRateSnapshot,
-          preferredCurrencyChanged,
+          preferredCurrencyChanged: shouldScheduleInlineConversion,
         });
       }
     },

@@ -2,6 +2,7 @@ import {
   INLINE_CONVERSION_CLASS,
   convertVisiblePrices,
 } from "../../test-dist/entrypoints/content/inlineConversion.js";
+import { suppressInlineConversions } from "../../test-dist/entrypoints/content/inlineConversion/conversionNodes.js";
 
 function createRateSnapshot(overrides = {}) {
   const baseSnapshot = {
@@ -66,6 +67,7 @@ test("refreshes existing wrappers in place and clears wrappers when requested", 
   const initialConvertedText = initialWrapper
     .querySelector(".ccx-converted-amount")
     .textContent;
+  const initialConvertedNode = initialWrapper.querySelector(".ccx-converted-amount");
 
   const refreshedApplied = convertVisiblePrices(
     "EUR",
@@ -81,6 +83,9 @@ test("refreshes existing wrappers in place and clears wrappers when requested", 
 
   const refreshedWrapper = document.querySelector(`#price span.${INLINE_CONVERSION_CLASS}`);
   expect(refreshedWrapper).toBe(initialWrapper);
+  expect(refreshedWrapper.querySelector(".ccx-converted-amount")).toBe(
+    initialConvertedNode,
+  );
 
   const refreshedConvertedText = refreshedWrapper
     .querySelector(".ccx-converted-amount")
@@ -91,6 +96,40 @@ test("refreshes existing wrappers in place and clears wrappers when requested", 
   expect(clearedApplied).toBe(0);
   expect(document.querySelector(`#price span.${INLINE_CONVERSION_CLASS}`)).toBeNull();
   expect(document.getElementById("price").textContent).toContain("$100");
+});
+
+test("suppresses and restores wrappers without replacing converted-amount node", () => {
+  document.body.innerHTML = '<p id="price">Price: $100</p>';
+
+  const initialApplied = convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
+    clearExisting: false,
+  });
+  expect(initialApplied).toBe(1);
+
+  const wrapper = document.querySelector(`#price span.${INLINE_CONVERSION_CLASS}`);
+  const convertedNode = wrapper.querySelector(".ccx-converted-amount");
+  expect(convertedNode).not.toBeNull();
+
+  const suppressedCount = suppressInlineConversions(document.body);
+  expect(suppressedCount).toBe(1);
+  expect(wrapper.querySelector(".ccx-converted-amount")).toBe(convertedNode);
+  expect(wrapper.firstChild.nodeValue).toBe("$100");
+  expect(wrapper.lastChild.nodeValue).toBe("");
+  expect(convertedNode.style.display).toBe("none");
+
+  convertVisiblePrices(
+    "EUR",
+    createRateSnapshot({ rates: { EUR: 0.75 } }),
+    document.body,
+    {
+      clearExisting: false,
+      refreshExisting: true,
+    },
+  );
+
+  expect(wrapper.querySelector(".ccx-converted-amount")).toBe(convertedNode);
+  expect(convertedNode.style.display).toBe("");
+  expect(wrapper.textContent).toMatch(/^\$100\s+\(.+\)$/);
 });
 
 test("skips editable, non-visible, and already-converted wrapper contexts", () => {

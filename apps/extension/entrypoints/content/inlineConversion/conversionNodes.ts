@@ -21,6 +21,50 @@ export function isInlineConversionAddon(node: Element): boolean {
   return node.getAttribute("data-ccx-mode") === INLINE_CONVERSION_ADDON_MODE;
 }
 
+type InlineConversionNodeRefs = {
+  prefixNode: Text;
+  convertedValueNode: HTMLSpanElement;
+  suffixNode: Text;
+};
+
+function ensureInlineConversionNodeRefs(
+  wrapper: HTMLSpanElement,
+): InlineConversionNodeRefs {
+  const firstChild = wrapper.firstChild;
+  const secondChild = wrapper.childNodes.item(1);
+  const thirdChild = wrapper.childNodes.item(2);
+
+  const hasExpectedShape =
+    wrapper.childNodes.length === 3 &&
+    firstChild instanceof Text &&
+    secondChild instanceof HTMLSpanElement &&
+    secondChild.classList.contains("ccx-converted-amount") &&
+    thirdChild instanceof Text;
+
+  if (hasExpectedShape) {
+    return {
+      prefixNode: firstChild,
+      convertedValueNode: secondChild,
+      suffixNode: thirdChild,
+    };
+  }
+
+  wrapper.textContent = "";
+
+  const prefixNode = document.createTextNode("");
+  const convertedValueNode = document.createElement("span");
+  convertedValueNode.className = "ccx-converted-amount";
+  const suffixNode = document.createTextNode("");
+
+  wrapper.append(prefixNode, convertedValueNode, suffixNode);
+
+  return {
+    prefixNode,
+    convertedValueNode,
+    suffixNode,
+  };
+}
+
 export function setInlineConversionContent(
   wrapper: HTMLSpanElement,
   convertedAmount: string,
@@ -28,15 +72,17 @@ export function setInlineConversionContent(
     originalText?: string;
   },
 ) {
-  wrapper.textContent =
+  const { prefixNode, convertedValueNode, suffixNode } =
+    ensureInlineConversionNodeRefs(wrapper);
+  const prefixText =
     options?.originalText === undefined ? " (" : `${options.originalText} (`;
 
-  const convertedValueNode = document.createElement("span");
-  convertedValueNode.className = "ccx-converted-amount";
+  wrapper.removeAttribute("data-ccx-suppressed");
+  wrapper.style.removeProperty("display");
+  convertedValueNode.style.removeProperty("display");
+  prefixNode.nodeValue = prefixText;
   convertedValueNode.textContent = convertedAmount;
-
-  wrapper.appendChild(convertedValueNode);
-  wrapper.append(")");
+  suffixNode.nodeValue = ")";
 }
 
 export function applyConvertedAmountColor(
@@ -64,6 +110,31 @@ export function clearInlineConversions(root: ParentNode = document.body) {
 
   if (root instanceof Element || root instanceof Document) {
     root.normalize();
+  }
+
+  return convertedNodes.length;
+}
+
+export function suppressInlineConversions(root: ParentNode = document.body) {
+  const convertedNodes = root.querySelectorAll(`span.${INLINE_CONVERSION_CLASS}`);
+  if (!convertedNodes.length) return 0;
+
+  for (const node of convertedNodes) {
+    if (!(node instanceof HTMLSpanElement)) continue;
+
+    node.setAttribute("data-ccx-suppressed", "true");
+
+    if (isInlineConversionAddon(node)) {
+      node.style.setProperty("display", "none");
+      continue;
+    }
+
+    const { prefixNode, convertedValueNode, suffixNode } =
+      ensureInlineConversionNodeRefs(node);
+
+    prefixNode.nodeValue = getOriginalText(node);
+    suffixNode.nodeValue = "";
+    convertedValueNode.style.setProperty("display", "none");
   }
 
   return convertedNodes.length;

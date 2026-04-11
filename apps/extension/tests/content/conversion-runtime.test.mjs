@@ -3,6 +3,7 @@ import { jest } from "@jest/globals";
 const getUserSettingsMock = jest.fn();
 const getRatesMock = jest.fn();
 const convertVisiblePricesMock = jest.fn();
+const suppressInlineConversionsMock = jest.fn();
 
 function createRateSnapshot(overrides = {}) {
   const base = {
@@ -30,6 +31,19 @@ async function importRuntimeModuleWithMocks() {
 
   await jest.unstable_mockModule("@/utils/appStorage", () => ({
     getUserSettings: getUserSettingsMock,
+    getOriginFromUrl: (url) => {
+      try {
+        const parsed = new URL(url);
+        return parsed.origin;
+      } catch {
+        return null;
+      }
+    },
+    isAutoConversionEnabledForOrigin: (settings, origin) => {
+      if (settings?.globalAutoConversionEnabled === false) return false;
+      if (!origin) return true;
+      return settings?.localAutoConversionByOrigin?.[origin] !== false;
+    },
   }));
   await jest.unstable_mockModule("@/utils/rates", () => ({
     getRates: getRatesMock,
@@ -42,6 +56,12 @@ async function importRuntimeModuleWithMocks() {
       convertVisiblePrices: convertVisiblePricesMock,
     }),
   );
+  await jest.unstable_mockModule(
+    "../../test-dist/entrypoints/content/inlineConversion/conversionNodes.js",
+    () => ({
+      suppressInlineConversions: suppressInlineConversionsMock,
+    }),
+  );
 
   return import("../../test-dist/entrypoints/content/conversionRuntime.js");
 }
@@ -50,9 +70,14 @@ beforeEach(() => {
   jest.useFakeTimers();
   jest.clearAllMocks();
 
-  getUserSettingsMock.mockResolvedValue({ preferredCurrency: "EUR" });
+  getUserSettingsMock.mockResolvedValue({
+    preferredCurrency: "EUR",
+    globalAutoConversionEnabled: true,
+    localAutoConversionByOrigin: {},
+  });
   getRatesMock.mockResolvedValue(createRateSnapshot());
   convertVisiblePricesMock.mockReturnValue(1);
+  suppressInlineConversionsMock.mockReturnValue(0);
 
   document.body.innerHTML = "<div id=\"root\"></div>";
   window.localStorage.removeItem("ccx:perf");
@@ -109,8 +134,8 @@ test("settings updates debounce conversion scheduling when preferred currency ch
   jest.advanceTimersByTime(1);
   expect(convertVisiblePricesMock).toHaveBeenCalledTimes(1);
 
-  expect(getUserSettingsMock).toHaveBeenCalledTimes(1);
-  expect(getRatesMock).toHaveBeenCalledTimes(1);
+  expect(getUserSettingsMock).toHaveBeenCalledTimes(2);
+  expect(getRatesMock).toHaveBeenCalledTimes(2);
 });
 
 test("partial conversion defers remaining roots when time budget is exceeded", async () => {
@@ -171,4 +196,50 @@ test("shouldIgnoreMutations stays true until suppression delay is released", asy
 
   jest.advanceTimersByTime(1);
   expect(runtime.shouldIgnoreMutations()).toBe(false);
+});
+
+test("disabling auto-conversion suppresses wrappers without running conversion", async () => {
+  getUserSettingsMock.mockResolvedValue({
+    preferredCurrency: "EUR",
+    globalAutoConversionEnabled: false,
+    localAutoConversionByOrigin: {},
+  });
+
+  const { createContentConversionRuntime } = await importRuntimeModuleWithMocks();
+  const runtime = createContentConversionRuntime();
+
+  await runtime.initialize();
+  jest.advanceTimersByTime(200);
+
+  expect(suppressInlineConversionsMock).toHaveBeenCalledTimes(1);
+  expect(suppressInlineConversionsMock).toHaveBeenCalledWith(document.body);
+  expect(convertVisiblePricesMock).toHaveBeenCalledTimes(0);
+});
+
+test("re-enabling auto-conversion refreshes rates before scheduling in-place updates", async () => {
+  const { createContentConversionRuntime } = await importRuntimeModuleWithMocks();
+  const runtime = createContentConversionRuntime();
+
+  await runtime.initialize();
+  jest.advanceTimersByTime(200);
+  convertVisiblePricesMock.mockClear();
+
+  await runtime.onSettingsStorageUpdate(
+    {
+      preferredCurrency: "EUR",
+      globalAutoConversionEnabled: true,
+      localAutoConversionByOrigin: {},
+    },
+    {
+      preferredCurrency: "EUR",
+      globalAutoConversionEnabled: false,
+      localAutoConversionByOrigin: {},
+    },
+  );
+
+  expect(getRatesMock).toHaveBeenCalledTimes(2);
+  expect(getRatesMock).toHaveBeenLastCalledWith({ forceRefresh: false });
+
+  jest.advanceTimersByTime(1600);
+  expect(convertVisiblePricesMock).toHaveBeenCalledTimes(1);
 });

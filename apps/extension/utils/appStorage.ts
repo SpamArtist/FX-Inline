@@ -158,6 +158,12 @@ export function isLocalAutoConversionEnabledForOrigin(
   origin: string | null,
 ): boolean {
   if (!origin) return false;
+  if (
+    !settings.localAutoConversionByOrigin ||
+    typeof settings.localAutoConversionByOrigin !== "object"
+  ) {
+    return true;
+  }
 
   return settings.localAutoConversionByOrigin[origin] !== false;
 }
