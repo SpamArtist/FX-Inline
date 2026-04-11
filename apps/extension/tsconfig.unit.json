@@ -19,6 +19,8 @@
     "utils/enums.ts",
     "utils/mutationRoots.ts",
     "utils/rateMath.ts",
-    "utils/ratePolicy.ts"
+    "utils/ratePolicy.ts",
+    "hooks/useCurrencyReducer.state.ts",
+    "hooks/useCurrencyReducer.hydration.ts"
   ]
 }

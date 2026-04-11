@@ -4,9 +4,7 @@ import { collectMutationConversionRoots } from "@/utils/mutationRoots";
 import { parseCurrencyValue } from "@/utils/utils";
 import { storage } from "wxt/utils/storage";
 import { createContentConversionRuntime } from "./conversionRuntime";
-import { createSelectionPopupController } from "./selectionPopup";
-import contentBoxStyles from "./content.css?inline";
-import converterThemeStyles from "@/styles/converter-theme.css?inline";
+import { createLazySelectionPopupControllerLoader } from "./selectionPopupLoader";
 
 const USER_SETTINGS_STORAGE_KEY = SETTINGS_KEY;
 const PORTAL_DROPDOWN_CLASS = "ccx-dropdown-menu-content";
@@ -37,16 +35,15 @@ export default defineContentScript({
   matches: ["<all_urls>"],
   cssInjectionMode: "manual",
   async main() {
-    const popupController = createSelectionPopupController(
-      `${converterThemeStyles}\n${contentBoxStyles}`,
-    );
+    const popupControllerLoader = createLazySelectionPopupControllerLoader();
     const conversionRuntime = createContentConversionRuntime();
     let uiCaptureActive = false;
 
     function isExtensionUiEvent(event: Event): boolean {
       if (!(event.target instanceof Node)) return false;
+      const popupController = popupControllerLoader.getSync();
 
-      if (popupController.containsTarget(event.target)) {
+      if (popupController?.containsTarget(event.target)) {
         return true;
       }
 
@@ -57,7 +54,8 @@ export default defineContentScript({
     }
 
     const swallowUiEvent = (event: Event) => {
-      if (!popupController.getRoot()) return;
+      const popupController = popupControllerLoader.getSync();
+      if (!popupController?.getRoot()) return;
       if (!isExtensionUiEvent(event)) return;
       stopEventPropagation(event);
     };
@@ -76,7 +74,7 @@ export default defineContentScript({
     }
 
     function removePopupAndCapture() {
-      popupController.removePopup();
+      popupControllerLoader.getSync()?.removePopup();
       setUiCaptureActive(false);
     }
 
@@ -90,7 +88,10 @@ export default defineContentScript({
     const mutationObserver = new MutationObserver((mutations) => {
       if (conversionRuntime.shouldIgnoreMutations()) return;
 
-      const roots = collectMutationConversionRoots(mutations, popupController.getRoot());
+      const roots = collectMutationConversionRoots(
+        mutations,
+        popupControllerLoader.getSync()?.getRoot() ?? null,
+      );
       if (!roots.length) return;
 
       conversionRuntime.enqueueMutationRoots(roots);
@@ -102,7 +103,7 @@ export default defineContentScript({
       characterData: true,
     });
 
-    const onMouseUp = (event: MouseEvent) => {
+    async function handleMouseUp(event: MouseEvent): Promise<void> {
       if (isExtensionUiEvent(event)) return;
 
       const selection = window.getSelection();
@@ -128,17 +129,25 @@ export default defineContentScript({
       }
 
       const sourceCurrency = currency ?? DEFAULT_STARTING_CURRENCY;
+      const popupController = await popupControllerLoader.get();
       popupController.showPopup(x, y, value.toString(), sourceCurrency);
       setUiCaptureActive(true);
       conversionRuntime.recordSelectionConversion();
+    }
+
+    const onMouseUp = (event: MouseEvent) => {
+      void handleMouseUp(event).catch((error) => {
+        console.warn("[ccx] Failed to show selection popup", error);
+      });
     };
 
     const onMouseDown = (event: MouseEvent) => {
       if (isExtensionUiEvent(event)) return;
       if (!(event.target instanceof Node)) return;
 
-      const popupRoot = popupController.getRoot();
-      if (popupRoot && !popupController.containsTarget(event.target)) {
+      const popupController = popupControllerLoader.getSync();
+      const popupRoot = popupController?.getRoot() ?? null;
+      if (popupRoot && popupController && !popupController.containsTarget(event.target)) {
         const selection = window.getSelection();
         if (!selection?.toString().trim()) {
           removePopupAndCapture();
@@ -153,7 +162,7 @@ export default defineContentScript({
       mutationObserver.disconnect();
       settingsUnwatch();
       setUiCaptureActive(false);
-      popupController.destroy();
+      popupControllerLoader.getSync()?.destroy();
       conversionRuntime.cleanup();
       document.removeEventListener("mouseup", onMouseUp);
       document.removeEventListener("mousedown", onMouseDown);

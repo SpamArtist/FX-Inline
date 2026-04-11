@@ -1,4 +1,4 @@
-import type { ConverterShellVariant, ConvertorHodProps } from "./Convertor.types";
+import type { ConvertorHodProps } from "./Convertor.types";
 import "./Convertor.css";
 
 export type { ConverterShellVariant } from "./Convertor.types";

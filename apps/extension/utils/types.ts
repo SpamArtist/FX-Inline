@@ -16,3 +16,6 @@ export interface IDispatchAction {
     currency?: CurrencyCode;
   };
 }
+
+export type CurrencyState = ICurrencyState;
+export type DispatchAction = IDispatchAction;

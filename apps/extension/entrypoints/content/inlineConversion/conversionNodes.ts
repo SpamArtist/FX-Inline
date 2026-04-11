@@ -1,0 +1,146 @@
+import { CurrencyCode } from "@/utils/enums";
+import type { RateSnapshot } from "@/utils/rates.types";
+import { extractCurrencyTextMatches } from "@/utils/utils";
+import {
+  INLINE_CONVERSION_ADDON_MODE,
+  INLINE_CONVERSION_CLASS,
+} from "./constants";
+import { getConvertedAmountText } from "./amountFormatting";
+
+export function getOriginalText(node: Element): string {
+  return node.getAttribute("data-original") || node.textContent || "";
+}
+
+export function replaceWithOriginalText(node: Element, fallbackText?: string) {
+  node.replaceWith(
+    document.createTextNode(fallbackText ?? getOriginalText(node)),
+  );
+}
+
+export function isInlineConversionAddon(node: Element): boolean {
+  return node.getAttribute("data-ccx-mode") === INLINE_CONVERSION_ADDON_MODE;
+}
+
+export function setInlineConversionContent(
+  wrapper: HTMLSpanElement,
+  convertedAmount: string,
+  options?: {
+    originalText?: string;
+  },
+) {
+  wrapper.textContent =
+    options?.originalText === undefined ? " (" : `${options.originalText} (`;
+
+  const convertedValueNode = document.createElement("span");
+  convertedValueNode.className = "ccx-converted-amount";
+  convertedValueNode.textContent = convertedAmount;
+
+  wrapper.appendChild(convertedValueNode);
+  wrapper.append(")");
+}
+
+export function applyConvertedAmountColor(
+  wrapper: HTMLSpanElement,
+  useLightColor: boolean,
+) {
+  wrapper.style.setProperty(
+    "--ccx-converted-color",
+    useLightColor ? "#93c5fd" : "#355aa8",
+  );
+}
+
+export function clearInlineConversions(root: ParentNode = document.body) {
+  const convertedNodes = root.querySelectorAll(`span.${INLINE_CONVERSION_CLASS}`);
+  if (!convertedNodes.length) return 0;
+
+  for (const node of convertedNodes) {
+    if (isInlineConversionAddon(node)) {
+      node.remove();
+      continue;
+    }
+
+    replaceWithOriginalText(node);
+  }
+
+  if (root instanceof Element || root instanceof Document) {
+    root.normalize();
+  }
+
+  return convertedNodes.length;
+}
+
+export function refreshExistingInlineConversions(
+  preferredCurrency: CurrencyCode,
+  rateSnapshot: RateSnapshot,
+  root: ParentNode,
+  localeHint: string | null,
+): number {
+  const convertedNodes = root.querySelectorAll(`span.${INLINE_CONVERSION_CLASS}`);
+  if (!convertedNodes.length) return 0;
+
+  let refreshedConversions = 0;
+
+  for (const node of convertedNodes) {
+    const isAddon = isInlineConversionAddon(node);
+    const originalText = getOriginalText(node);
+    if (!originalText.trim()) {
+      if (isAddon) {
+        node.remove();
+      } else {
+        replaceWithOriginalText(node, originalText);
+      }
+      continue;
+    }
+
+    const parsed = extractCurrencyTextMatches(originalText, localeHint);
+    const matched = parsed.find((item) => item.raw === originalText) || parsed[0];
+
+    if (!matched) {
+      if (isAddon) {
+        node.remove();
+      } else {
+        replaceWithOriginalText(node, originalText);
+      }
+      continue;
+    }
+
+    const convertedAmount = getConvertedAmountText(
+      matched,
+      preferredCurrency,
+      rateSnapshot,
+      localeHint,
+    );
+
+    if (!convertedAmount) {
+      if (isAddon) {
+        node.remove();
+      } else {
+        replaceWithOriginalText(node, originalText);
+      }
+      continue;
+    }
+
+    if (!(node instanceof HTMLSpanElement)) continue;
+
+    setInlineConversionContent(node, convertedAmount, {
+      originalText: isAddon ? undefined : originalText,
+    });
+    refreshedConversions += 1;
+  }
+
+  return refreshedConversions;
+}
+
+export function getInlineAddonNode(root: Element): HTMLSpanElement | null {
+  for (const child of root.children) {
+    if (
+      child instanceof HTMLSpanElement &&
+      child.classList.contains(INLINE_CONVERSION_CLASS) &&
+      child.getAttribute("data-ccx-mode") === INLINE_CONVERSION_ADDON_MODE
+    ) {
+      return child;
+    }
+  }
+
+  return null;
+}
