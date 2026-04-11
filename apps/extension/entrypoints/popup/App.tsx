@@ -11,6 +11,8 @@ import {
 import { DEFAULT_STARTING_CURRENCY } from "@/utils/constants";
 import { ActionType, type CurrencyCode } from "@/utils/enums";
 import SwitchIcon from "@/assets/switch.svg";
+import ToggleOffIcon from "@/assets/toggle-off.svg";
+import ToggleOnIcon from "@/assets/toggle-on.svg";
 import { ArrowLeftRight, Cog } from "lucide-react";
 import { useEffect, useState } from "react";
 import { browser } from "wxt/browser";
@@ -126,6 +128,7 @@ function App() {
 
   const sourceCurrency = currenciesState[0];
   const targetCurrency = currenciesState[1];
+  const LocalToggleIcon = localAutoConversionEnabled ? ToggleOnIcon : ToggleOffIcon;
 
   function onSwapCurrencies() {
     if (!sourceCurrency?.id) return;
@@ -179,7 +182,7 @@ function App() {
                   : "Local auto conversion is unavailable on this page"
               }
             >
-              <SwitchIcon aria-hidden />
+              <LocalToggleIcon aria-hidden />
             </button>
 
             <button
