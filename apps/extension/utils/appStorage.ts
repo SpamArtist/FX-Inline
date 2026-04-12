@@ -1,5 +1,6 @@
 import { storage } from "wxt/utils/storage";
 import { DEFAULT_STARTING_CURRENCY } from "./constants";
+import { isCurrencyCode } from "./currencyCodes";
 import { CurrencyCode } from "./enums";
 import type {
   LocalAutoConversionByOrigin,
@@ -7,10 +8,6 @@ import type {
 } from "./appStorage.types";
 
 const SETTINGS_KEY = "local:user-settings";
-
-const VALID_CURRENCY_CODES: ReadonlySet<string> = new Set(
-  Object.values(CurrencyCode),
-);
 
 const DEFAULT_USER_SETTINGS: UserSettings = {
   preferredCurrency: DEFAULT_STARTING_CURRENCY,
@@ -23,7 +20,7 @@ const userSettingsItem = storage.defineItem<UserSettings>(SETTINGS_KEY, {
 });
 
 function asCurrencyCode(value: string | null | undefined): CurrencyCode {
-  return typeof value === "string" && VALID_CURRENCY_CODES.has(value)
+  return typeof value === "string" && isCurrencyCode(value)
     ? (value as CurrencyCode)
     : DEFAULT_USER_SETTINGS.preferredCurrency;
 }
@@ -129,10 +126,6 @@ export async function getUserSettings(): Promise<UserSettings> {
   }
 
   return sanitized;
-}
-
-export async function setUserSettings(settings: UserSettings): Promise<UserSettings> {
-  return persistSanitizedUserSettings(settings);
 }
 
 export async function updateUserSettings(

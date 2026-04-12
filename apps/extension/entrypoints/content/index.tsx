@@ -5,22 +5,12 @@ import { parseCurrencyValue } from "@/utils/utils";
 import { storage } from "wxt/utils/storage";
 import { createContentConversionRuntime } from "./conversionRuntime";
 import { createLazySelectionPopupControllerLoader } from "./selectionPopupLoader";
+import {
+  CONTENT_UI_CAPTURE_EVENT_TYPES,
+  hasContentRuntimeUiContractTarget,
+} from "./uiContracts";
 
 const USER_SETTINGS_STORAGE_KEY = SETTINGS_KEY;
-const PORTAL_DROPDOWN_CLASS = "ccx-dropdown-menu-content";
-const UI_CAPTURE_EVENT_TYPES = [
-  "pointerdown",
-  "mousedown",
-  "click",
-  "contextmenu",
-] as const;
-
-function getEventElementTarget(target: EventTarget | null): Element | null {
-  if (!target) return null;
-  if (target instanceof Element) return target;
-  if (target instanceof Node) return target.parentElement;
-  return null;
-}
 
 function stopEventPropagation(event: Event) {
   if (event.cancelable) {
@@ -40,17 +30,12 @@ export default defineContentScript({
     let uiCaptureActive = false;
 
     function isExtensionUiEvent(event: Event): boolean {
-      if (!(event.target instanceof Node)) return false;
       const popupController = popupControllerLoader.getSync();
-
-      if (popupController?.containsTarget(event.target)) {
-        return true;
-      }
-
-      const elementTarget = getEventElementTarget(event.target);
-      if (!elementTarget) return false;
-
-      return Boolean(elementTarget.closest(`.${PORTAL_DROPDOWN_CLASS}`));
+      return hasContentRuntimeUiContractTarget({
+        target: event.target,
+        containsSelectionPopupTarget: (target) =>
+          popupController?.containsTarget(target) ?? false,
+      });
     }
 
     const swallowUiEvent = (event: Event) => {
@@ -64,7 +49,7 @@ export default defineContentScript({
       if (uiCaptureActive === next) return;
       uiCaptureActive = next;
 
-      for (const eventType of UI_CAPTURE_EVENT_TYPES) {
+      for (const eventType of CONTENT_UI_CAPTURE_EVENT_TYPES) {
         if (next) {
           document.addEventListener(eventType, swallowUiEvent, true);
         } else {
@@ -132,7 +117,6 @@ export default defineContentScript({
       const popupController = await popupControllerLoader.get();
       popupController.showPopup(x, y, value.toString(), sourceCurrency);
       setUiCaptureActive(true);
-      conversionRuntime.recordSelectionConversion();
     }
 
     const onMouseUp = (event: MouseEvent) => {

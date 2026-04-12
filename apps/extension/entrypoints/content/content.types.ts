@@ -19,7 +19,6 @@ export type ContentConversionRuntime = {
     oldSettings?: UserSettings | null,
   ) => Promise<void>;
   enqueueMutationRoots: (roots: ParentNode[]) => void;
-  recordSelectionConversion: () => void;
   shouldIgnoreMutations: () => boolean;
   cleanup: () => void;
 };

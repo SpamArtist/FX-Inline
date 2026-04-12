@@ -381,7 +381,6 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
 
       schedulePartialInlineConversion();
     },
-    recordSelectionConversion: () => {},
     shouldIgnoreMutations: () => {
       return isApplyingInlineConversion || suppressMutationDepth > 0;
     },

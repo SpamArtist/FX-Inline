@@ -1,14 +1,11 @@
 import { DEFAULT_STARTING_CURRENCY } from "../utils/constants";
+import { isCurrencyCode } from "../utils/currencyCodes";
 import { ActionType, CurrencyCode } from "../utils/enums";
 import { convertAmountWithSnapshot, formatConvertedAmount } from "../utils/rateMath";
 import type { RateSnapshot } from "../utils/rates.types";
 import type { CurrencyState, DispatchAction } from "../utils/types";
 
 export const DEFAULT_SECONDARY_CURRENCY = CurrencyCode["UNITED STATES DOLLAR"];
-
-const VALID_CURRENCY_CODES: ReadonlySet<string> = new Set(
-  Object.values(CurrencyCode),
-);
 
 type CurrencyStateFromCode = Pick<CurrencyState, "code" | "icon">;
 
@@ -66,7 +63,7 @@ export function createInitialCurrenciesState({
 }
 
 function asCurrencyCode(value: string | undefined): CurrencyCode | null {
-  return value && VALID_CURRENCY_CODES.has(value) ? (value as CurrencyCode) : null;
+  return value && isCurrencyCode(value) ? value : null;
 }
 
 function convertAmount(

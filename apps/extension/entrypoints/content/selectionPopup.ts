@@ -8,10 +8,7 @@ import {
 import type { CurrencyCode } from "@/utils/enums";
 import type { CurrencyState } from "@/utils/types";
 import type { SelectionPopupController } from "./content.types";
-import {
-  createSelectionPopupStateStore,
-  type SelectionPopupStateStore,
-} from "./selectionPopup/state";
+import { createSelectionPopupStateStore } from "./selectionPopup/state";
 
 type PopupView = {
   root: HTMLElement;
@@ -121,7 +118,6 @@ function createSelectionPopupView(
   shellInner.append(header, layout);
   root.appendChild(shellInner);
 
-  const rows: AmountRowView[] = [sourceRow, targetRow];
   const locale = resolveLocale(null);
   const store = createSelectionPopupStateStore({
     amount,

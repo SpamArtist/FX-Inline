@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { CURRENCY_SYMBOLS, ISO_CODES } from "./constants";
+import { isCurrencyCode } from "./currencyCodes";
 import { CurrencyCode } from "./enums";
 import { getMagnitudeAliasMap } from "./magnitudeProfiles";
 import type {
@@ -13,8 +14,6 @@ import type {
 export function cn(...inputs: ClassValue[]) {
   return clsx(inputs);
 }
-
-const CURRENCY_CODE_VALUES = new Set(Object.values(CurrencyCode));
 
 const CURRENCY_SYMBOL_TO_CODE: Partial<Record<string, CurrencyCode>> = {
   $: CurrencyCode["UNITED STATES DOLLAR"],
@@ -154,9 +153,7 @@ function getParserArtifacts(localeHint?: string | null): ParserArtifacts {
 }
 
 function toCurrencyCode(value: string): CurrencyCode | null {
-  return CURRENCY_CODE_VALUES.has(value as CurrencyCode)
-    ? (value as CurrencyCode)
-    : null;
+  return isCurrencyCode(value) ? value : null;
 }
 
 function getWordLikeCurrencyTokenRegex(currency: CurrencyCode): RegExp {

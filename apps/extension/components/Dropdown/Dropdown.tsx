@@ -25,7 +25,7 @@ export default function Dropdown<TValue extends string>({
         <span className="ccx-dropdown-trigger__label">{displayOption.label}</span>
         {!isDisabled && <ChevronDown className="ccx-dropdown-trigger__arrow" aria-hidden />}
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="ccx-dropdown-menu-content ccx-dropdown-content">
+      <DropdownMenuContent className="ccx-dropdown-content">
         {options.map(({ label, value, icon }) => (
           <DropdownMenuItem
             key={value}

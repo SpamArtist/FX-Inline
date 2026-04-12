@@ -1,5 +1,10 @@
-import currencies from "@/assets/currency.json";
-import { CURRENCY_CODE_MAP, DEFAULT_STARTING_CURRENCY } from "@/utils/constants";
+import {
+  applyHydratedBootstrapState,
+  createBootstrapCurrenciesState,
+  createCurrencyIdFactory,
+  getCurrencyStateFromCode,
+} from "@/hooks/currencyStateBootstrap";
+import { DEFAULT_STARTING_CURRENCY } from "@/utils/constants";
 import { ActionType, CurrencyCode } from "@/utils/enums";
 import type { RateSnapshot } from "@/utils/rates.types";
 import type { CurrencyState, DispatchAction } from "@/utils/types";
@@ -7,34 +12,10 @@ import type { CurrencyReducerHydrationDeps } from "@/hooks/useCurrencyReducer.hy
 import { loadCurrencyReducerHydration } from "@/hooks/useCurrencyReducer.hydration";
 import {
   DEFAULT_SECONDARY_CURRENCY,
-  applyPreferredCurrencyPreference,
-  createInitialCurrenciesState,
-  recalculateFromIndex,
   reduceCurrencyState,
 } from "@/hooks/useCurrencyReducer.state";
 
-type CurrencyListEntry = {
-  code: CurrencyCode;
-  logo: string;
-};
-
-const CURRENCY_LIST_BY_CODE = new Map<CurrencyCode, CurrencyListEntry>(
-  (currencies as CurrencyListEntry[]).map((currency) => [currency.code, currency]),
-);
-
-let currencyIdCounter = 0;
-
-function createCurrencyId() {
-  currencyIdCounter += 1;
-  return `currency-${currencyIdCounter}`;
-}
-
-function getCurrencyStateFromCode(code: CurrencyCode) {
-  const currencyFromMap = CURRENCY_CODE_MAP[code];
-  if (currencyFromMap) return currencyFromMap;
-
-  return { code, icon: CURRENCY_LIST_BY_CODE.get(code)?.logo || "" };
-}
+const createCurrencyId = createCurrencyIdFactory();
 
 function createAmountUpdateAction(
   id: string,
@@ -81,12 +62,11 @@ export function createSelectionPopupStateStore({
   let preferredCurrency = DEFAULT_STARTING_CURRENCY;
   let rateSnapshot: RateSnapshot | null = null;
 
-  let currenciesState = createInitialCurrenciesState({
+  let currenciesState = createBootstrapCurrenciesState({
     amount,
     sourceCurrency,
     preferredCurrency: DEFAULT_SECONDARY_CURRENCY,
     createCurrencyId,
-    getCurrencyStateFromCode,
   });
 
   const listeners = new Set<SelectionPopupStateListener>();
@@ -128,32 +108,18 @@ export function createSelectionPopupStateStore({
     const hydratedState = await loadCurrencyReducerHydration(hydrationDeps);
     if (destroyed) return;
 
-    const preferredCurrencyChanged =
-      Boolean(hydratedState.preferredCurrency) &&
-      hydratedState.preferredCurrency !== preferredCurrency;
-    const hasRateSnapshot = hydratedState.rateSnapshot !== null;
-
-    if (preferredCurrencyChanged && hydratedState.preferredCurrency) {
-      preferredCurrency = hydratedState.preferredCurrency;
-    }
-
-    if (!preferredCurrencyChanged && !hasRateSnapshot) return;
-
-    if (hasRateSnapshot) {
-      rateSnapshot = hydratedState.rateSnapshot;
-    }
-
-    if (hasRateSnapshot) {
-      currenciesState = recalculateFromIndex(currenciesState, 0, rateSnapshot);
-    }
-
-    currenciesState = applyPreferredCurrencyPreference(
+    const next = applyHydratedBootstrapState({
       currenciesState,
       preferredCurrency,
       rateSnapshot,
-      getCurrencyStateFromCode,
-    );
+      hydratedState,
+    });
 
+    if (!next.changed) return;
+
+    preferredCurrency = next.preferredCurrency;
+    rateSnapshot = next.rateSnapshot;
+    currenciesState = next.currenciesState;
     notify();
   };
 

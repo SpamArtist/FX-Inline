@@ -1,35 +1,22 @@
-import currencies from "@/assets/currency.json";
-import { CURRENCY_CODE_MAP, DEFAULT_STARTING_CURRENCY } from "@/utils/constants";
+import { DEFAULT_STARTING_CURRENCY } from "@/utils/constants";
 import { CurrencyCode } from "@/utils/enums";
 import type { RateSnapshot } from "@/utils/rates.types";
 import type { CurrencyState, DispatchAction } from "@/utils/types";
 import { useCallback, useEffect, useState } from "react";
+import {
+  applyHydratedBootstrapState,
+  createBootstrapCurrenciesState,
+  createCurrencyIdFactory,
+  getCurrencyStateFromCode,
+} from "./currencyStateBootstrap";
 import { loadCurrencyReducerHydration } from "./useCurrencyReducer.hydration";
 import {
   DEFAULT_SECONDARY_CURRENCY,
-  applyPreferredCurrencyPreference,
-  createInitialCurrenciesState,
   recalculateFromIndex,
   reduceCurrencyState,
 } from "./useCurrencyReducer.state";
 
-const CURRENCY_LIST_BY_CODE = new Map(
-  currencies.map((currency) => [currency.code as CurrencyCode, currency]),
-);
-
-let currencyIdCounter = 0;
-
-function createCurrencyId() {
-  currencyIdCounter += 1;
-  return `currency-${currencyIdCounter}`;
-}
-
-function getCurrencyStateFromCode(code: CurrencyCode) {
-  const currencyFromMap = CURRENCY_CODE_MAP[code];
-  if (currencyFromMap) return currencyFromMap;
-
-  return { code, icon: CURRENCY_LIST_BY_CODE.get(code)?.logo || "" };
-}
+const createCurrencyId = createCurrencyIdFactory();
 
 export const useCurrencyReducer = ({
   number,
@@ -44,12 +31,11 @@ export const useCurrencyReducer = ({
   );
 
   const [currenciesState, setCurrenciesState] = useState<CurrencyState[]>(() => {
-    return createInitialCurrenciesState({
+    return createBootstrapCurrenciesState({
       amount: number,
       sourceCurrency: currency,
       preferredCurrency: DEFAULT_SECONDARY_CURRENCY,
       createCurrencyId,
-      getCurrencyStateFromCode,
     });
   });
 
@@ -65,6 +51,16 @@ export const useCurrencyReducer = ({
         setPreferredCurrency(hydratedState.preferredCurrency);
       }
       setRateSnapshot(hydratedState.rateSnapshot);
+
+      setCurrenciesState((current) => {
+        const next = applyHydratedBootstrapState({
+          currenciesState: current,
+          preferredCurrency,
+          rateSnapshot,
+          hydratedState,
+        });
+        return next.changed ? next.currenciesState : current;
+      });
     };
 
     loadSettingsAndRates();
@@ -79,17 +75,6 @@ export const useCurrencyReducer = ({
 
     setCurrenciesState((current) => recalculateFromIndex(current, 0, rateSnapshot));
   }, [rateSnapshot]);
-
-  useEffect(() => {
-    setCurrenciesState((current) =>
-      applyPreferredCurrencyPreference(
-        current,
-        preferredCurrency,
-        rateSnapshot,
-        getCurrencyStateFromCode,
-      ),
-    );
-  }, [preferredCurrency, rateSnapshot]);
 
   const dispatch = useCallback(
     (action: DispatchAction) => {

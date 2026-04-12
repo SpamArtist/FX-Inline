@@ -2,6 +2,7 @@ import * as React from "react"
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
 import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react"
 
+import { withContentUiDropdownContractClassName } from "@/entrypoints/content/uiContracts"
 import { cn } from "@/utils/utils"
 
 function DropdownMenu({
@@ -39,7 +40,10 @@ function DropdownMenuContent({
       <DropdownMenuPrimitive.Content
         data-slot="dropdown-menu-content"
         sideOffset={sideOffset}
-        className={cn("ccx-dropdown-menu-content ccx-radix-dropdown-content", className)}
+        className={cn(
+          withContentUiDropdownContractClassName("ccx-radix-dropdown-content"),
+          className,
+        )}
         {...props}
       />
     </DropdownMenuPrimitive.Portal>
