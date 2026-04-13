@@ -34,6 +34,31 @@ test("parseCurrencyValue handles signs, separators, and lowercase iso", () => {
   }
 });
 
+test("parseCurrencyValue supports composite dollar symbols", () => {
+  const cases = [
+    ["R$ 10", 10, "BRL"],
+    ["10R$", 10, "BRL"],
+    ["RD$ 40", 40, "DOP"],
+    ["40 RD$", 40, "DOP"],
+    ["A$3", 3, "AUD"],
+    ["AU$ 4", 4, "AUD"],
+    ["CA$ 5", 5, "CAD"],
+    ["NZ$6", 6, "NZD"],
+    ["HK$7", 7, "HKD"],
+    ["MX$8", 8, "MXN"],
+    ["NT$9", 9, "TWD"],
+    ["US$10", 10, "USD"],
+    ["EC$11", 11, "XCD"],
+  ];
+
+  for (const [input, value, currency] of cases) {
+    const parsed = parseCurrencyValue(input);
+    expect(parsed.valid).toBe(true);
+    expect(parsed.value).toBe(value);
+    expect(parsed.currency).toBe(currency);
+  }
+});
+
 test("parseCurrencyValue supports lakh/lac/crore/cr with currency prefix and suffix", () => {
   const cases = [
     ["1 Lakh INR", 100000, "INR"],
@@ -112,6 +137,54 @@ test("extractCurrencyTextMatches supports mixed symbol and ISO snippets", () => 
   expect(matches[0].value).toBe(99.99);
   expect(matches[1].currency).toBe("CAD");
   expect(matches[2].value).toBe(10);
+});
+
+test("extractCurrencyTextMatches supports composite dollar symbols", () => {
+  const matches = extractCurrencyTextMatches(
+    "Rates: R$ 10 | RD$ 20 | A$3 | AU$4 | CA$5 | NZ$6 | HK$7 | MX$8 | NT$9 | US$10 | EC$11 | $12",
+  );
+
+  expect(matches).toHaveLength(12);
+  expect(matches.map((match) => match.currency)).toEqual([
+    "BRL",
+    "DOP",
+    "AUD",
+    "AUD",
+    "CAD",
+    "NZD",
+    "HKD",
+    "MXN",
+    "TWD",
+    "USD",
+    "XCD",
+    "USD",
+  ]);
+  expect(matches.map((match) => match.value)).toEqual([
+    10,
+    20,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+  ]);
+});
+
+test("extractCurrencyTextMatches prefers composite tokens over plain dollar", () => {
+  const matches = extractCurrencyTextMatches("Promo: R$100 then $200");
+
+  expect(matches).toHaveLength(2);
+  expect(matches[0].raw.trim()).toBe("R$100");
+  expect(matches[0].currency).toBe("BRL");
+  expect(matches[0].value).toBe(100);
+  expect(matches[1].raw.trim()).toBe("$200");
+  expect(matches[1].currency).toBe("USD");
+  expect(matches[1].value).toBe(200);
 });
 
 test("extractCurrencyTextMatches supports compact ISO prices in YouTube-style text", () => {

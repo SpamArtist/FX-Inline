@@ -18,6 +18,17 @@ const CURRENCY_CODE_VALUES = new Set(Object.values(CurrencyCode));
 
 const CURRENCY_SYMBOL_TO_CODE: Partial<Record<string, CurrencyCode>> = {
   $: CurrencyCode["UNITED STATES DOLLAR"],
+  "R$": "BRL" as CurrencyCode,
+  "RD$": "DOP" as CurrencyCode,
+  "A$": "AUD" as CurrencyCode,
+  "AU$": "AUD" as CurrencyCode,
+  "CA$": "CAD" as CurrencyCode,
+  "NZ$": "NZD" as CurrencyCode,
+  "HK$": "HKD" as CurrencyCode,
+  "MX$": "MXN" as CurrencyCode,
+  "NT$": "TWD" as CurrencyCode,
+  "US$": "USD" as CurrencyCode,
+  "EC$": "XCD" as CurrencyCode,
   "€": CurrencyCode.EURO,
   "£": "GBP" as CurrencyCode,
   "¥": CurrencyCode.JAPAN,

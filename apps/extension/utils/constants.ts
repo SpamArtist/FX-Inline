@@ -184,6 +184,17 @@ export const ISO_CODES = new Set([
 
 export const CURRENCY_SYMBOLS = new Set([
   "$",
+  "R$",
+  "RD$",
+  "A$",
+  "AU$",
+  "CA$",
+  "NZ$",
+  "HK$",
+  "MX$",
+  "NT$",
+  "US$",
+  "EC$",
   "€",
   "£",
   "¥",

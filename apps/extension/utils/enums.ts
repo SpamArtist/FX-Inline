@@ -105,7 +105,7 @@ export enum CurrencyCode {
   "MALI" = "XOF",
   "MAURITANIA" = "MRU",
   "MAURITIUS" = "MUR",
-  "MEXICO" = "MXV",
+  "MEXICO" = "MXN",
   "MOLDOVA" = "MDL",
   "MONGOLIA" = "MNT",
   "MONTSERRAT" = "XCD",
