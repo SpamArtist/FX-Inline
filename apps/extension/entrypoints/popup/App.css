@@ -71,10 +71,48 @@
   min-height: 4.4rem;
 }
 
-.ccx-popup-meta {
+.ccx-popup-footer {
   margin: 0.7rem -1rem -1rem;
   padding: 0.6rem 0.85rem 0.62rem;
   border-top: 1px solid rgba(226, 232, 240, 0.26);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.ccx-popup-feedback-button {
+  appearance: none;
+  border: 1px solid #1a8f44;
+  border-radius: 0.45rem;
+  background: #16a34a;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  padding: 0.42rem 0.64rem;
+  cursor: pointer;
+  transition: background-color 140ms ease, transform 140ms ease;
+}
+
+.ccx-popup-feedback-button:hover {
+  background: #15803d;
+}
+
+.ccx-popup-feedback-button:active {
+  transform: translateY(1px);
+}
+
+.ccx-popup-feedback-button:focus-visible {
+  outline: 2px solid var(--ccx-focus);
+  outline-offset: 2px;
+}
+
+.ccx-popup-meta {
+  width: 100%;
+  margin: 0;
   text-align: center;
   color: rgba(228, 232, 238, 0.78);
   font-size: 0.66rem;

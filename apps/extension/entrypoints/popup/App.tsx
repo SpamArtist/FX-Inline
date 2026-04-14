@@ -18,6 +18,8 @@ import { useEffect, useState } from "react";
 import { browser } from "wxt/browser";
 import "./App.css";
 
+const FEEDBACK_URL = "https://share.formgrid.com/9C13psBXtryfGlHL";
+
 function App() {
   const [currenciesState, dispatch] = useCurrencyReducer({
     number: "100",
@@ -39,6 +41,16 @@ function App() {
       await browser.tabs.create({
         url: browser.runtime.getURL("/options.html"),
       });
+    }
+  }
+
+  async function onOpenFeedback() {
+    try {
+      await browser.tabs.create({
+        url: FEEDBACK_URL,
+      });
+    } catch {
+      window.open(FEEDBACK_URL, "_blank", "noopener,noreferrer");
     }
   }
 
@@ -247,7 +259,18 @@ function App() {
             />
           </div>
         ) : null}
-        <p className="ccx-popup-meta">© {currentYear} FX Inline</p>
+        <div className="ccx-popup-footer">
+          <button
+            type="button"
+            className="ccx-popup-feedback-button"
+            onClick={onOpenFeedback}
+            aria-label="Share feedback (opens in a new tab)"
+            title="Share feedback (opens in a new tab)"
+          >
+            Feedback ↗
+          </button>
+          <p className="ccx-popup-meta">© {currentYear} FX Inline</p>
+        </div>
       </ConvertorHOD>
     </main>
   );
