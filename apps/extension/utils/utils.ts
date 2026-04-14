@@ -54,12 +54,46 @@ const CURRENCY_SYMBOL_TO_CODE: Partial<Record<string, CurrencyCode>> = {
   "ر.ق": "QAR" as CurrencyCode,
 };
 
+const CURRENCY_SYMBOL_VARIANT_HINTS = [
+  "￥",
+  "＄",
+  "￡",
+  "￦",
+  "￠",
+  "﹩",
+];
+
+function normalizeCurrencySymbolToken(token: string): string {
+  return token.normalize("NFKC");
+}
+
+function getCanonicalCurrencySymbolToken(token: string): string | null {
+  if (!token.length) return null;
+  if (CURRENCY_SYMBOLS.has(token)) return token;
+
+  const normalizedToken = normalizeCurrencySymbolToken(token);
+  if (CURRENCY_SYMBOLS.has(normalizedToken)) {
+    return normalizedToken;
+  }
+
+  return null;
+}
+
+const RECOGNIZED_CURRENCY_SYMBOLS = new Set<string>(Array.from(CURRENCY_SYMBOLS));
+for (const symbolVariant of CURRENCY_SYMBOL_VARIANT_HINTS) {
+  const canonicalSymbol = getCanonicalCurrencySymbolToken(symbolVariant);
+  if (!canonicalSymbol) continue;
+
+  RECOGNIZED_CURRENCY_SYMBOLS.add(symbolVariant);
+  RECOGNIZED_CURRENCY_SYMBOLS.add(canonicalSymbol);
+}
+
 const CURRENCY_TOKENS = [
   ...Array.from(ISO_CODES).map((token) => ({
     token,
     isIso: true,
   })),
-  ...Array.from(CURRENCY_SYMBOLS).map((token) => ({
+  ...Array.from(RECOGNIZED_CURRENCY_SYMBOLS).map((token) => ({
     token,
     isIso: false,
   })),
@@ -93,7 +127,7 @@ function normalizeMagnitudeAlias(input: string): string {
 
 const groupingSpaceRegex = /[\u00A0\u202F ]/gu;
 
-const symbolPattern = Array.from(CURRENCY_SYMBOLS)
+const symbolPattern = Array.from(RECOGNIZED_CURRENCY_SYMBOLS)
   .map(escapeRegex)
   .sort((a, b) => b.length - a.length)
   .join("|");
@@ -203,12 +237,17 @@ function isCurrencyToken(token: string): CurrencyCode | null {
     return toCurrencyCode(upper);
   }
 
-  if (CURRENCY_SYMBOLS.has(token)) {
-    const mappedCode = CURRENCY_SYMBOL_TO_CODE[token];
+  const canonicalSymbol = getCanonicalCurrencySymbolToken(token);
+  if (canonicalSymbol) {
+    const mappedCode = CURRENCY_SYMBOL_TO_CODE[canonicalSymbol];
     return mappedCode ? toCurrencyCode(mappedCode) : null;
   }
 
   return null;
+}
+
+export function isRecognizedCurrencySymbolToken(token: string): boolean {
+  return getCanonicalCurrencySymbolToken(token.trim()) !== null;
 }
 
 function parseFlexibleNumber(

@@ -59,6 +59,24 @@ test("parseCurrencyValue supports composite dollar symbols", () => {
   }
 });
 
+test("parseCurrencyValue normalizes compatibility/full-width currency symbols", () => {
+  const cases = [
+    ["￥39,000", 39000, "JPY"],
+    ["＄100", 100, "USD"],
+    ["￡200", 200, "GBP"],
+    ["￦3000", 3000, "KRW"],
+    ["￠50", 50, "USD"],
+    ["﹩75", 75, "USD"],
+  ];
+
+  for (const [input, value, currency] of cases) {
+    const parsed = parseCurrencyValue(input);
+    expect(parsed.valid).toBe(true);
+    expect(parsed.value).toBe(value);
+    expect(parsed.currency).toBe(currency);
+  }
+});
+
 test("parseCurrencyValue supports lakh/lac/crore/cr with currency prefix and suffix", () => {
   const cases = [
     ["1 Lakh INR", 100000, "INR"],
@@ -173,6 +191,18 @@ test("extractCurrencyTextMatches supports composite dollar symbols", () => {
     11,
     12,
   ]);
+});
+
+test("extractCurrencyTextMatches supports unicode compatibility symbol snippets", () => {
+  const matches = extractCurrencyTextMatches("Main ￥39,000 and fallback ﹩125");
+
+  expect(matches).toHaveLength(2);
+  expect(matches[0].raw.trim()).toBe("￥39,000");
+  expect(matches[0].currency).toBe("JPY");
+  expect(matches[0].value).toBe(39000);
+  expect(matches[1].raw.trim()).toBe("﹩125");
+  expect(matches[1].currency).toBe("USD");
+  expect(matches[1].value).toBe(125);
 });
 
 test("extractCurrencyTextMatches prefers composite tokens over plain dollar", () => {
@@ -317,7 +347,24 @@ test("mayContainCurrencyToken quickly filters non-currency text", () => {
   expect(mayContainCurrencyToken("Budget is $300")).toBe(true);
   expect(mayContainCurrencyToken("Offer: eur 120")).toBe(true);
   expect(mayContainCurrencyToken("Package: ¥6M")).toBe(true);
+  expect(mayContainCurrencyToken("Rent is ￥39,000")).toBe(true);
+  expect(mayContainCurrencyToken("Offer ﹩75 only")).toBe(true);
   expect(mayContainCurrencyToken("الدفع د.إ 4500")).toBe(true);
+});
+
+test("unicode symbol normalization does not enable full-width digits or full-width ISO", () => {
+  const fullWidthDigits = parseCurrencyValue("￥３９，０００");
+  expect(fullWidthDigits.valid).toBe(false);
+
+  const fullWidthIso = parseCurrencyValue("ＪＰＹ 39000");
+  expect(fullWidthIso.valid).toBe(false);
+
+  const matches = extractCurrencyTextMatches(
+    "Unsupported: ￥３９，０００ and ＪＰＹ 39000",
+  );
+  expect(matches).toHaveLength(0);
+  expect(mayContainCurrencyToken("￥３９，０００")).toBe(false);
+  expect(mayContainCurrencyToken("ＪＰＹ 39000")).toBe(false);
 });
 
 test("hasThousandMagnitudeHint detects K-style magnitudes only when tied to a number", () => {

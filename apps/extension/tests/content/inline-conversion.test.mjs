@@ -53,6 +53,47 @@ test("converts text-node prices with the expected inline wrapper shape", () => {
   expect(convertedAmount.textContent.length > 0).toBe(true);
 });
 
+test("converts unicode yen symbols in mixed listing text", () => {
+  document.body.innerHTML = [
+    '<h5 id="listing">',
+    '  <a href="/en/property/1545984">',
+    "    ￥39,000",
+    '    <span>Management fee：<span class="ccx-inline-conversion" data-original="¥6,500">¥6,500 (<span class="ccx-converted-amount">₹3,806.20</span>)</span></span>',
+    "  </a>",
+    "</h5>",
+  ].join("\n");
+
+  const applied = convertVisiblePrices(
+    "INR",
+    createRateSnapshot({ rates: { JPY: 110 } }),
+    document.body,
+    {
+      clearExisting: false,
+    },
+  );
+
+  expect(applied).toBe(1);
+
+  const listingWrappers = document.querySelectorAll(
+    `#listing span.${INLINE_CONVERSION_CLASS}`,
+  );
+  expect(listingWrappers).toHaveLength(2);
+
+  const convertedMainPrice = document.querySelector(
+    '#listing span.ccx-inline-conversion[data-original="￥39,000"]',
+  );
+  expect(convertedMainPrice).not.toBeNull();
+  expect(convertedMainPrice.textContent).toMatch(/^￥39,000\s+\(.+\)$/);
+
+  const existingFeeWrapper = document.querySelector(
+    '#listing span.ccx-inline-conversion[data-original="¥6,500"]',
+  );
+  expect(existingFeeWrapper).not.toBeNull();
+  expect(existingFeeWrapper.querySelector(".ccx-converted-amount").textContent).toBe(
+    "₹3,806.20",
+  );
+});
+
 test("refreshes existing wrappers in place and clears wrappers when requested", () => {
   document.body.innerHTML = '<p id="price">Price: $100</p>';
 

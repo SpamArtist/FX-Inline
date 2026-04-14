@@ -1,7 +1,10 @@
-import { CURRENCY_SYMBOLS } from "@/utils/constants";
 import { CurrencyCode } from "@/utils/enums";
 import type { RateSnapshot } from "@/utils/rates.types";
-import { extractCurrencyTextMatches, mayContainCurrencyToken } from "@/utils/utils";
+import {
+  extractCurrencyTextMatches,
+  isRecognizedCurrencySymbolToken,
+  mayContainCurrencyToken,
+} from "@/utils/utils";
 import { getConvertedAmountText } from "./amountFormatting";
 import {
   applyConvertedAmountColor,
@@ -124,7 +127,7 @@ function getSiblingCurrencySymbol(valueRoot: Element): string | null {
 
     const token = sibling.textContent?.replace(/\s+/g, "").trim();
     if (!token || token.length > 5) continue;
-    if (!CURRENCY_SYMBOLS.has(token)) continue;
+    if (!isRecognizedCurrencySymbolToken(token)) continue;
 
     const distance = Math.abs(index - valueIndex);
     if (distance < nearestDistance) {
