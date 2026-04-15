@@ -172,6 +172,8 @@ const thousandMagnitudeHintRegex =
 
 const parserArtifactsCache = new Map<string, ParserArtifacts>();
 const wordLikeCurrencyTokenRegexCache = new Map<CurrencyCode, RegExp>();
+const usernameWordCharacterRegex = /[\p{L}\p{N}_]/u;
+const unicodeWhitespaceRegex = /\s/u;
 
 function normalizeLocaleCacheKey(localeHint?: string | null): string {
   return localeHint?.trim().toLowerCase() || "__all__";
@@ -252,6 +254,42 @@ function shouldSkipWordLikeCurrencyByCasing(
 
   // Word-like ISO codes should be explicit in uppercase to avoid prose false positives.
   return matchedToken !== currency;
+}
+
+function isUsernameWordCharacter(input: string): boolean {
+  return input.length > 0 && usernameWordCharacterRegex.test(input);
+}
+
+function shouldSkipLikelyUsernameCurrencyMatch(
+  input: string,
+  start: number,
+  end: number,
+): boolean {
+  let trimmedStart = start;
+  let trimmedEnd = end;
+
+  while (
+    trimmedStart < trimmedEnd &&
+    unicodeWhitespaceRegex.test(input[trimmedStart] || "")
+  ) {
+    trimmedStart += 1;
+  }
+
+  while (
+    trimmedEnd > trimmedStart &&
+    unicodeWhitespaceRegex.test(input[trimmedEnd - 1] || "")
+  ) {
+    trimmedEnd -= 1;
+  }
+
+  const before = trimmedStart > 0 ? input[trimmedStart - 1] : "";
+  const after = trimmedEnd < input.length ? input[trimmedEnd] : "";
+
+  if (before === "@" || before === "＠") {
+    return true;
+  }
+
+  return isUsernameWordCharacter(before) || isUsernameWordCharacter(after);
 }
 
 function isCurrencyToken(token: string): CurrencyCode | null {
@@ -541,6 +579,15 @@ export function extractCurrencyTextMatches(
     if (shouldSkipWordLikeCurrencyByCasing(raw, parsed.currency)) {
       continue;
     }
+    if (
+      shouldSkipLikelyUsernameCurrencyMatch(
+        input,
+        candidate.index,
+        candidate.index + raw.length,
+      )
+    ) {
+      continue;
+    }
 
     matches.push({
       raw,
@@ -555,6 +602,16 @@ export function extractCurrencyTextMatches(
     if (candidate.index === undefined) continue;
 
     const raw = candidate[0];
+    if (
+      shouldSkipLikelyUsernameCurrencyMatch(
+        input,
+        candidate.index,
+        candidate.index + raw.length,
+      )
+    ) {
+      continue;
+    }
+
     const parsedCurrency = isCurrencyToken(candidate[1]);
     if (!parsedCurrency) continue;
     if (shouldSkipWordLikeCurrencyByCasing(candidate[1], parsedCurrency)) {
