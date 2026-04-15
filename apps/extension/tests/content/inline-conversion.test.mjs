@@ -238,7 +238,6 @@ test("adds structured add-on conversions for Amazon-style and sibling-symbol pri
       clearExisting: false,
     },
   );
-
   expect(applied).toBeGreaterThanOrEqual(2);
 
   const amazonAddon = document.querySelector(
@@ -267,6 +266,36 @@ test("adds structured add-on conversions for Amazon-style and sibling-symbol pri
   expect(
     siblingWordAddon.querySelector(".ccx-converted-amount").textContent,
   ).toMatch(/^\(.+\)$/);
+});
+
+test("adds conversion when amount and yen/month token are split across sibling nodes", () => {
+  document.body.innerHTML = [
+    '<div class="price" id="split-yen">',
+    "  from",
+    '  <span class="bold">990,000</span>',
+    "  yen/month",
+    "</div>",
+  ].join("\n");
+
+  const applied = convertVisiblePrices(
+    "EUR",
+    createRateSnapshot({ rates: { JPY: 110 } }),
+    document.body,
+    {
+      clearExisting: false,
+    },
+  );
+
+  expect(applied).toBeGreaterThanOrEqual(1);
+
+  const addon = document.querySelector(
+    '#split-yen .bold span.ccx-inline-conversion[data-ccx-mode="addon"]',
+  );
+  expect(addon).not.toBeNull();
+  expect(addon.getAttribute("data-original")).toBe("990,000 yen");
+  expect(addon.querySelector(".ccx-converted-amount").textContent).toMatch(
+    /^\(.+\)$/,
+  );
 });
 
 test("reports perf sample shape and node-limit metadata", () => {
