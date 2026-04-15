@@ -29,7 +29,7 @@ export const INLINE_CONVERSION_CSS = `
     margin-left: 0.1em !important;
     line-height: inherit !important;
     width: fit-content !important;
-    display: inline-block !important;
+    display: inline-block;
   }
 `;
 
