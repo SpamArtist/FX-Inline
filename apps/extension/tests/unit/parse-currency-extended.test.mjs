@@ -250,6 +250,20 @@ test("extractCurrencyTextMatches supports compact ISO prices in YouTube-style te
   expect(matches[1].value).toBe(350);
 });
 
+test("extractCurrencyTextMatches ignores social handles and usernames that resemble prices", () => {
+  const matches = extractCurrencyTextMatches(
+    "Twitter handles @kes11av and kes11buddy should stay untouched, but USD350/week and KES 11 are valid prices.",
+  );
+
+  expect(matches).toHaveLength(2);
+  expect(matches.map((match) => match.raw.trim())).toEqual([
+    "USD350",
+    "KES 11",
+  ]);
+  expect(matches.map((match) => match.currency)).toEqual(["USD", "KES"]);
+  expect(matches.map((match) => match.value)).toEqual([350, 11]);
+});
+
 test("extractCurrencyTextMatches parses large VND listing price snippets", () => {
   const matches = extractCurrencyTextMatches("₫ 45,000,000 / month");
 
