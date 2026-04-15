@@ -10,6 +10,7 @@ test("parseCurrencyValue supports roadmap formats", () => {
     ["USD100", true, 100, "USD"],
     ["100USD", true, 100, "USD"],
     ["usd 100", true, 100, "USD"],
+    ["yen 100", true, 100, "JPY"],
     ["EUR 12,5", true, 12.5, "EUR"],
     ["USD 4.295 billion", true, 4295000000, "USD"],
     ["4.295 billion USD", true, 4295000000, "USD"],

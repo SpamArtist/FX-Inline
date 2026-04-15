@@ -54,6 +54,11 @@ const CURRENCY_SYMBOL_TO_CODE: Partial<Record<string, CurrencyCode>> = {
   "ر.ق": "QAR" as CurrencyCode,
 };
 
+const CURRENCY_WORD_TO_CODE: Partial<Record<string, CurrencyCode>> = {
+  yen: CurrencyCode.JAPAN,
+  "yên": CurrencyCode.JAPAN,
+};
+
 const CURRENCY_SYMBOL_VARIANT_HINTS = [
   "￥",
   "＄",
@@ -62,6 +67,8 @@ const CURRENCY_SYMBOL_VARIANT_HINTS = [
   "￠",
   "﹩",
 ];
+
+const unicodeLetterRegex = /\p{L}/u;
 
 function normalizeCurrencySymbolToken(token: string): string {
   return token.normalize("NFKC");
@@ -88,14 +95,25 @@ for (const symbolVariant of CURRENCY_SYMBOL_VARIANT_HINTS) {
   RECOGNIZED_CURRENCY_SYMBOLS.add(canonicalSymbol);
 }
 
+type CurrencyTokenKind = "iso" | "symbol" | "word";
+
+type CurrencyTokenInfo = {
+  token: string;
+  kind: CurrencyTokenKind;
+};
+
 const CURRENCY_TOKENS = [
-  ...Array.from(ISO_CODES).map((token) => ({
+  ...Array.from(ISO_CODES).map<CurrencyTokenInfo>((token) => ({
     token,
-    isIso: true,
+    kind: "iso",
   })),
-  ...Array.from(RECOGNIZED_CURRENCY_SYMBOLS).map((token) => ({
+  ...Array.from(RECOGNIZED_CURRENCY_SYMBOLS).map<CurrencyTokenInfo>((token) => ({
     token,
-    isIso: false,
+    kind: "symbol",
+  })),
+  ...Array.from(Object.keys(CURRENCY_WORD_TO_CODE)).map<CurrencyTokenInfo>((token) => ({
+    token,
+    kind: "word",
   })),
 ].sort((a, b) => b.token.length - a.token.length);
 
@@ -137,10 +155,16 @@ const isoPattern = Array.from(ISO_CODES)
   .sort((a, b) => b.length - a.length)
   .join("|");
 
+const wordPattern = Array.from(Object.keys(CURRENCY_WORD_TO_CODE))
+  .map(escapeRegex)
+  .sort((a, b) => b.length - a.length)
+  .join("|");
+
 const isoTokenPattern = `(?<!\\p{L})(?:${isoPattern})(?!\\p{L})`;
+const wordTokenPattern = `(?<!\\p{L})(?:${wordPattern})(?!\\p{L})`;
 const quickDigitRegex = /\d/u;
 const quickCurrencyTokenRegex = new RegExp(
-  `(?:${isoTokenPattern}|${symbolPattern})`,
+  `(?:${isoTokenPattern}|${symbolPattern}|${wordTokenPattern})`,
   "iu",
 );
 const thousandMagnitudeHintRegex =
@@ -165,10 +189,10 @@ function buildParserArtifacts(localeHint?: string | null): ParserArtifacts {
     `[+-]?\\d[\\d,.\\u00A0\\u202F ]*(?:\\s*${magnitudeTokenPattern})?(?:\\s*\\+)?`;
   const boundedNumberWithOptionalMagnitudePattern =
     `(?<![\\p{N}\\-–—])${numberWithOptionalMagnitudePattern}`;
-  const currencyTokenPattern = `(${isoTokenPattern}|(?:${symbolPattern}))`;
+  const currencyTokenPattern = `(${isoTokenPattern}|(?:${symbolPattern})|${wordTokenPattern})`;
   const rangeSeparatorPattern = "(?:-|–|—)";
   const currencySnippetRegex = new RegExp(
-    `(?:${isoTokenPattern}\\s*${numberWithOptionalMagnitudePattern}|${boundedNumberWithOptionalMagnitudePattern}\\s*${isoTokenPattern}|(?:${symbolPattern})\\s*${numberWithOptionalMagnitudePattern}|${boundedNumberWithOptionalMagnitudePattern}\\s*(?:${symbolPattern}))`,
+    `(?:${isoTokenPattern}\\s*${numberWithOptionalMagnitudePattern}|${boundedNumberWithOptionalMagnitudePattern}\\s*${isoTokenPattern}|(?:${symbolPattern})\\s*${numberWithOptionalMagnitudePattern}|${boundedNumberWithOptionalMagnitudePattern}\\s*(?:${symbolPattern})|${wordTokenPattern}\\s*${numberWithOptionalMagnitudePattern}|${boundedNumberWithOptionalMagnitudePattern}\\s*${wordTokenPattern})`,
     "giu",
   );
   const currencyRangeRegex = new RegExp(
@@ -241,6 +265,11 @@ function isCurrencyToken(token: string): CurrencyCode | null {
   if (canonicalSymbol) {
     const mappedCode = CURRENCY_SYMBOL_TO_CODE[canonicalSymbol];
     return mappedCode ? toCurrencyCode(mappedCode) : null;
+  }
+
+  const mappedCode = CURRENCY_WORD_TO_CODE[token.toLowerCase()];
+  if (mappedCode) {
+    return toCurrencyCode(mappedCode);
   }
 
   return null;
@@ -392,15 +421,27 @@ function parseWithTokenForArtifacts(
   currency: CurrencyCode;
 } | null {
   const upperInput = input.toUpperCase();
+  const lowerInput = input.toLowerCase();
 
   for (const tokenInfo of CURRENCY_TOKENS) {
-    const hasToken = tokenInfo.isIso
-      ? position === "prefix"
+    let hasToken = false;
+
+    if (tokenInfo.kind === "iso") {
+      hasToken = position === "prefix"
         ? upperInput.startsWith(tokenInfo.token)
-        : upperInput.endsWith(tokenInfo.token)
-      : position === "prefix"
+        : upperInput.endsWith(tokenInfo.token);
+    } else if (tokenInfo.kind === "symbol") {
+      hasToken = position === "prefix"
         ? input.startsWith(tokenInfo.token)
         : input.endsWith(tokenInfo.token);
+    } else if (position === "prefix") {
+      hasToken = lowerInput.startsWith(tokenInfo.token) &&
+        !unicodeLetterRegex.test(input[tokenInfo.token.length] || "");
+    } else {
+      const tokenStart = input.length - tokenInfo.token.length;
+      hasToken = lowerInput.endsWith(tokenInfo.token) &&
+        !unicodeLetterRegex.test(input[tokenStart - 1] || "");
+    }
 
     if (!hasToken) continue;
 

@@ -12,6 +12,9 @@ test("parseCurrencyValue handles signs, separators, and lowercase iso", () => {
     ["+150 usd", true, 150, "USD"],
     ["42.5eur", true, 42.5, "EUR"],
     ["JPY 1,234", true, 1234, "JPY"],
+    ["yen 1,234", true, 1234, "JPY"],
+    ["YÊN 1,234", true, 1234, "JPY"],
+    ["1,234 yên", true, 1234, "JPY"],
     ["¥6M", true, 6000000, "JPY"],
     ["¥6m", true, 6000000, "JPY"],
     ["¥6M+", true, 6000000, "JPY"],
@@ -155,6 +158,16 @@ test("extractCurrencyTextMatches supports mixed symbol and ISO snippets", () => 
   expect(matches[0].value).toBe(99.99);
   expect(matches[1].currency).toBe("CAD");
   expect(matches[2].value).toBe(10);
+});
+
+test("extractCurrencyTextMatches supports yen word aliases", () => {
+  const matches = extractCurrencyTextMatches("Comp: yen 6M and 13,000 yên");
+
+  expect(matches).toHaveLength(2);
+  expect(matches[0].currency).toBe("JPY");
+  expect(matches[0].value).toBe(6000000);
+  expect(matches[1].currency).toBe("JPY");
+  expect(matches[1].value).toBe(13000);
 });
 
 test("extractCurrencyTextMatches supports composite dollar symbols", () => {
@@ -347,6 +360,8 @@ test("mayContainCurrencyToken quickly filters non-currency text", () => {
   expect(mayContainCurrencyToken("Budget is $300")).toBe(true);
   expect(mayContainCurrencyToken("Offer: eur 120")).toBe(true);
   expect(mayContainCurrencyToken("Package: ¥6M")).toBe(true);
+  expect(mayContainCurrencyToken("Comp starts at yen 6M")).toBe(true);
+  expect(mayContainCurrencyToken("Comp starts at yên 6M")).toBe(true);
   expect(mayContainCurrencyToken("Rent is ￥39,000")).toBe(true);
   expect(mayContainCurrencyToken("Offer ﹩75 only")).toBe(true);
   expect(mayContainCurrencyToken("الدفع د.إ 4500")).toBe(true);
