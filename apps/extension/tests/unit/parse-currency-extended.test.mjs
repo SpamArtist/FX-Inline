@@ -170,6 +170,14 @@ test("extractCurrencyTextMatches supports yen word aliases", () => {
   expect(matches[1].value).toBe(13000);
 });
 
+test("extractCurrencyTextMatches supports yen/month suffix snippets", () => {
+  const matches = extractCurrencyTextMatches("Rent starts from 990,000 yen/month");
+
+  expect(matches).toHaveLength(1);
+  expect(matches[0].currency).toBe("JPY");
+  expect(matches[0].value).toBe(990000);
+});
+
 test("extractCurrencyTextMatches supports composite dollar symbols", () => {
   const matches = extractCurrencyTextMatches(
     "Rates: R$ 10 | RD$ 20 | A$3 | AU$4 | CA$5 | NZ$6 | HK$7 | MX$8 | NT$9 | US$10 | EC$11 | $12",
