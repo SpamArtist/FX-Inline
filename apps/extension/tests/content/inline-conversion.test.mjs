@@ -50,7 +50,7 @@ test("converts text-node prices with the expected inline wrapper shape", () => {
 
   const convertedAmount = wrapper.querySelector(".ccx-converted-amount");
   expect(convertedAmount).not.toBeNull();
-  expect(convertedAmount.textContent.length > 0).toBe(true);
+  expect(convertedAmount.textContent).toMatch(/^\(.+\)$/);
 });
 
 test("converts unicode yen symbols in mixed listing text", () => {
@@ -108,6 +108,7 @@ test("refreshes existing wrappers in place and clears wrappers when requested", 
   const initialConvertedText = initialWrapper
     .querySelector(".ccx-converted-amount")
     .textContent;
+  expect(initialConvertedText).toMatch(/^\(.+\)$/);
   const initialConvertedNode = initialWrapper.querySelector(".ccx-converted-amount");
 
   const refreshedApplied = convertVisiblePrices(
@@ -132,6 +133,7 @@ test("refreshes existing wrappers in place and clears wrappers when requested", 
     .querySelector(".ccx-converted-amount")
     .textContent;
   expect(refreshedConvertedText).not.toBe(initialConvertedText);
+  expect(refreshedConvertedText).toMatch(/^\(.+\)$/);
 
   const clearedApplied = convertVisiblePrices("USD", createRateSnapshot(), document.body);
   expect(clearedApplied).toBe(0);
@@ -221,12 +223,18 @@ test("adds structured add-on conversions for Amazon-style and sibling-symbol pri
   );
   expect(amazonAddon).not.toBeNull();
   expect(amazonAddon.getAttribute("data-original")).toBe("$199.99");
+  expect(amazonAddon.querySelector(".ccx-converted-amount").textContent).toMatch(
+    /^\(.+\)$/,
+  );
 
   const siblingAddon = document.querySelector(
     '#sibling-value span.ccx-inline-conversion[data-ccx-mode="addon"]',
   );
   expect(siblingAddon).not.toBeNull();
   expect(siblingAddon.getAttribute("data-original")).toBe("$2500");
+  expect(siblingAddon.querySelector(".ccx-converted-amount").textContent).toMatch(
+    /^\(.+\)$/,
+  );
 });
 
 test("reports perf sample shape and node-limit metadata", () => {

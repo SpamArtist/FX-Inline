@@ -75,14 +75,14 @@ export function setInlineConversionContent(
   const { prefixNode, convertedValueNode, suffixNode } =
     ensureInlineConversionNodeRefs(wrapper);
   const prefixText =
-    options?.originalText === undefined ? " (" : `${options.originalText} (`;
+    options?.originalText === undefined ? " " : `${options.originalText} `;
 
   wrapper.removeAttribute("data-ccx-suppressed");
   wrapper.style.removeProperty("display");
   convertedValueNode.style.removeProperty("display");
   prefixNode.nodeValue = prefixText;
-  convertedValueNode.textContent = convertedAmount;
-  suffixNode.nodeValue = ")";
+  convertedValueNode.textContent = `(${convertedAmount})`;
+  suffixNode.nodeValue = "";
 }
 
 export function applyConvertedAmountColor(

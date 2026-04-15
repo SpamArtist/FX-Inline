@@ -209,7 +209,10 @@ export function decorateStructuredAmazonPrices(
       continue;
     }
 
-    if (previousOriginal !== rawPrice || previousConverted !== convertedAmount) {
+    if (
+      previousOriginal !== rawPrice ||
+      previousConverted !== `(${convertedAmount})`
+    ) {
       conversionsApplied += 1;
     }
   }
@@ -281,7 +284,10 @@ export function decorateStructuredSiblingSymbolPrices(
       continue;
     }
 
-    if (previousOriginal !== rawPrice || previousConverted !== convertedAmount) {
+    if (
+      previousOriginal !== rawPrice ||
+      previousConverted !== `(${convertedAmount})`
+    ) {
       conversionsApplied += 1;
     }
   }
