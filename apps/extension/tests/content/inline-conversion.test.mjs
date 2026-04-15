@@ -224,11 +224,20 @@ test("adds structured add-on conversions for Amazon-style and sibling-symbol pri
     '  <span aria-hidden="true" id="sibling-symbol">$</span>',
     '  <span aria-hidden="true" id="sibling-value">2500</span>',
     '</div>',
+    '<div>',
+    '  <span aria-hidden="true" id="sibling-value-word">990,000</span>',
+    '  <span aria-hidden="true" id="sibling-word">yen/month</span>',
+    '</div>',
   ].join("\n");
 
-  const applied = convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
-    clearExisting: false,
-  });
+  const applied = convertVisiblePrices(
+    "EUR",
+    createRateSnapshot({ rates: { JPY: 110 } }),
+    document.body,
+    {
+      clearExisting: false,
+    },
+  );
 
   expect(applied).toBeGreaterThanOrEqual(2);
 
@@ -249,6 +258,15 @@ test("adds structured add-on conversions for Amazon-style and sibling-symbol pri
   expect(siblingAddon.querySelector(".ccx-converted-amount").textContent).toMatch(
     /^\(.+\)$/,
   );
+
+  const siblingWordAddon = document.querySelector(
+    '#sibling-value-word span.ccx-inline-conversion[data-ccx-mode="addon"]',
+  );
+  expect(siblingWordAddon).not.toBeNull();
+  expect(siblingWordAddon.getAttribute("data-original")).toBe("990,000 yen");
+  expect(
+    siblingWordAddon.querySelector(".ccx-converted-amount").textContent,
+  ).toMatch(/^\(.+\)$/);
 });
 
 test("reports perf sample shape and node-limit metadata", () => {

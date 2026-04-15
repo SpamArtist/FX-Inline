@@ -2,8 +2,8 @@ import { CurrencyCode } from "@/utils/enums";
 import type { RateSnapshot } from "@/utils/rates.types";
 import {
   extractCurrencyTextMatches,
-  isRecognizedCurrencySymbolToken,
   mayContainCurrencyToken,
+  parseCurrencyValue,
 } from "@/utils/utils";
 import { getConvertedAmountText } from "./amountFormatting";
 import {
@@ -109,7 +109,21 @@ function getAmazonStructuredRawPrice(root: Element): string | null {
   return `${symbol}${whole}${decimal}${fraction}`;
 }
 
-function getSiblingCurrencySymbol(valueRoot: Element): string | null {
+function areParsedValuesEqual(left: number, right: number): boolean {
+  const delta = Math.abs(left - right);
+  const tolerance = Number.EPSILON * Math.max(1, Math.abs(left), Math.abs(right)) * 4;
+  return delta <= tolerance;
+}
+
+function getSiblingCurrencyRawPrice(
+  valueRoot: Element,
+  amountText: string,
+  localeHint: string | null,
+): string | null {
+  const parsedAmount = parseCurrencyValue(amountText, localeHint);
+  if (!parsedAmount.valid || parsedAmount.value === undefined) return null;
+  const amountValue = parsedAmount.value;
+
   const parent = valueRoot.parentElement;
   if (!parent) return null;
 
@@ -117,7 +131,7 @@ function getSiblingCurrencySymbol(valueRoot: Element): string | null {
   const valueIndex = siblings.indexOf(valueRoot);
   if (valueIndex < 0) return null;
 
-  let matchedSymbol: string | null = null;
+  let matchedRawPrice: string | null = null;
   let nearestDistance = Number.POSITIVE_INFINITY;
 
   for (let index = 0; index < siblings.length; index += 1) {
@@ -125,18 +139,43 @@ function getSiblingCurrencySymbol(valueRoot: Element): string | null {
     if (sibling === valueRoot) continue;
     if (sibling.getAttribute("aria-hidden") !== "true") continue;
 
-    const token = sibling.textContent?.replace(/\s+/g, "").trim();
-    if (!token || token.length > 5) continue;
-    if (!isRecognizedCurrencySymbolToken(token)) continue;
+    const token = sibling.textContent?.replace(/\s+/g, " ").trim();
+    if (!token || token.length > 32) continue;
+
+    const compactToken = token.replace(/\s+/g, "");
+    const rawCandidates = Array.from(
+      new Set([
+        `${compactToken}${amountText}`,
+        `${token} ${amountText}`,
+        `${amountText} ${token}`,
+        `${amountText}${compactToken}`,
+      ]),
+    );
+
+    let parsedRawPrice: string | null = null;
+
+    for (const rawCandidate of rawCandidates) {
+      const parsed = extractCurrencyTextMatches(rawCandidate, localeHint);
+      const matched = parsed.find((candidate) =>
+        areParsedValuesEqual(candidate.value, amountValue),
+      );
+      if (!matched) continue;
+
+      parsedRawPrice = matched.raw.trim();
+      if (parsedRawPrice.length) break;
+      parsedRawPrice = null;
+    }
+
+    if (!parsedRawPrice) continue;
 
     const distance = Math.abs(index - valueIndex);
     if (distance < nearestDistance) {
       nearestDistance = distance;
-      matchedSymbol = token;
+      matchedRawPrice = parsedRawPrice;
     }
   }
 
-  return matchedSymbol;
+  return matchedRawPrice;
 }
 
 function getSanitizedAmountText(root: Element): string | null {
@@ -238,14 +277,21 @@ export function decorateStructuredSiblingSymbolPrices(
 
     const existingAddon = getInlineAddonNode(hiddenRoot);
     const amountText = getSanitizedAmountText(hiddenRoot);
-    const symbol = getSiblingCurrencySymbol(hiddenRoot);
-
-    if (!amountText || !symbol) {
+    if (!amountText) {
       existingAddon?.remove();
       continue;
     }
 
-    const rawPrice = `${symbol}${amountText}`;
+    const rawPrice = getSiblingCurrencyRawPrice(
+      hiddenRoot,
+      amountText,
+      localeHint,
+    );
+    if (!rawPrice) {
+      existingAddon?.remove();
+      continue;
+    }
+
     const parsed = extractCurrencyTextMatches(rawPrice, localeHint);
     const matched = parsed.find((item) => item.raw === rawPrice) || parsed[0];
     if (!matched) {
