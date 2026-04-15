@@ -53,6 +53,20 @@ test("converts text-node prices with the expected inline wrapper shape", () => {
   expect(convertedAmount.textContent).toMatch(/^\(.+\)$/);
 });
 
+test("injects converted amount line-height and width styles", () => {
+  document.body.innerHTML = '<p id="price">Pay $100 now.</p>';
+
+  convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
+    clearExisting: false,
+  });
+
+  const styleTag = document.getElementById("ccx-inline-conversion-style");
+  expect(styleTag).not.toBeNull();
+  expect(styleTag.textContent).toMatch(/\.ccx-converted-amount\s*\{/);
+  expect(styleTag.textContent).toContain("line-height: inherit !important;");
+  expect(styleTag.textContent).toContain("width: fit-content !important;");
+});
+
 test("converts unicode yen symbols in mixed listing text", () => {
   document.body.innerHTML = [
     '<h5 id="listing">',

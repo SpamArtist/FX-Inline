@@ -27,6 +27,9 @@ export const INLINE_CONVERSION_CSS = `
     border-radius: 0 !important;
     padding: 0 !important;
     margin-left: 0.1em !important;
+    line-height: inherit !important;
+    width: fit-content !important;
+    display: inline-block !important;
   }
 `;
 
