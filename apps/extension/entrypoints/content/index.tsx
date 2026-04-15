@@ -31,13 +31,22 @@ function stopEventPropagation(event: Event) {
   event.stopPropagation();
 }
 
+function isExtensionContextInvalidatedError(error: unknown): boolean {
+  return (
+    error instanceof Error &&
+    /extension context invalidated/i.test(error.message)
+  );
+}
+
 export default defineContentScript({
   matches: ["<all_urls>"],
   cssInjectionMode: "manual",
-  async main() {
+  async main(ctx) {
     const popupControllerLoader = createLazySelectionPopupControllerLoader();
     const conversionRuntime = createContentConversionRuntime();
     let uiCaptureActive = false;
+    let isCleanedUp = false;
+    let settingsUnwatch: (() => void) | null = null;
 
     function isExtensionUiEvent(event: Event): boolean {
       if (!(event.target instanceof Node)) return false;
@@ -78,13 +87,6 @@ export default defineContentScript({
       setUiCaptureActive(false);
     }
 
-    await conversionRuntime.initialize();
-
-    const settingsUnwatch = storage.watch(
-      USER_SETTINGS_STORAGE_KEY,
-      conversionRuntime.onSettingsStorageUpdate,
-    );
-
     const mutationObserver = new MutationObserver((mutations) => {
       if (conversionRuntime.shouldIgnoreMutations()) return;
 
@@ -97,6 +99,60 @@ export default defineContentScript({
       conversionRuntime.enqueueMutationRoots(roots);
     });
 
+    function cleanup() {
+      if (isCleanedUp) return;
+      isCleanedUp = true;
+
+      mutationObserver.disconnect();
+      if (settingsUnwatch) {
+        try {
+          settingsUnwatch();
+        } catch (error) {
+          if (!isExtensionContextInvalidatedError(error)) {
+            console.warn("[ccx] Failed to unwatch settings during cleanup", error);
+          }
+        } finally {
+          settingsUnwatch = null;
+        }
+      }
+
+      setUiCaptureActive(false);
+      popupControllerLoader.getSync()?.destroy();
+      conversionRuntime.cleanup();
+    }
+
+    ctx.onInvalidated(cleanup);
+
+    try {
+      await conversionRuntime.initialize();
+    } catch (error) {
+      if (ctx.isInvalid || isExtensionContextInvalidatedError(error)) {
+        cleanup();
+        return;
+      }
+
+      throw error;
+    }
+
+    if (ctx.isInvalid) {
+      cleanup();
+      return;
+    }
+
+    try {
+      settingsUnwatch = storage.watch(
+        USER_SETTINGS_STORAGE_KEY,
+        conversionRuntime.onSettingsStorageUpdate,
+      );
+    } catch (error) {
+      if (ctx.isInvalid || isExtensionContextInvalidatedError(error)) {
+        cleanup();
+        return;
+      }
+
+      throw error;
+    }
+
     mutationObserver.observe(document.body, {
       childList: true,
       subtree: true,
@@ -104,6 +160,7 @@ export default defineContentScript({
     });
 
     async function handleMouseUp(event: MouseEvent): Promise<void> {
+      if (ctx.isInvalid || isCleanedUp) return;
       if (isExtensionUiEvent(event)) return;
 
       const selection = window.getSelection();
@@ -130,6 +187,7 @@ export default defineContentScript({
 
       const sourceCurrency = currency ?? DEFAULT_STARTING_CURRENCY;
       const popupController = await popupControllerLoader.get();
+      if (ctx.isInvalid || isCleanedUp) return;
       popupController.showPopup(x, y, value.toString(), sourceCurrency);
       setUiCaptureActive(true);
       conversionRuntime.recordSelectionConversion();
@@ -137,11 +195,13 @@ export default defineContentScript({
 
     const onMouseUp = (event: MouseEvent) => {
       void handleMouseUp(event).catch((error) => {
+        if (ctx.isInvalid || isExtensionContextInvalidatedError(error)) return;
         console.warn("[ccx] Failed to show selection popup", error);
       });
     };
 
     const onMouseDown = (event: MouseEvent) => {
+      if (ctx.isInvalid || isCleanedUp) return;
       if (isExtensionUiEvent(event)) return;
       if (!(event.target instanceof Node)) return;
 
@@ -155,20 +215,8 @@ export default defineContentScript({
       }
     };
 
-    document.addEventListener("mouseup", onMouseUp);
-    document.addEventListener("mousedown", onMouseDown);
-
-    const onBeforeUnload = () => {
-      mutationObserver.disconnect();
-      settingsUnwatch();
-      setUiCaptureActive(false);
-      popupControllerLoader.getSync()?.destroy();
-      conversionRuntime.cleanup();
-      document.removeEventListener("mouseup", onMouseUp);
-      document.removeEventListener("mousedown", onMouseDown);
-      window.removeEventListener("beforeunload", onBeforeUnload);
-    };
-
-    window.addEventListener("beforeunload", onBeforeUnload);
+    ctx.addEventListener(document, "mouseup", onMouseUp);
+    ctx.addEventListener(document, "mousedown", onMouseDown);
+    ctx.addEventListener(window, "beforeunload", cleanup);
   },
 });

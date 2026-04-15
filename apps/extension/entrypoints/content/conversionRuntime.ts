@@ -27,6 +27,13 @@ import { convertVisiblePrices } from "./inlineConversion";
 
 export type { ContentConversionRuntime } from "./content.types";
 
+function isExtensionContextInvalidatedError(error: unknown): boolean {
+  return (
+    error instanceof Error &&
+    /extension context invalidated/i.test(error.message)
+  );
+}
+
 export function createContentConversionRuntime(): ContentConversionRuntime {
   const {
     perfLoggingEnabled,
@@ -46,6 +53,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
   let isApplyingInlineConversion = false;
   let suppressMutationDepth = 0;
   let isHydratingRates = false;
+  let isCleanedUp = false;
 
   const pendingMutationRoots = new Set<ParentNode>();
 
@@ -93,30 +101,36 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
   function releaseMutationSuppression() {
     isApplyingInlineConversion = false;
     window.setTimeout(() => {
+      if (isCleanedUp) return;
       suppressMutationDepth = Math.max(0, suppressMutationDepth - 1);
     }, MUTATION_SUPPRESSION_RELEASE_MS);
   }
 
   function scheduleHydrationRetry() {
+    if (isCleanedUp) return;
     if (hydrationRetryTimer !== null) return;
 
     hydrationRetryTimer = window.setTimeout(() => {
       hydrationRetryTimer = null;
+      if (isCleanedUp) return;
       scheduleInlineConversion();
     }, HYDRATION_RETRY_MS);
   }
 
   function scheduleInlineConversion() {
+    if (isCleanedUp) return;
     if (conversionDebounceTimer !== null) {
       window.clearTimeout(conversionDebounceTimer);
     }
 
     conversionDebounceTimer = window.setTimeout(() => {
       conversionDebounceTimer = null;
+      if (isCleanedUp) return;
 
       if (!settings) {
         void hydrateRuntimeSettingsAndRates()
           .then(() => {
+            if (isCleanedUp) return;
             if (settings) {
               scheduleInlineConversion();
               return;
@@ -126,7 +140,9 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
             scheduleHydrationRetry();
           })
           .catch((error) => {
-            console.warn("[ccx] Failed to hydrate rates for inline conversion", error);
+            if (!isExtensionContextInvalidatedError(error)) {
+              console.warn("[ccx] Failed to hydrate rates for inline conversion", error);
+            }
             scheduleHydrationRetry();
           });
 
@@ -142,6 +158,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
       if (!rateSnapshot) {
         void hydrateRuntimeSettingsAndRates()
           .then(() => {
+            if (isCleanedUp) return;
             if (settings && rateSnapshot) {
               scheduleInlineConversion();
               return;
@@ -151,7 +168,9 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
             scheduleHydrationRetry();
           })
           .catch((error) => {
-            console.warn("[ccx] Failed to hydrate rates for inline conversion", error);
+            if (!isExtensionContextInvalidatedError(error)) {
+              console.warn("[ccx] Failed to hydrate rates for inline conversion", error);
+            }
             scheduleHydrationRetry();
           });
 
@@ -196,12 +215,14 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
   }
 
   function schedulePartialInlineConversion(delayMs = PARTIAL_CONVERSION_DEBOUNCE_MS) {
+    if (isCleanedUp) return;
     if (partialConversionTimer !== null) {
       window.clearTimeout(partialConversionTimer);
     }
 
     partialConversionTimer = window.setTimeout(() => {
       partialConversionTimer = null;
+      if (isCleanedUp) return;
 
       if (!pendingMutationRoots.size) return;
 
@@ -271,6 +292,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
   }
 
   function scheduleInlineConversionFromSettingsUpdate() {
+    if (isCleanedUp) return;
     if (settingsRefreshTimer !== null) {
       window.clearTimeout(settingsRefreshTimer);
     }
@@ -278,20 +300,26 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
     // Delay a bit after settings writes to avoid piggybacking a page gesture window.
     settingsRefreshTimer = window.setTimeout(() => {
       settingsRefreshTimer = null;
+      if (isCleanedUp) return;
       scheduleInlineConversion();
     }, SETTINGS_UPDATE_CONVERSION_DELAY_MS);
   }
 
   return {
     initialize: async () => {
+      if (isCleanedUp) return;
       const startedAt = perfLoggingEnabled ? performance.now() : 0;
       let hydrated = false;
+      let failedDueToInvalidation = false;
 
       try {
         await refreshRuntimeSettingsAndRates();
         hydrated = true;
       } catch (error) {
-        console.warn("[ccx] Initial settings/rates hydration failed", error);
+        failedDueToInvalidation = isExtensionContextInvalidatedError(error);
+        if (!failedDueToInvalidation) {
+          console.warn("[ccx] Initial settings/rates hydration failed", error);
+        }
         // Keep selection popup functional even if rates are unavailable initially.
       } finally {
         if (perfLoggingEnabled) {
@@ -302,9 +330,11 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
         }
       }
 
+      if (isCleanedUp || failedDueToInvalidation) return;
       scheduleInlineConversion();
     },
     onSettingsStorageUpdate: async (newSettings, oldSettings) => {
+      if (isCleanedUp) return;
       const startedAt = perfLoggingEnabled ? performance.now() : 0;
       let refreshed = false;
       let shouldScheduleInlineConversion = false;
@@ -339,7 +369,9 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
               await refreshRuntimeSettingsAndRates(false);
               refreshed = true;
             } catch (error) {
-              console.warn("[ccx] Failed to refresh rates after settings update", error);
+              if (!isExtensionContextInvalidatedError(error)) {
+                console.warn("[ccx] Failed to refresh rates after settings update", error);
+              }
             }
           }
 
@@ -363,7 +395,9 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
         refreshed = true;
         scheduleInlineConversionFromSettingsUpdate();
       } catch (error) {
-        console.warn("[ccx] Failed to refresh settings/rates after storage update", error);
+        if (!isExtensionContextInvalidatedError(error)) {
+          console.warn("[ccx] Failed to refresh settings/rates after storage update", error);
+        }
       } finally {
         logSettingsStorageUpdate(startedAt, {
           refreshed,
@@ -373,6 +407,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
       }
     },
     enqueueMutationRoots: (roots) => {
+      if (isCleanedUp) return;
       if (!roots.length) return;
 
       for (const root of roots) {
@@ -383,9 +418,11 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
     },
     recordSelectionConversion: () => {},
     shouldIgnoreMutations: () => {
-      return isApplyingInlineConversion || suppressMutationDepth > 0;
+      return isCleanedUp || isApplyingInlineConversion || suppressMutationDepth > 0;
     },
     cleanup: () => {
+      if (isCleanedUp) return;
+      isCleanedUp = true;
       conversionDebounceTimer = clearTimer(conversionDebounceTimer);
       partialConversionTimer = clearTimer(partialConversionTimer);
       hydrationRetryTimer = clearTimer(hydrationRetryTimer);
