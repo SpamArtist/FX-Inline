@@ -224,12 +224,20 @@ test("adds structured add-on conversions for Amazon-style and sibling-symbol pri
     '  <span aria-hidden="true" id="sibling-symbol">$</span>',
     '  <span aria-hidden="true" id="sibling-value">2500</span>',
     '</div>',
+    '<div>',
+    '  <span aria-hidden="true" id="sibling-value-word">990,000</span>',
+    '  <span aria-hidden="true" id="sibling-word">yen/month</span>',
+    '</div>',
   ].join("\n");
 
-  const applied = convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
-    clearExisting: false,
-  });
-
+  const applied = convertVisiblePrices(
+    "EUR",
+    createRateSnapshot({ rates: { JPY: 110 } }),
+    document.body,
+    {
+      clearExisting: false,
+    },
+  );
   expect(applied).toBeGreaterThanOrEqual(2);
 
   const amazonAddon = document.querySelector(
@@ -247,6 +255,45 @@ test("adds structured add-on conversions for Amazon-style and sibling-symbol pri
   expect(siblingAddon).not.toBeNull();
   expect(siblingAddon.getAttribute("data-original")).toBe("$2500");
   expect(siblingAddon.querySelector(".ccx-converted-amount").textContent).toMatch(
+    /^\(.+\)$/,
+  );
+
+  const siblingWordAddon = document.querySelector(
+    '#sibling-value-word span.ccx-inline-conversion[data-ccx-mode="addon"]',
+  );
+  expect(siblingWordAddon).not.toBeNull();
+  expect(siblingWordAddon.getAttribute("data-original")).toBe("990,000 yen");
+  expect(
+    siblingWordAddon.querySelector(".ccx-converted-amount").textContent,
+  ).toMatch(/^\(.+\)$/);
+});
+
+test("adds conversion when amount and yen/month token are split across sibling nodes", () => {
+  document.body.innerHTML = [
+    '<div class="price" id="split-yen">',
+    "  from",
+    '  <span class="bold">990,000</span>',
+    "  yen/month",
+    "</div>",
+  ].join("\n");
+
+  const applied = convertVisiblePrices(
+    "EUR",
+    createRateSnapshot({ rates: { JPY: 110 } }),
+    document.body,
+    {
+      clearExisting: false,
+    },
+  );
+
+  expect(applied).toBeGreaterThanOrEqual(1);
+
+  const addon = document.querySelector(
+    '#split-yen .bold span.ccx-inline-conversion[data-ccx-mode="addon"]',
+  );
+  expect(addon).not.toBeNull();
+  expect(addon.getAttribute("data-original")).toBe("990,000 yen");
+  expect(addon.querySelector(".ccx-converted-amount").textContent).toMatch(
     /^\(.+\)$/,
   );
 });
