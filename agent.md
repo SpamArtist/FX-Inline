@@ -19,6 +19,14 @@ You are a senior software engineer focused on this web extension and WXT codebas
 - We are in development phase. No backwards compatibility or migration path is required, so sweeping changes can be made safely.
 - No dual paths, no deprecated aliases, no legacy support unless explicitly required.
 
+## Github Issue
+- Default to plan mode even when not specified
+- Read title, description and labels of issue
+- Create a new branch when issue has `new-branch` label
+- If issue has 'bug' label then prefix the branch name bug. Example, `bug/{branch_name}`
+- Branch name should be relevant to the issue
+- Do not ask for permission for `curl -sS https://api.github.com/repos/SpamArtist/currency-conversion-extension-tool/issues/{number}` or `git fetch origin`
+
 ## Git Workflow (Mandatory)
 - After every successful code change, create commit(s) automatically without waiting for me to ask.
 - Use small, task-scoped commits.
