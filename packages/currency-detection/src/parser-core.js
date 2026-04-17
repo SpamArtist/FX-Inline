@@ -17,6 +17,57 @@ const quickDigitRegex = /\d/u;
 const thousandMagnitudeHintRegex =
   /\d[\d,.\u00A0\u202F ]*\s*[kK](?=$|[^\p{L}\p{N}])/u;
 
+/**
+ * @typedef {Object} ParseOptions
+ * @property {string | null} [localeHint]
+ */
+
+/**
+ * @typedef {Object} ParseResult
+ * @property {boolean} valid
+ * @property {number} [value]
+ * @property {string | null} [currency]
+ */
+
+/**
+ * @typedef {Object} CurrencyMatch
+ * @property {string} raw
+ * @property {number} start
+ * @property {number} end
+ * @property {number} value
+ * @property {string} currency
+ * @property {number} [rangeEndValue]
+ */
+
+/**
+ * @typedef {Object} MagnitudeProfileEntry
+ * @property {number} multiplier
+ * @property {string[]} aliases
+ */
+
+/**
+ * @typedef {Object} MagnitudeProfile
+ * @property {string} locale
+ * @property {boolean} [requiresLocaleHint]
+ * @property {MagnitudeProfileEntry[]} entries
+ */
+
+/**
+ * @typedef {Object} ParserConfig
+ * @property {Record<string, string>} [extraSymbols]
+ * @property {Record<string, string>} [extraWords]
+ * @property {string[]} [extraIsoCodes]
+ * @property {MagnitudeProfile[]} [extraMagnitudeProfiles]
+ */
+
+/**
+ * @typedef {Object} CurrencyParser
+ * @property {(input: string, options?: string | ParseOptions | null) => ParseResult} parseValue
+ * @property {(input: string, options?: string | ParseOptions | null) => CurrencyMatch[]} extractMatches
+ * @property {(input: string) => boolean} mayContainCurrencyToken
+ * @property {(input: string) => boolean} hasThousandMagnitudeHint
+ */
+
 function assertObjectOrUndefined(value, fieldName) {
   if (value == null) return;
   if (typeof value !== "object" || Array.isArray(value)) {
@@ -720,6 +771,16 @@ function createCompiledConfig(config) {
   });
 }
 
+/**
+ * Creates an immutable parser instance.
+ *
+ * The `config` object is optional and additive-only. It can add extra symbols,
+ * words, ISO-like codes, and magnitude profiles, but cannot override built-in
+ * tokens or built-in magnitude aliases.
+ *
+ * @param {ParserConfig} [config]
+ * @returns {CurrencyParser}
+ */
 export function createCurrencyParser(config) {
   return createCompiledConfig(config);
 }
