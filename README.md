@@ -66,13 +66,13 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run readme:sync:check` | `node scripts/readme-sync.mjs --check` |
 
 ### Recent Changes (first-parent, excluding README automation commits)
-- 2026-04-17 `8fbd12a` feat(website): enable reliable hot reload for dev server
-- 2026-04-17 `f3e6338` chore(playground): add SEO metadata for search and sharing
-- 2026-04-17 `3a2b62f` feat(playground): add clear input button and handler
-- 2026-04-17 `859d954` style(playground): set responsive minimum heights for result sections
-- 2026-04-17 `5cc7c8e` feat(playground): trigger detection automatically on paste
-- 2026-04-17 `97804e3` feat(playground): update input counter on typing and paste
-- 2026-04-17 `b5ec04c` feat(playground): show input character counter in header
-- 2026-04-17 `ed13890` fix(playground): cap input to 5000 characters
+- 2026-04-17 `8899fdb` docs: align docs with latest extension behavior
+- 2026-04-17 `959008e` feat: introduce standalone currency-detection package, benchmarks, and playground (#18)
+- 2026-04-17 `8019562` ci: run web extension tests on pull requests
+- 2026-04-16 `b2766fd` update
+- 2026-04-15 `42fb2a6` fix: ignore username/handle-like currency matches (#14)
+- 2026-04-15 `6a8e02b` Merge branch 'main' of https://github.com/SpamArtist/currency-conversion-extension-tool
+- 2026-04-15 `2ce0201` fix: no important in css
+- 2026-04-15 `9ba0eff` inline-conversion: add converted amount line-height and width styles
 
 <!-- AUTO-GENERATED:END -->
