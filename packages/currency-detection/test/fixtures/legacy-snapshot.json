@@ -1,0 +1,8744 @@
+{
+  "schemaVersion": 1,
+  "source": "apps/extension/utils/utils.ts (compiled via apps/extension/test-dist/utils/utils.js)",
+  "fixtureSchemaVersion": 1,
+  "parseResults": [
+    {
+      "input": "+150 usd",
+      "output": {
+        "valid": true,
+        "value": 150,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "¢123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "￠50",
+      "output": {
+        "valid": true,
+        "value": 50,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "$1,234.56",
+      "output": {
+        "valid": true,
+        "value": 1234.56,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "$100",
+      "output": {
+        "valid": true,
+        "value": 100,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "＄100",
+      "output": {
+        "valid": true,
+        "value": 100,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "$123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "﹩75",
+      "output": {
+        "valid": true,
+        "value": 75,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "£123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GBP"
+      }
+    },
+    {
+      "input": "￡200",
+      "output": {
+        "valid": true,
+        "value": 200,
+        "currency": "GBP"
+      }
+    },
+    {
+      "input": "¥123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "JPY"
+      }
+    },
+    {
+      "input": "￥39,000",
+      "output": {
+        "valid": true,
+        "value": 39000,
+        "currency": "JPY"
+      }
+    },
+    {
+      "input": "￥３９，０００",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "¥6m",
+      "output": {
+        "valid": true,
+        "value": 6000000,
+        "currency": "JPY"
+      }
+    },
+    {
+      "input": "¥6M",
+      "output": {
+        "valid": true,
+        "value": 6000000,
+        "currency": "JPY"
+      }
+    },
+    {
+      "input": "¥6M+",
+      "output": {
+        "valid": true,
+        "value": 6000000,
+        "currency": "JPY"
+      }
+    },
+    {
+      "input": "৳123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BDT"
+      }
+    },
+    {
+      "input": "฿123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "THB"
+      }
+    },
+    {
+      "input": "₡123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "₦123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "NGN"
+      }
+    },
+    {
+      "input": "₩123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KRW"
+      }
+    },
+    {
+      "input": "￦3000",
+      "output": {
+        "valid": true,
+        "value": 3000,
+        "currency": "KRW"
+      }
+    },
+    {
+      "input": "₪123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ILS"
+      }
+    },
+    {
+      "input": "₫ 1 nghìn tỷ",
+      "output": {
+        "valid": true,
+        "value": 1000000000000,
+        "currency": "VND"
+      }
+    },
+    {
+      "input": "₫ 3.65 tỷ",
+      "output": {
+        "valid": true,
+        "value": 3650000000,
+        "currency": "VND"
+      }
+    },
+    {
+      "input": "₫ 4.295 billion",
+      "output": {
+        "valid": true,
+        "value": 4295000000,
+        "currency": "VND"
+      }
+    },
+    {
+      "input": "₫ 4.295 trillion",
+      "output": {
+        "valid": true,
+        "value": 4295000000000,
+        "currency": "VND"
+      }
+    },
+    {
+      "input": "₫123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "VND"
+      }
+    },
+    {
+      "input": "₫3.65tỷ",
+      "output": {
+        "valid": true,
+        "value": 3650000000,
+        "currency": "VND"
+      }
+    },
+    {
+      "input": "€123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "EUR"
+      }
+    },
+    {
+      "input": "₭123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "LAK"
+      }
+    },
+    {
+      "input": "₮123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MNT"
+      }
+    },
+    {
+      "input": "₯123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "₰123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "₱123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "PHP"
+      }
+    },
+    {
+      "input": "₲123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "₳123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "₴123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "₵123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "₷123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "₸123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "₹123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "INR"
+      }
+    },
+    {
+      "input": "₺123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TRY"
+      }
+    },
+    {
+      "input": "₻123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "₼123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "₽123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "RUB"
+      }
+    },
+    {
+      "input": "₾123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "₿123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "1 000 000 ₫",
+      "output": {
+        "valid": true,
+        "value": 1000000,
+        "currency": "VND"
+      }
+    },
+    {
+      "input": "1 000 000 ₫",
+      "output": {
+        "valid": true,
+        "value": 1000000,
+        "currency": "VND"
+      }
+    },
+    {
+      "input": "1 Lakh INR",
+      "output": {
+        "valid": true,
+        "value": 100000,
+        "currency": "INR"
+      }
+    },
+    {
+      "input": "1,234 yên",
+      "output": {
+        "valid": true,
+        "value": 1234,
+        "currency": "JPY"
+      }
+    },
+    {
+      "input": "100",
+      "output": {
+        "valid": true,
+        "value": 100,
+        "currency": null
+      }
+    },
+    {
+      "input": "100 USD",
+      "output": {
+        "valid": true,
+        "value": 100,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "100..50",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "100$",
+      "output": {
+        "valid": true,
+        "value": 100,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "100USD",
+      "output": {
+        "valid": true,
+        "value": 100,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "12.3.4 USD",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123 AED",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AED"
+      }
+    },
+    {
+      "input": "123 AFN",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AFN"
+      }
+    },
+    {
+      "input": "123 ALL",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ALL"
+      }
+    },
+    {
+      "input": "123 AMD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AMD"
+      }
+    },
+    {
+      "input": "123 ANG",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123 AOA",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AOA"
+      }
+    },
+    {
+      "input": "123 ARS",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ARS"
+      }
+    },
+    {
+      "input": "123 AUD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AUD"
+      }
+    },
+    {
+      "input": "123 AWG",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AWG"
+      }
+    },
+    {
+      "input": "123 AZN",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AZN"
+      }
+    },
+    {
+      "input": "123 BAM",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BAM"
+      }
+    },
+    {
+      "input": "123 BBD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BBD"
+      }
+    },
+    {
+      "input": "123 BDT",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BDT"
+      }
+    },
+    {
+      "input": "123 BGN",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123 BHD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BHD"
+      }
+    },
+    {
+      "input": "123 BMD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BMD"
+      }
+    },
+    {
+      "input": "123 BND",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BND"
+      }
+    },
+    {
+      "input": "123 BOB",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123 BRL",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BRL"
+      }
+    },
+    {
+      "input": "123 BSD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BSD"
+      }
+    },
+    {
+      "input": "123 BTN",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123 BWP",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BWP"
+      }
+    },
+    {
+      "input": "123 BYN",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BYN"
+      }
+    },
+    {
+      "input": "123 BZD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BZD"
+      }
+    },
+    {
+      "input": "123 CAD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CAD"
+      }
+    },
+    {
+      "input": "123 CDF",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CDF"
+      }
+    },
+    {
+      "input": "123 CHF",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CHF"
+      }
+    },
+    {
+      "input": "123 CLP",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CLP"
+      }
+    },
+    {
+      "input": "123 CNY",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CNY"
+      }
+    },
+    {
+      "input": "123 COP",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123 CRC",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CRC"
+      }
+    },
+    {
+      "input": "123 CUP",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CUP"
+      }
+    },
+    {
+      "input": "123 CVE",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CVE"
+      }
+    },
+    {
+      "input": "123 CZK",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CZK"
+      }
+    },
+    {
+      "input": "123 DJF",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "DJF"
+      }
+    },
+    {
+      "input": "123 DKK",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "DKK"
+      }
+    },
+    {
+      "input": "123 DOP",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "DOP"
+      }
+    },
+    {
+      "input": "123 DZD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "DZD"
+      }
+    },
+    {
+      "input": "123 EGP",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "EGP"
+      }
+    },
+    {
+      "input": "123 ERN",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ERN"
+      }
+    },
+    {
+      "input": "123 ETB",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ETB"
+      }
+    },
+    {
+      "input": "123 EUR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "EUR"
+      }
+    },
+    {
+      "input": "123 FJD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "FJD"
+      }
+    },
+    {
+      "input": "123 FKP",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "FKP"
+      }
+    },
+    {
+      "input": "123 GBP",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GBP"
+      }
+    },
+    {
+      "input": "123 GEL",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GEL"
+      }
+    },
+    {
+      "input": "123 GHS",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GHS"
+      }
+    },
+    {
+      "input": "123 GIP",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GIP"
+      }
+    },
+    {
+      "input": "123 GMD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GMD"
+      }
+    },
+    {
+      "input": "123 GNF",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GNF"
+      }
+    },
+    {
+      "input": "123 GTQ",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GTQ"
+      }
+    },
+    {
+      "input": "123 GYD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GYD"
+      }
+    },
+    {
+      "input": "123 HKD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "HKD"
+      }
+    },
+    {
+      "input": "123 HNL",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "HNL"
+      }
+    },
+    {
+      "input": "123 HRK",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123 HTG",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123 HUF",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "HUF"
+      }
+    },
+    {
+      "input": "123 IDR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "IDR"
+      }
+    },
+    {
+      "input": "123 ILS",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ILS"
+      }
+    },
+    {
+      "input": "123 INR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "INR"
+      }
+    },
+    {
+      "input": "123 IQD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "IQD"
+      }
+    },
+    {
+      "input": "123 IRR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "IRR"
+      }
+    },
+    {
+      "input": "123 ISK",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ISK"
+      }
+    },
+    {
+      "input": "123 JMD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "JMD"
+      }
+    },
+    {
+      "input": "123 JOD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "JOD"
+      }
+    },
+    {
+      "input": "123 JPY",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "JPY"
+      }
+    },
+    {
+      "input": "123 KES",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KES"
+      }
+    },
+    {
+      "input": "123 KGS",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KGS"
+      }
+    },
+    {
+      "input": "123 KHR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KHR"
+      }
+    },
+    {
+      "input": "123 KMF",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KMF"
+      }
+    },
+    {
+      "input": "123 KPW",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123 KRW",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KRW"
+      }
+    },
+    {
+      "input": "123 KWD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KWD"
+      }
+    },
+    {
+      "input": "123 KYD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KYD"
+      }
+    },
+    {
+      "input": "123 KZT",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KZT"
+      }
+    },
+    {
+      "input": "123 LAK",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "LAK"
+      }
+    },
+    {
+      "input": "123 LBP",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "LBP"
+      }
+    },
+    {
+      "input": "123 LKR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "LKR"
+      }
+    },
+    {
+      "input": "123 LRD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "LRD"
+      }
+    },
+    {
+      "input": "123 LSL",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123 LYD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "LYD"
+      }
+    },
+    {
+      "input": "123 MAD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MAD"
+      }
+    },
+    {
+      "input": "123 MDL",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MDL"
+      }
+    },
+    {
+      "input": "123 MGA",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MGA"
+      }
+    },
+    {
+      "input": "123 MKD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MKD"
+      }
+    },
+    {
+      "input": "123 MMK",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MMK"
+      }
+    },
+    {
+      "input": "123 MNT",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MNT"
+      }
+    },
+    {
+      "input": "123 MOP",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MOP"
+      }
+    },
+    {
+      "input": "123 MRU",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MRU"
+      }
+    },
+    {
+      "input": "123 MUR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MUR"
+      }
+    },
+    {
+      "input": "123 MVR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MVR"
+      }
+    },
+    {
+      "input": "123 MWK",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MWK"
+      }
+    },
+    {
+      "input": "123 MXN",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MXN"
+      }
+    },
+    {
+      "input": "123 MYR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MYR"
+      }
+    },
+    {
+      "input": "123 MZN",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MZN"
+      }
+    },
+    {
+      "input": "123 NAD",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123 NGN",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "NGN"
+      }
+    },
+    {
+      "input": "123 NIO",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "NIO"
+      }
+    },
+    {
+      "input": "123 NOK",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "NOK"
+      }
+    },
+    {
+      "input": "123 NPR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "NPR"
+      }
+    },
+    {
+      "input": "123 NZD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "NZD"
+      }
+    },
+    {
+      "input": "123 OMR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "OMR"
+      }
+    },
+    {
+      "input": "123 PAB",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123 PEN",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "PEN"
+      }
+    },
+    {
+      "input": "123 PGK",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "PGK"
+      }
+    },
+    {
+      "input": "123 PHP",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "PHP"
+      }
+    },
+    {
+      "input": "123 PKR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "PKR"
+      }
+    },
+    {
+      "input": "123 PLN",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "PLN"
+      }
+    },
+    {
+      "input": "123 PYG",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "PYG"
+      }
+    },
+    {
+      "input": "123 QAR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "QAR"
+      }
+    },
+    {
+      "input": "123 RON",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "RON"
+      }
+    },
+    {
+      "input": "123 RSD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "RSD"
+      }
+    },
+    {
+      "input": "123 RUB",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "RUB"
+      }
+    },
+    {
+      "input": "123 RWF",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "RWF"
+      }
+    },
+    {
+      "input": "123 SAR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SAR"
+      }
+    },
+    {
+      "input": "123 SBD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SBD"
+      }
+    },
+    {
+      "input": "123 SCR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SCR"
+      }
+    },
+    {
+      "input": "123 SDG",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SDG"
+      }
+    },
+    {
+      "input": "123 SEK",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SEK"
+      }
+    },
+    {
+      "input": "123 SGD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SGD"
+      }
+    },
+    {
+      "input": "123 SHP",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SHP"
+      }
+    },
+    {
+      "input": "123 SLL",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123 SOS",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SOS"
+      }
+    },
+    {
+      "input": "123 SRD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SRD"
+      }
+    },
+    {
+      "input": "123 STN",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "STN"
+      }
+    },
+    {
+      "input": "123 SVC",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123 SYP",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SYP"
+      }
+    },
+    {
+      "input": "123 SZL",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SZL"
+      }
+    },
+    {
+      "input": "123 THB",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "THB"
+      }
+    },
+    {
+      "input": "123 TJS",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TJS"
+      }
+    },
+    {
+      "input": "123 TMT",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TMT"
+      }
+    },
+    {
+      "input": "123 TND",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TND"
+      }
+    },
+    {
+      "input": "123 TOP",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TOP"
+      }
+    },
+    {
+      "input": "123 TRY",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TRY"
+      }
+    },
+    {
+      "input": "123 TTD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TTD"
+      }
+    },
+    {
+      "input": "123 TWD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TWD"
+      }
+    },
+    {
+      "input": "123 TZS",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TZS"
+      }
+    },
+    {
+      "input": "123 UAH",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "UAH"
+      }
+    },
+    {
+      "input": "123 UGX",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "UGX"
+      }
+    },
+    {
+      "input": "123 USD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "123 UYU",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "UYU"
+      }
+    },
+    {
+      "input": "123 UZS",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "UZS"
+      }
+    },
+    {
+      "input": "123 VES",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123 VND",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "VND"
+      }
+    },
+    {
+      "input": "123 VUV",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "VUV"
+      }
+    },
+    {
+      "input": "123 WST",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "WST"
+      }
+    },
+    {
+      "input": "123 XAF",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "XAF"
+      }
+    },
+    {
+      "input": "123 XCD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "XCD"
+      }
+    },
+    {
+      "input": "123 XOF",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "XOF"
+      }
+    },
+    {
+      "input": "123 XPF",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123 YER",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "YER"
+      }
+    },
+    {
+      "input": "123 ZAR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ZAR"
+      }
+    },
+    {
+      "input": "123 ZMW",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ZMW"
+      }
+    },
+    {
+      "input": "123 ZWL",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ZWL"
+      }
+    },
+    {
+      "input": "123¢",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "123$",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "123£",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GBP"
+      }
+    },
+    {
+      "input": "123¥",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "JPY"
+      }
+    },
+    {
+      "input": "123৳",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BDT"
+      }
+    },
+    {
+      "input": "123฿",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "THB"
+      }
+    },
+    {
+      "input": "123₡",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123₦",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "NGN"
+      }
+    },
+    {
+      "input": "123₩",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KRW"
+      }
+    },
+    {
+      "input": "123₪",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ILS"
+      }
+    },
+    {
+      "input": "123₫",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "VND"
+      }
+    },
+    {
+      "input": "123€",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "EUR"
+      }
+    },
+    {
+      "input": "123₭",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "LAK"
+      }
+    },
+    {
+      "input": "123₮",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MNT"
+      }
+    },
+    {
+      "input": "123₯",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123₰",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123₱",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "PHP"
+      }
+    },
+    {
+      "input": "123₲",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123₳",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123₴",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123₵",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123₷",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123₸",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123₹",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "INR"
+      }
+    },
+    {
+      "input": "123₺",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TRY"
+      }
+    },
+    {
+      "input": "123₻",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123₼",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123₽",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "RUB"
+      }
+    },
+    {
+      "input": "123₾",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123₿",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123A$",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AUD"
+      }
+    },
+    {
+      "input": "123AED",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AED"
+      }
+    },
+    {
+      "input": "123AFN",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AFN"
+      }
+    },
+    {
+      "input": "123ALL",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ALL"
+      }
+    },
+    {
+      "input": "123AMD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AMD"
+      }
+    },
+    {
+      "input": "123ANG",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123AOA",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AOA"
+      }
+    },
+    {
+      "input": "123ARS",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ARS"
+      }
+    },
+    {
+      "input": "123AU$",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AUD"
+      }
+    },
+    {
+      "input": "123AUD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AUD"
+      }
+    },
+    {
+      "input": "123AWG",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AWG"
+      }
+    },
+    {
+      "input": "123AZN",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AZN"
+      }
+    },
+    {
+      "input": "123BAM",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BAM"
+      }
+    },
+    {
+      "input": "123BBD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BBD"
+      }
+    },
+    {
+      "input": "123BDT",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BDT"
+      }
+    },
+    {
+      "input": "123BGN",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123BHD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BHD"
+      }
+    },
+    {
+      "input": "123BMD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BMD"
+      }
+    },
+    {
+      "input": "123BND",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BND"
+      }
+    },
+    {
+      "input": "123BOB",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123BRL",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BRL"
+      }
+    },
+    {
+      "input": "123BSD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BSD"
+      }
+    },
+    {
+      "input": "123BTN",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123BWP",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BWP"
+      }
+    },
+    {
+      "input": "123BYN",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BYN"
+      }
+    },
+    {
+      "input": "123BZD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BZD"
+      }
+    },
+    {
+      "input": "123CA$",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CAD"
+      }
+    },
+    {
+      "input": "123CAD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CAD"
+      }
+    },
+    {
+      "input": "123CDF",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CDF"
+      }
+    },
+    {
+      "input": "123CHF",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CHF"
+      }
+    },
+    {
+      "input": "123CLP",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CLP"
+      }
+    },
+    {
+      "input": "123CNY",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CNY"
+      }
+    },
+    {
+      "input": "123COP",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123CRC",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CRC"
+      }
+    },
+    {
+      "input": "123CUP",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CUP"
+      }
+    },
+    {
+      "input": "123CVE",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CVE"
+      }
+    },
+    {
+      "input": "123CZK",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CZK"
+      }
+    },
+    {
+      "input": "123DJF",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "DJF"
+      }
+    },
+    {
+      "input": "123DKK",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "DKK"
+      }
+    },
+    {
+      "input": "123DOP",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "DOP"
+      }
+    },
+    {
+      "input": "123DZD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "DZD"
+      }
+    },
+    {
+      "input": "123EC$",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "XCD"
+      }
+    },
+    {
+      "input": "123EGP",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "EGP"
+      }
+    },
+    {
+      "input": "123ERN",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ERN"
+      }
+    },
+    {
+      "input": "123ETB",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ETB"
+      }
+    },
+    {
+      "input": "123EUR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "EUR"
+      }
+    },
+    {
+      "input": "123FJD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "FJD"
+      }
+    },
+    {
+      "input": "123FKP",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "FKP"
+      }
+    },
+    {
+      "input": "123GBP",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GBP"
+      }
+    },
+    {
+      "input": "123GEL",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GEL"
+      }
+    },
+    {
+      "input": "123GHS",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GHS"
+      }
+    },
+    {
+      "input": "123GIP",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GIP"
+      }
+    },
+    {
+      "input": "123GMD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GMD"
+      }
+    },
+    {
+      "input": "123GNF",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GNF"
+      }
+    },
+    {
+      "input": "123GTQ",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GTQ"
+      }
+    },
+    {
+      "input": "123GYD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GYD"
+      }
+    },
+    {
+      "input": "123HK$",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "HKD"
+      }
+    },
+    {
+      "input": "123HKD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "HKD"
+      }
+    },
+    {
+      "input": "123HNL",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "HNL"
+      }
+    },
+    {
+      "input": "123HRK",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123HTG",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123HUF",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "HUF"
+      }
+    },
+    {
+      "input": "123IDR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "IDR"
+      }
+    },
+    {
+      "input": "123ILS",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ILS"
+      }
+    },
+    {
+      "input": "123INR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "INR"
+      }
+    },
+    {
+      "input": "123IQD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "IQD"
+      }
+    },
+    {
+      "input": "123IRR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "IRR"
+      }
+    },
+    {
+      "input": "123ISK",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ISK"
+      }
+    },
+    {
+      "input": "123JMD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "JMD"
+      }
+    },
+    {
+      "input": "123JOD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "JOD"
+      }
+    },
+    {
+      "input": "123JPY",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "JPY"
+      }
+    },
+    {
+      "input": "123KES",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KES"
+      }
+    },
+    {
+      "input": "123KGS",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KGS"
+      }
+    },
+    {
+      "input": "123KHR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KHR"
+      }
+    },
+    {
+      "input": "123KMF",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KMF"
+      }
+    },
+    {
+      "input": "123KPW",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123KRW",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KRW"
+      }
+    },
+    {
+      "input": "123KWD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KWD"
+      }
+    },
+    {
+      "input": "123KYD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KYD"
+      }
+    },
+    {
+      "input": "123KZT",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KZT"
+      }
+    },
+    {
+      "input": "123LAK",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "LAK"
+      }
+    },
+    {
+      "input": "123LBP",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "LBP"
+      }
+    },
+    {
+      "input": "123LKR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "LKR"
+      }
+    },
+    {
+      "input": "123LRD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "LRD"
+      }
+    },
+    {
+      "input": "123LSL",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123LYD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "LYD"
+      }
+    },
+    {
+      "input": "123MAD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MAD"
+      }
+    },
+    {
+      "input": "123MDL",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MDL"
+      }
+    },
+    {
+      "input": "123MGA",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MGA"
+      }
+    },
+    {
+      "input": "123MKD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MKD"
+      }
+    },
+    {
+      "input": "123MMK",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MMK"
+      }
+    },
+    {
+      "input": "123MNT",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MNT"
+      }
+    },
+    {
+      "input": "123MOP",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MOP"
+      }
+    },
+    {
+      "input": "123MRU",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MRU"
+      }
+    },
+    {
+      "input": "123MUR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MUR"
+      }
+    },
+    {
+      "input": "123MVR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MVR"
+      }
+    },
+    {
+      "input": "123MWK",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MWK"
+      }
+    },
+    {
+      "input": "123MX$",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MXN"
+      }
+    },
+    {
+      "input": "123MXN",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MXN"
+      }
+    },
+    {
+      "input": "123MYR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MYR"
+      }
+    },
+    {
+      "input": "123MZN",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MZN"
+      }
+    },
+    {
+      "input": "123NAD",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123NGN",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "NGN"
+      }
+    },
+    {
+      "input": "123NIO",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "NIO"
+      }
+    },
+    {
+      "input": "123NOK",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "NOK"
+      }
+    },
+    {
+      "input": "123NPR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "NPR"
+      }
+    },
+    {
+      "input": "123NT$",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TWD"
+      }
+    },
+    {
+      "input": "123NZ$",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "NZD"
+      }
+    },
+    {
+      "input": "123NZD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "NZD"
+      }
+    },
+    {
+      "input": "123OMR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "OMR"
+      }
+    },
+    {
+      "input": "123PAB",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123PEN",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "PEN"
+      }
+    },
+    {
+      "input": "123PGK",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "PGK"
+      }
+    },
+    {
+      "input": "123PHP",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "PHP"
+      }
+    },
+    {
+      "input": "123PKR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "PKR"
+      }
+    },
+    {
+      "input": "123PLN",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "PLN"
+      }
+    },
+    {
+      "input": "123PYG",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "PYG"
+      }
+    },
+    {
+      "input": "123QAR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "QAR"
+      }
+    },
+    {
+      "input": "123R$",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BRL"
+      }
+    },
+    {
+      "input": "123RD$",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "DOP"
+      }
+    },
+    {
+      "input": "123RON",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "RON"
+      }
+    },
+    {
+      "input": "123₨",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "PKR"
+      }
+    },
+    {
+      "input": "123RSD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "RSD"
+      }
+    },
+    {
+      "input": "123RUB",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "RUB"
+      }
+    },
+    {
+      "input": "123RWF",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "RWF"
+      }
+    },
+    {
+      "input": "123SAR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SAR"
+      }
+    },
+    {
+      "input": "123SBD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SBD"
+      }
+    },
+    {
+      "input": "123SCR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SCR"
+      }
+    },
+    {
+      "input": "123SDG",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SDG"
+      }
+    },
+    {
+      "input": "123SEK",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SEK"
+      }
+    },
+    {
+      "input": "123SGD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SGD"
+      }
+    },
+    {
+      "input": "123SHP",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SHP"
+      }
+    },
+    {
+      "input": "123SLL",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123SOS",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SOS"
+      }
+    },
+    {
+      "input": "123SRD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SRD"
+      }
+    },
+    {
+      "input": "123STN",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "STN"
+      }
+    },
+    {
+      "input": "123SVC",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123SYP",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SYP"
+      }
+    },
+    {
+      "input": "123SZL",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SZL"
+      }
+    },
+    {
+      "input": "123THB",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "THB"
+      }
+    },
+    {
+      "input": "123TJS",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TJS"
+      }
+    },
+    {
+      "input": "123TMT",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TMT"
+      }
+    },
+    {
+      "input": "123TND",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TND"
+      }
+    },
+    {
+      "input": "123TOP",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TOP"
+      }
+    },
+    {
+      "input": "123TRY",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TRY"
+      }
+    },
+    {
+      "input": "123TTD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TTD"
+      }
+    },
+    {
+      "input": "123TWD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TWD"
+      }
+    },
+    {
+      "input": "123TZS",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TZS"
+      }
+    },
+    {
+      "input": "123UAH",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "UAH"
+      }
+    },
+    {
+      "input": "123UGX",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "UGX"
+      }
+    },
+    {
+      "input": "123US$",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "123USD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "123UYU",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "UYU"
+      }
+    },
+    {
+      "input": "123UZS",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "UZS"
+      }
+    },
+    {
+      "input": "123VES",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123VND",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "VND"
+      }
+    },
+    {
+      "input": "123VUV",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "VUV"
+      }
+    },
+    {
+      "input": "123WST",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "WST"
+      }
+    },
+    {
+      "input": "123XAF",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "XAF"
+      }
+    },
+    {
+      "input": "123XCD",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "XCD"
+      }
+    },
+    {
+      "input": "123XOF",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "XOF"
+      }
+    },
+    {
+      "input": "123XPF",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "123YER",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "YER"
+      }
+    },
+    {
+      "input": "123ZAR",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ZAR"
+      }
+    },
+    {
+      "input": "123ZMW",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ZMW"
+      }
+    },
+    {
+      "input": "123ZWL",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ZWL"
+      }
+    },
+    {
+      "input": "123د.إ",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AED"
+      }
+    },
+    {
+      "input": "123د.ك",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KWD"
+      }
+    },
+    {
+      "input": "123ر.س",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SAR"
+      }
+    },
+    {
+      "input": "123ر.ع.",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "OMR"
+      }
+    },
+    {
+      "input": "123ر.ق",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "QAR"
+      }
+    },
+    {
+      "input": "123ل.د",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "LYD"
+      }
+    },
+    {
+      "input": "2 billions USD",
+      "output": {
+        "valid": true,
+        "value": 2000000000,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "27, all",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "4.295 billion USD",
+      "output": {
+        "valid": true,
+        "value": 4295000000,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "42.5eur",
+      "output": {
+        "valid": true,
+        "value": 42.5,
+        "currency": "EUR"
+      }
+    },
+    {
+      "input": "A$123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AUD"
+      }
+    },
+    {
+      "input": "AED 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AED"
+      }
+    },
+    {
+      "input": "AED123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AED"
+      }
+    },
+    {
+      "input": "AFN 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AFN"
+      }
+    },
+    {
+      "input": "AFN123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AFN"
+      }
+    },
+    {
+      "input": "ALL 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ALL"
+      }
+    },
+    {
+      "input": "ALL123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ALL"
+      }
+    },
+    {
+      "input": "AMD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AMD"
+      }
+    },
+    {
+      "input": "AMD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AMD"
+      }
+    },
+    {
+      "input": "and 100",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "ANG 123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "ANG123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "AOA 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AOA"
+      }
+    },
+    {
+      "input": "AOA123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AOA"
+      }
+    },
+    {
+      "input": "ARS 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ARS"
+      }
+    },
+    {
+      "input": "ARS123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ARS"
+      }
+    },
+    {
+      "input": "AU$123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AUD"
+      }
+    },
+    {
+      "input": "AUD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AUD"
+      }
+    },
+    {
+      "input": "AUD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AUD"
+      }
+    },
+    {
+      "input": "AWG 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AWG"
+      }
+    },
+    {
+      "input": "AWG123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AWG"
+      }
+    },
+    {
+      "input": "AZN 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AZN"
+      }
+    },
+    {
+      "input": "AZN123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AZN"
+      }
+    },
+    {
+      "input": "BAM 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BAM"
+      }
+    },
+    {
+      "input": "BAM123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BAM"
+      }
+    },
+    {
+      "input": "BBD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BBD"
+      }
+    },
+    {
+      "input": "BBD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BBD"
+      }
+    },
+    {
+      "input": "BDT 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BDT"
+      }
+    },
+    {
+      "input": "BDT123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BDT"
+      }
+    },
+    {
+      "input": "BGN 123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "BGN123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "BHD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BHD"
+      }
+    },
+    {
+      "input": "BHD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BHD"
+      }
+    },
+    {
+      "input": "BMD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BMD"
+      }
+    },
+    {
+      "input": "BMD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BMD"
+      }
+    },
+    {
+      "input": "BND 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BND"
+      }
+    },
+    {
+      "input": "BND123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BND"
+      }
+    },
+    {
+      "input": "BOB 123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "BOB123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "BRL 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BRL"
+      }
+    },
+    {
+      "input": "BRL123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BRL"
+      }
+    },
+    {
+      "input": "BSD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BSD"
+      }
+    },
+    {
+      "input": "BSD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BSD"
+      }
+    },
+    {
+      "input": "BTN 123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "BTN123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "BWP 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BWP"
+      }
+    },
+    {
+      "input": "BWP123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BWP"
+      }
+    },
+    {
+      "input": "BYN 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BYN"
+      }
+    },
+    {
+      "input": "BYN123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BYN"
+      }
+    },
+    {
+      "input": "BZD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BZD"
+      }
+    },
+    {
+      "input": "BZD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BZD"
+      }
+    },
+    {
+      "input": "CA$123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CAD"
+      }
+    },
+    {
+      "input": "CAD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CAD"
+      }
+    },
+    {
+      "input": "CAD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CAD"
+      }
+    },
+    {
+      "input": "CDF 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CDF"
+      }
+    },
+    {
+      "input": "CDF123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CDF"
+      }
+    },
+    {
+      "input": "CHF 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CHF"
+      }
+    },
+    {
+      "input": "CHF123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CHF"
+      }
+    },
+    {
+      "input": "CLP 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CLP"
+      }
+    },
+    {
+      "input": "CLP123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CLP"
+      }
+    },
+    {
+      "input": "CNY 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CNY"
+      }
+    },
+    {
+      "input": "CNY123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CNY"
+      }
+    },
+    {
+      "input": "COP 123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "COP123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "CRC 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CRC"
+      }
+    },
+    {
+      "input": "CRC123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CRC"
+      }
+    },
+    {
+      "input": "CUP 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CUP"
+      }
+    },
+    {
+      "input": "CUP123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CUP"
+      }
+    },
+    {
+      "input": "CVE 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CVE"
+      }
+    },
+    {
+      "input": "CVE123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CVE"
+      }
+    },
+    {
+      "input": "CZK 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CZK"
+      }
+    },
+    {
+      "input": "CZK123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "CZK"
+      }
+    },
+    {
+      "input": "DJF 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "DJF"
+      }
+    },
+    {
+      "input": "DJF123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "DJF"
+      }
+    },
+    {
+      "input": "DKK 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "DKK"
+      }
+    },
+    {
+      "input": "DKK123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "DKK"
+      }
+    },
+    {
+      "input": "DOP 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "DOP"
+      }
+    },
+    {
+      "input": "DOP123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "DOP"
+      }
+    },
+    {
+      "input": "DZD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "DZD"
+      }
+    },
+    {
+      "input": "DZD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "DZD"
+      }
+    },
+    {
+      "input": "EC$123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "XCD"
+      }
+    },
+    {
+      "input": "EGP 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "EGP"
+      }
+    },
+    {
+      "input": "EGP123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "EGP"
+      }
+    },
+    {
+      "input": "ERN 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ERN"
+      }
+    },
+    {
+      "input": "ERN123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ERN"
+      }
+    },
+    {
+      "input": "ETB 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ETB"
+      }
+    },
+    {
+      "input": "ETB123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ETB"
+      }
+    },
+    {
+      "input": "EUR 12,5",
+      "output": {
+        "valid": true,
+        "value": 12.5,
+        "currency": "EUR"
+      }
+    },
+    {
+      "input": "EUR 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "EUR"
+      }
+    },
+    {
+      "input": "eur-42.5",
+      "output": {
+        "valid": true,
+        "value": -42.5,
+        "currency": "EUR"
+      }
+    },
+    {
+      "input": "EUR123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "EUR"
+      }
+    },
+    {
+      "input": "FJD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "FJD"
+      }
+    },
+    {
+      "input": "FJD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "FJD"
+      }
+    },
+    {
+      "input": "FKP 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "FKP"
+      }
+    },
+    {
+      "input": "FKP123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "FKP"
+      }
+    },
+    {
+      "input": "foo",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "foo bar",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "GBP 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GBP"
+      }
+    },
+    {
+      "input": "GBP123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GBP"
+      }
+    },
+    {
+      "input": "GEL 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GEL"
+      }
+    },
+    {
+      "input": "GEL123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GEL"
+      }
+    },
+    {
+      "input": "GHS 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GHS"
+      }
+    },
+    {
+      "input": "GHS123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GHS"
+      }
+    },
+    {
+      "input": "GIP 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GIP"
+      }
+    },
+    {
+      "input": "GIP123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GIP"
+      }
+    },
+    {
+      "input": "GMD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GMD"
+      }
+    },
+    {
+      "input": "GMD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GMD"
+      }
+    },
+    {
+      "input": "GNF 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GNF"
+      }
+    },
+    {
+      "input": "GNF123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GNF"
+      }
+    },
+    {
+      "input": "GTQ 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GTQ"
+      }
+    },
+    {
+      "input": "GTQ123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GTQ"
+      }
+    },
+    {
+      "input": "GYD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GYD"
+      }
+    },
+    {
+      "input": "GYD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "GYD"
+      }
+    },
+    {
+      "input": "HK$123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "HKD"
+      }
+    },
+    {
+      "input": "HKD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "HKD"
+      }
+    },
+    {
+      "input": "HKD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "HKD"
+      }
+    },
+    {
+      "input": "HNL 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "HNL"
+      }
+    },
+    {
+      "input": "HNL123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "HNL"
+      }
+    },
+    {
+      "input": "HRK 123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "HRK123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "HTG 123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "HTG123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "HUF 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "HUF"
+      }
+    },
+    {
+      "input": "HUF123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "HUF"
+      }
+    },
+    {
+      "input": "IDR 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "IDR"
+      }
+    },
+    {
+      "input": "IDR123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "IDR"
+      }
+    },
+    {
+      "input": "ILS 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ILS"
+      }
+    },
+    {
+      "input": "ILS123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ILS"
+      }
+    },
+    {
+      "input": "INR 1 Cr",
+      "output": {
+        "valid": true,
+        "value": 10000000,
+        "currency": "INR"
+      }
+    },
+    {
+      "input": "INR 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "INR"
+      }
+    },
+    {
+      "input": "INR123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "INR"
+      }
+    },
+    {
+      "input": "IQD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "IQD"
+      }
+    },
+    {
+      "input": "IQD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "IQD"
+      }
+    },
+    {
+      "input": "IRR 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "IRR"
+      }
+    },
+    {
+      "input": "IRR123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "IRR"
+      }
+    },
+    {
+      "input": "ISK 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ISK"
+      }
+    },
+    {
+      "input": "ISK123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ISK"
+      }
+    },
+    {
+      "input": "JMD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "JMD"
+      }
+    },
+    {
+      "input": "JMD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "JMD"
+      }
+    },
+    {
+      "input": "JOD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "JOD"
+      }
+    },
+    {
+      "input": "JOD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "JOD"
+      }
+    },
+    {
+      "input": "JPY 1,234",
+      "output": {
+        "valid": true,
+        "value": 1234,
+        "currency": "JPY"
+      }
+    },
+    {
+      "input": "JPY 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "JPY"
+      }
+    },
+    {
+      "input": "ＪＰＹ 39000",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "JPY123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "JPY"
+      }
+    },
+    {
+      "input": "KES 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KES"
+      }
+    },
+    {
+      "input": "KES123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KES"
+      }
+    },
+    {
+      "input": "KGS 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KGS"
+      }
+    },
+    {
+      "input": "KGS123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KGS"
+      }
+    },
+    {
+      "input": "KHR 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KHR"
+      }
+    },
+    {
+      "input": "KHR123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KHR"
+      }
+    },
+    {
+      "input": "KMF 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KMF"
+      }
+    },
+    {
+      "input": "KMF123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KMF"
+      }
+    },
+    {
+      "input": "KPW 123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "KPW123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "KRW 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KRW"
+      }
+    },
+    {
+      "input": "KRW123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KRW"
+      }
+    },
+    {
+      "input": "KWD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KWD"
+      }
+    },
+    {
+      "input": "KWD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KWD"
+      }
+    },
+    {
+      "input": "KYD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KYD"
+      }
+    },
+    {
+      "input": "KYD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KYD"
+      }
+    },
+    {
+      "input": "KZT 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KZT"
+      }
+    },
+    {
+      "input": "KZT123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KZT"
+      }
+    },
+    {
+      "input": "LAK 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "LAK"
+      }
+    },
+    {
+      "input": "LAK123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "LAK"
+      }
+    },
+    {
+      "input": "LBP 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "LBP"
+      }
+    },
+    {
+      "input": "LBP123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "LBP"
+      }
+    },
+    {
+      "input": "LKR 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "LKR"
+      }
+    },
+    {
+      "input": "LKR123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "LKR"
+      }
+    },
+    {
+      "input": "LRD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "LRD"
+      }
+    },
+    {
+      "input": "LRD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "LRD"
+      }
+    },
+    {
+      "input": "LSL 123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "LSL123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "LYD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "LYD"
+      }
+    },
+    {
+      "input": "LYD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "LYD"
+      }
+    },
+    {
+      "input": "MAD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MAD"
+      }
+    },
+    {
+      "input": "MAD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MAD"
+      }
+    },
+    {
+      "input": "MDL 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MDL"
+      }
+    },
+    {
+      "input": "MDL123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MDL"
+      }
+    },
+    {
+      "input": "MGA 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MGA"
+      }
+    },
+    {
+      "input": "MGA123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MGA"
+      }
+    },
+    {
+      "input": "MKD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MKD"
+      }
+    },
+    {
+      "input": "MKD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MKD"
+      }
+    },
+    {
+      "input": "MMK 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MMK"
+      }
+    },
+    {
+      "input": "MMK123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MMK"
+      }
+    },
+    {
+      "input": "MNT 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MNT"
+      }
+    },
+    {
+      "input": "MNT123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MNT"
+      }
+    },
+    {
+      "input": "MOP 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MOP"
+      }
+    },
+    {
+      "input": "MOP123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MOP"
+      }
+    },
+    {
+      "input": "MRU 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MRU"
+      }
+    },
+    {
+      "input": "MRU123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MRU"
+      }
+    },
+    {
+      "input": "MUR 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MUR"
+      }
+    },
+    {
+      "input": "MUR123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MUR"
+      }
+    },
+    {
+      "input": "MVR 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MVR"
+      }
+    },
+    {
+      "input": "MVR123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MVR"
+      }
+    },
+    {
+      "input": "MWK 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MWK"
+      }
+    },
+    {
+      "input": "MWK123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MWK"
+      }
+    },
+    {
+      "input": "MX$123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MXN"
+      }
+    },
+    {
+      "input": "MXN 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MXN"
+      }
+    },
+    {
+      "input": "MXN123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MXN"
+      }
+    },
+    {
+      "input": "MYR 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MYR"
+      }
+    },
+    {
+      "input": "MYR123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MYR"
+      }
+    },
+    {
+      "input": "MZN 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MZN"
+      }
+    },
+    {
+      "input": "MZN123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "MZN"
+      }
+    },
+    {
+      "input": "NAD 123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "NAD123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "NGN 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "NGN"
+      }
+    },
+    {
+      "input": "NGN123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "NGN"
+      }
+    },
+    {
+      "input": "NIO 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "NIO"
+      }
+    },
+    {
+      "input": "NIO123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "NIO"
+      }
+    },
+    {
+      "input": "NOK 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "NOK"
+      }
+    },
+    {
+      "input": "NOK123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "NOK"
+      }
+    },
+    {
+      "input": "NPR 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "NPR"
+      }
+    },
+    {
+      "input": "NPR123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "NPR"
+      }
+    },
+    {
+      "input": "NT$123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TWD"
+      }
+    },
+    {
+      "input": "NZ$123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "NZD"
+      }
+    },
+    {
+      "input": "NZD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "NZD"
+      }
+    },
+    {
+      "input": "NZD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "NZD"
+      }
+    },
+    {
+      "input": "OMR 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "OMR"
+      }
+    },
+    {
+      "input": "OMR123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "OMR"
+      }
+    },
+    {
+      "input": "PAB 123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "PAB123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "PEN 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "PEN"
+      }
+    },
+    {
+      "input": "PEN123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "PEN"
+      }
+    },
+    {
+      "input": "PGK 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "PGK"
+      }
+    },
+    {
+      "input": "PGK123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "PGK"
+      }
+    },
+    {
+      "input": "PHP 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "PHP"
+      }
+    },
+    {
+      "input": "PHP123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "PHP"
+      }
+    },
+    {
+      "input": "PKR 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "PKR"
+      }
+    },
+    {
+      "input": "PKR123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "PKR"
+      }
+    },
+    {
+      "input": "PLN 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "PLN"
+      }
+    },
+    {
+      "input": "PLN123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "PLN"
+      }
+    },
+    {
+      "input": "PYG 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "PYG"
+      }
+    },
+    {
+      "input": "PYG123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "PYG"
+      }
+    },
+    {
+      "input": "QAR 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "QAR"
+      }
+    },
+    {
+      "input": "QAR123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "QAR"
+      }
+    },
+    {
+      "input": "R$123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "BRL"
+      }
+    },
+    {
+      "input": "RD$123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "DOP"
+      }
+    },
+    {
+      "input": "RON 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "RON"
+      }
+    },
+    {
+      "input": "RON123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "RON"
+      }
+    },
+    {
+      "input": "₨123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "PKR"
+      }
+    },
+    {
+      "input": "RSD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "RSD"
+      }
+    },
+    {
+      "input": "RSD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "RSD"
+      }
+    },
+    {
+      "input": "RUB 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "RUB"
+      }
+    },
+    {
+      "input": "RUB123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "RUB"
+      }
+    },
+    {
+      "input": "RWF 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "RWF"
+      }
+    },
+    {
+      "input": "RWF123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "RWF"
+      }
+    },
+    {
+      "input": "SAR 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SAR"
+      }
+    },
+    {
+      "input": "SAR123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SAR"
+      }
+    },
+    {
+      "input": "SBD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SBD"
+      }
+    },
+    {
+      "input": "SBD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SBD"
+      }
+    },
+    {
+      "input": "SCR 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SCR"
+      }
+    },
+    {
+      "input": "SCR123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SCR"
+      }
+    },
+    {
+      "input": "SDG 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SDG"
+      }
+    },
+    {
+      "input": "SDG123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SDG"
+      }
+    },
+    {
+      "input": "SEK 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SEK"
+      }
+    },
+    {
+      "input": "SEK123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SEK"
+      }
+    },
+    {
+      "input": "SGD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SGD"
+      }
+    },
+    {
+      "input": "SGD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SGD"
+      }
+    },
+    {
+      "input": "SHP 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SHP"
+      }
+    },
+    {
+      "input": "SHP123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SHP"
+      }
+    },
+    {
+      "input": "SLL 123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "SLL123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "SOS 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SOS"
+      }
+    },
+    {
+      "input": "SOS123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SOS"
+      }
+    },
+    {
+      "input": "SRD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SRD"
+      }
+    },
+    {
+      "input": "SRD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SRD"
+      }
+    },
+    {
+      "input": "STN 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "STN"
+      }
+    },
+    {
+      "input": "STN123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "STN"
+      }
+    },
+    {
+      "input": "SVC 123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "SVC123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "SYP 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SYP"
+      }
+    },
+    {
+      "input": "SYP123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SYP"
+      }
+    },
+    {
+      "input": "SZL 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SZL"
+      }
+    },
+    {
+      "input": "SZL123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SZL"
+      }
+    },
+    {
+      "input": "THB 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "THB"
+      }
+    },
+    {
+      "input": "THB123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "THB"
+      }
+    },
+    {
+      "input": "TJS 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TJS"
+      }
+    },
+    {
+      "input": "TJS123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TJS"
+      }
+    },
+    {
+      "input": "TMT 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TMT"
+      }
+    },
+    {
+      "input": "TMT123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TMT"
+      }
+    },
+    {
+      "input": "TND 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TND"
+      }
+    },
+    {
+      "input": "TND123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TND"
+      }
+    },
+    {
+      "input": "TOP 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TOP"
+      }
+    },
+    {
+      "input": "TOP123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TOP"
+      }
+    },
+    {
+      "input": "TRY 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TRY"
+      }
+    },
+    {
+      "input": "TRY123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TRY"
+      }
+    },
+    {
+      "input": "TTD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TTD"
+      }
+    },
+    {
+      "input": "TTD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TTD"
+      }
+    },
+    {
+      "input": "TWD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TWD"
+      }
+    },
+    {
+      "input": "TWD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TWD"
+      }
+    },
+    {
+      "input": "TZS 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TZS"
+      }
+    },
+    {
+      "input": "TZS123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "TZS"
+      }
+    },
+    {
+      "input": "UAH 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "UAH"
+      }
+    },
+    {
+      "input": "UAH123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "UAH"
+      }
+    },
+    {
+      "input": "UGX 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "UGX"
+      }
+    },
+    {
+      "input": "UGX123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "UGX"
+      }
+    },
+    {
+      "input": "US$123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "USD",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "USD 1.2 million",
+      "output": {
+        "valid": true,
+        "value": 1200000,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "USD 1.5 triliun",
+      "output": {
+        "valid": true,
+        "value": 1500000000000,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "usd 100",
+      "output": {
+        "valid": true,
+        "value": 100,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "USD 100",
+      "output": {
+        "valid": true,
+        "value": 100,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "USD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "USD 2 miliar",
+      "output": {
+        "valid": true,
+        "value": 2000000000,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "USD 350+",
+      "output": {
+        "valid": true,
+        "value": 350,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "USD 4.295 billion",
+      "output": {
+        "valid": true,
+        "value": 4295000000,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "USD100",
+      "output": {
+        "valid": true,
+        "value": 100,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "USD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "UYU 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "UYU"
+      }
+    },
+    {
+      "input": "UYU123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "UYU"
+      }
+    },
+    {
+      "input": "UZS 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "UZS"
+      }
+    },
+    {
+      "input": "UZS123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "UZS"
+      }
+    },
+    {
+      "input": "VES 123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "VES123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "VND 1 ngan ty",
+      "output": {
+        "valid": true,
+        "value": 1000000000000,
+        "currency": "VND"
+      }
+    },
+    {
+      "input": "VND 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "VND"
+      }
+    },
+    {
+      "input": "VND 850 triệu",
+      "output": {
+        "valid": true,
+        "value": 850000000,
+        "currency": "VND"
+      }
+    },
+    {
+      "input": "VND123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "VND"
+      }
+    },
+    {
+      "input": "VUV 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "VUV"
+      }
+    },
+    {
+      "input": "VUV123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "VUV"
+      }
+    },
+    {
+      "input": "WST 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "WST"
+      }
+    },
+    {
+      "input": "WST123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "WST"
+      }
+    },
+    {
+      "input": "XAF 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "XAF"
+      }
+    },
+    {
+      "input": "XAF123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "XAF"
+      }
+    },
+    {
+      "input": "XCD 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "XCD"
+      }
+    },
+    {
+      "input": "XCD123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "XCD"
+      }
+    },
+    {
+      "input": "XOF 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "XOF"
+      }
+    },
+    {
+      "input": "XOF123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "XOF"
+      }
+    },
+    {
+      "input": "XPF 123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "XPF123",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "yen 1,234",
+      "output": {
+        "valid": true,
+        "value": 1234,
+        "currency": "JPY"
+      }
+    },
+    {
+      "input": "YÊN 1,234",
+      "output": {
+        "valid": true,
+        "value": 1234,
+        "currency": "JPY"
+      }
+    },
+    {
+      "input": "yen 100",
+      "output": {
+        "valid": true,
+        "value": 100,
+        "currency": "JPY"
+      }
+    },
+    {
+      "input": "YER 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "YER"
+      }
+    },
+    {
+      "input": "YER123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "YER"
+      }
+    },
+    {
+      "input": "ZAR 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ZAR"
+      }
+    },
+    {
+      "input": "ZAR123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ZAR"
+      }
+    },
+    {
+      "input": "ZMW 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ZMW"
+      }
+    },
+    {
+      "input": "ZMW123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ZMW"
+      }
+    },
+    {
+      "input": "ZWL 123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ZWL"
+      }
+    },
+    {
+      "input": "ZWL123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "ZWL"
+      }
+    },
+    {
+      "input": "د.إ123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "AED"
+      }
+    },
+    {
+      "input": "د.ك123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "KWD"
+      }
+    },
+    {
+      "input": "ر.س123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "SAR"
+      }
+    },
+    {
+      "input": "ر.ع.123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "OMR"
+      }
+    },
+    {
+      "input": "ر.ق123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "QAR"
+      }
+    },
+    {
+      "input": "ل.د123",
+      "output": {
+        "valid": true,
+        "value": 123,
+        "currency": "LYD"
+      }
+    }
+  ],
+  "extractResults": [
+    {
+      "input": "🇯🇵 Salary: ¥6M–¥13M | Hiring: Application Engineer",
+      "output": [
+        {
+          "raw": "¥6M",
+          "start": 13,
+          "end": 16,
+          "value": 6000000,
+          "currency": "JPY"
+        },
+        {
+          "raw": "¥13M",
+          "start": 17,
+          "end": 21,
+          "value": 13000000,
+          "currency": "JPY"
+        }
+      ]
+    },
+    {
+      "input": "₫ 45,000,000 / month",
+      "output": [
+        {
+          "raw": "₫ 45,000,000 ",
+          "start": 0,
+          "end": 13,
+          "value": 45000000,
+          "currency": "VND"
+        }
+      ]
+    },
+    {
+      "input": "200USD/month Coliving in Da Nang and USD350/week",
+      "output": [
+        {
+          "raw": "200USD",
+          "start": 0,
+          "end": 6,
+          "value": 200,
+          "currency": "USD"
+        },
+        {
+          "raw": "USD350",
+          "start": 37,
+          "end": 43,
+          "value": 350,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include AED 123 in the listing.",
+      "output": [
+        {
+          "raw": "AED 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "AED"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include AFN 123 in the listing.",
+      "output": [
+        {
+          "raw": "AFN 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "AFN"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include ALL 123 in the listing.",
+      "output": [
+        {
+          "raw": "ALL 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "ALL"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include AMD 123 in the listing.",
+      "output": [
+        {
+          "raw": "AMD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "AMD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include ANG 123 in the listing.",
+      "output": []
+    },
+    {
+      "input": "Catalog entries include AOA 123 in the listing.",
+      "output": [
+        {
+          "raw": "AOA 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "AOA"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include ARS 123 in the listing.",
+      "output": [
+        {
+          "raw": "ARS 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "ARS"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include AUD 123 in the listing.",
+      "output": [
+        {
+          "raw": "AUD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "AUD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include AWG 123 in the listing.",
+      "output": [
+        {
+          "raw": "AWG 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "AWG"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include AZN 123 in the listing.",
+      "output": [
+        {
+          "raw": "AZN 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "AZN"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include BAM 123 in the listing.",
+      "output": [
+        {
+          "raw": "BAM 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "BAM"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include BBD 123 in the listing.",
+      "output": [
+        {
+          "raw": "BBD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "BBD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include BDT 123 in the listing.",
+      "output": [
+        {
+          "raw": "BDT 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "BDT"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include BGN 123 in the listing.",
+      "output": []
+    },
+    {
+      "input": "Catalog entries include BHD 123 in the listing.",
+      "output": [
+        {
+          "raw": "BHD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "BHD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include BMD 123 in the listing.",
+      "output": [
+        {
+          "raw": "BMD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "BMD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include BND 123 in the listing.",
+      "output": [
+        {
+          "raw": "BND 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "BND"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include BOB 123 in the listing.",
+      "output": []
+    },
+    {
+      "input": "Catalog entries include BRL 123 in the listing.",
+      "output": [
+        {
+          "raw": "BRL 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "BRL"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include BSD 123 in the listing.",
+      "output": [
+        {
+          "raw": "BSD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "BSD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include BTN 123 in the listing.",
+      "output": []
+    },
+    {
+      "input": "Catalog entries include BWP 123 in the listing.",
+      "output": [
+        {
+          "raw": "BWP 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "BWP"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include BYN 123 in the listing.",
+      "output": [
+        {
+          "raw": "BYN 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "BYN"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include BZD 123 in the listing.",
+      "output": [
+        {
+          "raw": "BZD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "BZD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include CAD 123 in the listing.",
+      "output": [
+        {
+          "raw": "CAD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "CAD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include CDF 123 in the listing.",
+      "output": [
+        {
+          "raw": "CDF 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "CDF"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include CHF 123 in the listing.",
+      "output": [
+        {
+          "raw": "CHF 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "CHF"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include CLP 123 in the listing.",
+      "output": [
+        {
+          "raw": "CLP 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "CLP"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include CNY 123 in the listing.",
+      "output": [
+        {
+          "raw": "CNY 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "CNY"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include COP 123 in the listing.",
+      "output": []
+    },
+    {
+      "input": "Catalog entries include CRC 123 in the listing.",
+      "output": [
+        {
+          "raw": "CRC 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "CRC"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include CUP 123 in the listing.",
+      "output": [
+        {
+          "raw": "CUP 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "CUP"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include CVE 123 in the listing.",
+      "output": [
+        {
+          "raw": "CVE 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "CVE"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include CZK 123 in the listing.",
+      "output": [
+        {
+          "raw": "CZK 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "CZK"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include DJF 123 in the listing.",
+      "output": [
+        {
+          "raw": "DJF 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "DJF"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include DKK 123 in the listing.",
+      "output": [
+        {
+          "raw": "DKK 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "DKK"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include DOP 123 in the listing.",
+      "output": [
+        {
+          "raw": "DOP 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "DOP"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include DZD 123 in the listing.",
+      "output": [
+        {
+          "raw": "DZD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "DZD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include EGP 123 in the listing.",
+      "output": [
+        {
+          "raw": "EGP 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "EGP"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include ERN 123 in the listing.",
+      "output": [
+        {
+          "raw": "ERN 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "ERN"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include ETB 123 in the listing.",
+      "output": [
+        {
+          "raw": "ETB 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "ETB"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include EUR 123 in the listing.",
+      "output": [
+        {
+          "raw": "EUR 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "EUR"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include FJD 123 in the listing.",
+      "output": [
+        {
+          "raw": "FJD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "FJD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include FKP 123 in the listing.",
+      "output": [
+        {
+          "raw": "FKP 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "FKP"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include GBP 123 in the listing.",
+      "output": [
+        {
+          "raw": "GBP 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "GBP"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include GEL 123 in the listing.",
+      "output": [
+        {
+          "raw": "GEL 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "GEL"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include GHS 123 in the listing.",
+      "output": [
+        {
+          "raw": "GHS 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "GHS"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include GIP 123 in the listing.",
+      "output": [
+        {
+          "raw": "GIP 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "GIP"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include GMD 123 in the listing.",
+      "output": [
+        {
+          "raw": "GMD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "GMD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include GNF 123 in the listing.",
+      "output": [
+        {
+          "raw": "GNF 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "GNF"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include GTQ 123 in the listing.",
+      "output": [
+        {
+          "raw": "GTQ 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "GTQ"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include GYD 123 in the listing.",
+      "output": [
+        {
+          "raw": "GYD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "GYD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include HKD 123 in the listing.",
+      "output": [
+        {
+          "raw": "HKD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "HKD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include HNL 123 in the listing.",
+      "output": [
+        {
+          "raw": "HNL 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "HNL"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include HRK 123 in the listing.",
+      "output": []
+    },
+    {
+      "input": "Catalog entries include HTG 123 in the listing.",
+      "output": []
+    },
+    {
+      "input": "Catalog entries include HUF 123 in the listing.",
+      "output": [
+        {
+          "raw": "HUF 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "HUF"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include IDR 123 in the listing.",
+      "output": [
+        {
+          "raw": "IDR 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "IDR"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include ILS 123 in the listing.",
+      "output": [
+        {
+          "raw": "ILS 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "ILS"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include INR 123 in the listing.",
+      "output": [
+        {
+          "raw": "INR 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "INR"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include IQD 123 in the listing.",
+      "output": [
+        {
+          "raw": "IQD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "IQD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include IRR 123 in the listing.",
+      "output": [
+        {
+          "raw": "IRR 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "IRR"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include ISK 123 in the listing.",
+      "output": [
+        {
+          "raw": "ISK 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "ISK"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include JMD 123 in the listing.",
+      "output": [
+        {
+          "raw": "JMD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "JMD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include JOD 123 in the listing.",
+      "output": [
+        {
+          "raw": "JOD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "JOD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include JPY 123 in the listing.",
+      "output": [
+        {
+          "raw": "JPY 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "JPY"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include KES 123 in the listing.",
+      "output": [
+        {
+          "raw": "KES 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "KES"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include KGS 123 in the listing.",
+      "output": [
+        {
+          "raw": "KGS 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "KGS"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include KHR 123 in the listing.",
+      "output": [
+        {
+          "raw": "KHR 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "KHR"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include KMF 123 in the listing.",
+      "output": [
+        {
+          "raw": "KMF 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "KMF"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include KPW 123 in the listing.",
+      "output": []
+    },
+    {
+      "input": "Catalog entries include KRW 123 in the listing.",
+      "output": [
+        {
+          "raw": "KRW 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "KRW"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include KWD 123 in the listing.",
+      "output": [
+        {
+          "raw": "KWD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "KWD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include KYD 123 in the listing.",
+      "output": [
+        {
+          "raw": "KYD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "KYD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include KZT 123 in the listing.",
+      "output": [
+        {
+          "raw": "KZT 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "KZT"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include LAK 123 in the listing.",
+      "output": [
+        {
+          "raw": "LAK 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "LAK"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include LBP 123 in the listing.",
+      "output": [
+        {
+          "raw": "LBP 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "LBP"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include LKR 123 in the listing.",
+      "output": [
+        {
+          "raw": "LKR 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "LKR"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include LRD 123 in the listing.",
+      "output": [
+        {
+          "raw": "LRD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "LRD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include LSL 123 in the listing.",
+      "output": []
+    },
+    {
+      "input": "Catalog entries include LYD 123 in the listing.",
+      "output": [
+        {
+          "raw": "LYD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "LYD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include MAD 123 in the listing.",
+      "output": [
+        {
+          "raw": "MAD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "MAD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include MDL 123 in the listing.",
+      "output": [
+        {
+          "raw": "MDL 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "MDL"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include MGA 123 in the listing.",
+      "output": [
+        {
+          "raw": "MGA 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "MGA"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include MKD 123 in the listing.",
+      "output": [
+        {
+          "raw": "MKD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "MKD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include MMK 123 in the listing.",
+      "output": [
+        {
+          "raw": "MMK 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "MMK"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include MNT 123 in the listing.",
+      "output": [
+        {
+          "raw": "MNT 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "MNT"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include MOP 123 in the listing.",
+      "output": [
+        {
+          "raw": "MOP 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "MOP"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include MRU 123 in the listing.",
+      "output": [
+        {
+          "raw": "MRU 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "MRU"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include MUR 123 in the listing.",
+      "output": [
+        {
+          "raw": "MUR 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "MUR"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include MVR 123 in the listing.",
+      "output": [
+        {
+          "raw": "MVR 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "MVR"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include MWK 123 in the listing.",
+      "output": [
+        {
+          "raw": "MWK 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "MWK"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include MXN 123 in the listing.",
+      "output": [
+        {
+          "raw": "MXN 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "MXN"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include MYR 123 in the listing.",
+      "output": [
+        {
+          "raw": "MYR 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "MYR"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include MZN 123 in the listing.",
+      "output": [
+        {
+          "raw": "MZN 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "MZN"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include NAD 123 in the listing.",
+      "output": []
+    },
+    {
+      "input": "Catalog entries include NGN 123 in the listing.",
+      "output": [
+        {
+          "raw": "NGN 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "NGN"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include NIO 123 in the listing.",
+      "output": [
+        {
+          "raw": "NIO 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "NIO"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include NOK 123 in the listing.",
+      "output": [
+        {
+          "raw": "NOK 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "NOK"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include NPR 123 in the listing.",
+      "output": [
+        {
+          "raw": "NPR 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "NPR"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include NZD 123 in the listing.",
+      "output": [
+        {
+          "raw": "NZD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "NZD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include OMR 123 in the listing.",
+      "output": [
+        {
+          "raw": "OMR 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "OMR"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include PAB 123 in the listing.",
+      "output": []
+    },
+    {
+      "input": "Catalog entries include PEN 123 in the listing.",
+      "output": [
+        {
+          "raw": "PEN 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "PEN"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include PGK 123 in the listing.",
+      "output": [
+        {
+          "raw": "PGK 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "PGK"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include PHP 123 in the listing.",
+      "output": [
+        {
+          "raw": "PHP 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "PHP"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include PKR 123 in the listing.",
+      "output": [
+        {
+          "raw": "PKR 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "PKR"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include PLN 123 in the listing.",
+      "output": [
+        {
+          "raw": "PLN 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "PLN"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include PYG 123 in the listing.",
+      "output": [
+        {
+          "raw": "PYG 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "PYG"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include QAR 123 in the listing.",
+      "output": [
+        {
+          "raw": "QAR 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "QAR"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include RON 123 in the listing.",
+      "output": [
+        {
+          "raw": "RON 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "RON"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include RSD 123 in the listing.",
+      "output": [
+        {
+          "raw": "RSD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "RSD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include RUB 123 in the listing.",
+      "output": [
+        {
+          "raw": "RUB 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "RUB"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include RWF 123 in the listing.",
+      "output": [
+        {
+          "raw": "RWF 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "RWF"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include SAR 123 in the listing.",
+      "output": [
+        {
+          "raw": "SAR 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "SAR"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include SBD 123 in the listing.",
+      "output": [
+        {
+          "raw": "SBD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "SBD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include SCR 123 in the listing.",
+      "output": [
+        {
+          "raw": "SCR 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "SCR"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include SDG 123 in the listing.",
+      "output": [
+        {
+          "raw": "SDG 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "SDG"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include SEK 123 in the listing.",
+      "output": [
+        {
+          "raw": "SEK 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "SEK"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include SGD 123 in the listing.",
+      "output": [
+        {
+          "raw": "SGD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "SGD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include SHP 123 in the listing.",
+      "output": [
+        {
+          "raw": "SHP 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "SHP"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include SLL 123 in the listing.",
+      "output": []
+    },
+    {
+      "input": "Catalog entries include SOS 123 in the listing.",
+      "output": [
+        {
+          "raw": "SOS 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "SOS"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include SRD 123 in the listing.",
+      "output": [
+        {
+          "raw": "SRD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "SRD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include STN 123 in the listing.",
+      "output": [
+        {
+          "raw": "STN 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "STN"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include SVC 123 in the listing.",
+      "output": []
+    },
+    {
+      "input": "Catalog entries include SYP 123 in the listing.",
+      "output": [
+        {
+          "raw": "SYP 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "SYP"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include SZL 123 in the listing.",
+      "output": [
+        {
+          "raw": "SZL 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "SZL"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include THB 123 in the listing.",
+      "output": [
+        {
+          "raw": "THB 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "THB"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include TJS 123 in the listing.",
+      "output": [
+        {
+          "raw": "TJS 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "TJS"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include TMT 123 in the listing.",
+      "output": [
+        {
+          "raw": "TMT 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "TMT"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include TND 123 in the listing.",
+      "output": [
+        {
+          "raw": "TND 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "TND"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include TOP 123 in the listing.",
+      "output": [
+        {
+          "raw": "TOP 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "TOP"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include TRY 123 in the listing.",
+      "output": [
+        {
+          "raw": "TRY 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "TRY"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include TTD 123 in the listing.",
+      "output": [
+        {
+          "raw": "TTD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "TTD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include TWD 123 in the listing.",
+      "output": [
+        {
+          "raw": "TWD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "TWD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include TZS 123 in the listing.",
+      "output": [
+        {
+          "raw": "TZS 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "TZS"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include UAH 123 in the listing.",
+      "output": [
+        {
+          "raw": "UAH 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "UAH"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include UGX 123 in the listing.",
+      "output": [
+        {
+          "raw": "UGX 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "UGX"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include USD 123 in the listing.",
+      "output": [
+        {
+          "raw": "USD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include UYU 123 in the listing.",
+      "output": [
+        {
+          "raw": "UYU 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "UYU"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include UZS 123 in the listing.",
+      "output": [
+        {
+          "raw": "UZS 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "UZS"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include VES 123 in the listing.",
+      "output": []
+    },
+    {
+      "input": "Catalog entries include VND 123 in the listing.",
+      "output": [
+        {
+          "raw": "VND 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "VND"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include VUV 123 in the listing.",
+      "output": [
+        {
+          "raw": "VUV 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "VUV"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include WST 123 in the listing.",
+      "output": [
+        {
+          "raw": "WST 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "WST"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include XAF 123 in the listing.",
+      "output": [
+        {
+          "raw": "XAF 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "XAF"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include XCD 123 in the listing.",
+      "output": [
+        {
+          "raw": "XCD 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "XCD"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include XOF 123 in the listing.",
+      "output": [
+        {
+          "raw": "XOF 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "XOF"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include XPF 123 in the listing.",
+      "output": []
+    },
+    {
+      "input": "Catalog entries include YER 123 in the listing.",
+      "output": [
+        {
+          "raw": "YER 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "YER"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include ZAR 123 in the listing.",
+      "output": [
+        {
+          "raw": "ZAR 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "ZAR"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include ZMW 123 in the listing.",
+      "output": [
+        {
+          "raw": "ZMW 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "ZMW"
+        }
+      ]
+    },
+    {
+      "input": "Catalog entries include ZWL 123 in the listing.",
+      "output": [
+        {
+          "raw": "ZWL 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "ZWL"
+        }
+      ]
+    },
+    {
+      "input": "Comp range starts at ¥6M+ base",
+      "output": [
+        {
+          "raw": "¥6M+",
+          "start": 21,
+          "end": 25,
+          "value": 6000000,
+          "currency": "JPY"
+        }
+      ]
+    },
+    {
+      "input": "Comp: yen 6M and 13,000 yên",
+      "output": [
+        {
+          "raw": "yen 6M",
+          "start": 6,
+          "end": 12,
+          "value": 6000000,
+          "currency": "JPY"
+        },
+        {
+          "raw": "13,000 yên",
+          "start": 17,
+          "end": 27,
+          "value": 13000,
+          "currency": "JPY"
+        }
+      ]
+    },
+    {
+      "input": "Compensation: ¥6-13M base",
+      "output": [
+        {
+          "raw": "¥6-13M",
+          "start": 14,
+          "end": 20,
+          "value": 6000000,
+          "rangeEndValue": 13000000,
+          "currency": "JPY"
+        }
+      ]
+    },
+    {
+      "input": "Deal: $100 and 200 eur today",
+      "output": [
+        {
+          "raw": "$100 ",
+          "start": 6,
+          "end": 11,
+          "value": 100,
+          "currency": "USD"
+        },
+        {
+          "raw": "200 eur",
+          "start": 15,
+          "end": 22,
+          "value": 200,
+          "currency": "EUR"
+        }
+      ]
+    },
+    {
+      "input": "Deal: £99.99 then 120 CAD and 10€",
+      "output": [
+        {
+          "raw": "£99.99 ",
+          "start": 6,
+          "end": 13,
+          "value": 99.99,
+          "currency": "GBP"
+        },
+        {
+          "raw": "120 CAD",
+          "start": 18,
+          "end": 25,
+          "value": 120,
+          "currency": "CAD"
+        },
+        {
+          "raw": "10€",
+          "start": 30,
+          "end": 33,
+          "value": 10,
+          "currency": "EUR"
+        }
+      ]
+    },
+    {
+      "input": "Examples: 1 Lakh INR, 1 Lac INR, INR 1 Lakh, INR 1 Lac, 1 Crore INR, 1 Cr INR, INR 1 Crore, INR 1 Cr.",
+      "output": [
+        {
+          "raw": "1 Lakh INR",
+          "start": 10,
+          "end": 20,
+          "value": 100000,
+          "currency": "INR"
+        },
+        {
+          "raw": "1 Lac INR",
+          "start": 22,
+          "end": 31,
+          "value": 100000,
+          "currency": "INR"
+        },
+        {
+          "raw": "INR 1 Lakh",
+          "start": 33,
+          "end": 43,
+          "value": 100000,
+          "currency": "INR"
+        },
+        {
+          "raw": "INR 1 Lac",
+          "start": 45,
+          "end": 54,
+          "value": 100000,
+          "currency": "INR"
+        },
+        {
+          "raw": "1 Crore INR",
+          "start": 56,
+          "end": 67,
+          "value": 10000000,
+          "currency": "INR"
+        },
+        {
+          "raw": "1 Cr INR",
+          "start": 69,
+          "end": 77,
+          "value": 10000000,
+          "currency": "INR"
+        },
+        {
+          "raw": "INR 1 Crore",
+          "start": 79,
+          "end": 90,
+          "value": 10000000,
+          "currency": "INR"
+        },
+        {
+          "raw": "INR 1 Cr",
+          "start": 92,
+          "end": 100,
+          "value": 10000000,
+          "currency": "INR"
+        }
+      ]
+    },
+    {
+      "input": "From March 13 to 27, all users",
+      "output": []
+    },
+    {
+      "input": "Main ￥39,000 and fallback ﹩125",
+      "output": [
+        {
+          "raw": "￥39,000 ",
+          "start": 5,
+          "end": 13,
+          "value": 39000,
+          "currency": "JPY"
+        },
+        {
+          "raw": "﹩125",
+          "start": 26,
+          "end": 30,
+          "value": 125,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "Mais de 1 000 000 ₫ por pessoa",
+      "output": [
+        {
+          "raw": "1 000 000 ₫",
+          "start": 8,
+          "end": 19,
+          "value": 1000000,
+          "currency": "VND"
+        }
+      ]
+    },
+    {
+      "input": "Median price ₫ 4.295 billion",
+      "output": [
+        {
+          "raw": "₫ 4.295 billion",
+          "start": 13,
+          "end": 28,
+          "value": 4295000000,
+          "currency": "VND"
+        }
+      ]
+    },
+    {
+      "input": "Median price: ₫ 4.295 billion and backup USD 2 million and EUR 3 trillions and VND 1.2 tỷ",
+      "output": [
+        {
+          "raw": "₫ 4.295 billion",
+          "start": 14,
+          "end": 29,
+          "value": 4295000000,
+          "currency": "VND"
+        },
+        {
+          "raw": "USD 2 million",
+          "start": 41,
+          "end": 54,
+          "value": 2000000,
+          "currency": "USD"
+        },
+        {
+          "raw": "EUR 3 trillions",
+          "start": 59,
+          "end": 74,
+          "value": 3000000000000,
+          "currency": "EUR"
+        },
+        {
+          "raw": "VND 1.2 tỷ",
+          "start": 79,
+          "end": 89,
+          "value": 1200000000,
+          "currency": "VND"
+        }
+      ]
+    },
+    {
+      "input": "Mức giá từ ₫ 3.65 tỷ đến ₫ 4.2 tỷ, có thể lên USD 2 miliar",
+      "output": [
+        {
+          "raw": "₫ 3.65 tỷ",
+          "start": 11,
+          "end": 20,
+          "value": 3650000000,
+          "currency": "VND"
+        },
+        {
+          "raw": "₫ 4.2 tỷ",
+          "start": 25,
+          "end": 33,
+          "value": 4200000000,
+          "currency": "VND"
+        },
+        {
+          "raw": "USD 2 miliar",
+          "start": 46,
+          "end": 58,
+          "value": 2000000000,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows ¢123 as a sample amount.",
+      "output": [
+        {
+          "raw": "¢123 ",
+          "start": 12,
+          "end": 17,
+          "value": 123,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows $123 as a sample amount.",
+      "output": [
+        {
+          "raw": "$123 ",
+          "start": 12,
+          "end": 17,
+          "value": 123,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows £123 as a sample amount.",
+      "output": [
+        {
+          "raw": "£123 ",
+          "start": 12,
+          "end": 17,
+          "value": 123,
+          "currency": "GBP"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows ¥123 as a sample amount.",
+      "output": [
+        {
+          "raw": "¥123 ",
+          "start": 12,
+          "end": 17,
+          "value": 123,
+          "currency": "JPY"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows ৳123 as a sample amount.",
+      "output": [
+        {
+          "raw": "৳123 ",
+          "start": 12,
+          "end": 17,
+          "value": 123,
+          "currency": "BDT"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows ฿123 as a sample amount.",
+      "output": [
+        {
+          "raw": "฿123 ",
+          "start": 12,
+          "end": 17,
+          "value": 123,
+          "currency": "THB"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows ₡123 as a sample amount.",
+      "output": []
+    },
+    {
+      "input": "Promo shows ₦123 as a sample amount.",
+      "output": [
+        {
+          "raw": "₦123 ",
+          "start": 12,
+          "end": 17,
+          "value": 123,
+          "currency": "NGN"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows ₩123 as a sample amount.",
+      "output": [
+        {
+          "raw": "₩123 ",
+          "start": 12,
+          "end": 17,
+          "value": 123,
+          "currency": "KRW"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows ₪123 as a sample amount.",
+      "output": [
+        {
+          "raw": "₪123 ",
+          "start": 12,
+          "end": 17,
+          "value": 123,
+          "currency": "ILS"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows ₫123 as a sample amount.",
+      "output": [
+        {
+          "raw": "₫123 ",
+          "start": 12,
+          "end": 17,
+          "value": 123,
+          "currency": "VND"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows €123 as a sample amount.",
+      "output": [
+        {
+          "raw": "€123 ",
+          "start": 12,
+          "end": 17,
+          "value": 123,
+          "currency": "EUR"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows ₭123 as a sample amount.",
+      "output": [
+        {
+          "raw": "₭123 ",
+          "start": 12,
+          "end": 17,
+          "value": 123,
+          "currency": "LAK"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows ₮123 as a sample amount.",
+      "output": [
+        {
+          "raw": "₮123 ",
+          "start": 12,
+          "end": 17,
+          "value": 123,
+          "currency": "MNT"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows ₯123 as a sample amount.",
+      "output": []
+    },
+    {
+      "input": "Promo shows ₰123 as a sample amount.",
+      "output": []
+    },
+    {
+      "input": "Promo shows ₱123 as a sample amount.",
+      "output": [
+        {
+          "raw": "₱123 ",
+          "start": 12,
+          "end": 17,
+          "value": 123,
+          "currency": "PHP"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows ₲123 as a sample amount.",
+      "output": []
+    },
+    {
+      "input": "Promo shows ₳123 as a sample amount.",
+      "output": []
+    },
+    {
+      "input": "Promo shows ₴123 as a sample amount.",
+      "output": []
+    },
+    {
+      "input": "Promo shows ₵123 as a sample amount.",
+      "output": []
+    },
+    {
+      "input": "Promo shows ₷123 as a sample amount.",
+      "output": []
+    },
+    {
+      "input": "Promo shows ₸123 as a sample amount.",
+      "output": []
+    },
+    {
+      "input": "Promo shows ₹123 as a sample amount.",
+      "output": [
+        {
+          "raw": "₹123 ",
+          "start": 12,
+          "end": 17,
+          "value": 123,
+          "currency": "INR"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows ₺123 as a sample amount.",
+      "output": [
+        {
+          "raw": "₺123 ",
+          "start": 12,
+          "end": 17,
+          "value": 123,
+          "currency": "TRY"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows ₻123 as a sample amount.",
+      "output": []
+    },
+    {
+      "input": "Promo shows ₼123 as a sample amount.",
+      "output": []
+    },
+    {
+      "input": "Promo shows ₽123 as a sample amount.",
+      "output": [
+        {
+          "raw": "₽123 ",
+          "start": 12,
+          "end": 17,
+          "value": 123,
+          "currency": "RUB"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows ₾123 as a sample amount.",
+      "output": []
+    },
+    {
+      "input": "Promo shows ₿123 as a sample amount.",
+      "output": []
+    },
+    {
+      "input": "Promo shows A$123 as a sample amount.",
+      "output": [
+        {
+          "raw": "A$123 ",
+          "start": 12,
+          "end": 18,
+          "value": 123,
+          "currency": "AUD"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows AU$123 as a sample amount.",
+      "output": [
+        {
+          "raw": "AU$123 ",
+          "start": 12,
+          "end": 19,
+          "value": 123,
+          "currency": "AUD"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows CA$123 as a sample amount.",
+      "output": [
+        {
+          "raw": "CA$123 ",
+          "start": 12,
+          "end": 19,
+          "value": 123,
+          "currency": "CAD"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows EC$123 as a sample amount.",
+      "output": [
+        {
+          "raw": "EC$123 ",
+          "start": 12,
+          "end": 19,
+          "value": 123,
+          "currency": "XCD"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows HK$123 as a sample amount.",
+      "output": [
+        {
+          "raw": "HK$123 ",
+          "start": 12,
+          "end": 19,
+          "value": 123,
+          "currency": "HKD"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows MX$123 as a sample amount.",
+      "output": [
+        {
+          "raw": "MX$123 ",
+          "start": 12,
+          "end": 19,
+          "value": 123,
+          "currency": "MXN"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows NT$123 as a sample amount.",
+      "output": [
+        {
+          "raw": "NT$123 ",
+          "start": 12,
+          "end": 19,
+          "value": 123,
+          "currency": "TWD"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows NZ$123 as a sample amount.",
+      "output": [
+        {
+          "raw": "NZ$123 ",
+          "start": 12,
+          "end": 19,
+          "value": 123,
+          "currency": "NZD"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows R$123 as a sample amount.",
+      "output": [
+        {
+          "raw": "R$123 ",
+          "start": 12,
+          "end": 18,
+          "value": 123,
+          "currency": "BRL"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows RD$123 as a sample amount.",
+      "output": [
+        {
+          "raw": "RD$123 ",
+          "start": 12,
+          "end": 19,
+          "value": 123,
+          "currency": "DOP"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows ₨123 as a sample amount.",
+      "output": [
+        {
+          "raw": "₨123 ",
+          "start": 12,
+          "end": 17,
+          "value": 123,
+          "currency": "PKR"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows US$123 as a sample amount.",
+      "output": [
+        {
+          "raw": "US$123 ",
+          "start": 12,
+          "end": 19,
+          "value": 123,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows د.إ123 as a sample amount.",
+      "output": [
+        {
+          "raw": "د.إ123 ",
+          "start": 12,
+          "end": 19,
+          "value": 123,
+          "currency": "AED"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows د.ك123 as a sample amount.",
+      "output": [
+        {
+          "raw": "د.ك123 ",
+          "start": 12,
+          "end": 19,
+          "value": 123,
+          "currency": "KWD"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows ر.س123 as a sample amount.",
+      "output": [
+        {
+          "raw": "ر.س123 ",
+          "start": 12,
+          "end": 19,
+          "value": 123,
+          "currency": "SAR"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows ر.ع.123 as a sample amount.",
+      "output": [
+        {
+          "raw": "ر.ع.123 ",
+          "start": 12,
+          "end": 20,
+          "value": 123,
+          "currency": "OMR"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows ر.ق123 as a sample amount.",
+      "output": [
+        {
+          "raw": "ر.ق123 ",
+          "start": 12,
+          "end": 19,
+          "value": 123,
+          "currency": "QAR"
+        }
+      ]
+    },
+    {
+      "input": "Promo shows ل.د123 as a sample amount.",
+      "output": [
+        {
+          "raw": "ل.د123 ",
+          "start": 12,
+          "end": 19,
+          "value": 123,
+          "currency": "LYD"
+        }
+      ]
+    },
+    {
+      "input": "Promo: R$100 then $200",
+      "output": [
+        {
+          "raw": "R$100 ",
+          "start": 7,
+          "end": 13,
+          "value": 100,
+          "currency": "BRL"
+        },
+        {
+          "raw": "$200",
+          "start": 18,
+          "end": 22,
+          "value": 200,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "Rates: R$ 10 | RD$ 20 | A$3 | AU$4 | CA$5 | NZ$6 | HK$7 | MX$8 | NT$9 | US$10 | EC$11 | $12",
+      "output": [
+        {
+          "raw": "R$ 10 ",
+          "start": 7,
+          "end": 13,
+          "value": 10,
+          "currency": "BRL"
+        },
+        {
+          "raw": "RD$ 20 ",
+          "start": 15,
+          "end": 22,
+          "value": 20,
+          "currency": "DOP"
+        },
+        {
+          "raw": "A$3 ",
+          "start": 24,
+          "end": 28,
+          "value": 3,
+          "currency": "AUD"
+        },
+        {
+          "raw": "AU$4 ",
+          "start": 30,
+          "end": 35,
+          "value": 4,
+          "currency": "AUD"
+        },
+        {
+          "raw": "CA$5 ",
+          "start": 37,
+          "end": 42,
+          "value": 5,
+          "currency": "CAD"
+        },
+        {
+          "raw": "NZ$6 ",
+          "start": 44,
+          "end": 49,
+          "value": 6,
+          "currency": "NZD"
+        },
+        {
+          "raw": "HK$7 ",
+          "start": 51,
+          "end": 56,
+          "value": 7,
+          "currency": "HKD"
+        },
+        {
+          "raw": "MX$8 ",
+          "start": 58,
+          "end": 63,
+          "value": 8,
+          "currency": "MXN"
+        },
+        {
+          "raw": "NT$9 ",
+          "start": 65,
+          "end": 70,
+          "value": 9,
+          "currency": "TWD"
+        },
+        {
+          "raw": "US$10 ",
+          "start": 72,
+          "end": 78,
+          "value": 10,
+          "currency": "USD"
+        },
+        {
+          "raw": "EC$11 ",
+          "start": 80,
+          "end": 86,
+          "value": 11,
+          "currency": "XCD"
+        },
+        {
+          "raw": "$12",
+          "start": 88,
+          "end": 91,
+          "value": 12,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "Rent starts from 990,000 yen/month",
+      "output": [
+        {
+          "raw": "990,000 yen",
+          "start": 17,
+          "end": 28,
+          "value": 990000,
+          "currency": "JPY"
+        }
+      ]
+    },
+    {
+      "input": "Revenue; 2023-24 $446,641,957.",
+      "output": [
+        {
+          "raw": "$446,641,957.",
+          "start": 17,
+          "end": 30,
+          "value": 446641957,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "Top 10 and all 5 and try 3 with 8 mad and 12 top picks",
+      "output": []
+    },
+    {
+      "input": "TOP 10 and ALL 5 and TRY 3 with 8 MAD for fares",
+      "output": [
+        {
+          "raw": "TOP 10 ",
+          "start": 0,
+          "end": 7,
+          "value": 10,
+          "currency": "TOP"
+        },
+        {
+          "raw": "ALL 5 ",
+          "start": 11,
+          "end": 17,
+          "value": 5,
+          "currency": "ALL"
+        },
+        {
+          "raw": "TRY 3 ",
+          "start": 21,
+          "end": 27,
+          "value": 3,
+          "currency": "TRY"
+        },
+        {
+          "raw": "8 MAD",
+          "start": 32,
+          "end": 37,
+          "value": 8,
+          "currency": "MAD"
+        }
+      ]
+    },
+    {
+      "input": "Twitter handles @kes11av and kes11buddy should stay untouched, but USD350/week and KES 11 are valid prices.",
+      "output": [
+        {
+          "raw": "USD350",
+          "start": 67,
+          "end": 73,
+          "value": 350,
+          "currency": "USD"
+        },
+        {
+          "raw": "KES 11 ",
+          "start": 83,
+          "end": 90,
+          "value": 11,
+          "currency": "KES"
+        }
+      ]
+    },
+    {
+      "input": "Unsupported: ￥３９，０００ and ＪＰＹ 39000",
+      "output": []
+    },
+    {
+      "input": "Words and 200 apples; offer usd 30 and ₹50 now",
+      "output": [
+        {
+          "raw": "usd 30 ",
+          "start": 28,
+          "end": 35,
+          "value": 30,
+          "currency": "USD"
+        },
+        {
+          "raw": "₹50 ",
+          "start": 39,
+          "end": 43,
+          "value": 50,
+          "currency": "INR"
+        }
+      ]
+    }
+  ],
+  "quickFilterResults": [
+    {
+      "input": "$$$",
+      "output": false
+    },
+    {
+      "input": "￥３９，０００",
+      "output": false
+    },
+    {
+      "input": "Budget is $300",
+      "output": true
+    },
+    {
+      "input": "Comp starts at yen 6M",
+      "output": true
+    },
+    {
+      "input": "Comp starts at yên 6M",
+      "output": true
+    },
+    {
+      "input": "ＪＰＹ 39000",
+      "output": false
+    },
+    {
+      "input": "No price here",
+      "output": false
+    },
+    {
+      "input": "Offer ﹩75 only",
+      "output": true
+    },
+    {
+      "input": "Offer: eur 120",
+      "output": true
+    },
+    {
+      "input": "Package: ¥6M",
+      "output": true
+    },
+    {
+      "input": "Release notes for 2026",
+      "output": false
+    },
+    {
+      "input": "Rent is ￥39,000",
+      "output": true
+    },
+    {
+      "input": "الدفع د.إ 4500",
+      "output": true
+    }
+  ],
+  "thousandHintResults": [
+    {
+      "input": "Comp: ¥6-13K",
+      "output": true
+    },
+    {
+      "input": "Comp: ¥6K-¥13K",
+      "output": true
+    },
+    {
+      "input": "No magnitude here",
+      "output": false
+    },
+    {
+      "input": "PKR 5000",
+      "output": false
+    },
+    {
+      "input": "SEK 100",
+      "output": false
+    },
+    {
+      "input": "USD 100K",
+      "output": true
+    }
+  ]
+}

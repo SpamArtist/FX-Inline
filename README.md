@@ -12,7 +12,7 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 
 ### Project
 - Package: `FX Inline`
-- Version: `0.3.6`
+- Version: `0.4.1`
 - Description: FX Inline converts prices directly on webpages into your preferred currency, so you can compare costs without leaving the page.
 
 ### Layout
@@ -56,18 +56,23 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run test:content` | `npm run build:content-tests && npm run jest -- --config jest.content.config.cjs apps/extension/tests/content` |
 | `npm run test:unit` | `npm run test:frontend` |
 | `npm run test:all` | `npm run test:frontend && npm run test:content` |
+| `npm run currency-detection:fixtures` | `node packages/currency-detection/scripts/generate-fixtures.mjs` |
+| `npm run currency-detection:baseline` | `npm run build:unit && npm run currency-detection:fixtures && node packages/currency-detection/scripts/generate-legacy-snapshot.mjs` |
+| `npm run currency-detection:test` | `npm run jest -- packages/currency-detection/test` |
+| `npm run currency-detection:bench` | `node packages/currency-detection/scripts/run-benchmarks.mjs` |
+| `npm run currency-detection:bench:compare` | `node packages/currency-detection/scripts/compare-benchmarks.mjs` |
 | `npm run postinstall` | `wxt prepare` |
 | `npm run readme:sync` | `node scripts/readme-sync.mjs` |
 | `npm run readme:sync:check` | `node scripts/readme-sync.mjs --check` |
 
 ### Recent Changes (first-parent, excluding README automation commits)
-- 2026-04-11 `9d005dd` docs: refresh NEW_WEB_EXTENSION_PROMPT to match current extension behavior
-- 2026-04-11 `aab4876` docs: refine agent opening guidance
-- 2026-04-11 `ef971e5` docs: strengthen commit policy in agent instructions
-- 2026-04-11 `e8c9935` incorrect 2023-24 token (#7)
-- 2026-04-11 `8ed09b3` Toggles (#6)
-- 2026-04-11 `6c6a7cc` Simplify (#5)
-- 2026-04-11 `20a601b` Simplify (#4)
-- 2026-04-11 `8af09d7` Merge pull request #3 from SpamArtist/BugFix/ruppee-amazon
+- 2026-04-17 `8fbd12a` feat(website): enable reliable hot reload for dev server
+- 2026-04-17 `f3e6338` chore(playground): add SEO metadata for search and sharing
+- 2026-04-17 `3a2b62f` feat(playground): add clear input button and handler
+- 2026-04-17 `859d954` style(playground): set responsive minimum heights for result sections
+- 2026-04-17 `5cc7c8e` feat(playground): trigger detection automatically on paste
+- 2026-04-17 `97804e3` feat(playground): update input counter on typing and paste
+- 2026-04-17 `b5ec04c` feat(playground): show input character counter in header
+- 2026-04-17 `ed13890` fix(playground): cap input to 5000 characters
 
 <!-- AUTO-GENERATED:END -->

@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <title>FX Inline | Currency Detection Playground</title>
+    <meta
+      name="description"
+      content="Interactive playground for testing standalone currency and amount detection on plain text content."
+    />
+    <meta
+      name="robots"
+      content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1"
+    />
+    <meta name="theme-color" content="#0d1829" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="FX Inline Currency Detection Playground" />
+    <meta
+      property="og:description"
+      content="Try the FX Inline parser in a standalone playground and inspect full and partial currency matches."
+    />
+    <meta property="og:url" content="/playground.html" />
+    <meta property="og:image" content="/assets/fx-inline-site-mark.svg" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="FX Inline Currency Detection Playground" />
+    <meta
+      name="twitter:description"
+      content="Standalone playground for currency and amount detection with full and partial match outputs."
+    />
+    <meta name="twitter:image" content="/assets/fx-inline-site-mark.svg" />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0b1220;
+        --text: #f0f6ff;
+        --muted: #afc2db;
+        --accent: #66d4ff;
+        --accent-soft: rgba(102, 212, 255, 0.18);
+        --ok: #2ec27e;
+        --border: rgba(153, 208, 255, 0.25);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        background:
+          radial-gradient(circle at 10% 0%, rgba(58, 112, 170, 0.2), transparent 35%),
+          linear-gradient(160deg, #08101d, #0d1829 60%, #0e1728);
+        color: var(--text);
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .shell {
+        width: min(1100px, calc(100% - 2rem));
+        height: calc(100vh - 2rem);
+        margin: 1rem auto;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: linear-gradient(160deg, rgba(21, 33, 52, 0.96), rgba(13, 23, 38, 0.98));
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(1.3rem, 2.8vw, 2rem);
+      }
+
+      p {
+        margin: 0.6rem 0 0;
+        color: var(--muted);
+      }
+
+      .toolbar {
+        margin-top: 1rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        align-items: center;
+      }
+
+      label {
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      input,
+      select,
+      textarea,
+      button {
+        font: inherit;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: #0c1627;
+        color: var(--text);
+        padding: 0.6rem 0.7rem;
+      }
+
+      textarea {
+        min-height: 130px;
+        resize: vertical;
+        line-height: 1.45;
+      }
+
+      .locale {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+
+      .locale select {
+        width: 120px;
+      }
+
+      button {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: var(--accent-soft);
+        color: var(--text);
+        padding: 0.5rem 0.8rem;
+        cursor: pointer;
+      }
+
+      button:hover {
+        border-color: var(--accent);
+      }
+
+      .content-flex {
+        margin-top: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        flex: 0 0 auto;
+      }
+
+      .panel {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: rgba(19, 32, 52, 0.8);
+        padding: 0.8rem;
+        min-height: 280px;
+      }
+
+      .panel h2 {
+        margin: 0;
+        font-size: 1rem;
+      }
+
+      .input-panel {
+        width: 100%;
+      }
+
+      #source {
+        display: block;
+        width: 100%;
+      }
+
+      .panel-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 0.5rem;
+        margin-bottom: 0.7rem;
+      }
+
+      .panel-head-right {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+      }
+
+      .stats {
+        color: var(--muted);
+        font-size: 0.86rem;
+      }
+
+      .stats strong {
+        color: var(--ok);
+      }
+
+      .copy-btn {
+        padding: 0.35rem 0.6rem;
+        font-size: 0.8rem;
+        line-height: 1;
+      }
+
+      .results-grid {
+        margin-top: 1rem;
+        display: flex;
+        gap: 1rem;
+        align-items: stretch;
+        flex: 1 1 auto;
+        min-height: 0;
+      }
+
+      .results-grid .panel {
+        flex: 1 1 0;
+        min-width: 0;
+        min-height: clamp(180px, 28vh, 420px);
+        display: flex;
+        flex-direction: column;
+      }
+
+      .match-list {
+        margin: 0;
+        padding-left: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+        min-height: 0;
+        overflow: auto;
+      }
+
+      .match-list li {
+        font-size: 0.86rem;
+        color: #dce8f7;
+      }
+
+      .footer {
+        margin-top: 0.8rem;
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+
+      a {
+        color: #aee8ff;
+      }
+
+      @media (max-width: 900px) {
+        .results-grid {
+          flex-direction: column;
+        }
+
+        .results-grid .panel {
+          min-height: clamp(160px, 24vh, 320px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <h1>Currency Detection Playground</h1>
+      <p>
+        Runs <code>@fx-inline/currency-detection</code> against plain text input and lists detected matches.
+      </p>
+
+      <section class="toolbar" aria-label="Playground controls">
+        <label class="locale">
+          Locale hint
+          <select id="locale">
+            <option value="en-US" selected>en-US</option>
+            <option value="en-GB">en-GB</option>
+            <option value="de-DE">de-DE</option>
+            <option value="fr-FR">fr-FR</option>
+            <option value="es-ES">es-ES</option>
+            <option value="it-IT">it-IT</option>
+            <option value="ja-JP">ja-JP</option>
+            <option value="zh-CN">zh-CN</option>
+            <option value="hi-IN">hi-IN</option>
+            <option value="pt-BR">pt-BR</option>
+          </select>
+        </label>
+        <button id="detect" type="button">Detect</button>
+        <button id="reset" type="button">Reset</button>
+        <button id="clear-input" type="button">Clear Input</button>
+      </section>
+
+      <section class="content-flex" aria-label="Playground content">
+        <article class="panel input-panel">
+          <div class="panel-head">
+            <h2>Input Text</h2>
+            <span class="stats" id="input-count">Chars: <strong>0</strong>/5000</span>
+          </div>
+          <textarea id="source" maxlength="5000">Deal: $100 and 200 eur today.
+Comp range starts at ¥6M+ base.
+Twitter handle @kes11av should not match.
+Revenue; 2023-24 $446,641,957.
+Mức giá từ ₫ 3.65 tỷ đến ₫ 4.2 tỷ.</textarea>
+        </article>
+      </section>
+
+      <section class="results-grid" aria-label="Playground results">
+        <article class="panel">
+          <div class="panel-head">
+            <h2>Detected Matches</h2>
+            <div class="panel-head-right">
+              <span class="stats" id="full-count">Count: <strong>0</strong></span>
+              <button id="copy-full" class="copy-btn" type="button">Copy</button>
+            </div>
+          </div>
+          <ul id="matches" class="match-list"></ul>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <h2>Partial Matches</h2>
+            <div class="panel-head-right">
+              <span class="stats" id="partial-count">Count: <strong>0</strong></span>
+              <button id="copy-partial" class="copy-btn" type="button">Copy</button>
+            </div>
+          </div>
+          <ul id="partial-matches" class="match-list"></ul>
+        </article>
+      </section>
+
+      <p class="footer">
+        Back to <a href="./index.html">website home</a>.
+      </p>
+    </main>
+
+    <script type="module" src="./playground.js"></script>
+  </body>
+</html>
