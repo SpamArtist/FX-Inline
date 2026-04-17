@@ -93,9 +93,11 @@ Implement these extension entrypoints and behaviors exactly.
 - first call `browser.runtime.openOptionsPage()`
 - fallback: `browser.tabs.create({ url: browser.runtime.getURL("/options.html") })`
 7. Footer:
+- include feedback action button text: `Feedback ↗` that opens a new tab to the configured feedback URL
 - text: `© {currentYear} FX Inline`
 8. Popup HTML metadata:
 - include `<meta name="manifest.type" content="browser_action" />`.
+- keep popup HTML title as `Default Popup Title` (runtime shell provides visible `FX INLINE` branding).
 
 ### B) Options Page (`options.html`, open in tab)
 
@@ -126,6 +128,7 @@ Implement these extension entrypoints and behaviors exactly.
 - automatic inline conversion in page text
 - mutation-aware partial/full reconversion runtime
 - storage watch for settings updates
+- context invalidation-safe cleanup for observers/watchers/UI capture listeners
 4. Mutation observation target and options:
 - observe `document.body`
 - `childList: true`
@@ -268,6 +271,9 @@ Use extension local storage with these keys and semantics:
   - dark text context: `#355aa8`
 11. Structured price decorators:
 - support structured Amazon-style fragments and sibling symbol/amount node patterns
+- include sibling currency-word combinations such as `yen/month`
+12. Converted amount style contract:
+- `.ccx-converted-amount` must include inherited line-height and `width: fit-content`
 
 ### E) Mutation-Aware Conversion Runtime
 
@@ -298,6 +304,8 @@ Implement the same runtime behavior pattern:
 - log phase timings and counters for initialize/full/partial/settings flows
 9. Auto-conversion disabled behavior:
 - suppress/hide existing inline wrappers instead of applying new conversions
+10. Lifecycle safety:
+- cleanup must be idempotent and resilient to extension context invalidation errors
 
 ## 6) Parsing and Matching Requirements
 
@@ -348,7 +356,27 @@ Must parse all of these correctly:
 39. `1 Cr INR`
 40. `INR 1 Crore`
 41. `INR 1 Cr`
-
+42. `yen 1,234`
+43. `YÊN 1,234`
+44. `1,234 yên`
+45. `R$ 10`
+46. `10R$`
+47. `RD$ 40`
+48. `A$3`
+49. `AU$ 4`
+50. `CA$ 5`
+51. `NZ$6`
+52. `HK$7`
+53. `MX$8`
+54. `NT$9`
+55. `US$10`
+56. `EC$11`
+57. `￥39,000`
+58. `＄100`
+59. `￡200`
+60. `￦3000`
+61. `￠50`
+62. `﹩75`
 ### B) Required Invalid Parse Cases
 
 Must reject:
@@ -379,6 +407,9 @@ Must detect correctly from mixed text:
 12. `Compensation: ¥6-13M base` (shared magnitude range)
 13. `Revenue; 2023-24 $446,641,957.` -> detect only USD amount, not year range.
 14. Ignore lowercase/titlecase word-like ISO prose (e.g. `top`, `all`, `try`, `mad`) unless uppercase token is intentional currency code.
+15. Ignore username/handle-like boundaries (for example `@kes11av`, `kes11buddy`) while still detecting nearby valid snippets such as `USD350/week` or `KES 11`.
+16. Support composite dollar symbols and Unicode compatibility/full-width symbols inside mixed text.
+17. Support yen alias extraction including `yen/month` sibling-token contexts.
 
 ### D) Locale-Aware Magnitude Profiles
 
@@ -472,6 +503,9 @@ Include jsdom-level tests for content runtime and selection popup:
 7. selection popup loader lazy-import and dedupe behavior.
 8. selection popup controller render, editing interactions, cleanup idempotency.
 9. perf logger enable/disable behavior.
+10. structured add-on decorators for Amazon and sibling symbol/amount patterns.
+11. username/handle-like false-positive protections.
+12. extension context invalidation cleanup safety path.
 
 ### C) Manual E2E Checklist (`docs/QA_E2E_CHECKLIST.md`)
 
