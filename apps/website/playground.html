@@ -113,10 +113,10 @@
         border-color: var(--accent);
       }
 
-      .grid {
+      .content-flex {
         margin-top: 1rem;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
+        display: flex;
+        flex-direction: column;
         gap: 1rem;
       }
 
@@ -165,7 +165,8 @@
       .match-list {
         margin: 0;
         padding-left: 1rem;
-        display: grid;
+        display: flex;
+        flex-direction: column;
         gap: 0.3rem;
         max-height: 220px;
         overflow: auto;
@@ -187,10 +188,6 @@
       }
 
       @media (max-width: 900px) {
-        .grid {
-          grid-template-columns: 1fr;
-        }
-
         .results-grid {
           flex-direction: column;
         }
@@ -224,7 +221,7 @@
         <button id="reset" type="button">Reset</button>
       </section>
 
-      <section class="grid" aria-label="Playground content">
+      <section class="content-flex" aria-label="Playground content">
         <article class="panel">
           <div class="panel-head">
             <h2>Input Text</h2>
