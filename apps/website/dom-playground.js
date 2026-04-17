@@ -1,4 +1,4 @@
-import { createCurrencyParser } from "../../packages/currency-detection/src/index.js";
+import { createCurrencyParser } from "@fx-inline/currency-detection";
 
 const parser = createCurrencyParser();
 
