@@ -1,5 +1,9 @@
 # FX Inline
 
+[![CI](https://github.com/SpamArtist/currency-conversion-extension-tool/actions/workflows/ci.yml/badge.svg)](https://github.com/SpamArtist/currency-conversion-extension-tool/actions/workflows/ci.yml)
+[![Currency Detection Benchmarks](https://github.com/SpamArtist/currency-conversion-extension-tool/actions/workflows/currency-detection-benchmarks.yml/badge.svg)](https://github.com/SpamArtist/currency-conversion-extension-tool/actions/workflows/currency-detection-benchmarks.yml)
+[![Last Commit](https://img.shields.io/github/last-commit/SpamArtist/currency-conversion-extension-tool)](https://github.com/SpamArtist/currency-conversion-extension-tool/commits/main)
+
 FX Inline converts prices directly on webpages into your preferred currency so you can compare costs without leaving the page.
 
 This README has an auto-generated repository snapshot that updates via `npm run readme:sync` and CI workflows after merges to `main`.
@@ -66,6 +70,7 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run readme:sync:check` | `node scripts/readme-sync.mjs --check` |
 
 ### Recent Changes (first-parent, excluding README automation commits)
+- 2026-04-17 `022fe64` docs: refresh README snapshot
 - 2026-04-17 `8899fdb` docs: align docs with latest extension behavior
 - 2026-04-17 `959008e` feat: introduce standalone currency-detection package, benchmarks, and playground (#18)
 - 2026-04-17 `8019562` ci: run web extension tests on pull requests
@@ -73,6 +78,5 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 - 2026-04-15 `42fb2a6` fix: ignore username/handle-like currency matches (#14)
 - 2026-04-15 `6a8e02b` Merge branch 'main' of https://github.com/SpamArtist/currency-conversion-extension-tool
 - 2026-04-15 `2ce0201` fix: no important in css
-- 2026-04-15 `9ba0eff` inline-conversion: add converted amount line-height and width styles
 
 <!-- AUTO-GENERATED:END -->

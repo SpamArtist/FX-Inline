@@ -1,5 +1,7 @@
 # Currency Detection Package
 
+[![Currency Detection Benchmarks](https://github.com/SpamArtist/currency-conversion-extension-tool/actions/workflows/currency-detection-benchmarks.yml/badge.svg)](https://github.com/SpamArtist/currency-conversion-extension-tool/actions/workflows/currency-detection-benchmarks.yml)
+
 ## Scope
 
 `packages/currency-detection` provides a standalone, dependency-free detection core for:

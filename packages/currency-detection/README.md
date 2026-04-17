@@ -1,5 +1,8 @@
 # @fx-inline/currency-detection
 
+[![CI](https://github.com/SpamArtist/currency-conversion-extension-tool/actions/workflows/ci.yml/badge.svg)](https://github.com/SpamArtist/currency-conversion-extension-tool/actions/workflows/ci.yml)
+[![Currency Detection Benchmarks](https://github.com/SpamArtist/currency-conversion-extension-tool/actions/workflows/currency-detection-benchmarks.yml/badge.svg)](https://github.com/SpamArtist/currency-conversion-extension-tool/actions/workflows/currency-detection-benchmarks.yml)
+
 Portable, dependency-free currency and amount detection/parsing core.
 
 ## Usage
