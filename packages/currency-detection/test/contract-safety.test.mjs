@@ -1,15 +1,14 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+import { expect, test } from "@jest/globals";
 
 import { createCurrencyParser } from "../src/index.js";
 
 test("createCurrencyParser returns a frozen parser instance", () => {
   const parser = createCurrencyParser();
-  assert.equal(Object.isFrozen(parser), true);
-  assert.equal(typeof parser.parseValue, "function");
-  assert.equal(typeof parser.extractMatches, "function");
-  assert.equal(typeof parser.mayContainCurrencyToken, "function");
-  assert.equal(typeof parser.hasThousandMagnitudeHint, "function");
+  expect(Object.isFrozen(parser)).toBe(true);
+  expect(typeof parser.parseValue).toBe("function");
+  expect(typeof parser.extractMatches).toBe("function");
+  expect(typeof parser.mayContainCurrencyToken).toBe("function");
+  expect(typeof parser.hasThousandMagnitudeHint).toBe("function");
 });
 
 test("parser behavior is immutable after caller mutates config object", () => {
@@ -25,30 +24,26 @@ test("parser behavior is immutable after caller mutates config object", () => {
   config.extraWords.bucks = "EUR";
 
   const afterMutation = parser.parseValue("bucks 10");
-  assert.deepStrictEqual(beforeMutation, afterMutation);
-  assert.equal(afterMutation.currency, "USD");
+  expect(beforeMutation).toEqual(afterMutation);
+  expect(afterMutation.currency).toBe("USD");
 });
 
 test("createCurrencyParser rejects invalid extraIsoCodes format", () => {
-  assert.throws(
+  expect(
     () => createCurrencyParser({ extraIsoCodes: ["US"] }),
-    /extraIsoCodes/i,
-  );
-  assert.throws(
+  ).toThrow(/extraIsoCodes/i);
+  expect(
     () => createCurrencyParser({ extraIsoCodes: ["usd"] }),
-    /extraIsoCodes/i,
-  );
+  ).toThrow(/extraIsoCodes/i);
 });
 
 test("createCurrencyParser rejects overriding built-in tokens", () => {
-  assert.throws(
+  expect(
     () => createCurrencyParser({ extraSymbols: { "$": "EUR" } }),
-    /extraSymbols/i,
-  );
-  assert.throws(
+  ).toThrow(/extraSymbols/i);
+  expect(
     () => createCurrencyParser({ extraWords: { yen: "USD" } }),
-    /extraWords/i,
-  );
+  ).toThrow(/extraWords/i);
 });
 
 test("createCurrencyParser supports additive runtime extension tokens", () => {
@@ -78,12 +73,12 @@ test("createCurrencyParser supports additive runtime extension tokens", () => {
   const iso = parser.parseValue("XYZ 9");
   const magnitude = parser.parseValue("USD 2 mega", { localeHint: "x-test" });
 
-  assert.equal(bucks.valid, true);
-  assert.equal(bucks.currency, "USD");
-  assert.equal(symbol.valid, true);
-  assert.equal(symbol.currency, "INR");
-  assert.equal(iso.valid, true);
-  assert.equal(iso.currency, "XYZ");
-  assert.equal(magnitude.valid, true);
-  assert.equal(magnitude.value, 2_000_000);
+  expect(bucks.valid).toBe(true);
+  expect(bucks.currency).toBe("USD");
+  expect(symbol.valid).toBe(true);
+  expect(symbol.currency).toBe("INR");
+  expect(iso.valid).toBe(true);
+  expect(iso.currency).toBe("XYZ");
+  expect(magnitude.valid).toBe(true);
+  expect(magnitude.value).toBe(2_000_000);
 });

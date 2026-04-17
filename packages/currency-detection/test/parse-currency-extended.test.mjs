@@ -1,4 +1,4 @@
-import test from "node:test";
+import { expect, test } from "@jest/globals";
 
 import {
   extractCurrencyTextMatches,
@@ -6,7 +6,6 @@ import {
   mayContainCurrencyToken,
   parseCurrencyValue,
 } from "../src/index.js";
-import { expect } from "./helpers/expect.mjs";
 
 test("parseCurrencyValue handles signs, separators, and lowercase iso", () => {
   const cases = [

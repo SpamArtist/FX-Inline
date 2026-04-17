@@ -1,10 +1,9 @@
-import test from "node:test";
+import { expect, test } from "@jest/globals";
 
 import {
   extractCurrencyTextMatches,
   parseCurrencyValue,
 } from "../src/index.js";
-import { expect } from "./helpers/expect.mjs";
 
 test("parseCurrencyValue supports roadmap formats", () => {
   const cases = [

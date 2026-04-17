@@ -58,7 +58,7 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run test:all` | `npm run test:frontend && npm run test:content` |
 | `npm run currency-detection:fixtures` | `node packages/currency-detection/scripts/generate-fixtures.mjs` |
 | `npm run currency-detection:baseline` | `npm run build:unit && npm run currency-detection:fixtures && node packages/currency-detection/scripts/generate-legacy-snapshot.mjs` |
-| `npm run currency-detection:test` | `node --test "packages/currency-detection/test/**/*.test.mjs"` |
+| `npm run currency-detection:test` | `npm run jest -- packages/currency-detection/test` |
 | `npm run currency-detection:bench` | `node packages/currency-detection/scripts/run-benchmarks.mjs` |
 | `npm run currency-detection:bench:compare` | `node packages/currency-detection/scripts/compare-benchmarks.mjs` |
 | `npm run postinstall` | `wxt prepare` |
