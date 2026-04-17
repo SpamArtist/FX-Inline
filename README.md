@@ -6,7 +6,7 @@
 
 FX Inline converts prices directly on webpages into your preferred currency so you can compare costs without leaving the page.
 
-This README has an auto-generated repository snapshot that updates via `npm run readme:sync` and CI workflows after merges to `main`.
+This README has an auto-generated repository snapshot that updates via `npm run readme:sync` (run it and commit the result after changes that affect the snapshot).
 
 <!-- AUTO-GENERATED:START -->
 
@@ -70,6 +70,7 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run readme:sync:check` | `node scripts/readme-sync.mjs --check` |
 
 ### Recent Changes (first-parent, excluding README automation commits)
+- 2026-04-17 `9f0b379` docs: add GitHub badges to repo and package docs
 - 2026-04-17 `022fe64` docs: refresh README snapshot
 - 2026-04-17 `8899fdb` docs: align docs with latest extension behavior
 - 2026-04-17 `959008e` feat: introduce standalone currency-detection package, benchmarks, and playground (#18)
@@ -77,6 +78,5 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 - 2026-04-16 `b2766fd` update
 - 2026-04-15 `42fb2a6` fix: ignore username/handle-like currency matches (#14)
 - 2026-04-15 `6a8e02b` Merge branch 'main' of https://github.com/SpamArtist/currency-conversion-extension-tool
-- 2026-04-15 `2ce0201` fix: no important in css
 
 <!-- AUTO-GENERATED:END -->
