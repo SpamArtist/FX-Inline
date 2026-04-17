@@ -9,6 +9,7 @@ const MAX_INPUT_LENGTH = 5000;
 
 const sourceInput = document.getElementById("source");
 const localeInput = document.getElementById("locale");
+const inputCount = document.getElementById("input-count");
 const matchesList = document.getElementById("matches");
 const partialMatchesList = document.getElementById("partial-matches");
 const fullCount = document.getElementById("full-count");
@@ -21,6 +22,7 @@ const resetButton = document.getElementById("reset");
 if (
   !sourceInput ||
   !localeInput ||
+  !inputCount ||
   !matchesList ||
   !partialMatchesList ||
   !fullCount ||
@@ -50,6 +52,14 @@ function updateCount(container, value) {
     return;
   }
   countNode.textContent = String(value);
+}
+
+function updateInputCharCount() {
+  const countNode = inputCount.querySelector("strong");
+  if (!countNode) {
+    return;
+  }
+  countNode.textContent = String(sourceInput.value.length);
 }
 
 function buildListCopyText(listNode) {
@@ -229,7 +239,9 @@ copyPartialButton.addEventListener("click", async () => {
   flashCopyButton(copyPartialButton, copied);
 });
 
+sourceInput.addEventListener("input", updateInputCharCount);
 detectButton.addEventListener("click", runDetection);
 resetButton.addEventListener("click", resetResults);
 
+updateInputCharCount();
 resetResults();
