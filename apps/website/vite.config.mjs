@@ -7,6 +7,13 @@ const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
   root: currentDirectory,
   server: {
+    hmr: {
+      overlay: true,
+    },
+    watch: {
+      usePolling: true,
+      interval: 150,
+    },
     fs: {
       allow: [path.resolve(currentDirectory, "../../")],
     },
