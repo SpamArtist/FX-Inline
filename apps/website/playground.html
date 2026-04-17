@@ -160,6 +160,12 @@
         margin-bottom: 0.7rem;
       }
 
+      .panel-head-right {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+      }
+
       .stats {
         color: var(--muted);
         font-size: 0.86rem;
@@ -167,6 +173,12 @@
 
       .stats strong {
         color: var(--ok);
+      }
+
+      .copy-btn {
+        padding: 0.35rem 0.6rem;
+        font-size: 0.8rem;
+        line-height: 1;
       }
 
       .results-grid {
@@ -262,7 +274,10 @@ Mức giá từ ₫ 3.65 tỷ đến ₫ 4.2 tỷ.</textarea>
         <article class="panel">
           <div class="panel-head">
             <h2>Detected Matches</h2>
-            <span class="stats" id="full-count">Count: <strong>0</strong></span>
+            <div class="panel-head-right">
+              <span class="stats" id="full-count">Count: <strong>0</strong></span>
+              <button id="copy-full" class="copy-btn" type="button">Copy</button>
+            </div>
           </div>
           <ul id="matches" class="match-list"></ul>
         </article>
@@ -270,7 +285,10 @@ Mức giá từ ₫ 3.65 tỷ đến ₫ 4.2 tỷ.</textarea>
         <article class="panel">
           <div class="panel-head">
             <h2>Partial Matches</h2>
-            <span class="stats" id="partial-count">Count: <strong>0</strong></span>
+            <div class="panel-head-right">
+              <span class="stats" id="partial-count">Count: <strong>0</strong></span>
+              <button id="copy-partial" class="copy-btn" type="button">Copy</button>
+            </div>
           </div>
           <ul id="partial-matches" class="match-list"></ul>
         </article>

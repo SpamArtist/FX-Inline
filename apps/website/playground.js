@@ -13,6 +13,8 @@ const matchesList = document.getElementById("matches");
 const partialMatchesList = document.getElementById("partial-matches");
 const fullCount = document.getElementById("full-count");
 const partialCount = document.getElementById("partial-count");
+const copyFullButton = document.getElementById("copy-full");
+const copyPartialButton = document.getElementById("copy-partial");
 const detectButton = document.getElementById("detect");
 const resetButton = document.getElementById("reset");
 
@@ -23,6 +25,8 @@ if (
   !partialMatchesList ||
   !fullCount ||
   !partialCount ||
+  !copyFullButton ||
+  !copyPartialButton ||
   !detectButton ||
   !resetButton
 ) {
@@ -46,6 +50,48 @@ function updateCount(container, value) {
     return;
   }
   countNode.textContent = String(value);
+}
+
+function buildListCopyText(listNode) {
+  const values = Array.from(listNode.querySelectorAll("li")).map((node) =>
+    (node.textContent || "").trim(),
+  );
+  return values.filter(Boolean).join("\n");
+}
+
+async function copyText(text) {
+  if (!text) {
+    return false;
+  }
+
+  if (navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      // Fallback below.
+    }
+  }
+
+  const fallback = document.createElement("textarea");
+  fallback.value = text;
+  fallback.setAttribute("readonly", "readonly");
+  fallback.style.position = "fixed";
+  fallback.style.top = "-1000px";
+  fallback.style.left = "-1000px";
+  document.body.append(fallback);
+  fallback.select();
+  const copied = document.execCommand("copy");
+  fallback.remove();
+  return copied;
+}
+
+function flashCopyButton(button, success) {
+  const label = success ? "Copied" : "No Data";
+  button.textContent = label;
+  window.setTimeout(() => {
+    button.textContent = "Copy";
+  }, 1200);
 }
 
 function resetResults() {
@@ -170,6 +216,18 @@ function runDetection() {
   updateCount(fullCount, matches.length);
   updateCount(partialCount, partialMatches.length);
 }
+
+copyFullButton.addEventListener("click", async () => {
+  const text = buildListCopyText(matchesList);
+  const copied = await copyText(text);
+  flashCopyButton(copyFullButton, copied);
+});
+
+copyPartialButton.addEventListener("click", async () => {
+  const text = buildListCopyText(partialMatchesList);
+  const copied = await copyText(text);
+  flashCopyButton(copyPartialButton, copied);
+});
 
 detectButton.addEventListener("click", runDetection);
 resetButton.addEventListener("click", resetResults);
