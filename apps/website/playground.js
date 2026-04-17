@@ -18,6 +18,7 @@ const copyFullButton = document.getElementById("copy-full");
 const copyPartialButton = document.getElementById("copy-partial");
 const detectButton = document.getElementById("detect");
 const resetButton = document.getElementById("reset");
+const clearInputButton = document.getElementById("clear-input");
 
 if (
   !sourceInput ||
@@ -31,6 +32,7 @@ if (
   !copyPartialButton ||
   !detectButton ||
   !resetButton
+  || !clearInputButton
 ) {
   throw new Error("Playground DOM is missing required controls.");
 }
@@ -227,6 +229,13 @@ function runDetection() {
   updateCount(partialCount, partialMatches.length);
 }
 
+function clearInputText() {
+  sourceInput.value = "";
+  updateInputCharCount();
+  resetResults();
+  sourceInput.focus();
+}
+
 copyFullButton.addEventListener("click", async () => {
   const text = buildListCopyText(matchesList);
   const copied = await copyText(text);
@@ -248,6 +257,7 @@ sourceInput.addEventListener("paste", () => {
 });
 detectButton.addEventListener("click", runDetection);
 resetButton.addEventListener("click", resetResults);
+clearInputButton.addEventListener("click", clearInputText);
 
 updateInputCharCount();
 resetResults();
