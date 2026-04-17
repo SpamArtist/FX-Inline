@@ -240,6 +240,12 @@ copyPartialButton.addEventListener("click", async () => {
 });
 
 sourceInput.addEventListener("input", updateInputCharCount);
+sourceInput.addEventListener("paste", () => {
+  window.setTimeout(() => {
+    updateInputCharCount();
+    runDetection();
+  }, 0);
+});
 detectButton.addEventListener("click", runDetection);
 resetButton.addEventListener("click", resetResults);
 
