@@ -17,7 +17,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         index: path.resolve(currentDirectory, "index.html"),
-        domPlayground: path.resolve(currentDirectory, "dom-playground.html"),
+        playground: path.resolve(currentDirectory, "playground.html"),
       },
     },
   },
