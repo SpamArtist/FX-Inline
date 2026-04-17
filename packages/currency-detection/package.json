@@ -1,0 +1,25 @@
+{
+  "name": "@fx-inline/currency-detection",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Portable currency and amount detection/parsing core with strict legacy parity.",
+  "type": "module",
+  "main": "./src/index.js",
+  "module": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js",
+      "default": "./src/index.js"
+    }
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=20"
+  }
+}

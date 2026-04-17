@@ -23,6 +23,11 @@
     "test:content": "npm run build:content-tests && npm run jest -- --config jest.content.config.cjs apps/extension/tests/content",
     "test:unit": "npm run test:frontend",
     "test:all": "npm run test:frontend && npm run test:content",
+    "currency-detection:fixtures": "node packages/currency-detection/scripts/generate-fixtures.mjs",
+    "currency-detection:baseline": "npm run build:unit && npm run currency-detection:fixtures && node packages/currency-detection/scripts/generate-legacy-snapshot.mjs",
+    "currency-detection:test": "node --test \"packages/currency-detection/test/**/*.test.mjs\"",
+    "currency-detection:bench": "node packages/currency-detection/scripts/run-benchmarks.mjs",
+    "currency-detection:bench:compare": "node packages/currency-detection/scripts/compare-benchmarks.mjs",
     "postinstall": "wxt prepare",
     "readme:sync": "node scripts/readme-sync.mjs",
     "readme:sync:check": "node scripts/readme-sync.mjs --check"
