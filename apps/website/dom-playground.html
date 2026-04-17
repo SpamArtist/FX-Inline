@@ -67,12 +67,14 @@
       }
 
       input,
+      select,
       textarea,
       button {
         font: inherit;
       }
 
       input,
+      select,
       textarea {
         width: 100%;
         border: 1px solid var(--border);
@@ -94,7 +96,7 @@
         gap: 0.4rem;
       }
 
-      .locale input {
+      .locale select {
         width: 120px;
       }
 
@@ -207,7 +209,18 @@
       <section class="toolbar" aria-label="Playground controls">
         <label class="locale">
           Locale hint
-          <input id="locale" type="text" value="en-US" />
+          <select id="locale">
+            <option value="en-US" selected>en-US</option>
+            <option value="en-GB">en-GB</option>
+            <option value="de-DE">de-DE</option>
+            <option value="fr-FR">fr-FR</option>
+            <option value="es-ES">es-ES</option>
+            <option value="it-IT">it-IT</option>
+            <option value="ja-JP">ja-JP</option>
+            <option value="zh-CN">zh-CN</option>
+            <option value="hi-IN">hi-IN</option>
+            <option value="pt-BR">pt-BR</option>
+          </select>
         </label>
         <button id="render" type="button">Render Preview</button>
         <button id="detect" type="button">Detect In DOM</button>
