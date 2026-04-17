@@ -12,6 +12,21 @@
 
 It intentionally excludes DOM manipulation, rate math, and reducer/state logic.
 
+## API Value Rules
+
+`createCurrencyParser(config)`:
+- `config` allowed values: omitted/`undefined` or object.
+- `extraSymbols`/`extraWords` values must be uppercase ISO-like codes (`^[A-Z]{3,4}$`).
+- `extraIsoCodes` max `500`; each value must match `^[A-Z]{3,4}$`.
+- `extraMagnitudeProfiles` max `100`; each profile has non-empty locale + non-empty entries.
+- magnitude aliases are additive-only; cannot override built-in aliases.
+
+`localeHint`:
+- allowed values: omitted, `null`, or locale string (examples: `en-US`, `pt-BR`, `vi`).
+
+For full API signatures and all allowed values, see:
+- `packages/currency-detection/README.md`
+
 ## TDD + Parity Workflow
 
 1. Generate fixture corpus:

@@ -19,44 +19,74 @@ const thousandMagnitudeHintRegex =
 
 /**
  * @typedef {Object} ParseOptions
+ * Allowed values:
+ * - localeHint omitted
+ * - localeHint = null
+ * - localeHint = locale string (examples: "en", "en-US", "pt-BR", "vi")
  * @property {string | null} [localeHint]
  */
 
 /**
  * @typedef {Object} ParseResult
+ * `valid` allowed values:
+ * - true: `value` and `currency` are populated
+ * - false: parse failed
  * @property {boolean} valid
+ * Allowed values: finite positive/negative number when valid.
  * @property {number} [value]
+ * Allowed values: recognized uppercase ISO-like code when valid.
  * @property {string | null} [currency]
  */
 
 /**
  * @typedef {Object} CurrencyMatch
  * @property {string} raw
+ * Allowed values: 0-based integer index.
  * @property {number} start
+ * Allowed values: 0-based integer index (exclusive end).
  * @property {number} end
  * @property {number} value
+ * Allowed values: recognized uppercase ISO-like code.
  * @property {string} currency
+ * Allowed values: finite number, present only for range matches.
  * @property {number} [rangeEndValue]
  */
 
 /**
  * @typedef {Object} MagnitudeProfileEntry
+ * Allowed values: finite positive number (`> 0`).
  * @property {number} multiplier
+ * Allowed values: non-empty alias strings, max 100 per entry, each <= 64 chars.
  * @property {string[]} aliases
  */
 
 /**
  * @typedef {Object} MagnitudeProfile
+ * Allowed values: non-empty locale string.
  * @property {string} locale
+ * Allowed values: true | false | omitted.
  * @property {boolean} [requiresLocaleHint]
+ * Allowed values: non-empty array of magnitude entries.
  * @property {MagnitudeProfileEntry[]} entries
  */
 
 /**
  * @typedef {Object} ParserConfig
+ * Allowed values:
+ * - object map
+ * - key: non-empty symbol token
+ * - value: uppercase ISO-like code (`^[A-Z]{3,4}$`)
+ * - additive only (no built-in override)
  * @property {Record<string, string>} [extraSymbols]
+ * Allowed values:
+ * - object map
+ * - key: non-empty word token
+ * - value: uppercase ISO-like code (`^[A-Z]{3,4}$`)
+ * - additive only (no built-in override)
  * @property {Record<string, string>} [extraWords]
+ * Allowed values: array length <= 500, each item `^[A-Z]{3,4}$`.
  * @property {string[]} [extraIsoCodes]
+ * Allowed values: array length <= 100, additive only aliases.
  * @property {MagnitudeProfile[]} [extraMagnitudeProfiles]
  */
 
@@ -777,6 +807,10 @@ function createCompiledConfig(config) {
  * The `config` object is optional and additive-only. It can add extra symbols,
  * words, ISO-like codes, and magnitude profiles, but cannot override built-in
  * tokens or built-in magnitude aliases.
+ * Allowed value highlights:
+ * - extra ISO/code values must match `^[A-Z]{3,4}$`
+ * - extraIsoCodes max 500
+ * - extraMagnitudeProfiles max 100
  *
  * @param {ParserConfig} [config]
  * @returns {CurrencyParser}
