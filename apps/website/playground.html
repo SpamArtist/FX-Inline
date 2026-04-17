@@ -141,6 +141,15 @@
         margin-bottom: 0.7rem;
       }
 
+      .stats {
+        color: var(--muted);
+        font-size: 0.86rem;
+      }
+
+      .stats strong {
+        color: var(--ok);
+      }
+
       .results-grid {
         margin-top: 1rem;
         display: flex;
@@ -232,6 +241,7 @@ Mức giá từ ₫ 3.65 tỷ đến ₫ 4.2 tỷ.</textarea>
         <article class="panel">
           <div class="panel-head">
             <h2>Detected Matches</h2>
+            <span class="stats" id="full-count">Count: <strong>0</strong></span>
           </div>
           <ol id="matches" class="match-list"></ol>
         </article>
@@ -239,6 +249,7 @@ Mức giá từ ₫ 3.65 tỷ đến ₫ 4.2 tỷ.</textarea>
         <article class="panel">
           <div class="panel-head">
             <h2>Partial Matches</h2>
+            <span class="stats" id="partial-count">Count: <strong>0</strong></span>
           </div>
           <ol id="partial-matches" class="match-list"></ol>
         </article>

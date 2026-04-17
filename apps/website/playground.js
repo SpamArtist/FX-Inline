@@ -9,6 +9,8 @@ const sourceInput = document.getElementById("source");
 const localeInput = document.getElementById("locale");
 const matchesList = document.getElementById("matches");
 const partialMatchesList = document.getElementById("partial-matches");
+const fullCount = document.getElementById("full-count");
+const partialCount = document.getElementById("partial-count");
 const detectButton = document.getElementById("detect");
 const resetButton = document.getElementById("reset");
 
@@ -17,6 +19,8 @@ if (
   !localeInput ||
   !matchesList ||
   !partialMatchesList ||
+  !fullCount ||
+  !partialCount ||
   !detectButton ||
   !resetButton
 ) {
@@ -31,6 +35,8 @@ function getLocaleHint() {
 function resetResults() {
   matchesList.textContent = "";
   partialMatchesList.textContent = "";
+  fullCount.innerHTML = "Count: <strong>0</strong>";
+  partialCount.innerHTML = "Count: <strong>0</strong>";
 }
 
 function hasRangeOverlap(rangeA, rangeB) {
@@ -144,6 +150,9 @@ function runDetection() {
     item.textContent = `${match.raw} [${match.start}-${match.end}]`;
     partialMatchesList.append(item);
   }
+
+  fullCount.innerHTML = `Count: <strong>${matches.length}</strong>`;
+  partialCount.innerHTML = `Count: <strong>${partialMatches.length}</strong>`;
 }
 
 detectButton.addEventListener("click", runDetection);
