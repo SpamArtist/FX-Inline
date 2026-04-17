@@ -6,7 +6,7 @@
     <title>FX Inline | Currency Detection DOM Playground</title>
     <meta
       name="description"
-      content="Interactive playground for testing standalone currency and amount detection on DOM text content."
+      content="Interactive playground for testing standalone currency and amount detection on plain text content."
     />
     <style>
       :root {
@@ -141,24 +141,6 @@
         margin-bottom: 0.7rem;
       }
 
-      #preview {
-        white-space: pre-wrap;
-        line-height: 1.52;
-      }
-
-      .ccx-match {
-        background: rgba(102, 212, 255, 0.2);
-        border: 1px solid rgba(102, 212, 255, 0.45);
-        border-radius: 6px;
-        padding: 0.04rem 0.15rem;
-      }
-
-      .ccx-tag {
-        margin-left: 0.25rem;
-        color: #aee8ff;
-        font-size: 0.78rem;
-      }
-
       .stats {
         color: var(--muted);
         font-size: 0.86rem;
@@ -203,7 +185,7 @@
     <main class="shell">
       <h1>Currency Detection DOM Playground</h1>
       <p>
-        Runs <code>@fx-inline/currency-detection</code> against text nodes in a preview DOM and highlights detected matches.
+        Runs <code>@fx-inline/currency-detection</code> against plain text input and lists detected matches.
       </p>
 
       <section class="toolbar" aria-label="Playground controls">
@@ -222,8 +204,7 @@
             <option value="pt-BR">pt-BR</option>
           </select>
         </label>
-        <button id="render" type="button">Render Preview</button>
-        <button id="detect" type="button">Detect In DOM</button>
+        <button id="detect" type="button">Detect</button>
         <button id="reset" type="button">Reset</button>
       </section>
 
@@ -238,19 +219,12 @@ Twitter handle @kes11av should not match.
 Revenue; 2023-24 $446,641,957.
 Mức giá từ ₫ 3.65 tỷ đến ₫ 4.2 tỷ.</textarea>
         </article>
-
-        <article class="panel" aria-live="polite">
-          <div class="panel-head">
-            <h2>Preview DOM</h2>
-            <span class="stats" id="summary">Matches: <strong>0</strong></span>
-          </div>
-          <div id="preview"></div>
-        </article>
       </section>
 
       <section class="panel" style="margin-top: 1rem">
         <div class="panel-head">
           <h2>Detected Matches</h2>
+          <span class="stats" id="summary">Matches: <strong>0</strong></span>
         </div>
         <ol id="matches"></ol>
       </section>
