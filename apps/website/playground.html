@@ -193,7 +193,7 @@
       .results-grid .panel {
         flex: 1 1 0;
         min-width: 0;
-        min-height: 0;
+        min-height: clamp(180px, 28vh, 420px);
         display: flex;
         flex-direction: column;
       }
@@ -226,6 +226,10 @@
       @media (max-width: 900px) {
         .results-grid {
           flex-direction: column;
+        }
+
+        .results-grid .panel {
+          min-height: clamp(160px, 24vh, 320px);
         }
       }
     </style>
