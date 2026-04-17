@@ -4,6 +4,8 @@ const parser = createCurrencyParser();
 const PARTIAL_TOKEN_REGEX =
   /[$€£¥₹₩₽₺₫₴₦₱]|(?:USD|EUR|GBP|JPY|INR|AUD|CAD|CNY|CHF|HKD|SGD|SEK|NOK|DKK|NZD|BRL|MXN|ZAR|AED|SAR|PKR|IDR|THB|MYR|VND)|(?:dollars?|euros?|pounds?|rupees?|yen|yuan|won|dirhams?|riyals?|francs?)/giu;
 const SNIPPET_BOUNDARY_REGEX = /[\n\r,;.!?()[\]{}]/;
+const UNSAFE_CONTROL_CHARS_REGEX = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
+const MAX_INPUT_LENGTH = 120000;
 
 const sourceInput = document.getElementById("source");
 const localeInput = document.getElementById("locale");
@@ -32,11 +34,25 @@ function getLocaleHint() {
   return raw.length ? raw : document.documentElement.lang || "en";
 }
 
+function normalizeInput(rawInput) {
+  return String(rawInput ?? "")
+    .slice(0, MAX_INPUT_LENGTH)
+    .replace(UNSAFE_CONTROL_CHARS_REGEX, " ");
+}
+
+function updateCount(container, value) {
+  const countNode = container.querySelector("strong");
+  if (!countNode) {
+    return;
+  }
+  countNode.textContent = String(value);
+}
+
 function resetResults() {
   matchesList.textContent = "";
   partialMatchesList.textContent = "";
-  fullCount.innerHTML = "Count: <strong>0</strong>";
-  partialCount.innerHTML = "Count: <strong>0</strong>";
+  updateCount(fullCount, 0);
+  updateCount(partialCount, 0);
 }
 
 function hasRangeOverlap(rangeA, rangeB) {
@@ -133,7 +149,7 @@ function collectPartialMatches(input, fullMatches, localeHint) {
 function runDetection() {
   resetResults();
   const localeHint = getLocaleHint();
-  const text = sourceInput.value;
+  const text = normalizeInput(sourceInput.value);
   if (!parser.mayContainCurrencyToken(text)) return;
 
   const matches = parser.extractMatches(text, { localeHint });
@@ -151,8 +167,8 @@ function runDetection() {
     partialMatchesList.append(item);
   }
 
-  fullCount.innerHTML = `Count: <strong>${matches.length}</strong>`;
-  partialCount.innerHTML = `Count: <strong>${partialMatches.length}</strong>`;
+  updateCount(fullCount, matches.length);
+  updateCount(partialCount, partialMatches.length);
 }
 
 detectButton.addEventListener("click", runDetection);
