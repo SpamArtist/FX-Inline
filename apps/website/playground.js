@@ -5,7 +5,7 @@ const PARTIAL_TOKEN_REGEX =
   /[$€£¥₹₩₽₺₫₴₦₱]|(?:USD|EUR|GBP|JPY|INR|AUD|CAD|CNY|CHF|HKD|SGD|SEK|NOK|DKK|NZD|BRL|MXN|ZAR|AED|SAR|PKR|IDR|THB|MYR|VND)|(?:dollars?|euros?|pounds?|rupees?|yen|yuan|won|dirhams?|riyals?|francs?)/giu;
 const SNIPPET_BOUNDARY_REGEX = /[\n\r,;.!?()[\]{}]/;
 const UNSAFE_CONTROL_CHARS_REGEX = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
-const MAX_INPUT_LENGTH = 120000;
+const MAX_INPUT_LENGTH = 5000;
 
 const sourceInput = document.getElementById("source");
 const localeInput = document.getElementById("locale");
