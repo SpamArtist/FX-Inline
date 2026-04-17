@@ -141,16 +141,19 @@
         margin-bottom: 0.7rem;
       }
 
-      .stats {
-        color: var(--muted);
-        font-size: 0.86rem;
+      .results-grid {
+        margin-top: 1rem;
+        display: flex;
+        gap: 1rem;
+        align-items: stretch;
       }
 
-      .stats strong {
-        color: var(--ok);
+      .results-grid .panel {
+        flex: 1 1 0;
+        min-width: 0;
       }
 
-      #matches {
+      .match-list {
         margin: 0;
         padding-left: 1rem;
         display: grid;
@@ -159,7 +162,7 @@
         overflow: auto;
       }
 
-      #matches li {
+      .match-list li {
         font-size: 0.86rem;
         color: #dce8f7;
       }
@@ -177,6 +180,10 @@
       @media (max-width: 900px) {
         .grid {
           grid-template-columns: 1fr;
+        }
+
+        .results-grid {
+          flex-direction: column;
         }
       }
     </style>
@@ -221,12 +228,20 @@ Mức giá từ ₫ 3.65 tỷ đến ₫ 4.2 tỷ.</textarea>
         </article>
       </section>
 
-      <section class="panel" style="margin-top: 1rem">
-        <div class="panel-head">
-          <h2>Detected Matches</h2>
-          <span class="stats" id="summary">Matches: <strong>0</strong></span>
-        </div>
-        <ol id="matches"></ol>
+      <section class="results-grid" aria-label="Playground results">
+        <article class="panel">
+          <div class="panel-head">
+            <h2>Detected Matches</h2>
+          </div>
+          <ol id="matches" class="match-list"></ol>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <h2>Partial Matches</h2>
+          </div>
+          <ol id="partial-matches" class="match-list"></ol>
+        </article>
       </section>
 
       <p class="footer">
