@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FX Inline | Currency Detection DOM Playground</title>
+    <meta
+      name="description"
+      content="Interactive playground for testing standalone currency and amount detection on DOM text content."
+    />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0b1220;
+        --text: #f0f6ff;
+        --muted: #afc2db;
+        --accent: #66d4ff;
+        --accent-soft: rgba(102, 212, 255, 0.18);
+        --ok: #2ec27e;
+        --border: rgba(153, 208, 255, 0.25);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        background:
+          radial-gradient(circle at 10% 0%, rgba(58, 112, 170, 0.2), transparent 35%),
+          linear-gradient(160deg, #08101d, #0d1829 60%, #0e1728);
+        color: var(--text);
+        min-height: 100vh;
+      }
+
+      .shell {
+        width: min(1100px, calc(100% - 2rem));
+        margin: 1.2rem auto;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: linear-gradient(160deg, rgba(21, 33, 52, 0.96), rgba(13, 23, 38, 0.98));
+        padding: 1rem;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(1.3rem, 2.8vw, 2rem);
+      }
+
+      p {
+        margin: 0.6rem 0 0;
+        color: var(--muted);
+      }
+
+      .toolbar {
+        margin-top: 1rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        align-items: center;
+      }
+
+      label {
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      input,
+      textarea,
+      button {
+        font: inherit;
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: #0c1627;
+        color: var(--text);
+        padding: 0.6rem 0.7rem;
+      }
+
+      textarea {
+        min-height: 130px;
+        resize: vertical;
+        line-height: 1.45;
+      }
+
+      .locale {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+
+      .locale input {
+        width: 120px;
+      }
+
+      button {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: var(--accent-soft);
+        color: var(--text);
+        padding: 0.5rem 0.8rem;
+        cursor: pointer;
+      }
+
+      button:hover {
+        border-color: var(--accent);
+      }
+
+      .grid {
+        margin-top: 1rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+
+      .panel {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: rgba(19, 32, 52, 0.8);
+        padding: 0.8rem;
+        min-height: 280px;
+      }
+
+      .panel h2 {
+        margin: 0;
+        font-size: 1rem;
+      }
+
+      .panel-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 0.5rem;
+        margin-bottom: 0.7rem;
+      }
+
+      #preview {
+        white-space: pre-wrap;
+        line-height: 1.52;
+      }
+
+      .ccx-match {
+        background: rgba(102, 212, 255, 0.2);
+        border: 1px solid rgba(102, 212, 255, 0.45);
+        border-radius: 6px;
+        padding: 0.04rem 0.15rem;
+      }
+
+      .ccx-tag {
+        margin-left: 0.25rem;
+        color: #aee8ff;
+        font-size: 0.78rem;
+      }
+
+      .stats {
+        color: var(--muted);
+        font-size: 0.86rem;
+      }
+
+      .stats strong {
+        color: var(--ok);
+      }
+
+      #matches {
+        margin: 0;
+        padding-left: 1rem;
+        display: grid;
+        gap: 0.3rem;
+        max-height: 220px;
+        overflow: auto;
+      }
+
+      #matches li {
+        font-size: 0.86rem;
+        color: #dce8f7;
+      }
+
+      .footer {
+        margin-top: 1rem;
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+
+      a {
+        color: #aee8ff;
+      }
+
+      @media (max-width: 900px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <h1>Currency Detection DOM Playground</h1>
+      <p>
+        Runs <code>@fx-inline/currency-detection</code> against text nodes in a preview DOM and highlights detected matches.
+      </p>
+
+      <section class="toolbar" aria-label="Playground controls">
+        <label class="locale">
+          Locale hint
+          <input id="locale" type="text" value="en-US" />
+        </label>
+        <button id="render" type="button">Render Preview</button>
+        <button id="detect" type="button">Detect In DOM</button>
+        <button id="reset" type="button">Reset</button>
+      </section>
+
+      <section class="grid" aria-label="Playground content">
+        <article class="panel">
+          <div class="panel-head">
+            <h2>Input Text</h2>
+          </div>
+          <textarea id="source">Deal: $100 and 200 eur today.
+Comp range starts at ¥6M+ base.
+Twitter handle @kes11av should not match.
+Revenue; 2023-24 $446,641,957.
+Mức giá từ ₫ 3.65 tỷ đến ₫ 4.2 tỷ.</textarea>
+        </article>
+
+        <article class="panel" aria-live="polite">
+          <div class="panel-head">
+            <h2>Preview DOM</h2>
+            <span class="stats" id="summary">Matches: <strong>0</strong></span>
+          </div>
+          <div id="preview"></div>
+        </article>
+      </section>
+
+      <section class="panel" style="margin-top: 1rem">
+        <div class="panel-head">
+          <h2>Detected Matches</h2>
+        </div>
+        <ol id="matches"></ol>
+      </section>
+
+      <p class="footer">
+        Back to <a href="./index.html">website home</a>.
+      </p>
+    </main>
+
+    <script type="module" src="./dom-playground.js"></script>
+  </body>
+</html>

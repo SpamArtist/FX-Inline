@@ -6,8 +6,19 @@ const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   root: currentDirectory,
+  server: {
+    fs: {
+      allow: [path.resolve(currentDirectory, "../../")],
+    },
+  },
   build: {
     outDir: path.resolve(currentDirectory, "../../dist/website"),
     emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        index: path.resolve(currentDirectory, "index.html"),
+        domPlayground: path.resolve(currentDirectory, "dom-playground.html"),
+      },
+    },
   },
 });
