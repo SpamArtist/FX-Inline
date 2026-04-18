@@ -10,9 +10,9 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 
 ## Architecture Diagrams
 
-LikeC4 scaffolding lives in `architecture/likec4/`. The generated model is rebuilt from `package.json`, `wxt.config.ts`, extension entrypoints, the website playground, and workflow metadata.
+LikeC4 scaffolding lives in `architecture/likec4/`. The generator now scans the repository on each run, infers workspaces and modules from the file tree, aggregates import relationships, inspects workflow commands, and captures referenced external services. Both the model and the views are regenerated from that inferred structure.
 
-- `npm run arch:sync` regenerates the model file.
+- `npm run arch:sync` regenerates the model and views.
 - `npm run arch:validate` checks the LikeC4 workspace.
 - `npm run arch:build` builds a shareable single-file site in `dist/architecture-site`.
 - `npm run arch:export:mermaid` exports Mermaid sources to `dist/architecture-mermaid`.
@@ -86,13 +86,13 @@ LikeC4 scaffolding lives in `architecture/likec4/`. The generated model is rebui
 | `npm run readme:sync:check` | `node scripts/readme-sync.mjs --check` |
 
 ### Recent Changes (first-parent, excluding README automation commits)
+- 2026-04-18 `f43034d` Merge branch 'main' of https://github.com/SpamArtist/currency-conversion-extension-tool into evaluate-likec4-diagram-support
+- 2026-04-18 `34defff` feat: scaffold automated LikeC4 architecture diagrams
+- 2026-04-18 `997d991` docs: add revenue review for 2026-04-18
 - 2026-04-17 `c3e9a54` docs: add revenue review for 2026-04-17
 - 2026-04-17 `d2da2ef` docs: clarify README snapshot workflow
 - 2026-04-17 `9f0b379` docs: add GitHub badges to repo and package docs
 - 2026-04-17 `022fe64` docs: refresh README snapshot
 - 2026-04-17 `8899fdb` docs: align docs with latest extension behavior
-- 2026-04-17 `959008e` feat: introduce standalone currency-detection package, benchmarks, and playground (#18)
-- 2026-04-17 `8019562` ci: run web extension tests on pull requests
-- 2026-04-16 `b2766fd` update
 
 <!-- AUTO-GENERATED:END -->
