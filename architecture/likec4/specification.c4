@@ -1,0 +1,11 @@
+specification {
+  element actor {
+    style {
+      shape person
+    }
+  }
+
+  element system
+  element component
+  element external
+}
