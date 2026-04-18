@@ -135,6 +135,7 @@ function buildAutoSection() {
   const testsBySuite = countTestsBySuite(testFiles);
 
   const knownLayout = [
+    ["architecture", "LikeC4 architecture model and generated diagram sources"],
     ["apps/extension", "Browser extension app (WXT + React)"],
     ["apps/website", "Standalone marketing website (Vite)"],
     ["docs", "Project docs and runbooks"],

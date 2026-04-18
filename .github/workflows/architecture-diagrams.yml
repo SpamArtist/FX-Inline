@@ -1,0 +1,76 @@
+name: Architecture Diagrams
+
+on:
+  pull_request:
+    paths:
+      - "architecture/**"
+      - "apps/extension/**"
+      - "apps/website/**"
+      - "packages/currency-detection/**"
+      - "package.json"
+      - "package-lock.json"
+      - "scripts/generate-likec4-model.mjs"
+      - "scripts/run-likec4.mjs"
+      - "wxt.config.ts"
+      - ".github/workflows/architecture-diagrams.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "architecture/**"
+      - "apps/extension/**"
+      - "apps/website/**"
+      - "packages/currency-detection/**"
+      - "package.json"
+      - "package-lock.json"
+      - "scripts/generate-likec4-model.mjs"
+      - "scripts/run-likec4.mjs"
+      - "wxt.config.ts"
+      - ".github/workflows/architecture-diagrams.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: architecture-diagrams-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-architecture:
+    name: Build Architecture Artifacts
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate LikeC4 workspace
+        run: npm run arch:validate
+
+      - name: Build architecture site
+        run: npm run arch:build
+
+      - name: Export Mermaid diagrams
+        run: npm run arch:export:mermaid
+
+      - name: Upload architecture site
+        uses: actions/upload-artifact@v4
+        with:
+          name: architecture-site
+          path: dist/architecture-site
+
+      - name: Upload Mermaid diagrams
+        uses: actions/upload-artifact@v4
+        with:
+          name: architecture-mermaid
+          path: dist/architecture-mermaid

@@ -8,6 +8,16 @@ FX Inline converts prices directly on webpages into your preferred currency so y
 
 This README has an auto-generated repository snapshot that updates via `npm run readme:sync` (run it and commit the result after changes that affect the snapshot).
 
+## Architecture Diagrams
+
+LikeC4 scaffolding lives in `architecture/likec4/`. The generator now scans the repository on each run, infers workspaces and modules from the file tree, aggregates import relationships, inspects workflow commands, and captures referenced external services. Both the model and the views are regenerated from that inferred structure.
+
+- `npm run arch:sync` regenerates the model and views.
+- `npm run arch:validate` checks the LikeC4 workspace.
+- `npm run arch:build` builds a shareable single-file site in `dist/architecture-site`.
+- `npm run arch:export:mermaid` exports Mermaid sources to `dist/architecture-mermaid`.
+- `npm run arch:serve` regenerates the model and starts a local LikeC4 preview server.
+
 <!-- AUTO-GENERATED:START -->
 
 ## Auto-Generated Repository Snapshot
@@ -20,6 +30,7 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 - Description: FX Inline converts prices directly on webpages into your preferred currency, so you can compare costs without leaving the page.
 
 ### Layout
+- `architecture/` - LikeC4 architecture model and generated diagram sources
 - `apps/extension/` - Browser extension app (WXT + React)
 - `apps/website/` - Standalone marketing website (Vite)
 - `docs/` - Project docs and runbooks
@@ -45,6 +56,11 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run dev` | `wxt` |
 | `npm run dev:firefox` | `wxt -b firefox` |
 | `npm run dev:website` | `vite --config apps/website/vite.config.mjs` |
+| `npm run arch:sync` | `node scripts/generate-likec4-model.mjs` |
+| `npm run arch:validate` | `npm run arch:sync && node scripts/run-likec4.mjs validate architecture/likec4` |
+| `npm run arch:build` | `npm run arch:sync && node scripts/run-likec4.mjs build architecture/likec4 --output dist/architecture-site --output-single-file --base ./ --title "FX Inline Architecture"` |
+| `npm run arch:export:mermaid` | `npm run arch:sync && node scripts/run-likec4.mjs gen mermaid architecture/likec4 --output dist/architecture-mermaid` |
+| `npm run arch:serve` | `npm run arch:sync && node scripts/run-likec4.mjs serve architecture/likec4` |
 | `npm run build` | `wxt build` |
 | `npm run build:firefox` | `wxt build -b firefox` |
 | `npm run build:website` | `vite build --config apps/website/vite.config.mjs` |
@@ -70,13 +86,13 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run readme:sync:check` | `node scripts/readme-sync.mjs --check` |
 
 ### Recent Changes (first-parent, excluding README automation commits)
+- 2026-04-18 `f43034d` Merge branch 'main' of https://github.com/SpamArtist/currency-conversion-extension-tool into evaluate-likec4-diagram-support
+- 2026-04-18 `34defff` feat: scaffold automated LikeC4 architecture diagrams
+- 2026-04-18 `997d991` docs: add revenue review for 2026-04-18
+- 2026-04-17 `c3e9a54` docs: add revenue review for 2026-04-17
+- 2026-04-17 `d2da2ef` docs: clarify README snapshot workflow
 - 2026-04-17 `9f0b379` docs: add GitHub badges to repo and package docs
 - 2026-04-17 `022fe64` docs: refresh README snapshot
 - 2026-04-17 `8899fdb` docs: align docs with latest extension behavior
-- 2026-04-17 `959008e` feat: introduce standalone currency-detection package, benchmarks, and playground (#18)
-- 2026-04-17 `8019562` ci: run web extension tests on pull requests
-- 2026-04-16 `b2766fd` update
-- 2026-04-15 `42fb2a6` fix: ignore username/handle-like currency matches (#14)
-- 2026-04-15 `6a8e02b` Merge branch 'main' of https://github.com/SpamArtist/currency-conversion-extension-tool
 
 <!-- AUTO-GENERATED:END -->
