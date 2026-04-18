@@ -86,9 +86,9 @@ LikeC4 scaffolding lives in `architecture/likec4/`. The generator now scans the 
 | `npm run readme:sync:check` | `node scripts/readme-sync.mjs --check` |
 
 ### Recent Changes (first-parent, excluding README automation commits)
-- 2026-04-18 `f43034d` Merge branch 'main' of https://github.com/SpamArtist/currency-conversion-extension-tool into evaluate-likec4-diagram-support
-- 2026-04-18 `34defff` feat: scaffold automated LikeC4 architecture diagrams
-- 2026-04-18 `997d991` docs: add revenue review for 2026-04-18
+- 2026-04-18 `98e04b4` docs: add revenue review for 2026-04-18
+- 2026-04-18 `030a5e1` scaffold automated LikeC4 architecture diagrams (#20)
+- 2026-04-18 `0969a09` docs: add revenue review for 2026-04-18 (#19)
 - 2026-04-17 `c3e9a54` docs: add revenue review for 2026-04-17
 - 2026-04-17 `d2da2ef` docs: clarify README snapshot workflow
 - 2026-04-17 `9f0b379` docs: add GitHub badges to repo and package docs
