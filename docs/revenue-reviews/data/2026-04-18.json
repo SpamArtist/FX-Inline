@@ -1,451 +1,494 @@
 {
   "date": "2026-04-18",
   "project": "FX Inline",
-  "summary": "FX Inline still has meaningful technical depth but no revenue system. The fastest path to first revenue is a fixed-fee B2B pilot for cross-border price localization, because consumer installs, reviews, traffic, billing, and trust scaffolding are all currently too weak.",
+  "summary": "FX Inline has a real inline-conversion product and a credible parser package, but it still has no revenue surface, no analytics, no billing, no lead capture, and essentially no public traction. The best path to first revenue is a fixed-fee B2B pilot for client-side local-currency price localization, sold using the existing extension as proof.",
   "context_files_read": [],
-  "context_status": {
-    "context_directory_exists": false,
-    "key_context_inputs_used": [
-      "No files were available under docs/revenue-reviews/context/.",
-      "Prior revenue-review artifacts were used as historical memory only, not as user-provided ground truth."
+  "key_context_inputs_used": [
+    "docs/revenue-reviews/context/ was missing entirely, so there was no user-provided business ground truth for installs, traffic, revenue, or constraints.",
+    "docs/SAAS_ROADMAP.md explicitly keeps billing and backend-managed rates out of scope.",
+    "package.json reports version 0.4.1 while public marketplace snippets still show 0.3.6 or even 0.0.0."
+  ],
+  "repository_areas_inspected": [
+    "package.json",
+    "wxt.config.ts",
+    "tsconfig.json",
+    "eslint.config.mjs",
+    "apps/extension/entrypoints",
+    "apps/extension/components",
+    "apps/extension/hooks",
+    "apps/extension/utils",
+    "apps/extension/tests",
+    "apps/website/index.html",
+    "apps/website/styles.css",
+    "apps/website/main.js",
+    "apps/website/playground.html",
+    "apps/website/playground.js",
+    "packages/currency-detection/README.md",
+    "packages/currency-detection/src/index.js",
+    "packages/currency-detection/src/parser-core.js",
+    "packages/currency-detection/scripts",
+    "scripts/readme-sync.mjs",
+    "docs/CURRENCY_DETECTION_PACKAGE.md",
+    "docs/QA_E2E_CHECKLIST.md",
+    "docs/SAAS_ROADMAP.md",
+    ".github/workflows/ci.yml",
+    ".github/workflows/currency-detection-benchmarks.yml",
+    "docs/revenue-reviews/reports/2026-04-17.md",
+    "docs/revenue-reviews/data/2026-04-17.json",
+    "docs/revenue-reviews/data/index.jsonl"
+  ],
+  "verification": {
+    "commands_run": [
+      "npm run test:all",
+      "npm run currency-detection:test",
+      "npm run build:website"
     ],
-    "missing_or_stale_context": [
-      "No install, MAU, traffic, CTR, or retention metrics",
-      "No explicit monetization constraints or preferences",
-      "No audience or country split",
-      "No record of previous experiments or outreach",
-      "No cost structure or time-budget context"
+    "results": [
+      "apps/extension unit tests passed",
+      "apps/extension content tests passed",
+      "packages/currency-detection tests passed",
+      "website production build passed"
     ]
   },
-  "repository_areas_inspected": [
-    "root configuration files",
-    "apps/extension popup/options/background/content runtime",
-    "apps/extension utilities and tests",
-    "apps/website static site and playground",
-    "packages/currency-detection source/tests/scripts",
-    "scripts/readme-sync.mjs",
-    ".github/workflows",
-    "docs and prior revenue-review artifacts",
-    ".output manifests and packaged build filenames"
-  ],
-  "repository_audit_summary": {
-    "main_product_surfaces": [
-      "Browser extension popup converter",
-      "Options page with preferred currency persistence",
-      "All-URLs content script with inline conversion and selection popup",
-      "Static marketing site",
-      "Static parser playground",
-      "Private standalone currency-detection package"
-    ],
-    "monetizable_assets_found": [
-      "Robust currency parser and text extraction logic",
-      "Mutation-aware inline conversion runtime",
-      "Structured price decorators for Amazon-like and sibling layouts",
-      "Automated tests and benchmark tooling",
-      "Privacy-leaning local-storage plus client-side rate-fetch story"
-    ],
-    "major_revenue_blockers": [
-      "No billing or licensing surface",
-      "No lead capture or contact capture on the website",
-      "No analytics or attribution",
-      "No trust pages or proof assets",
-      "Website build fails because @fx-inline/currency-detection does not resolve from apps/website/playground.js",
-      "Public version drift across repo, build artifacts, and listings",
-      "Package remains private and there is no LICENSE file"
-    ],
-    "verification": {
-      "test_all": {
-        "status": "passed",
-        "suites": 17,
-        "tests": 97
-      },
-      "build_website": {
-        "status": "failed",
-        "reason": "Vite failed to resolve @fx-inline/currency-detection from apps/website/playground.js"
-      }
-    }
-  },
   "recommended_focus": {
-    "id": "b2b-pilot-cross-border-price-localization",
-    "title": "Sell one fixed-fee B2B pilot for cross-border price localization",
+    "id": "b2b-pilot-client-side-price-localization",
+    "title": "Sell one fixed-fee B2B pilot for client-side local-currency price localization",
     "segment": "developer_b2b",
     "timeframe": "near_term",
-    "why": "A single buyer can validate willingness to pay before installs or traffic exist. The repo already contains the hard technical asset: inline rendering plus strong currency parsing on messy real-world pages.",
-    "smallest_viable_test": "Fix the website build, rewrite the site around one pilot offer, produce three real-page demos, and send 30 targeted outreach messages to cross-border merchants or travel publishers.",
+    "why": "The repo already contains the hard technical asset: on-page price detection and conversion that works on messy DOM. One paying pilot can generate revenue faster than waiting for browser-install scale or building a premium paywall.",
+    "smallest_viable_test": "Rewrite the website around one pilot offer, create personalized demos using the existing extension on real prospect pages, and sell one fixed-fee implementation without building subscriptions first.",
     "success_metrics": [
-      "30 outreach messages sent",
-      "5 qualified replies",
-      "2 discovery calls",
-      "1 paid pilot"
+      "30 targeted outbound messages",
+      "3 serious replies",
+      "1 discovery call",
+      "1 paid pilot",
+      "1 testimonial or before/after case study"
     ]
   },
   "ranked_monetization_opportunities": [
     {
       "rank": 1,
-      "id": "manual-b2b-pilot",
-      "title": "Manual B2B pilot for cross-border price localization",
+      "id": "b2b-pilot-client-side-price-localization",
+      "title": "Fixed-fee pilot for client-side local-currency price localization",
       "segment": "developer_b2b",
-      "time_to_first_dollar": "2-6 weeks",
+      "timeframe": "near_term",
       "revenue_potential": "high",
-      "why": "Uses the strongest repo asset and needs only one customer."
+      "time_to_first_dollar": "1-3 weeks",
+      "rationale": "The current extension can already demonstrate the outcome on real pages. A single buyer closes faster than a consumer paywall from zero installs.",
+      "smallest_test": "Use the existing extension to create personalized before/after demos for SaaS pricing pages, travel pages, or price-heavy content pages."
     },
     {
       "rank": 2,
-      "id": "package-support-custom-parser-packs",
-      "title": "Package-led support or custom parser-pack sale",
+      "id": "package-led-services",
+      "title": "Parser and runtime packaging plus services or licensing",
       "segment": "developer_b2b",
-      "time_to_first_dollar": "4-8 weeks",
-      "revenue_potential": "medium",
-      "why": "The parser package is credible, benchmarked, and test-backed, but not yet public."
+      "timeframe": "medium_term",
+      "revenue_potential": "medium_high",
+      "time_to_first_dollar": "3-6 weeks",
+      "rationale": "The standalone parser package and benchmark scripts are credible technical assets, but packaging is blocked by private package settings and missing licensing.",
+      "smallest_test": "After one pilot conversation, extract a smallest embeddable runtime and attach a services offer."
     },
     {
       "rank": 3,
-      "id": "affiliate-content",
-      "title": "Affiliate content for shopping/travel/money transfer intent",
+      "id": "affiliate-content-referrals",
+      "title": "Affiliate content around international shopping, travel, and transfers",
       "segment": "creator_affiliate",
-      "time_to_first_dollar": "4-10 weeks",
+      "timeframe": "near_to_medium_term",
       "revenue_potential": "medium",
-      "why": "Strong fit to user intent, but traffic is currently zero."
+      "time_to_first_dollar": "4-8 weeks",
+      "rationale": "Wise and Travelpayouts validate referral economics, but FX Inline has no audience, analytics, or content engine yet.",
+      "smallest_test": "Launch one use-case landing page and one referral CTA after measurement exists."
     },
     {
       "rank": 4,
-      "id": "consumer-premium",
-      "title": "Consumer premium extension",
+      "id": "consumer-premium-extension",
+      "title": "Paid consumer extension tier",
       "segment": "consumer",
-      "time_to_first_dollar": "install_dependent",
+      "timeframe": "later",
       "revenue_potential": "medium",
-      "why": "The category can monetize, but FX Inline has no install base or trust moat yet."
+      "time_to_first_dollar": "install_dependent",
+      "rationale": "Competing extensions with more scale still struggle on reviews. FX Inline has no traction cushion for a premium launch.",
+      "smallest_test": "Only test after trust, installs, ratings, and onboarding improve."
     }
   ],
   "ranked_marketing_channels": [
     {
       "rank": 1,
-      "channel": "founder_led_outbound_and_partnerships",
-      "target_audience": "Cross-border merchants, travel publishers, agencies",
-      "message_or_offer": "Add local-price context to your existing pages without rebuilding checkout.",
-      "likely_effort": "medium",
-      "likely_revenue_upside": "high"
+      "channel": "founder_led_outbound",
+      "timeframe": "near_term",
+      "fit": "No traffic required and directly aligned to the best revenue path.",
+      "target_audience": "SaaS operators, travel publishers, price-heavy content sites, agencies",
+      "message": "Add local-currency price hints to existing pages in days without rebuilding checkout.",
+      "effort": "medium",
+      "revenue_upside": "high"
     },
     {
       "rank": 2,
-      "channel": "browser_extension_marketplaces",
-      "target_audience": "Shoppers, travelers, remote workers",
-      "message_or_offer": "See foreign prices in your currency without leaving the page.",
-      "likely_effort": "medium",
-      "likely_revenue_upside": "medium"
+      "channel": "website_pilot_page",
+      "timeframe": "near_term",
+      "fit": "Outreach needs a serious destination page with proof.",
+      "target_audience": "The same B2B prospects reached via outbound",
+      "message": "Request a pilot and watch a short demo on real page patterns.",
+      "effort": "medium",
+      "revenue_upside": "high"
     },
     {
       "rank": 3,
-      "channel": "search_seo",
-      "target_audience": "International shoppers and trip planners",
-      "message_or_offer": "Convert Amazon Japan, Booking, or SaaS prices inline.",
-      "likely_effort": "medium_high",
-      "likely_revenue_upside": "medium_high"
+      "channel": "personalized_demo_videos",
+      "timeframe": "near_term",
+      "fit": "The value is visual and prospect-specific proof closes better than generic copy.",
+      "target_audience": "Public companies with obvious foreign-price friction",
+      "message": "Here is your own page localized in under a minute.",
+      "effort": "medium",
+      "revenue_upside": "high"
     },
     {
       "rank": 4,
-      "channel": "short_form_video_and_youtube",
-      "target_audience": "Travel planners, shoppers, deal hunters",
-      "message_or_offer": "Before/after clips on real shopping and travel pages.",
-      "likely_effort": "medium",
-      "likely_revenue_upside": "medium_high"
+      "channel": "browser_marketplaces",
+      "timeframe": "near_term",
+      "fit": "Still important for trust and future consumer growth, but not the fastest first-dollar path.",
+      "target_audience": "Shoppers, travelers, deal hunters",
+      "message": "See foreign prices in your currency without leaving the page.",
+      "effort": "medium",
+      "revenue_upside": "medium"
     },
     {
       "rank": 5,
-      "channel": "reddit_and_niche_communities",
-      "target_audience": "Digital nomads, travel and shopping communities",
-      "message_or_offer": "Privacy-first inline foreign-price translator.",
-      "likely_effort": "low_medium",
-      "likely_revenue_upside": "medium"
+      "channel": "seo_use_case_pages",
+      "timeframe": "medium_term",
+      "fit": "Can later capture long-tail intent around shopping abroad and pricing comparison.",
+      "target_audience": "International shoppers, travelers, remote workers",
+      "message": "Convert foreign prices inline instead of opening a separate converter tab.",
+      "effort": "high",
+      "revenue_upside": "medium"
     },
     {
       "rank": 6,
-      "channel": "affiliate_content",
-      "target_audience": "Users about to transfer money or book travel",
-      "message_or_offer": "Understand the price first, then choose how to pay or book.",
-      "likely_effort": "medium",
-      "likely_revenue_upside": "medium"
+      "channel": "developer_communities",
+      "timeframe": "medium_term",
+      "fit": "Useful only after the package has a license and commercial story.",
+      "target_audience": "Frontend engineers, agencies, growth teams",
+      "message": "DOM-robust inline price localization for messy pricing markup.",
+      "effort": "medium",
+      "revenue_upside": "medium"
     },
     {
       "rank": 7,
-      "channel": "developer_communities",
-      "target_audience": "JavaScript developers and technical buyers",
-      "message_or_offer": "Dependency-free parser extracted from a production extension.",
-      "likely_effort": "medium",
-      "likely_revenue_upside": "medium"
+      "channel": "reddit_niche_communities",
+      "timeframe": "near_term",
+      "fit": "Good for qualitative feedback and some awareness, weak for first revenue alone.",
+      "target_audience": "Travel, shopping-abroad, digital nomad, deal communities",
+      "message": "Privacy-first inline currency conversion for foreign prices.",
+      "effort": "low_medium",
+      "revenue_upside": "low_medium"
+    },
+    {
+      "rank": 8,
+      "channel": "affiliate_content",
+      "timeframe": "later",
+      "fit": "Economically real but blocked on traffic.",
+      "target_audience": "People about to transfer money, book travel, or shop abroad",
+      "message": "Understand the price first, then pick how to pay or transfer.",
+      "effort": "medium",
+      "revenue_upside": "medium"
     }
   ],
   "top_actions": [
     {
       "rank": 1,
-      "title": "Rebuild the website around a paid pilot and fix the broken build",
+      "title": "Rebuild the website around one pilot offer",
+      "timeframe": "near_term",
       "expected_impact": "high",
       "implementation_effort": "medium",
       "dependencies": [
-        "Resolve website package import",
-        "Rewrite homepage copy",
-        "Add buyer CTA"
+        "Choose target wedge",
+        "Create before/after proof assets",
+        "Pick a contact or booking flow"
       ],
-      "success_measure": "Working site plus 10 qualified pilot visits"
+      "parallelizable": [
+        "Landing-page rewrite",
+        "Proof asset generation",
+        "Privacy/support copy"
+      ],
+      "sequential_dependencies": [
+        "Offer decision must happen before final copy"
+      ],
+      "ai_coding_acceleration": "AI can rewrite the static website and add CTA instrumentation in hours instead of days.",
+      "ai_design_acceleration": "AI can produce proof cards, hero mockups, and comparison visuals the same day.",
+      "success_metrics": [
+        "Improved CTA clarity",
+        "Pilot page ready for outreach",
+        "At least 10 qualified visits from outreach traffic"
+      ]
     },
     {
       "rank": 2,
-      "title": "Create three proof demos and run outbound",
+      "title": "Create personalized demos using the existing extension",
+      "timeframe": "near_term",
       "expected_impact": "high",
-      "implementation_effort": "medium",
+      "implementation_effort": "low_medium",
       "dependencies": [
-        "Real-page screenshots or GIFs",
         "Prospect list",
-        "Short outreach copy"
+        "Extension set up on public sample pages"
       ],
-      "success_measure": "30 messages, 5 replies, 2 calls, 1 pilot"
+      "parallelizable": [
+        "Multiple prospect demos can be recorded in parallel",
+        "Outreach list building can run alongside recordings"
+      ],
+      "sequential_dependencies": [
+        "Website proof page should exist before email outreach starts"
+      ],
+      "ai_coding_acceleration": "No major coding required up front because the extension itself is the demo engine.",
+      "ai_design_acceleration": "AI can clean screenshots, add labels, and create simple motion demos for outreach.",
+      "success_metrics": [
+        "Reply rate above 10%",
+        "At least 1 discovery call booked"
+      ]
     },
     {
       "rank": 3,
-      "title": "Add onboarding and allowlist mode",
-      "expected_impact": "medium",
+      "title": "Fix trust basics and release hygiene",
+      "timeframe": "near_term",
+      "expected_impact": "medium_high",
       "implementation_effort": "medium",
       "dependencies": [
-        "Settings model update",
-        "Popup/options UX changes"
+        "Marketplace listing access",
+        "Version sync process"
       ],
-      "success_measure": "Lower false-positive complaints and better first reviews"
+      "parallelizable": [
+        "Privacy page",
+        "Support page",
+        "Store listing cleanup",
+        "Version consistency fixes"
+      ],
+      "sequential_dependencies": [
+        "Public version metadata should be cleaned before paid outreach"
+      ],
+      "ai_coding_acceleration": "AI can draft the pages and version-check automation quickly.",
+      "ai_design_acceleration": "AI can create store screenshots and trust blocks quickly.",
+      "success_metrics": [
+        "No visible version drift across main public surfaces",
+        "Public privacy/support paths available"
+      ]
     },
     {
       "rank": 4,
-      "title": "Clean versioning and refresh marketplace listings",
-      "expected_impact": "medium",
-      "implementation_effort": "low_medium",
+      "title": "Extract the smallest embeddable runtime only after interest appears",
+      "timeframe": "near_to_medium_term",
+      "expected_impact": "medium_high",
+      "implementation_effort": "medium",
       "dependencies": [
-        "Release process cleanup",
-        "Updated screenshots",
-        "Privacy/support URLs"
+        "At least one real buyer conversation",
+        "Narrow delivery scope"
       ],
-      "success_measure": "Consistent public versions and first 5 real reviews"
+      "parallelizable": [
+        "Config design",
+        "Runtime extraction",
+        "Demo-page asset preparation"
+      ],
+      "sequential_dependencies": [
+        "Demand validation first, extraction second"
+      ],
+      "ai_coding_acceleration": "AI can extract and refactor the content runtime into a pilot script faster than a single engineer working sequentially.",
+      "ai_design_acceleration": "AI can produce integration diagrams and buyer-friendly docs in parallel.",
+      "success_metrics": [
+        "Config-driven pilot script exists",
+        "One delivery candidate is ready"
+      ]
     },
     {
       "rank": 5,
-      "title": "Publish the parser package with a support CTA",
-      "expected_impact": "medium",
-      "implementation_effort": "medium",
-      "dependencies": [
-        "LICENSE decision",
-        "npm publish path",
-        "Buyer-facing docs"
+      "title": "Delay consumer premium and public package launch",
+      "timeframe": "now",
+      "expected_impact": "high opportunity-cost savings",
+      "implementation_effort": "none",
+      "dependencies": [],
+      "parallelizable": [],
+      "sequential_dependencies": [
+        "Pilot learning should inform future productization"
       ],
-      "success_measure": "Inbound technical leads or package-driven conversations"
+      "ai_coding_acceleration": "AI speed is irrelevant if the work itself is strategically wrong.",
+      "ai_design_acceleration": "AI can make a premium page look polished, but that does not solve zero demand.",
+      "success_metrics": [
+        "No wasted engineering time on a premature paywall",
+        "Focus stays on first revenue"
+      ]
     }
   ],
   "assumptions": [
-    "There is no reliable traffic, install, or revenue baseline beyond public zero-signal listings.",
-    "The owner is willing to do some manual B2B selling if that is the shortest path to first revenue.",
-    "Affiliate monetization is acceptable unless future context forbids it.",
-    "Publishing the parser package is acceptable unless future context forbids it."
+    "The missing docs/revenue-reviews/context directory means there is still no business ground truth for installs, traffic, or monetization constraints.",
+    "The user is willing to pursue service revenue or fixed-fee pilots if that is the fastest path to first revenue.",
+    "The public marketplace snippets captured this run are directionally accurate even if some store metadata is cached or locale-specific.",
+    "There is no hidden analytics or CRM stack outside the repo."
   ],
   "risks": [
-    "Broken website build blocks demos and SEO until fixed.",
-    "Broad all-pages permission without trust pages can suppress installs and reviews.",
-    "False positives or runtime drag could damage early reputation.",
-    "Buyers may confuse inline localization with checkout-grade FX, which this repo does not provide."
-  ],
-  "competitor_list_additions_or_changes": {
-    "newly_added": [
-      "BestPrice Assistant",
-      "Universal Automatic Currency Converter",
-      "CurrencyOS",
-      "Currency.Wiki extension",
-      "QuickCConverter",
-      "Savely",
-      "FX Auto Convert",
-      "Currency Converter Injector",
-      "InMyTwoCents CurrencyConverter",
-      "In-line Currency Converter"
-    ],
-    "notable_changes": [
-      "The long-standing Chrome currency-converter listing now resolves to BestPrice Assistant, indicating broader shopping-assistant positioning.",
-      "XE pricing detail was captured this run: Lite plan publicly starts at $799/year.",
-      "Wise creator economics were verified this run via the official influencer referral help page."
-    ]
-  },
-  "review_themes_and_sentiment_findings": {
-    "positive_themes": [
-      "Instant on-page conversion is meaningfully useful for shoppers and travelers.",
-      "Whitelist/context-menu controls are appreciated when discoverable.",
-      "Privacy and no-account claims matter.",
-      "Users like not having to open Google or a separate converter tab."
-    ],
-    "negative_themes": [
-      "Confusing setup and poor settings UX",
-      "Wrong conversions or outdated rates",
-      "CPU and memory overhead",
-      "False positives in spreadsheets, edit boxes, and non-price text",
-      "Missing currencies or brittle edge-case handling"
-    ],
-    "feature_requests": [
-      "Multiple target currencies at once",
-      "Allowlist or safer defaults",
-      "Reverse display modes",
-      "Cleaner highlighting or less intrusive visuals"
-    ],
-    "trust_concerns": [
-      "All-website access permissions",
-      "Potential browser slowdown",
-      "Data collection suspicion",
-      "Exposed API keys in at least one competing product"
-    ],
-    "revenue_relevant_insights": [
-      "Performance and accuracy directly affect ratings and therefore revenue.",
-      "A whitelist/shopping-mode default would likely improve trust and reduce churn.",
-      "Competitors monetize with premium fences, broader shopper-savings positioning, or business tooling.",
-      "FX Inline currently has zero social proof and cannot rely on paid consumer conversion."
-    ]
-  },
-  "missing_context_inputs": [
-    "Install counts by browser",
-    "Store impressions and listing CTR",
-    "Website traffic and source mix",
-    "Retention / DAU / WAU or uninstall trends",
-    "Current user geography and dominant currency pairs",
-    "Monetization constraints or preferences",
-    "Time budget and willingness to do B2B service work",
-    "Any existing outreach, waitlist, or partner conversations",
-    "Any prior experiments with pricing, content, or listings"
+    "The wrong B2B wedge could waste outreach cycles if the offer is too broad or too weak.",
+    "Version inconsistency and missing trust pages can kill response rates before product quality matters.",
+    "Performance or false-positive issues on live pilot pages would hurt delivery and credibility.",
+    "Launching a premium consumer tier before traction would likely fail and could produce bad reviews faster."
   ],
   "sources": [
     {
       "type": "repo",
-      "title": "package.json",
       "path": "package.json"
     },
     {
       "type": "repo",
-      "title": "Website playground import",
-      "path": "apps/website/playground.js"
+      "path": "apps/website/index.html"
     },
     {
       "type": "repo",
-      "title": "Website Vite config",
-      "path": "apps/website/vite.config.mjs"
+      "path": "apps/website/playground.html"
     },
     {
       "type": "repo",
-      "title": "Popup app",
       "path": "apps/extension/entrypoints/popup/App.tsx"
     },
     {
       "type": "repo",
-      "title": "Content runtime",
+      "path": "apps/extension/entrypoints/content/index.tsx"
+    },
+    {
+      "type": "repo",
       "path": "apps/extension/entrypoints/content/conversionRuntime.ts"
     },
     {
       "type": "repo",
-      "title": "Parser package manifest",
-      "path": "packages/currency-detection/package.json"
+      "path": "apps/extension/entrypoints/content/inlineConversion.ts"
     },
     {
       "type": "repo",
-      "title": "Built Chrome manifest",
-      "path": ".output/chrome-mv3/manifest.json"
+      "path": "apps/extension/utils/rates.ts"
     },
     {
       "type": "repo",
-      "title": "Built Firefox manifest",
-      "path": ".output/firefox-mv2/manifest.json"
+      "path": "packages/currency-detection/src/parser-core.js"
     },
     {
-      "type": "web",
-      "title": "FX Inline Firefox Add-ons",
+      "type": "repo",
+      "path": ".github/workflows/ci.yml"
+    },
+    {
+      "type": "external",
+      "title": "FX Inline on Firefox Add-ons",
       "url": "https://addons.mozilla.org/en-US/firefox/addon/fx-inline/"
     },
     {
-      "type": "web",
-      "title": "FX Inline Extpose listing",
+      "type": "external",
+      "title": "FX Inline Chrome Web Store mirror",
       "url": "https://extpose.com/ext/cicoldboionelecmpjpkkdhicjbpfefj"
     },
     {
-      "type": "web",
-      "title": "Click Currency",
+      "type": "external",
+      "title": "Click Currency official site",
       "url": "https://clickcurrency.co/"
     },
     {
-      "type": "web",
-      "title": "BestPrice Assistant",
-      "url": "https://chromewebstore.google.com/detail/bestprice-assistant/anbfhidldjknonaihbalghlebaijealk"
+      "type": "external",
+      "title": "Currency.Wiki pricing",
+      "url": "https://currency.wiki/pricing"
     },
     {
-      "type": "web",
-      "title": "Universal Automatic Currency Converter",
-      "url": "https://addons.mozilla.org/en-US/firefox/addon/ua-currency-converter/"
+      "type": "external",
+      "title": "Chrome Currency Converter listing",
+      "url": "https://chromewebstore.google.com/detail/chrome-currency-converter/anbfhidldjknonaihbalghlebaijealk?hl=en"
     },
     {
-      "type": "web",
+      "type": "external",
       "title": "Universal Automatic Currency Converter reviews",
       "url": "https://addons.mozilla.org/en-US/firefox/addon/ua-currency-converter/reviews/"
     },
     {
-      "type": "web",
-      "title": "CurrencyOS",
-      "url": "https://currencyos.pro/"
+      "type": "external",
+      "title": "Direct Currency Converter reviews",
+      "url": "https://addons.mozilla.org/en-US/firefox/addon/direct-currency-converter-2/reviews/"
     },
     {
-      "type": "web",
-      "title": "Currency.Wiki Chrome extension page",
-      "url": "https://currency.wiki/extensions/chrome"
-    },
-    {
-      "type": "web",
-      "title": "QuickCConverter",
-      "url": "https://chromewebstore.google.com/detail/quickcconverter-quick-cur/ajgaihokdfdjgephfaibpdjbogepckgd?hl=en"
-    },
-    {
-      "type": "web",
-      "title": "Savely",
-      "url": "https://www.getsavely.com/"
-    },
-    {
-      "type": "web",
-      "title": "Wise referral program",
-      "url": "https://wise.com/gb/about/referral/"
-    },
-    {
-      "type": "web",
-      "title": "Wise influencer program",
-      "url": "https://wise.com/help/articles/6hmyCEpnZKN7W3Fc0J93g8/influencer-referral-program-at-wise"
-    },
-    {
-      "type": "web",
-      "title": "Travelpayouts",
-      "url": "https://www.travelpayouts.com/about/"
-    },
-    {
-      "type": "web",
-      "title": "XE Currency Data API",
+      "type": "external",
+      "title": "XE Currency Data API pricing",
       "url": "https://www.xe.com/en-us/business/xecurrencydata/"
     },
     {
-      "type": "web",
-      "title": "FX Auto Convert",
-      "url": "https://chrome-stats.com/d/eiokcbadjmmbeiblkdlbkpfoojbmfbpd"
+      "type": "external",
+      "title": "Shopify international pricing",
+      "url": "https://www.shopify.com/international/pricing"
     },
     {
-      "type": "web",
-      "title": "Reddit demand for highlight-to-convert",
-      "url": "https://www.reddit.com/r/browsers/comments/1q4bl98/any_browser_or_extension_that_has_operas/"
+      "type": "external",
+      "title": "Wise influencer referral program",
+      "url": "https://wise.com/help/articles/6hmyCEpnZKN7W3Fc0J93g8/influencer-referral-program-at-wise"
     },
     {
-      "type": "web",
-      "title": "Reddit builder launch post",
-      "url": "https://www.reddit.com/r/chrome_extensions/comments/1snidrp/i_made_a_currency_converter_browser_extension/"
-    },
-    {
-      "type": "web",
-      "title": "Reddit builder lessons post",
-      "url": "https://www.reddit.com/r/SideProject/comments/1qea9it/an_extension_that_converts_any_foreign_currency/"
-    },
-    {
-      "type": "web",
-      "title": "Capital One Shopping complaints",
-      "url": "https://www.reddit.com/r/chrome/comments/1qdojm8/for_anyone_using_the_capital_one_shopping/"
+      "type": "external",
+      "title": "Travelpayouts overview",
+      "url": "https://support.travelpayouts.com/hc/en-us/articles/4407822199954-All-about-Travelpayouts"
     }
+  ],
+  "competitor_list_additions_or_changes": {
+    "added_this_run": [
+      "currency_wiki_extension",
+      "chrome_currency_converter",
+      "universal_automatic_currency_converter",
+      "direct_currency_converter",
+      "currencyos",
+      "bestprice_assistant",
+      "savely",
+      "in_line_currency_converter",
+      "currency_converter_injector",
+      "xe_currency_converter_switcher"
+    ],
+    "changed_this_run": [
+      "click_currency: current Chrome listing showed 384 users, 22 ratings, and 2.0 rating while the official site still pushes one-time lifetime premium.",
+      "xe_currency_data_api: verified current public pricing from 799 USD/year to 4499 USD/year depending on plan.",
+      "fx_inline_public_metadata: Firefox and Chrome surfaces still lag the repo version."
+    ]
+  },
+  "review_themes_and_sentiment_findings": {
+    "positive_themes": [
+      "Users like staying on-page instead of opening a separate converter.",
+      "Privacy and no-account positioning helps when the experience works.",
+      "Auto mode plus click mode flexibility is appreciated."
+    ],
+    "negative_themes": [
+      "Complicated setup causes frustration quickly.",
+      "Wrong conversions or nonsense values kill trust immediately.",
+      "CPU or memory overload on dynamic sites creates harsh feedback.",
+      "Manual currency defaults and repeated setup feel slower than opening a website.",
+      "Highlight styles and number formatting can hurt readability."
+    ],
+    "feature_requests": [
+      "More currencies and symbol support",
+      "Better decimal and locale formatting controls",
+      "Better handling of JavaScript-updated pages",
+      "Whitelist or allowlist behavior",
+      "More direct site-specific controls"
+    ],
+    "trust_concerns": [
+      "Exposed API keys were explicitly called out in competitor reviews.",
+      "Extension privacy claims need visible public support pages.",
+      "Version inconsistency makes FX Inline look unfinished."
+    ],
+    "revenue_relevant_insights": [
+      "Simplicity, accuracy, and performance drive reviews more than feature breadth.",
+      "Bad ratings can coexist with monetization attempts, which makes weak consumer premium dangerous.",
+      "Merchant and publisher buyers already pay for localization outcomes elsewhere, so page-layer localization can be sold if positioned correctly."
+    ]
+  },
+  "missing_context_inputs": [
+    "Install counts by browser and listing URLs",
+    "Website traffic and acquisition sources",
+    "Audience size on social, email, or communities",
+    "Whether services revenue is acceptable",
+    "Available time budget and willingness to run outreach",
+    "Target niche preference",
+    "Existing user feedback outside public marketplaces",
+    "Any current analytics or attribution setup",
+    "Pricing preferences and legal constraints"
+  ],
+  "ai_execution_assumptions_used": [
+    "AI coding can parallelize website rewrite, proof-page creation, trust-page drafting, instrumentation, and runtime extraction.",
+    "AI design can generate screenshots, before/after visuals, mockups, and store/listing creative much faster than a manual design cycle.",
+    "Serial bottlenecks still remain: choosing the offer, buyer trust, outreach response, and closing a pilot.",
+    "Manual payment collection is faster than building subscription infrastructure."
   ]
 }

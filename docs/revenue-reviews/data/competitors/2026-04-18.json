@@ -1,71 +1,112 @@
 {
   "date": "2026-04-18",
-  "baselineFromPreviousRun": [
-    "Click Currency",
-    "Wise",
-    "Travelpayouts",
-    "XE Currency Data API"
+  "summary": "This run expanded the competitor set from a few proof points into a real market map. Currency.Wiki is the biggest direct commercial benchmark. Click Currency remains the clearest proof that monetization is possible but weak ratings make it a warning, not a model. Shopping assistants like BestPrice Assistant and Savely matter because they monetize the same user intent more directly.",
+  "added_this_run": [
+    "currency_wiki_extension",
+    "chrome_currency_converter",
+    "universal_automatic_currency_converter",
+    "direct_currency_converter",
+    "currencyos",
+    "currency_converter_injector",
+    "in_line_currency_converter",
+    "xe_currency_converter_switcher",
+    "bestprice_assistant",
+    "savely"
   ],
-  "newlyTrackedCompetitors": [
-    "BestPrice Assistant",
-    "Universal Automatic Currency Converter",
-    "CurrencyOS",
-    "Currency.Wiki extension",
-    "QuickCConverter",
-    "Savely",
-    "FX Auto Convert",
-    "Currency Converter Injector",
-    "InMyTwoCents CurrencyConverter",
-    "In-line Currency Converter"
-  ],
-  "notableChanges": [
+  "notable_changes": [
     {
-      "name": "BestPrice Assistant",
-      "type": "newly_relevant",
-      "summary": "Chrome currency-converter listing now resolves to a broader shopping-assistant brand with 40k users and fee/tax controls."
+      "id": "click_currency",
+      "change": "Verified current Chrome listing at 384 users and 22 ratings with a 2.0 rating while the official site still pushes a lifetime premium upsell."
     },
     {
-      "name": "XE Currency Data API",
-      "type": "new_detail_captured",
-      "summary": "Public pricing baseline captured this run: Lite plan shown at $799/year."
+      "id": "xe_currency_data_api",
+      "change": "Verified public pricing details this run: 799 USD/year lite, 1799 USD/year intermediate, 4499 USD/year prime."
     },
     {
-      "name": "Wise",
-      "type": "new_detail_captured",
-      "summary": "Official influencer economics captured this run, including £10 qualifying referral fee details."
+      "id": "fx_inline_public_metadata",
+      "change": "FX Inline public marketplace metadata remains inconsistent with the repo version, which worsens competitive trust."
     }
   ],
-  "stableTrackedCompetitors": [
+  "newly_relevant_products_or_launches": [
     {
-      "name": "Click Currency",
-      "summary": "Still the clearest direct example of premium gating around unlimited pairs and real-time rates."
-    },
-    {
-      "name": "Travelpayouts",
-      "summary": "Still a strong affiliate model for travel-intent content."
+      "id": "converter_app_extension_launch",
+      "why_it_matters": "Fresh Reddit launch activity on 2026-04-16 and 2026-04-17 shows new entrants still see this category as open enough to attack.",
+      "sources": [
+        "https://www.reddit.com/r/chrome_extensions/comments/1snidrp/i_made_a_currency_converter_browser_extension/",
+        "https://www.reddit.com/r/firefox/comments/1snyid5/i_made_a_rightclick_currency_converter_adon_for/"
+      ]
     }
   ],
-  "competitorInsights": [
-    "Direct competitors win on clarity, controls, or scale, not on parser elegance alone.",
-    "High-config tools attract complaints about complexity, nonsense conversions, and browser overhead.",
-    "The larger players drift toward broader shopper economics or platform ecosystems, not pure conversion utility."
-  ],
-  "sources": [
-    "https://clickcurrency.co/",
-    "https://chromewebstore.google.com/detail/bestprice-assistant/anbfhidldjknonaihbalghlebaijealk",
-    "https://addons.mozilla.org/en-US/firefox/addon/ua-currency-converter/",
-    "https://addons.mozilla.org/en-US/firefox/addon/ua-currency-converter/reviews/",
-    "https://currencyos.pro/",
-    "https://currency.wiki/extensions/chrome",
-    "https://chromewebstore.google.com/detail/quickcconverter-quick-cur/ajgaihokdfdjgephfaibpdjbogepckgd?hl=en",
-    "https://www.getsavely.com/",
-    "https://chrome-stats.com/d/eiokcbadjmmbeiblkdlbkpfoojbmfbpd",
-    "https://addons.mozilla.org/en-US/firefox/addon/currency-converter-injector/",
-    "https://addons.mozilla.org/en-US/firefox/addon/inmytwocents-currencyconverter/",
-    "https://addons.mozilla.org/en-US/firefox/addon/in-line-currency-converter/",
-    "https://wise.com/gb/about/referral/",
-    "https://wise.com/help/articles/6hmyCEpnZKN7W3Fc0J93g8/influencer-referral-program-at-wise",
-    "https://www.travelpayouts.com/about/",
-    "https://www.xe.com/en-us/business/xecurrencydata/"
+  "competitors_reviewed": [
+    {
+      "id": "currency_wiki_extension",
+      "category": "direct_extension",
+      "traction": "60,000 users and 4.8 rating from Chrome store snippet",
+      "pricing_model": "Freemium with 7.95 USD/month Extension Pro and paid credit packs",
+      "why_it_matters": "Best current proof that browser-based currency conversion can be monetized seriously."
+    },
+    {
+      "id": "chrome_currency_converter",
+      "category": "direct_extension",
+      "traction": "40,000 users and 1.5K ratings at 3.6",
+      "pricing_model": "Free",
+      "why_it_matters": "Large incumbent with middling ratings proves feature depth alone does not create love."
+    },
+    {
+      "id": "universal_automatic_currency_converter",
+      "category": "direct_extension",
+      "traction": "7,000 Chrome users plus 732 Firefox users",
+      "pricing_model": "Free",
+      "why_it_matters": "Reviews reveal the setup, performance, and accuracy problems that buyers punish."
+    },
+    {
+      "id": "direct_currency_converter",
+      "category": "direct_extension",
+      "traction": "938 Chrome users and 83 ratings",
+      "pricing_model": "Free",
+      "why_it_matters": "Strong browsing-centric controls create ideas worth copying, but settings friction is a warning."
+    },
+    {
+      "id": "click_currency",
+      "category": "direct_extension",
+      "traction": "384 Chrome users and 22 ratings at 2.0",
+      "pricing_model": "Freemium plus pay-what-you-want lifetime premium",
+      "why_it_matters": "Monetization proof plus a warning that weak quality and trust poison monetization."
+    },
+    {
+      "id": "bestprice_assistant",
+      "category": "adjacent_shopping_assistant",
+      "traction": "4,000 users and 61 ratings at 4.8",
+      "pricing_model": "Free",
+      "why_it_matters": "Shows that 'save time and money while shopping' is a stronger mainstream message than raw currency conversion."
+    },
+    {
+      "id": "savely",
+      "category": "adjacent_shopping_assistant",
+      "traction": "5,000 users and 24 ratings at 4.3",
+      "pricing_model": "Free with affiliate commissions",
+      "why_it_matters": "Affiliate and savings-led positioning competes for the same shopper intent."
+    },
+    {
+      "id": "xe_currency_data_api",
+      "category": "b2b_api_substitute",
+      "traction": "Enterprise pricing benchmark",
+      "pricing_model": "Annual paid API plans",
+      "why_it_matters": "Validates B2B willingness to pay for currency-related infrastructure."
+    },
+    {
+      "id": "wise_partnerships",
+      "category": "affiliate_substitute",
+      "traction": "Global brand with active partner programs",
+      "pricing_model": "Referral commissions",
+      "why_it_matters": "Validates creator and affiliate monetization if traffic ever exists."
+    },
+    {
+      "id": "travelpayouts",
+      "category": "affiliate_substitute",
+      "traction": "Large travel partner network",
+      "pricing_model": "Affiliate payouts",
+      "why_it_matters": "Validates travel-intent monetization, but also highlights how far FX Inline is from having a traffic engine."
+    }
   ]
 }

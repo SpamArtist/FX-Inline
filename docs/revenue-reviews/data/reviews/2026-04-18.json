@@ -1,176 +1,107 @@
 {
   "date": "2026-04-18",
-  "productsReviewed": [
+  "project": "FX Inline",
+  "summary": "Review mining reinforces a blunt rule for this category: simplicity, accuracy, and performance drive trust; everything else is secondary. FX Inline still has no public review proof of its own, which makes trust-building mandatory before consumer monetization.",
+  "surfaces": [
     {
-      "name": "FX Inline",
-      "productType": "self",
-      "sources": [
-        "https://addons.mozilla.org/en-US/firefox/addon/fx-inline/",
-        "https://addons.mozilla.org/en-US/firefox/addon/fx-inline/reviews/",
-        "https://extpose.com/ext/cicoldboionelecmpjpkkdhicjbpfefj"
-      ],
-      "summary": {
-        "firefoxRating": "0/5",
-        "firefoxReviews": 0,
-        "chromeMirrorInstalls": 0,
-        "chromeMirrorVotes": 0
-      },
-      "positiveThemes": [],
-      "negativeThemes": [
-        "No social proof",
-        "Version inconsistency damages trust"
-      ],
-      "featureRequests": [],
-      "trustConcerns": [
-        "All-website access without visible trust scaffolding",
-        "Public version drift"
-      ],
-      "revenueInsight": "Do not expect a premium consumer conversion funnel to work from a zero-review, zero-install baseline."
+      "product": "FX Inline",
+      "surface": "Firefox Add-ons",
+      "url": "https://addons.mozilla.org/en-US/firefox/addon/fx-inline/reviews/",
+      "rating": 0,
+      "review_count": 0,
+      "user_count": null,
+      "notes": "No review proof."
     },
     {
-      "name": "Universal Automatic Currency Converter",
-      "productType": "competitor",
-      "sources": [
-        "https://addons.mozilla.org/en-US/firefox/addon/ua-currency-converter/",
-        "https://addons.mozilla.org/en-US/firefox/addon/ua-currency-converter/reviews/"
-      ],
-      "summary": {
-        "rating": "4.2/5",
-        "reviewCount": 74,
-        "userCount": 712
-      },
-      "positiveThemes": [
-        "Strong when configured correctly",
-        "Whitelist controls appreciated",
-        "Hover and context-menu conversion useful"
-      ],
-      "negativeThemes": [
-        "Complicated setup",
-        "Wrong or nonsense values",
-        "CPU and memory overload",
-        "False positives in spreadsheets and edit contexts",
-        "Slow calculation"
-      ],
-      "featureRequests": [
-        "Multiple currencies at once",
-        "Cleaner visual treatment than highlight",
-        "Better default whitelist behavior"
-      ],
-      "trustConcerns": [
-        "Runs on all websites",
-        "Performance complaints"
-      ],
-      "revenueInsight": "Category reviews punish complexity and runtime drag harder than they reward configurability."
+      "product": "FX Inline",
+      "surface": "Chrome Web Store mirror (Extpose)",
+      "url": "https://extpose.com/ext/cicoldboionelecmpjpkkdhicjbpfefj",
+      "rating": 0,
+      "review_count": 0,
+      "user_count": 0,
+      "notes": "Mirror surfaced 0 installs and 0 votes."
     },
     {
-      "name": "Direct Currency Converter",
-      "productType": "competitor",
-      "sources": [
-        "https://addons.mozilla.org/en-US/firefox/addon/direct-currency-converter-2/",
-        "https://addons.mozilla.org/en-US/firefox/addon/direct-currency-converter-2/reviews/"
-      ],
-      "summary": {
-        "rating": "3.5/5",
-        "reviewCount": 28,
-        "userCount": 188
-      },
-      "positiveThemes": [
-        "Useful when automatic conversion works"
-      ],
-      "negativeThemes": [
-        "Settings fail to save",
-        "Hard to find/select currencies",
-        "Toolbar UX frustration",
-        "Sometimes does nothing"
-      ],
-      "featureRequests": [
-        "Better currency selection UX"
-      ],
-      "trustConcerns": [
-        "Utility feels unreliable"
-      ],
-      "revenueInsight": "Weak settings UX and reliability quickly erase whatever value the core conversion creates."
+      "product": "Universal Automatic Currency Converter",
+      "surface": "Firefox Add-ons reviews",
+      "url": "https://addons.mozilla.org/en-US/firefox/addon/ua-currency-converter/reviews/",
+      "rating": 4.2,
+      "review_count": 73,
+      "user_count": 732,
+      "notes": "Positive theme: auto or click mode flexibility. Negative themes: complicated setup, wrong conversions, CPU and memory overload."
     },
     {
-      "name": "Currency Converter Injector",
-      "productType": "competitor",
-      "sources": [
-        "https://addons.mozilla.org/en-US/firefox/addon/currency-converter-injector/",
-        "https://addons.mozilla.org/en-US/firefox/addon/currency-converter-injector/reviews/"
-      ],
-      "summary": {
-        "rating": "4.3/5",
-        "reviewCount": 4,
-        "userCount": 15
-      },
-      "positiveThemes": [
-        "Simple value proposition"
-      ],
-      "negativeThemes": [
-        "API-key handling called out in public review",
-        "Missing desired currency additions"
-      ],
-      "featureRequests": [
-        "Add BRL / more currencies"
-      ],
-      "trustConcerns": [
-        "Security hygiene surfaced immediately"
-      ],
-      "revenueInsight": "Even tiny review volume can surface trust flaws that materially hurt growth."
+      "product": "Direct Currency Converter",
+      "surface": "Firefox Add-ons reviews",
+      "url": "https://addons.mozilla.org/en-US/firefox/addon/direct-currency-converter-2/reviews/",
+      "rating": 3.5,
+      "review_count": 28,
+      "user_count": null,
+      "notes": "Positive theme: useful for automatic conversion. Negative themes: saving settings fails, list is messy, toolbar UX is weak."
+    },
+    {
+      "product": "Currency Converter Injector",
+      "surface": "Firefox Add-ons reviews",
+      "url": "https://addons.mozilla.org/en-US/firefox/addon/currency-converter-injector/reviews/",
+      "rating": 5,
+      "review_count": 2,
+      "user_count": 15,
+      "notes": "Feature requests: Android support, R$BRL support. Trust issue: reviewer called out exposed API keys."
+    },
+    {
+      "product": "In-line Currency Converter",
+      "surface": "Firefox Add-ons reviews",
+      "url": "https://addons.mozilla.org/ru/firefox/addon/in-line-currency-converter/reviews/",
+      "rating": 4.5,
+      "review_count": 4,
+      "user_count": 29,
+      "notes": "Praise for doing the basic job. Requests around highlight readability, taxes, and more currencies."
+    },
+    {
+      "product": "Xe Currency Converter & Price Switcher",
+      "surface": "Firefox Add-ons reviews",
+      "url": "https://addons.mozilla.org/ru/firefox/addon/xe-currency-converter/reviews/",
+      "rating": 3,
+      "review_count": 1,
+      "user_count": 188,
+      "notes": "Complaint focused on bad defaults and repeated manual currency selection."
     }
   ],
-  "categoryDiscussions": [
-    {
-      "source": "https://www.reddit.com/r/browsers/comments/1q4bl98/any_browser_or_extension_that_has_operas/",
-      "theme": "There is real user demand for Opera-style highlight-to-convert behavior.",
-      "revenueRelevance": "Selection-based inline conversion is a validated convenience hook."
-    },
-    {
-      "source": "https://www.reddit.com/r/chrome_extensions/comments/1snidrp/i_made_a_currency_converter_browser_extension/",
-      "theme": "New builders continue launching right-click/inline converter tools around travel frustration.",
-      "revenueRelevance": "Barrier to entry is low; differentiation has to come from positioning and trust."
-    },
-    {
-      "source": "https://www.reddit.com/r/SideProject/comments/1qea9it/an_extension_that_converts_any_foreign_currency/",
-      "theme": "Builder lessons emphasize messy real websites, privacy, and user feedback.",
-      "revenueRelevance": "Parser/runtime quality matters only when translated into reliable buyer experience."
-    },
-    {
-      "source": "https://www.reddit.com/r/chrome/comments/1qdojm8/for_anyone_using_the_capital_one_shopping/",
-      "theme": "Users complain loudly when shopping extensions cause browser lag or memory issues.",
-      "revenueRelevance": "Performance is a commercial feature, not optional polish."
-    }
-  ],
-  "positiveThemes": [
-    "Instant in-page conversion is genuinely useful",
-    "No-account and privacy claims matter",
-    "Whitelist/context-menu controls are valued",
-    "Users like avoiding a separate Google/XE lookup"
-  ],
-  "negativeThemes": [
-    "Confusing onboarding and settings",
-    "Wrong or stale conversions",
-    "Browser slowdown and CPU/memory use",
-    "False positives in non-price contexts",
-    "Weak currency-selection UX"
-  ],
-  "featureRequests": [
-    "Multiple target currencies",
-    "Allowlist-first mode",
-    "Cleaner non-highlight visuals",
-    "Reverse display options",
-    "More obvious support for desired currencies"
-  ],
-  "trustConcerns": [
-    "All-site permissions",
-    "Possible data collection",
-    "API-key/security hygiene",
-    "Version drift and abandonment signals"
-  ],
-  "revenueRelevantInsights": [
-    "A privacy-first and performance-safe story is sellable only if it is visible in listings and on the website.",
-    "FX Inline should optimize first for rating safety and trust, not feature breadth.",
-    "Multi-currency compare is a plausible paid feature later, but it is not the first-dollar move.",
-    "The project needs a safer default mode to avoid the same complaints hitting competing tools."
+  "themes": {
+    "positive_themes": [
+      "Users value staying on-page and avoiding tab switching.",
+      "Hybrid auto and click models are appreciated.",
+      "Privacy and no-account messaging helps when the core experience works."
+    ],
+    "negative_themes": [
+      "Complicated setup creates immediate frustration.",
+      "Wrong values or broken persistence kill trust.",
+      "Performance problems on dynamic pages create strong negative reactions.",
+      "Unreadable highlights and poor number formatting hurt usability."
+    ],
+    "feature_requests": [
+      "More currency and symbol coverage",
+      "Locale-aware decimal and thousands formatting",
+      "Android and dynamic-page support",
+      "Whitelist or allowlist controls",
+      "Tax or fee adjustments"
+    ],
+    "trust_concerns": [
+      "Exposed API keys were explicitly called out in competitor feedback.",
+      "Low-scale extensions are still judged harshly on security and privacy behavior.",
+      "FX Inline has no review proof of its own."
+    ],
+    "revenue_relevant_insights": [
+      "Simplicity is a growth feature in this category.",
+      "Performance is a rating feature in this category.",
+      "Accurate defaults matter more than big feature lists.",
+      "Weak trust surfaces make monetization harder before a user even installs."
+    ]
+  },
+  "review_driven_recommendations": [
+    "Make onboarding and preferred-currency setup obvious and fast.",
+    "Add site-targeted controls or allowlist behavior before broader consumer growth pushes.",
+    "Market privacy and local storage clearly on the website and listings.",
+    "Avoid premium gating until the trust surface and default UX are stronger."
   ]
 }
