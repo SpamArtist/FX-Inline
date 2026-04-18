@@ -1,0 +1,439 @@
+{
+  "schemaVersion": 1,
+  "lastUpdated": "2026-04-18",
+  "trackedCompetitors": [
+    {
+      "id": "click-currency",
+      "name": "Click Currency",
+      "category": "direct",
+      "segment": "consumer",
+      "url": "https://clickcurrency.co/",
+      "positioning": "Right-click browser extension for quick currency conversion on SaaS, ecommerce, finance, and travel pages.",
+      "pricingModel": "Free tier plus pay-what-you-want lifetime premium.",
+      "monetizationModel": "One-time premium license.",
+      "evidence": {
+        "website": "3 free currency pairs; premium unlocks unlimited pairs and real-time rates.",
+        "storeSignal": "Chrome Web Store search snippet showed 2.0 rating with 21 ratings."
+      },
+      "strengths": [
+        "Explicit free vs paid boundary",
+        "Strong use-case-specific messaging",
+        "Simple product story"
+      ],
+      "weaknesses": [
+        "Weak store rating",
+        "Chromium-first positioning",
+        "Right-click-only interaction"
+      ],
+      "whatToCopy": [
+        "Use-case framing",
+        "Premium fence around unlimited pairs and real-time rates"
+      ],
+      "whatToAvoid": [
+        "Shipping a premium wall before trust and reviews exist"
+      ],
+      "firstSeen": "2026-04-17",
+      "lastSeen": "2026-04-18",
+      "newSinceLastRun": false
+    },
+    {
+      "id": "bestprice-assistant",
+      "name": "BestPrice Assistant",
+      "category": "direct",
+      "segment": "consumer",
+      "url": "https://chromewebstore.google.com/detail/bestprice-assistant/anbfhidldjknonaihbalghlebaijealk",
+      "positioning": "Broader shopping assistant that still includes automatic in-page currency conversion.",
+      "pricingModel": "Free extension.",
+      "monetizationModel": "Shopping-assistant lead generation / ecosystem play.",
+      "evidence": {
+        "store": "40,000 users, 1.5K ratings, version 6.9.0 updated 2026-04-16.",
+        "features": "Whitelist/blacklist, fee or tax percentage, popup quick converter, ambiguous currency handling."
+      },
+      "strengths": [
+        "Real installed base",
+        "Domain controls",
+        "Richer controls than FX Inline"
+      ],
+      "weaknesses": [
+        "Only 3.6 rating despite scale",
+        "Cluttered shopping-assistant positioning"
+      ],
+      "whatToCopy": [
+        "Whitelist/blacklist controls",
+        "Fee or tax adjustment as a traveler/shopper aid"
+      ],
+      "whatToAvoid": [
+        "Becoming a bloated catch-all assistant"
+      ],
+      "firstSeen": "2026-04-18",
+      "lastSeen": "2026-04-18",
+      "newSinceLastRun": true
+    },
+    {
+      "id": "universal-automatic-currency-converter",
+      "name": "Universal Automatic Currency Converter",
+      "category": "direct",
+      "segment": "consumer",
+      "url": "https://addons.mozilla.org/en-US/firefox/addon/ua-currency-converter/",
+      "positioning": "Highly customizable automatic currency conversion with popup mini-converter and whitelist controls.",
+      "pricingModel": "Free extension.",
+      "monetizationModel": "Free utility with optional service endpoint.",
+      "evidence": {
+        "marketplace": "Firefox Add-ons showed 712 users and 74 reviews.",
+        "reviewThemes": "Customization praised; confusing setup, nonsense values, CPU/memory overload, and spreadsheet false positives criticized."
+      },
+      "strengths": [
+        "Marketplace maturity",
+        "Whitelist/context-menu controls",
+        "Reversible display behavior"
+      ],
+      "weaknesses": [
+        "Complex setup",
+        "Performance complaints",
+        "Accuracy complaints"
+      ],
+      "whatToCopy": [
+        "Allowlist defaults",
+        "Visible domain control affordances"
+      ],
+      "whatToAvoid": [
+        "Complex settings UX",
+        "Heavy runtime behavior"
+      ],
+      "firstSeen": "2026-04-18",
+      "lastSeen": "2026-04-18",
+      "newSinceLastRun": true
+    },
+    {
+      "id": "currency-os",
+      "name": "CurrencyOS",
+      "category": "direct",
+      "segment": "consumer",
+      "url": "https://currencyos.pro/",
+      "positioning": "Privacy-forward Chrome extension with onboarding, context menu, popup, and omnibox conversion.",
+      "pricingModel": "Free extension marketing page surfaced; no paid tier clearly exposed.",
+      "monetizationModel": "Unclear from public page.",
+      "evidence": {
+        "website": "Claims no servers, no data collection, hourly rate sync, context-menu conversion, popup conversion, and inline Chrome search-bar conversion."
+      },
+      "strengths": [
+        "Strong onboarding story",
+        "Strong privacy headline",
+        "Multiple interaction modes"
+      ],
+      "weaknesses": [
+        "Weak visible proof of traction",
+        "No obvious monetization path"
+      ],
+      "whatToCopy": [
+        "First-run onboarding",
+        "Privacy-forward landing page"
+      ],
+      "whatToAvoid": [
+        "Adding too many modes before revenue exists"
+      ],
+      "firstSeen": "2026-04-18",
+      "lastSeen": "2026-04-18",
+      "newSinceLastRun": true
+    },
+    {
+      "id": "currency-wiki-extension",
+      "name": "Currency.Wiki browser extension",
+      "category": "adjacent",
+      "segment": "consumer_and_platform",
+      "url": "https://currency.wiki/extensions/chrome",
+      "positioning": "Cross-platform extension within a wider currency ecosystem including apps, widgets, alerts, and Shopify.",
+      "pricingModel": "Free forever extension with account and ecosystem upsell.",
+      "monetizationModel": "Platform and ecosystem expansion.",
+      "evidence": {
+        "website": "Publicly claims 4.7 rating, 50k+ users, and sign-in for price alerts."
+      },
+      "strengths": [
+        "Trust through ecosystem breadth",
+        "Multi-platform support",
+        "Support/contact paths"
+      ],
+      "weaknesses": [
+        "Less tightly focused on inline conversion",
+        "Higher product complexity"
+      ],
+      "whatToCopy": [
+        "Support visibility",
+        "Future product ladder thinking"
+      ],
+      "whatToAvoid": [
+        "Building an ecosystem before the first customer exists"
+      ],
+      "firstSeen": "2026-04-18",
+      "lastSeen": "2026-04-18",
+      "newSinceLastRun": true
+    },
+    {
+      "id": "quickcconverter",
+      "name": "QuickCConverter",
+      "category": "direct",
+      "segment": "consumer",
+      "url": "https://chromewebstore.google.com/detail/quickcconverter-quick-cur/ajgaihokdfdjgephfaibpdjbogepckgd?hl=en",
+      "positioning": "Popup-first quick converter with on-page selection, offline support, and auto-save behavior.",
+      "pricingModel": "Free extension.",
+      "monetizationModel": "Free utility.",
+      "evidence": {
+        "store": "Chrome Web Store showed 9,000 users and 116 ratings.",
+        "features": "Offline support, 100+ currencies, auto-save, multi-currency live converter."
+      },
+      "strengths": [
+        "Decent user base",
+        "Retention-oriented features",
+        "Auto-save and offline story"
+      ],
+      "weaknesses": [
+        "Less differentiated inline wedge",
+        "Feels like a general tool"
+      ],
+      "whatToCopy": [
+        "Multi-currency compare as later premium feature",
+        "Auto-save behavior"
+      ],
+      "whatToAvoid": [
+        "Becoming just another popup converter"
+      ],
+      "firstSeen": "2026-04-18",
+      "lastSeen": "2026-04-18",
+      "newSinceLastRun": true
+    },
+    {
+      "id": "savely",
+      "name": "Savely",
+      "category": "substitute",
+      "segment": "consumer",
+      "url": "https://www.getsavely.com/",
+      "positioning": "Price-comparison browser extension that automatically finds cheaper offers on product pages.",
+      "pricingModel": "Free extension.",
+      "monetizationModel": "Affiliate / commerce economics.",
+      "evidence": {
+        "website": "Featured by Google, Verified by Google, 1B+ products, 20k retailers, 40+ countries."
+      },
+      "strengths": [
+        "Much stronger savings promise",
+        "Better trust badges",
+        "Automatic shopper value"
+      ],
+      "weaknesses": [
+        "Requires large data infrastructure",
+        "Not a direct FX tool"
+      ],
+      "whatToCopy": [
+        "Shopper-outcome messaging",
+        "Trust badges and strong proof language"
+      ],
+      "whatToAvoid": [
+        "Trying to match data scale before revenue"
+      ],
+      "firstSeen": "2026-04-18",
+      "lastSeen": "2026-04-18",
+      "newSinceLastRun": true
+    },
+    {
+      "id": "wise",
+      "name": "Wise referral and influencer programs",
+      "category": "adjacent",
+      "segment": "creator_affiliate",
+      "url": "https://wise.com/gb/about/referral/",
+      "positioning": "Cross-border money product with consumer referrals and creator CPA economics.",
+      "pricingModel": "Referral rewards and creator commissions.",
+      "monetizationModel": "Financial services referral economics.",
+      "evidence": {
+        "official": "Public referral page plus influencer help page showing creator incentive structures including £10 qualifying referral fees."
+      },
+      "strengths": [
+        "Clear affiliate economics",
+        "Direct relevance to foreign-payment intent"
+      ],
+      "weaknesses": [
+        "Not a direct inline-conversion product"
+      ],
+      "whatToCopy": [
+        "Use website content as the monetization surface for affiliate offers"
+      ],
+      "whatToAvoid": [
+        "Stuffing affiliate CTAs into the extension runtime"
+      ],
+      "firstSeen": "2026-04-17",
+      "lastSeen": "2026-04-18",
+      "newSinceLastRun": false
+    },
+    {
+      "id": "travelpayouts",
+      "name": "Travelpayouts",
+      "category": "adjacent",
+      "segment": "creator_affiliate",
+      "url": "https://www.travelpayouts.com/about/",
+      "positioning": "Travel affiliate platform for creators and brands.",
+      "pricingModel": "Affiliate commissions.",
+      "monetizationModel": "Travel referral marketplace.",
+      "evidence": {
+        "official": "Publicly claims 650,000 creators and 90+ trusted travel brands."
+      },
+      "strengths": [
+        "Strong proof that travel intent monetizes",
+        "Clear brand-and-creator marketplace"
+      ],
+      "weaknesses": [
+        "Not a direct FX competitor"
+      ],
+      "whatToCopy": [
+        "Travel-intent content monetization path"
+      ],
+      "whatToAvoid": [
+        "Trying to monetize travel before traffic exists"
+      ],
+      "firstSeen": "2026-04-17",
+      "lastSeen": "2026-04-18",
+      "newSinceLastRun": false
+    },
+    {
+      "id": "xe-currency-data-api",
+      "name": "XE Currency Data API",
+      "category": "adjacent",
+      "segment": "developer_b2b",
+      "url": "https://www.xe.com/en-us/business/xecurrencydata/",
+      "positioning": "Business-grade currency data API for companies and enterprise systems.",
+      "pricingModel": "Annual subscription plans starting at $799/year.",
+      "monetizationModel": "B2B SaaS / API subscription.",
+      "evidence": {
+        "official": "Lite package shown at $799/year with 10,000 requests/month and daily rates."
+      },
+      "strengths": [
+        "Strong willingness-to-pay proof",
+        "Enterprise-grade reliability positioning"
+      ],
+      "weaknesses": [
+        "Not an inline UX tool",
+        "Massive reliability and sales gap vs FX Inline"
+      ],
+      "whatToCopy": [
+        "Business-value framing for future B2B packaging"
+      ],
+      "whatToAvoid": [
+        "Trying to compete as a raw FX data provider right now"
+      ],
+      "firstSeen": "2026-04-17",
+      "lastSeen": "2026-04-18",
+      "newSinceLastRun": false
+    },
+    {
+      "id": "fx-auto-convert",
+      "name": "FX Auto Convert",
+      "category": "direct",
+      "segment": "consumer",
+      "url": "https://chrome-stats.com/d/eiokcbadjmmbeiblkdlbkpfoojbmfbpd",
+      "positioning": "New entrant offering tooltip, inline, or replace display modes with all-website access.",
+      "pricingModel": "Free extension.",
+      "monetizationModel": "Not surfaced.",
+      "evidence": {
+        "chrome_stats": "Created 2026-02-16, version 0.1.1, 6 users, all_urls host access."
+      },
+      "strengths": [
+        "Fresh entrant with multiple display modes"
+      ],
+      "weaknesses": [
+        "Tiny traction",
+        "Low trust due youth and all-site permissions"
+      ],
+      "whatToCopy": [
+        "Monitor tooltip/replace-mode demand"
+      ],
+      "whatToAvoid": [
+        "Assuming tiny low-trust entrants are strong monetization evidence"
+      ],
+      "firstSeen": "2026-04-18",
+      "lastSeen": "2026-04-18",
+      "newSinceLastRun": true
+    },
+    {
+      "id": "currency-converter-injector",
+      "name": "Currency Converter Injector",
+      "category": "direct",
+      "segment": "consumer",
+      "url": "https://addons.mozilla.org/en-US/firefox/addon/currency-converter-injector/",
+      "positioning": "Firefox add-on that injects converted values beside prices on any website.",
+      "pricingModel": "Free extension.",
+      "monetizationModel": "Not surfaced.",
+      "evidence": {
+        "marketplace": "Firefox Add-ons showed 4.3 rating and 15 users.",
+        "review": "One review explicitly called out exposed API keys."
+      },
+      "strengths": [
+        "Simple shopper/travel positioning",
+        "Early positive ratings"
+      ],
+      "weaknesses": [
+        "Very low volume",
+        "Security/trust issues surfaced immediately"
+      ],
+      "whatToCopy": [
+        "Simple shopper/travel copy"
+      ],
+      "whatToAvoid": [
+        "Any sloppy API-key or trust mistake"
+      ],
+      "firstSeen": "2026-04-18",
+      "lastSeen": "2026-04-18",
+      "newSinceLastRun": true
+    },
+    {
+      "id": "inmytwocents",
+      "name": "InMyTwoCents CurrencyConverter",
+      "category": "direct",
+      "segment": "consumer",
+      "url": "https://addons.mozilla.org/en-US/firefox/addon/inmytwocents-currencyconverter/",
+      "positioning": "Recent Firefox inline-conversion add-on with favorites and regex customization.",
+      "pricingModel": "Free extension.",
+      "monetizationModel": "Not surfaced.",
+      "evidence": {
+        "marketplace": "Recent Firefox entry with no reviews and no obvious traction."
+      },
+      "strengths": [
+        "Shows low barrier to entry"
+      ],
+      "weaknesses": [
+        "Very low traction",
+        "No proof of demand"
+      ],
+      "whatToCopy": [],
+      "whatToAvoid": [
+        "Treating every new entrant as evidence of a good business"
+      ],
+      "firstSeen": "2026-04-18",
+      "lastSeen": "2026-04-18",
+      "newSinceLastRun": true
+    },
+    {
+      "id": "in-line-currency-converter",
+      "name": "In-line Currency Converter",
+      "category": "direct",
+      "segment": "consumer",
+      "url": "https://addons.mozilla.org/en-US/firefox/addon/in-line-currency-converter/",
+      "positioning": "Recent Firefox auto-convert add-on with right-click menu and highlight behavior.",
+      "pricingModel": "Free extension.",
+      "monetizationModel": "Not surfaced.",
+      "evidence": {
+        "marketplace": "Firefox Add-ons showed 4.0 rating with 6 reviews and 29 users."
+      },
+      "strengths": [
+        "Recent entrant with some review traction"
+      ],
+      "weaknesses": [
+        "Tiny scale",
+        "No obvious commercial moat"
+      ],
+      "whatToCopy": [],
+      "whatToAvoid": [
+        "Mistaking a fragmented long tail for an open premium market"
+      ],
+      "firstSeen": "2026-04-18",
+      "lastSeen": "2026-04-18",
+      "newSinceLastRun": true
+    }
+  ]
+}
