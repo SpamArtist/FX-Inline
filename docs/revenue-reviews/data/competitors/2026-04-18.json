@@ -1,0 +1,71 @@
+{
+  "date": "2026-04-18",
+  "baselineFromPreviousRun": [
+    "Click Currency",
+    "Wise",
+    "Travelpayouts",
+    "XE Currency Data API"
+  ],
+  "newlyTrackedCompetitors": [
+    "BestPrice Assistant",
+    "Universal Automatic Currency Converter",
+    "CurrencyOS",
+    "Currency.Wiki extension",
+    "QuickCConverter",
+    "Savely",
+    "FX Auto Convert",
+    "Currency Converter Injector",
+    "InMyTwoCents CurrencyConverter",
+    "In-line Currency Converter"
+  ],
+  "notableChanges": [
+    {
+      "name": "BestPrice Assistant",
+      "type": "newly_relevant",
+      "summary": "Chrome currency-converter listing now resolves to a broader shopping-assistant brand with 40k users and fee/tax controls."
+    },
+    {
+      "name": "XE Currency Data API",
+      "type": "new_detail_captured",
+      "summary": "Public pricing baseline captured this run: Lite plan shown at $799/year."
+    },
+    {
+      "name": "Wise",
+      "type": "new_detail_captured",
+      "summary": "Official influencer economics captured this run, including £10 qualifying referral fee details."
+    }
+  ],
+  "stableTrackedCompetitors": [
+    {
+      "name": "Click Currency",
+      "summary": "Still the clearest direct example of premium gating around unlimited pairs and real-time rates."
+    },
+    {
+      "name": "Travelpayouts",
+      "summary": "Still a strong affiliate model for travel-intent content."
+    }
+  ],
+  "competitorInsights": [
+    "Direct competitors win on clarity, controls, or scale, not on parser elegance alone.",
+    "High-config tools attract complaints about complexity, nonsense conversions, and browser overhead.",
+    "The larger players drift toward broader shopper economics or platform ecosystems, not pure conversion utility."
+  ],
+  "sources": [
+    "https://clickcurrency.co/",
+    "https://chromewebstore.google.com/detail/bestprice-assistant/anbfhidldjknonaihbalghlebaijealk",
+    "https://addons.mozilla.org/en-US/firefox/addon/ua-currency-converter/",
+    "https://addons.mozilla.org/en-US/firefox/addon/ua-currency-converter/reviews/",
+    "https://currencyos.pro/",
+    "https://currency.wiki/extensions/chrome",
+    "https://chromewebstore.google.com/detail/quickcconverter-quick-cur/ajgaihokdfdjgephfaibpdjbogepckgd?hl=en",
+    "https://www.getsavely.com/",
+    "https://chrome-stats.com/d/eiokcbadjmmbeiblkdlbkpfoojbmfbpd",
+    "https://addons.mozilla.org/en-US/firefox/addon/currency-converter-injector/",
+    "https://addons.mozilla.org/en-US/firefox/addon/inmytwocents-currencyconverter/",
+    "https://addons.mozilla.org/en-US/firefox/addon/in-line-currency-converter/",
+    "https://wise.com/gb/about/referral/",
+    "https://wise.com/help/articles/6hmyCEpnZKN7W3Fc0J93g8/influencer-referral-program-at-wise",
+    "https://www.travelpayouts.com/about/",
+    "https://www.xe.com/en-us/business/xecurrencydata/"
+  ]
+}
