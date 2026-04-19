@@ -14,13 +14,14 @@ tests
 **/*.test.*
 *.spec.*
 **/*.spec.*
+apps/extension/test-dist/
 
 # optional
 coverage
 dist
 build
-likec4
-.github
+architecture/likec4
+architecture/README.md
 packages/**/benchmarks
 packages/**/scripts
 

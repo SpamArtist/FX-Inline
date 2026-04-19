@@ -1,86 +1,89 @@
-# Graph Report - /Users/xbotpc/Desktop/XBOTPC/Work/Code/currency-conversion-extension-tool-codex-78e0  (2026-04-19)
+# Graph Report - .  (2026-04-19)
 
 ## Corpus Check
-- 73 files · ~72,004 words
+- 103 files · ~71,903 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 353 nodes · 481 edges · 71 communities detected
-- Extraction: 79% EXTRACTED · 20% INFERRED · 1% AMBIGUOUS · INFERRED: 98 edges (avg confidence: 0.81)
+- 379 nodes · 508 edges · 74 communities detected
+- Extraction: 79% EXTRACTED · 20% INFERRED · 1% AMBIGUOUS · INFERRED: 102 edges (avg confidence: 0.81)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
-- [[_COMMUNITY_Community 0|Community 0]]
-- [[_COMMUNITY_Community 1|Community 1]]
-- [[_COMMUNITY_Community 2|Community 2]]
-- [[_COMMUNITY_Community 3|Community 3]]
-- [[_COMMUNITY_Community 4|Community 4]]
-- [[_COMMUNITY_Community 5|Community 5]]
-- [[_COMMUNITY_Community 6|Community 6]]
-- [[_COMMUNITY_Community 7|Community 7]]
-- [[_COMMUNITY_Community 8|Community 8]]
-- [[_COMMUNITY_Community 9|Community 9]]
-- [[_COMMUNITY_Community 10|Community 10]]
-- [[_COMMUNITY_Community 11|Community 11]]
-- [[_COMMUNITY_Community 12|Community 12]]
-- [[_COMMUNITY_Community 13|Community 13]]
-- [[_COMMUNITY_Community 14|Community 14]]
-- [[_COMMUNITY_Community 15|Community 15]]
-- [[_COMMUNITY_Community 16|Community 16]]
-- [[_COMMUNITY_Community 17|Community 17]]
-- [[_COMMUNITY_Community 18|Community 18]]
-- [[_COMMUNITY_Community 19|Community 19]]
-- [[_COMMUNITY_Community 20|Community 20]]
-- [[_COMMUNITY_Community 21|Community 21]]
-- [[_COMMUNITY_Community 22|Community 22]]
-- [[_COMMUNITY_Community 23|Community 23]]
-- [[_COMMUNITY_Community 24|Community 24]]
-- [[_COMMUNITY_Community 25|Community 25]]
-- [[_COMMUNITY_Community 26|Community 26]]
-- [[_COMMUNITY_Community 27|Community 27]]
-- [[_COMMUNITY_Community 28|Community 28]]
-- [[_COMMUNITY_Community 29|Community 29]]
-- [[_COMMUNITY_Community 30|Community 30]]
-- [[_COMMUNITY_Community 31|Community 31]]
-- [[_COMMUNITY_Community 32|Community 32]]
-- [[_COMMUNITY_Community 33|Community 33]]
-- [[_COMMUNITY_Community 34|Community 34]]
-- [[_COMMUNITY_Community 35|Community 35]]
-- [[_COMMUNITY_Community 36|Community 36]]
-- [[_COMMUNITY_Community 37|Community 37]]
-- [[_COMMUNITY_Community 38|Community 38]]
-- [[_COMMUNITY_Community 39|Community 39]]
-- [[_COMMUNITY_Community 40|Community 40]]
-- [[_COMMUNITY_Community 41|Community 41]]
-- [[_COMMUNITY_Community 42|Community 42]]
-- [[_COMMUNITY_Community 43|Community 43]]
-- [[_COMMUNITY_Community 44|Community 44]]
-- [[_COMMUNITY_Community 45|Community 45]]
-- [[_COMMUNITY_Community 46|Community 46]]
-- [[_COMMUNITY_Community 47|Community 47]]
-- [[_COMMUNITY_Community 48|Community 48]]
-- [[_COMMUNITY_Community 49|Community 49]]
-- [[_COMMUNITY_Community 50|Community 50]]
-- [[_COMMUNITY_Community 51|Community 51]]
-- [[_COMMUNITY_Community 52|Community 52]]
-- [[_COMMUNITY_Community 53|Community 53]]
-- [[_COMMUNITY_Community 54|Community 54]]
-- [[_COMMUNITY_Community 55|Community 55]]
-- [[_COMMUNITY_Community 56|Community 56]]
-- [[_COMMUNITY_Community 57|Community 57]]
-- [[_COMMUNITY_Community 58|Community 58]]
-- [[_COMMUNITY_Community 59|Community 59]]
-- [[_COMMUNITY_Community 60|Community 60]]
-- [[_COMMUNITY_Community 61|Community 61]]
-- [[_COMMUNITY_Community 62|Community 62]]
-- [[_COMMUNITY_Community 63|Community 63]]
-- [[_COMMUNITY_Community 64|Community 64]]
-- [[_COMMUNITY_Community 65|Community 65]]
-- [[_COMMUNITY_Community 66|Community 66]]
-- [[_COMMUNITY_Community 67|Community 67]]
-- [[_COMMUNITY_Community 68|Community 68]]
-- [[_COMMUNITY_Community 69|Community 69]]
-- [[_COMMUNITY_Community 70|Community 70]]
+- [[_COMMUNITY_decorateStructuredAmazonPrices decorateStructuredSiblingSymbolPrices|decorateStructuredAmazonPrices decorateStructuredSiblingSymbolPrices]]
+- [[_COMMUNITY_rates ratePolicy|rates ratePolicy]]
+- [[_COMMUNITY_utils extractCurrencyTextMatches|utils extractCurrencyTextMatches]]
+- [[_COMMUNITY_appStorage getUserSettings|appStorage getUserSettings]]
+- [[_COMMUNITY_useCurrencyReducer state reduceCurrencyState|useCurrencyReducer state reduceCurrencyState]]
+- [[_COMMUNITY_index selectionPopupLoader|index selectionPopupLoader]]
+- [[_COMMUNITY_Graph Report vis Network|Graph Report vis Network]]
+- [[_COMMUNITY_currencyPresentation CurrencyBox|currencyPresentation CurrencyBox]]
+- [[_COMMUNITY_playground runDetection|playground runDetection]]
+- [[_COMMUNITY_parser core createCompiledConfig|parser core createCompiledConfig]]
+- [[_COMMUNITY_Extension Runtime E2E Conversion|Extension Runtime E2E Conversion]]
+- [[_COMMUNITY_magnitude profiles createMagnitudeAliasResolver|magnitude profiles createMagnitudeAliasResolver]]
+- [[_COMMUNITY_magnitudeProfiles getMagnitudeAliasMap|magnitudeProfiles getMagnitudeAliasMap]]
+- [[_COMMUNITY_Fixed Fee 2026 04|Fixed Fee 2026 04]]
+- [[_COMMUNITY_Extension Icon Currency Conversion|Extension Icon Currency Conversion]]
+- [[_COMMUNITY_FX Inline Cyan Circular|FX Inline Cyan Circular]]
+- [[_COMMUNITY_FX Inline Bidirectional Exchange|FX Inline Bidirectional Exchange]]
+- [[_COMMUNITY_Engineering Guidance No Backward|Engineering Guidance No Backward]]
+- [[_COMMUNITY_index extractCurrencyTextMatches|index extractCurrencyTextMatches]]
+- [[_COMMUNITY_mutationRoots collectMutationConversionRoots|mutationRoots collectMutationConversionRoots]]
+- [[_COMMUNITY_runPartialConversionPass createInlineConversionPerfAggregate|runPartialConversionPass createInlineConversionPerfAggregate]]
+- [[_COMMUNITY_useCurrencyReducer createCurrencyId|useCurrencyReducer createCurrencyId]]
+- [[_COMMUNITY_Currency Conversion Cyan Circular|Currency Conversion Cyan Circular]]
+- [[_COMMUNITY_dropdown menu DropdownMenu|dropdown menu DropdownMenu]]
+- [[_COMMUNITY_FX Inline Architecture Diagrams|FX Inline Architecture Diagrams]]
+- [[_COMMUNITY_Central Currency Extension Icon|Central Currency Extension Icon]]
+- [[_COMMUNITY_hardenFirefoxInnerHtmlAssignments wxt config|hardenFirefoxInnerHtmlAssignments wxt config]]
+- [[_COMMUNITY_Label|Label]]
+- [[_COMMUNITY_Input|Input]]
+- [[_COMMUNITY_Dropdown|Dropdown]]
+- [[_COMMUNITY_CurrencyDropdown|CurrencyDropdown]]
+- [[_COMMUNITY_useCurrencyReducer hydration loadCurrencyReducerHydration|useCurrencyReducer hydration loadCurrencyReducerHydration]]
+- [[_COMMUNITY_App|App]]
+- [[_COMMUNITY_timers clearTimer|timers clearTimer]]
+- [[_COMMUNITY_guards isUserSettingsSnapshot|guards isUserSettingsSnapshot]]
+- [[_COMMUNITY_Vertical Swap Swap Vertical|Vertical Swap Swap Vertical]]
+- [[_COMMUNITY_GitHub Issue Worktree Policy|GitHub Issue Worktree Policy]]
+- [[_COMMUNITY_Decision Summary Mandatory Git|Decision Summary Mandatory Git]]
+- [[_COMMUNITY_eslint config|eslint config]]
+- [[_COMMUNITY_data|data]]
+- [[_COMMUNITY_index d|index d]]
+- [[_COMMUNITY_types|types]]
+- [[_COMMUNITY_currencyPresentation types|currencyPresentation types]]
+- [[_COMMUNITY_appStorage types|appStorage types]]
+- [[_COMMUNITY_rateMath types|rateMath types]]
+- [[_COMMUNITY_types|types]]
+- [[_COMMUNITY_constants|constants]]
+- [[_COMMUNITY_currencyUtils types|currencyUtils types]]
+- [[_COMMUNITY_enums|enums]]
+- [[_COMMUNITY_magnitudeProfiles types|magnitudeProfiles types]]
+- [[_COMMUNITY_rates types|rates types]]
+- [[_COMMUNITY_Dropdown types|Dropdown types]]
+- [[_COMMUNITY_Convertor types|Convertor types]]
+- [[_COMMUNITY_Convertor|Convertor]]
+- [[_COMMUNITY_CurrencyBox types|CurrencyBox types]]
+- [[_COMMUNITY_CurrencyDropdown types|CurrencyDropdown types]]
+- [[_COMMUNITY_main|main]]
+- [[_COMMUNITY_main|main]]
+- [[_COMMUNITY_content types|content types]]
+- [[_COMMUNITY_perfLogger types|perfLogger types]]
+- [[_COMMUNITY_perfLogger|perfLogger]]
+- [[_COMMUNITY_constants|constants]]
+- [[_COMMUNITY_constants|constants]]
+- [[_COMMUNITY_constants|constants]]
+- [[_COMMUNITY_vite config|vite config]]
+- [[_COMMUNITY_main|main]]
+- [[_COMMUNITY_16px extension|16px extension]]
+- [[_COMMUNITY_Currency Conversion|Currency Conversion]]
+- [[_COMMUNITY_Currency Conversion|Currency Conversion]]
+- [[_COMMUNITY_Toggle On|Toggle On]]
+- [[_COMMUNITY_Drop Down|Drop Down]]
+- [[_COMMUNITY_Toggle Off|Toggle Off]]
+- [[_COMMUNITY_Switch Icon|Switch Icon]]
+- [[_COMMUNITY_Add Outline|Add Outline]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `extractCurrencyTextMatches()` - 18 edges
@@ -97,307 +100,322 @@
 ## Surprising Connections (you probably didn't know these)
 - `createCompiledConfig()` --calls--> `getCanonicalCurrencySymbolToken()`  [INFERRED]
   packages/currency-detection/src/parser-core.js → /Users/xbotpc/Desktop/XBOTPC/Work/Code/currency-conversion-extension-tool-codex-78e0/apps/extension/utils/utils.ts
-- `getMagnitudeAliasMap()` --calls--> `buildParserArtifacts()`  [INFERRED]
-  apps/extension/utils/magnitudeProfiles.ts → /Users/xbotpc/Desktop/XBOTPC/Work/Code/currency-conversion-extension-tool-codex-78e0/apps/extension/utils/utils.ts
-- `parseCurrencyValue()` --calls--> `getSiblingCurrencyRawPrice()`  [INFERRED]
-  /Users/xbotpc/Desktop/XBOTPC/Work/Code/currency-conversion-extension-tool-codex-78e0/apps/extension/utils/utils.ts → apps/extension/entrypoints/content/inlineConversion/structuredDecorators.ts
-- `parseCurrencyValue()` --calls--> `getSplitSiblingRawPrice()`  [INFERRED]
-  /Users/xbotpc/Desktop/XBOTPC/Work/Code/currency-conversion-extension-tool-codex-78e0/apps/extension/utils/utils.ts → apps/extension/entrypoints/content/inlineConversion/textNodeDecorator.ts
-- `extractCurrencyTextMatches()` --calls--> `refreshExistingInlineConversions()`  [INFERRED]
-  /Users/xbotpc/Desktop/XBOTPC/Work/Code/currency-conversion-extension-tool-codex-78e0/apps/extension/utils/utils.ts → apps/extension/entrypoints/content/inlineConversion/conversionNodes.ts
+- `buildParserArtifacts()` --calls--> `getMagnitudeAliasMap()`  [INFERRED]
+  /Users/xbotpc/Desktop/XBOTPC/Work/Code/currency-conversion-extension-tool-codex-78e0/apps/extension/utils/utils.ts → apps/extension/utils/magnitudeProfiles.ts
+- `getSiblingCurrencyRawPrice()` --calls--> `parseCurrencyValue()`  [INFERRED]
+  apps/extension/entrypoints/content/inlineConversion/structuredDecorators.ts → /Users/xbotpc/Desktop/XBOTPC/Work/Code/currency-conversion-extension-tool-codex-78e0/apps/extension/utils/utils.ts
+- `getSplitSiblingRawPrice()` --calls--> `parseCurrencyValue()`  [INFERRED]
+  apps/extension/entrypoints/content/inlineConversion/textNodeDecorator.ts → /Users/xbotpc/Desktop/XBOTPC/Work/Code/currency-conversion-extension-tool-codex-78e0/apps/extension/utils/utils.ts
+- `refreshExistingInlineConversions()` --calls--> `extractCurrencyTextMatches()`  [INFERRED]
+  apps/extension/entrypoints/content/inlineConversion/conversionNodes.ts → /Users/xbotpc/Desktop/XBOTPC/Work/Code/currency-conversion-extension-tool-codex-78e0/apps/extension/utils/utils.ts
 
 ## Hyperedges (group relationships)
 - **Logo Composition** — fx_inline_logo, fx_inline_logo_background, fx_inline_logo_ring, fx_inline_logo_arrows, fx_inline_logo_lines, fx_inline_logo_mark [EXTRACTED 1.00]
-- **Icon Composition** — icon_128_png, icon_128_png_exchange_motif, icon_128_png_cyan_ring, icon_128_png_dark_badge [EXTRACTED 1.00]
 - **App Icon Brand Mark** — 48_png_extension_icon, 48_png_refresh_exchange_ring, 48_png_central_currency_glyph [INFERRED 0.82]
+- **Icon Composition** — icon_128_png, icon_128_png_exchange_motif, icon_128_png_cyan_ring, icon_128_png_dark_badge [EXTRACTED 1.00]
 - **Icon composition** — 512_png_extension_icon, 512_png_dark_rounded_square_background, 512_png_cyan_ring, 512_png_exchange_arrows [INFERRED 0.82]
 - **Site Mark Composition** — fx_inline_rounded_background, fx_inline_circular_ring, fx_inline_horizontal_lines, fx_inline_left_arrow, fx_inline_right_arrow [EXTRACTED 1.00]
+- **Engineering Governance Bundle** — agents_md_engineering_guidance, agents_md_worktree_policy, agents_md_git_issue_workflow, agents_md_git_workflow_mandate [INFERRED 0.82]
+- **Interactive Graph UI Flow** — graph_html_raw_nodes_dataset, graph_html_raw_edges_dataset, graph_html_network_instance, graph_html_node_info_panel, graph_html_search_feature, graph_html_community_filter [EXTRACTED 1.00]
+- **Graph Report Navigation Scaffold** — graph_report_md_graph_report, graph_report_md_community_hubs, graph_report_md_god_nodes, graph_report_md_surprising_connections, graph_report_md_hyperedges_section [EXTRACTED 1.00]
 
 ## Communities
 
-### Community 0 - "Community 0"
+### Community 0 - "decorateStructuredAmazonPrices decorateStructuredSiblingSymbolPrices"
 Cohesion: 0.1
 Nodes (31): getConvertedAmountText(), applyConvertedAmountColor(), clearInlineConversions(), ensureInlineConversionNodeRefs(), getInlineAddonNode(), getOriginalText(), isInlineConversionAddon(), refreshExistingInlineConversions() (+23 more)
 
-### Community 1 - "Community 1"
+### Community 1 - "rates ratePolicy"
 Cohesion: 0.12
 Nodes (18): initializeRateRefresh(), scheduleRateRefreshAlarm(), refreshSettingsAndRates(), getMarketDayKey(), getPreviousBusinessDay(), isWeekend(), shouldUseMarketDayCache(), toDateKey() (+10 more)
 
-### Community 2 - "Community 2"
+### Community 2 - "utils extractCurrencyTextMatches"
 Cohesion: 0.17
 Nodes (25): formatCurrencyHeadlineAmount(), buildParserArtifacts(), escapeRegex(), extractCurrencyTextMatches(), formatAmountInCurrency(), getCanonicalCurrencySymbolToken(), getCurrencyFormatter(), getParserArtifacts() (+17 more)
 
-### Community 3 - "Community 3"
+### Community 3 - "appStorage getUserSettings"
 Cohesion: 0.16
 Nodes (16): loadSettings(), onToggleGlobalAutoConversion(), onToggleLocalAutoConversion(), asCurrencyCode(), asGlobalAutoConversionEnabled(), asLocalAutoConversionByOrigin(), getOriginFromUrl(), getUserSettings() (+8 more)
 
-### Community 4 - "Community 4"
+### Community 4 - "useCurrencyReducer state reduceCurrencyState"
 Cohesion: 0.16
 Nodes (16): convertAmountWithSnapshot(), formatConvertedAmount(), createAmountRowView(), createSelectionPopupView(), resolveLocale(), createCurrencyId(), createSelectionPopupStateStore(), getCurrencyStateFromCode() (+8 more)
 
-### Community 5 - "Community 5"
+### Community 5 - "index selectionPopupLoader"
 Cohesion: 0.12
 Nodes (7): createContentConversionRuntime(), isExtensionContextInvalidatedError(), main(), createPerfLogger(), isPerfLoggingEnabled(), createRuntimePerfContext(), createLazySelectionPopupControllerLoader()
 
-### Community 6 - "Community 6"
+### Community 6 - "Graph Report vis Network"
+Cohesion: 0.14
+Nodes (18): Community Legend Filter, Hyperedge Region Rendering, Hyperedges Data Overlay, LEGEND Dataset, vis Network Instance, Node Info Panel, RAW_EDGES Dataset, RAW_NODES Dataset (+10 more)
+
+### Community 7 - "currencyPresentation CurrencyBox"
 Cohesion: 0.21
 Nodes (11): finalizeAmountEdit(), handleAmountChange(), onAmountInputKeyDown(), revertAmountEdit(), cancelAmountEdit(), commitAmountDraft(), getCurrencyDisplayName(), getDisplayNames() (+3 more)
 
-### Community 7 - "Community 7"
+### Community 8 - "playground runDetection"
 Cohesion: 0.22
 Nodes (10): clearInputText(), collectPartialMatches(), expandSnippetRange(), getLocaleHint(), normalizeInput(), resetResults(), runDetection(), updateCount() (+2 more)
 
-### Community 8 - "Community 8"
+### Community 9 - "parser core createCompiledConfig"
 Cohesion: 0.21
 Nodes (6): assertObjectOrUndefined(), createCompiledConfig(), createCurrencyParser(), isUsernameWordCharacter(), normalizeCurrencyCode(), shouldSkipLikelyUsernameCurrencyMatch()
 
-### Community 9 - "Community 9"
+### Community 10 - "Extension Runtime E2E Conversion"
 Cohesion: 0.22
 Nodes (13): Background Alarm Refresh, FX Inline Clone Specification, Extension Runtime Concepts, E2E Conversion Checklist, SaaS Roadmap Delivered, Security Checklist: Network and DOM Hardening, Security Checklist: Manifest and CSP, Inline Conversion Runtime (+5 more)
 
-### Community 10 - "Community 10"
+### Community 11 - "magnitude profiles createMagnitudeAliasResolver"
 Cohesion: 0.35
 Nodes (11): buildAliasSet(), buildProfileAliasMap(), createMagnitudeAliasResolver(), dedupeProfiles(), getAliasMapCacheKey(), getLocaleCandidates(), getProfilesForLocaleHint(), mergeProfileAliasMaps() (+3 more)
 
-### Community 11 - "Community 11"
+### Community 12 - "magnitudeProfiles getMagnitudeAliasMap"
 Cohesion: 0.38
 Nodes (9): buildProfileAliasMap(), dedupeProfiles(), getAliasMapCacheKey(), getLocaleCandidates(), getMagnitudeAliasMap(), getProfilesForLocaleHint(), mergeProfileAliasMaps(), normalizeAlias() (+1 more)
 
-### Community 12 - "Community 12"
+### Community 13 - "Fixed Fee 2026 04"
 Cohesion: 0.28
 Nodes (9): Fixed-Fee B2B Pilot Offer, Currency Detection API Rules, Currency Detection Package Scope, 2026-04-17 Revenue Review: B2B Pilot Thesis, 2026-04-18 Revenue Review: Trust and Funnel Gap, SaaS Roadmap Not in Scope, Currency Detection Package API, FX Inline Marketing Website (+1 more)
 
-### Community 13 - "Community 13"
+### Community 14 - "Extension Icon Currency Conversion"
 Cohesion: 0.48
 Nodes (7): Currency Conversion / Exchange, Cyan Circular Ring, Dark Rounded Square Background, Horizontal Exchange Arrows, Extension Icon Asset, Letter R Shape, Letter X Shape
 
-### Community 14 - "Community 14"
+### Community 15 - "FX Inline Cyan Circular"
 Cohesion: 0.29
 Nodes (7): Cyan Circular Ring, Currency Conversion Motif, Three Horizontal Lines, Left Arrow Shape, Right Arrow Shape, Dark Rounded Background, FX Inline Site Mark
 
-### Community 15 - "Community 15"
+### Community 16 - "FX Inline Bidirectional Exchange"
 Cohesion: 0.33
 Nodes (6): FX Inline Logo, Bidirectional Exchange Arrows, Rounded Square Background, Horizontal Rate Lines, Sparkle Mark, Circular Ring
 
-### Community 16 - "Community 16"
+### Community 17 - "Engineering Guidance No Backward"
+Cohesion: 0.33
+Nodes (6): Date Handling Policy (Intl then date-fns), Development Phase Enables Sweeping Changes, Engineering Guidance, No Backward Compatibility Requirement in Development, Correctness, Security, and Performance Focus, Strict TypeScript Rules
+
+### Community 18 - "index extractCurrencyTextMatches"
 Cohesion: 0.4
 Nodes (0): 
 
-### Community 17 - "Community 17"
+### Community 19 - "mutationRoots collectMutationConversionRoots"
 Cohesion: 0.5
 Nodes (2): collectMutationConversionRoots(), toConversionRoot()
 
-### Community 18 - "Community 18"
+### Community 20 - "runPartialConversionPass createInlineConversionPerfAggregate"
 Cohesion: 0.4
 Nodes (2): createInlineConversionPerfAggregate(), runPartialConversionPass()
 
-### Community 19 - "Community 19"
+### Community 21 - "useCurrencyReducer createCurrencyId"
 Cohesion: 0.5
 Nodes (0): 
 
-### Community 20 - "Community 20"
-Cohesion: 0.5
-Nodes (4): LikeC4 Architecture Scaffold, Architecture Diagrams, FX Inline README, Auto-Generated Repository Snapshot
-
-### Community 21 - "Community 21"
+### Community 22 - "Currency Conversion Cyan Circular"
 Cohesion: 0.5
 Nodes (4): Currency Conversion Extension Icon, Cyan Circular Ring, Dark Rounded-Square Badge, Bidirectional Exchange Motif
 
-### Community 22 - "Community 22"
+### Community 23 - "dropdown menu DropdownMenu"
 Cohesion: 0.67
 Nodes (0): 
 
-### Community 23 - "Community 23"
+### Community 24 - "FX Inline Architecture Diagrams"
+Cohesion: 0.67
+Nodes (3): Architecture Diagrams, FX Inline README, Auto-Generated Repository Snapshot
+
+### Community 25 - "Central Currency Extension Icon"
 Cohesion: 1.0
 Nodes (3): Central Currency Glyph, Extension Icon, Refresh/Exchange Ring
 
-### Community 24 - "Community 24"
+### Community 26 - "hardenFirefoxInnerHtmlAssignments wxt config"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 25 - "Community 25"
+### Community 27 - "Label"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 26 - "Community 26"
+### Community 28 - "Input"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 27 - "Community 27"
+### Community 29 - "Dropdown"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 28 - "Community 28"
+### Community 30 - "CurrencyDropdown"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 29 - "Community 29"
+### Community 31 - "useCurrencyReducer hydration loadCurrencyReducerHydration"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 30 - "Community 30"
+### Community 32 - "App"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 31 - "Community 31"
+### Community 33 - "timers clearTimer"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 32 - "Community 32"
+### Community 34 - "guards isUserSettingsSnapshot"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 33 - "Community 33"
+### Community 35 - "Vertical Swap Swap Vertical"
 Cohesion: 1.0
 Nodes (2): Vertical Swap Icon, Swap Vertical Outline SVG
 
-### Community 34 - "Community 34"
+### Community 36 - "GitHub Issue Worktree Policy"
+Cohesion: 1.0
+Nodes (2): GitHub Issue Workflow Rules, Worktree Policy
+
+### Community 37 - "Decision Summary Mandatory Git"
+Cohesion: 1.0
+Nodes (2): Decision Summary Commit Body Requirement, Mandatory Git Workflow
+
+### Community 38 - "eslint config"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 35 - "Community 35"
+### Community 39 - "data"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 36 - "Community 36"
+### Community 40 - "index d"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 37 - "Community 37"
+### Community 41 - "types"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 38 - "Community 38"
+### Community 42 - "currencyPresentation types"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 39 - "Community 39"
+### Community 43 - "appStorage types"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 40 - "Community 40"
+### Community 44 - "rateMath types"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 41 - "Community 41"
+### Community 45 - "types"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 42 - "Community 42"
+### Community 46 - "constants"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 43 - "Community 43"
+### Community 47 - "currencyUtils types"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 44 - "Community 44"
+### Community 48 - "enums"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 45 - "Community 45"
+### Community 49 - "magnitudeProfiles types"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 46 - "Community 46"
+### Community 50 - "rates types"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 47 - "Community 47"
+### Community 51 - "Dropdown types"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 48 - "Community 48"
+### Community 52 - "Convertor types"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 49 - "Community 49"
+### Community 53 - "Convertor"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 50 - "Community 50"
+### Community 54 - "CurrencyBox types"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 51 - "Community 51"
+### Community 55 - "CurrencyDropdown types"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 52 - "Community 52"
+### Community 56 - "main"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 53 - "Community 53"
+### Community 57 - "main"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 54 - "Community 54"
+### Community 58 - "content types"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 55 - "Community 55"
+### Community 59 - "perfLogger types"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 56 - "Community 56"
+### Community 60 - "perfLogger"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 57 - "Community 57"
+### Community 61 - "constants"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 58 - "Community 58"
+### Community 62 - "constants"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 59 - "Community 59"
+### Community 63 - "constants"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 60 - "Community 60"
+### Community 64 - "vite config"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 61 - "Community 61"
+### Community 65 - "main"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 62 - "Community 62"
-Cohesion: 1.0
-Nodes (1): Repository Agent Guidance
-
-### Community 63 - "Community 63"
-Cohesion: 1.0
-Nodes (1): Add Outline Icon
-
-### Community 64 - "Community 64"
-Cohesion: 1.0
-Nodes (1): Drop Down Icon
-
-### Community 65 - "Community 65"
-Cohesion: 1.0
-Nodes (1): Switch Icon
-
-### Community 66 - "Community 66"
-Cohesion: 1.0
-Nodes (1): Toggle Off Icon
-
-### Community 67 - "Community 67"
-Cohesion: 1.0
-Nodes (1): Toggle On Icon
-
-### Community 68 - "Community 68"
+### Community 66 - "16px extension"
 Cohesion: 1.0
 Nodes (1): 16px extension icon
 
-### Community 69 - "Community 69"
+### Community 67 - "Currency Conversion"
 Cohesion: 1.0
 Nodes (1): Currency Conversion Extension Icon
 
-### Community 70 - "Community 70"
+### Community 68 - "Currency Conversion"
 Cohesion: 1.0
 Nodes (1): Currency Conversion App Icon
+
+### Community 69 - "Toggle On"
+Cohesion: 1.0
+Nodes (1): Toggle On Icon
+
+### Community 70 - "Drop Down"
+Cohesion: 1.0
+Nodes (1): Drop Down Icon
+
+### Community 71 - "Toggle Off"
+Cohesion: 1.0
+Nodes (1): Toggle Off Icon
+
+### Community 72 - "Switch Icon"
+Cohesion: 1.0
+Nodes (1): Switch Icon
+
+### Community 73 - "Add Outline"
+Cohesion: 1.0
+Nodes (1): Add Outline Icon
 
 ## Ambiguous Edges - Review These
 - `FX Inline Logo` → `Sparkle Mark`  [AMBIGUOUS]
@@ -406,103 +424,107 @@ Nodes (1): Currency Conversion App Icon
   apps/extension/public/icon/512.png · relation: conceptually_related_to
 - `Currency Conversion / Exchange` → `Letter R Shape`  [AMBIGUOUS]
   apps/extension/public/icon/512.png · relation: conceptually_related_to
+- `Surprising Connections` → `RAW_EDGES Dataset`  [AMBIGUOUS]
+  graphify-out/GRAPH_REPORT.md · relation: references
 
 ## Knowledge Gaps
-- **33 isolated node(s):** `Auto-Generated Repository Snapshot`, `Repository Agent Guidance`, `FX Inline Settings Options Page`, `Popup Entry Point Shell`, `FX Inline Marketing Website` (+28 more)
+- **46 isolated node(s):** `Architecture Diagrams`, `Auto-Generated Repository Snapshot`, `Security Checklist: Manifest and CSP`, `SaaS Roadmap Not in Scope`, `FX Inline Settings Options Page` (+41 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **Thin community `Community 24`** (2 nodes): `hardenFirefoxInnerHtmlAssignments()`, `wxt.config.ts`
+- **Thin community `hardenFirefoxInnerHtmlAssignments wxt config`** (2 nodes): `hardenFirefoxInnerHtmlAssignments()`, `wxt.config.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 25`** (2 nodes): `Label()`, `label.tsx`
+- **Thin community `Label`** (2 nodes): `Label()`, `label.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 26`** (2 nodes): `Input()`, `input.tsx`
+- **Thin community `Input`** (2 nodes): `Input()`, `input.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 27`** (2 nodes): `Dropdown.tsx`, `Dropdown()`
+- **Thin community `Dropdown`** (2 nodes): `Dropdown.tsx`, `Dropdown()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 28`** (2 nodes): `CurrencyDropdown.tsx`, `CurrencyDropdown()`
+- **Thin community `CurrencyDropdown`** (2 nodes): `CurrencyDropdown.tsx`, `CurrencyDropdown()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 29`** (2 nodes): `useCurrencyReducer.hydration.ts`, `loadCurrencyReducerHydration()`
+- **Thin community `useCurrencyReducer hydration loadCurrencyReducerHydration`** (2 nodes): `useCurrencyReducer.hydration.ts`, `loadCurrencyReducerHydration()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 30`** (2 nodes): `App()`, `App.tsx`
+- **Thin community `App`** (2 nodes): `App()`, `App.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 31`** (2 nodes): `timers.ts`, `clearTimer()`
+- **Thin community `timers clearTimer`** (2 nodes): `timers.ts`, `clearTimer()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 32`** (2 nodes): `guards.ts`, `isUserSettingsSnapshot()`
+- **Thin community `guards isUserSettingsSnapshot`** (2 nodes): `guards.ts`, `isUserSettingsSnapshot()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 33`** (2 nodes): `Vertical Swap Icon`, `Swap Vertical Outline SVG`
+- **Thin community `Vertical Swap Swap Vertical`** (2 nodes): `Vertical Swap Icon`, `Swap Vertical Outline SVG`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 34`** (1 nodes): `eslint.config.mjs`
+- **Thin community `GitHub Issue Worktree Policy`** (2 nodes): `GitHub Issue Workflow Rules`, `Worktree Policy`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 35`** (1 nodes): `data.js`
+- **Thin community `Decision Summary Mandatory Git`** (2 nodes): `Decision Summary Commit Body Requirement`, `Mandatory Git Workflow`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 36`** (1 nodes): `index.d.ts`
+- **Thin community `eslint config`** (1 nodes): `eslint.config.mjs`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 37`** (1 nodes): `json.types.ts`
+- **Thin community `data`** (1 nodes): `data.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 38`** (1 nodes): `currencyPresentation.types.ts`
+- **Thin community `index d`** (1 nodes): `index.d.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 39`** (1 nodes): `appStorage.types.ts`
+- **Thin community `types`** (1 nodes): `json.types.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 40`** (1 nodes): `rateMath.types.ts`
+- **Thin community `currencyPresentation types`** (1 nodes): `currencyPresentation.types.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 41`** (1 nodes): `types.ts`
+- **Thin community `appStorage types`** (1 nodes): `appStorage.types.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 42`** (1 nodes): `constants.ts`
+- **Thin community `rateMath types`** (1 nodes): `rateMath.types.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 43`** (1 nodes): `currencyUtils.types.ts`
+- **Thin community `types`** (1 nodes): `types.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 44`** (1 nodes): `enums.ts`
+- **Thin community `constants`** (1 nodes): `constants.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 45`** (1 nodes): `magnitudeProfiles.types.ts`
+- **Thin community `currencyUtils types`** (1 nodes): `currencyUtils.types.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 46`** (1 nodes): `rates.types.ts`
+- **Thin community `enums`** (1 nodes): `enums.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 47`** (1 nodes): `Dropdown.types.ts`
+- **Thin community `magnitudeProfiles types`** (1 nodes): `magnitudeProfiles.types.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 48`** (1 nodes): `Convertor.types.ts`
+- **Thin community `rates types`** (1 nodes): `rates.types.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 49`** (1 nodes): `Convertor.tsx`
+- **Thin community `Dropdown types`** (1 nodes): `Dropdown.types.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 50`** (1 nodes): `CurrencyBox.types.ts`
+- **Thin community `Convertor types`** (1 nodes): `Convertor.types.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 51`** (1 nodes): `CurrencyDropdown.types.ts`
+- **Thin community `Convertor`** (1 nodes): `Convertor.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 52`** (1 nodes): `main.tsx`
+- **Thin community `CurrencyBox types`** (1 nodes): `CurrencyBox.types.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 53`** (1 nodes): `main.tsx`
+- **Thin community `CurrencyDropdown types`** (1 nodes): `CurrencyDropdown.types.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 54`** (1 nodes): `content.types.ts`
+- **Thin community `main`** (1 nodes): `main.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 55`** (1 nodes): `perfLogger.types.ts`
+- **Thin community `main`** (1 nodes): `main.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 56`** (1 nodes): `perfLogger.ts`
+- **Thin community `content types`** (1 nodes): `content.types.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 57`** (1 nodes): `constants.ts`
+- **Thin community `perfLogger types`** (1 nodes): `perfLogger.types.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 58`** (1 nodes): `constants.ts`
+- **Thin community `perfLogger`** (1 nodes): `perfLogger.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 59`** (1 nodes): `constants.ts`
+- **Thin community `constants`** (1 nodes): `constants.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 60`** (1 nodes): `vite.config.mjs`
+- **Thin community `constants`** (1 nodes): `constants.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 61`** (1 nodes): `main.js`
+- **Thin community `constants`** (1 nodes): `constants.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 62`** (1 nodes): `Repository Agent Guidance`
+- **Thin community `vite config`** (1 nodes): `vite.config.mjs`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 63`** (1 nodes): `Add Outline Icon`
+- **Thin community `main`** (1 nodes): `main.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 64`** (1 nodes): `Drop Down Icon`
+- **Thin community `16px extension`** (1 nodes): `16px extension icon`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 65`** (1 nodes): `Switch Icon`
+- **Thin community `Currency Conversion`** (1 nodes): `Currency Conversion Extension Icon`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 66`** (1 nodes): `Toggle Off Icon`
+- **Thin community `Currency Conversion`** (1 nodes): `Currency Conversion App Icon`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 67`** (1 nodes): `Toggle On Icon`
+- **Thin community `Toggle On`** (1 nodes): `Toggle On Icon`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 68`** (1 nodes): `16px extension icon`
+- **Thin community `Drop Down`** (1 nodes): `Drop Down Icon`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 69`** (1 nodes): `Currency Conversion Extension Icon`
+- **Thin community `Toggle Off`** (1 nodes): `Toggle Off Icon`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 70`** (1 nodes): `Currency Conversion App Icon`
+- **Thin community `Switch Icon`** (1 nodes): `Switch Icon`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Add Outline`** (1 nodes): `Add Outline Icon`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
@@ -514,11 +536,11 @@ _Questions this graph is uniquely positioned to answer:_
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
 - **What is the exact relationship between `Currency Conversion / Exchange` and `Letter R Shape`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
-- **Why does `getConvertedAmountText()` connect `Community 0` to `Community 2`, `Community 4`?**
-  _High betweenness centrality (0.064) - this node is a cross-community bridge._
-- **Why does `createCompiledConfig()` connect `Community 8` to `Community 10`, `Community 2`?**
-  _High betweenness centrality (0.054) - this node is a cross-community bridge._
-- **Why does `getCanonicalCurrencySymbolToken()` connect `Community 2` to `Community 8`?**
-  _High betweenness centrality (0.054) - this node is a cross-community bridge._
-- **Are the 7 inferred relationships involving `extractCurrencyTextMatches()` (e.g. with `refreshExistingInlineConversions()` and `getSiblingCurrencyRawPrice()`) actually correct?**
-  _`extractCurrencyTextMatches()` has 7 INFERRED edges - model-reasoned connections that need verification._
+- **What is the exact relationship between `Surprising Connections` and `RAW_EDGES Dataset`?**
+  _Edge tagged AMBIGUOUS (relation: references) - confidence is low._
+- **Why does `getConvertedAmountText()` connect `decorateStructuredAmazonPrices decorateStructuredSiblingSymbolPrices` to `utils extractCurrencyTextMatches`, `useCurrencyReducer state reduceCurrencyState`?**
+  _High betweenness centrality (0.055) - this node is a cross-community bridge._
+- **Why does `createCompiledConfig()` connect `parser core createCompiledConfig` to `utils extractCurrencyTextMatches`, `magnitude profiles createMagnitudeAliasResolver`?**
+  _High betweenness centrality (0.047) - this node is a cross-community bridge._
+- **Why does `getCanonicalCurrencySymbolToken()` connect `utils extractCurrencyTextMatches` to `parser core createCompiledConfig`?**
+  _High betweenness centrality (0.047) - this node is a cross-community bridge._
