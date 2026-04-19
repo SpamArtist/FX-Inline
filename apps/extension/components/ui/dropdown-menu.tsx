@@ -37,7 +37,7 @@ function DropdownMenuContent({
       <DropdownMenuPrimitive.Content
         data-slot="dropdown-menu-content"
         sideOffset={sideOffset}
-        className={className ? `ccx-dropdown-menu-content ccx-radix-dropdown-content ${className}` : "ccx-dropdown-menu-content ccx-radix-dropdown-content"}
+        className={`ccx-dropdown-menu-content ccx-radix-dropdown-content${className ? ` ${className}` : ""}`}
         {...props}
       />
     </DropdownMenuPrimitive.Portal>
@@ -66,7 +66,7 @@ function DropdownMenuItem({
       data-slot="dropdown-menu-item"
       data-inset={inset}
       data-variant={variant}
-      className={className ? `ccx-radix-dropdown-item ${className}` : "ccx-radix-dropdown-item"}
+      className={`ccx-radix-dropdown-item${className ? ` ${className}` : ""}`}
       {...props}
     />
   )
@@ -81,7 +81,7 @@ function DropdownMenuCheckboxItem({
   return (
     <DropdownMenuPrimitive.CheckboxItem
       data-slot="dropdown-menu-checkbox-item"
-      className={className ? `ccx-radix-dropdown-item ccx-radix-dropdown-item--checkbox ${className}` : "ccx-radix-dropdown-item ccx-radix-dropdown-item--checkbox"}
+      className={`ccx-radix-dropdown-item ccx-radix-dropdown-item--checkbox${className ? ` ${className}` : ""}`}
       checked={checked}
       {...props}
     >
@@ -114,7 +114,7 @@ function DropdownMenuRadioItem({
   return (
     <DropdownMenuPrimitive.RadioItem
       data-slot="dropdown-menu-radio-item"
-      className={className ? `ccx-radix-dropdown-item ccx-radix-dropdown-item--radio ${className}` : "ccx-radix-dropdown-item ccx-radix-dropdown-item--radio"}
+      className={`ccx-radix-dropdown-item ccx-radix-dropdown-item--radio${className ? ` ${className}` : ""}`}
       {...props}
     >
       <span className="ccx-radix-dropdown-indicator" aria-hidden>
@@ -138,7 +138,7 @@ function DropdownMenuLabel({
     <DropdownMenuPrimitive.Label
       data-slot="dropdown-menu-label"
       data-inset={inset}
-      className={className ? `ccx-radix-dropdown-label ${className}` : "ccx-radix-dropdown-label"}
+      className={`ccx-radix-dropdown-label${className ? ` ${className}` : ""}`}
       {...props}
     />
   )
@@ -151,7 +151,7 @@ function DropdownMenuSeparator({
   return (
     <DropdownMenuPrimitive.Separator
       data-slot="dropdown-menu-separator"
-      className={className ? `ccx-radix-dropdown-separator ${className}` : "ccx-radix-dropdown-separator"}
+      className={`ccx-radix-dropdown-separator${className ? ` ${className}` : ""}`}
       {...props}
     />
   )
@@ -164,7 +164,7 @@ function DropdownMenuShortcut({
   return (
     <span
       data-slot="dropdown-menu-shortcut"
-      className={className ? `ccx-radix-dropdown-shortcut ${className}` : "ccx-radix-dropdown-shortcut"}
+      className={`ccx-radix-dropdown-shortcut${className ? ` ${className}` : ""}`}
       {...props}
     />
   )
@@ -188,7 +188,7 @@ function DropdownMenuSubTrigger({
     <DropdownMenuPrimitive.SubTrigger
       data-slot="dropdown-menu-sub-trigger"
       data-inset={inset}
-      className={className ? `ccx-radix-dropdown-item ccx-radix-dropdown-sub-trigger ${className}` : "ccx-radix-dropdown-item ccx-radix-dropdown-sub-trigger"}
+      className={`ccx-radix-dropdown-item ccx-radix-dropdown-sub-trigger${className ? ` ${className}` : ""}`}
       {...props}
     >
       {children}
@@ -204,7 +204,7 @@ function DropdownMenuSubContent({
   return (
     <DropdownMenuPrimitive.SubContent
       data-slot="dropdown-menu-sub-content"
-      className={className ? `ccx-radix-dropdown-content ${className}` : "ccx-radix-dropdown-content"}
+      className={`ccx-radix-dropdown-content${className ? ` ${className}` : ""}`}
       {...props}
     />
   )

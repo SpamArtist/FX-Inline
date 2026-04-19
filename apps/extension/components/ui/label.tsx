@@ -8,7 +8,7 @@ function Label({
   return (
     <LabelPrimitive.Root
       data-slot="label"
-      className={className ? `ccx-ui-label ${className}` : "ccx-ui-label"}
+      className={`ccx-ui-label${className ? ` ${className}` : ""}`}
       {...props}
     />
   )
