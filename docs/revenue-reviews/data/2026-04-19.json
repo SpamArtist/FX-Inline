@@ -1,13 +1,23 @@
 {
   "date": "2026-04-19",
+  "generated_at": "2026-04-19T14:22:32Z",
   "project": "FX Inline",
-  "summary": "FX Inline still has useful inline-conversion technology but no serious revenue system. The website is still a brochure, the public version story is inconsistent, and the project still has zero review proof. The best path to first revenue remains a fixed-fee B2B pilot for client-side local-currency price hints on existing price pages, sold with the current extension as proof.",
+  "summary": "FX Inline still has strong page-layer currency-conversion technology but almost no commercial system. The shortest path to first revenue is one fixed-fee B2B pilot for local-currency price hints on a USD-only public pricing page, not a consumer paywall or more technical polish.",
   "context_files_read": [],
   "key_context_inputs_used": [
-    "docs/revenue-reviews/context/ is still missing, so there is no user-provided business ground truth for installs, traffic, costs, or monetization constraints.",
-    "docs/SAAS_ROADMAP.md explicitly keeps billing and a backend-managed rate service out of scope.",
-    "Repo versioning and public marketplace versioning are still contradictory: package.json is 0.4.1, .output/firefox-mv2/manifest.json is 0.4.0, Firefox Add-ons en-US shows 0.0.0, and public store mirrors still show 0.3.6.",
-    "apps/website/index.html still behaves like a brochure and apps/website/main.js still contains no analytics or lead-capture logic."
+    "docs/revenue-reviews/context/ is missing, so there is no user-provided business ground truth for traffic, installs, costs, or monetization constraints.",
+    "docs/SAAS_ROADMAP.md still keeps account, subscription, billing, and a backend-managed rate service out of scope.",
+    "apps/website/index.html still includes a note saying the store links should be updated once published, which damages trust.",
+    "apps/website/main.js still contains no analytics, lead capture, or funnel logic.",
+    "Public versioning is still inconsistent across repo and marketplace surfaces."
+  ],
+  "context_gaps_or_conflicts": [
+    "No install or activation metrics",
+    "No landing-page traffic data",
+    "No monetization preference between consumer, affiliate, or B2B",
+    "No explicit willingness to do outbound sales",
+    "No support-capacity guidance",
+    "Marketplace version surfaces do not line up cleanly with the repo version"
   ],
   "repository_areas_inspected": [
     "package.json",
@@ -21,61 +31,54 @@
     "apps/extension/components",
     "apps/extension/hooks",
     "apps/extension/utils",
-    "apps/extension/tests",
     "apps/extension/public",
+    "apps/extension/assets",
     "apps/website/index.html",
     "apps/website/styles.css",
     "apps/website/main.js",
     "apps/website/playground.html",
     "apps/website/playground.js",
-    "apps/website/assets",
     "packages/currency-detection/package.json",
     "packages/currency-detection/README.md",
     "packages/currency-detection/src",
-    "packages/currency-detection/test",
-    "packages/currency-text-toolkit/dist",
     "scripts/readme-sync.mjs",
     "scripts/generate-likec4-model.mjs",
     "scripts/run-likec4.mjs",
-    "docs/SAAS_ROADMAP.md",
-    "docs/CURRENCY_DETECTION_PACKAGE.md",
-    "docs/QA_E2E_CHECKLIST.md",
-    "docs/SECURITY_CHECKLIST.md",
     ".github/workflows/ci.yml",
     ".github/workflows/currency-detection-benchmarks.yml",
     ".github/workflows/architecture-diagrams.yml",
-    ".output/chrome-mv3/manifest.json",
-    ".output/firefox-mv2/manifest.json",
-    "dist/website/index.html",
-    "docs/revenue-reviews/reports/2026-04-17.md",
-    "docs/revenue-reviews/reports/2026-04-18.md",
-    "docs/revenue-reviews/data/2026-04-17.json",
-    "docs/revenue-reviews/data/2026-04-18.json",
-    "docs/revenue-reviews/data/reviews/2026-04-18.json",
-    "docs/revenue-reviews/data/competitors.json",
-    "docs/revenue-reviews/data/competitors/2026-04-18.json",
-    "docs/revenue-reviews/data/index.jsonl"
+    "docs/SAAS_ROADMAP.md",
+    "docs/CURRENCY_DETECTION_PACKAGE.md",
+    "docs/SECURITY_CHECKLIST.md",
+    "docs/QA_E2E_CHECKLIST.md"
+  ],
+  "ignored_paths_or_categories": [
+    "LikeC4 and related architecture-generation output",
+    "graphify, Graphify, and generated graph artifacts",
+    "previous narrative revenue reports as analytical ground truth",
+    "previous generated daily JSON report artifacts as analytical ground truth",
+    "test files as primary analytical inputs",
+    "generated build output and packaged artifacts as primary analytical inputs"
   ],
   "verification": {
     "commands_run": [
-      "npm run test:all",
-      "npm run currency-detection:test",
-      "npm run build:website"
+      "npm run compile",
+      "npm run build:website",
+      "npm run test:all"
     ],
     "results": [
-      "apps/extension unit tests passed",
-      "apps/extension content tests passed",
-      "packages/currency-detection tests passed",
-      "website production build passed"
+      "compile passed",
+      "website build passed",
+      "extension unit and content tests passed"
     ]
   },
   "recommended_focus": {
-    "id": "b2b-pilot-client-side-price-localization",
-    "title": "Sell one fixed-fee B2B pilot for client-side local-currency price hints",
+    "id": "b2b_saas_pricing_pilot",
+    "title": "Sell one fixed-fee B2B pilot for client-side local-currency hints on a USD-only SaaS pricing page",
     "segment": "developer_b2b",
     "timeframe": "near_term",
-    "why": "The extension already proves the hard technical part on real pages. One paid pilot creates revenue, proof, and learning faster than waiting for consumer installs or building a paywall.",
-    "smallest_viable_test": "Rewrite the website around one pilot offer, fix the public trust story, record personalized demos on real prospect pages, and try to close one fixed-fee pilot without building subscription infrastructure.",
+    "why": "This uses the repo's strongest current asset immediately, avoids waiting for consumer scale, and does not require subscription infrastructure before there is a buyer.",
+    "smallest_viable_test": "Rewrite the website around one pilot offer, create personalized before-and-after demos on real prospect pages, and try to close one paid pilot via outbound.",
     "success_metrics": [
       "30 targeted outbound contacts",
       "3 serious replies",
@@ -87,464 +90,417 @@
   "ranked_monetization_opportunities": [
     {
       "rank": 1,
-      "id": "b2b-pilot-client-side-price-localization",
-      "title": "Fixed-fee pilot for client-side local-currency price hints on existing pages",
+      "id": "b2b_saas_pricing_pilot",
+      "title": "Fixed-fee pilot for local-currency price hints on existing public pricing pages",
       "segment": "developer_b2b",
       "timeframe": "near_term",
       "revenue_potential": "high",
       "time_to_first_dollar": "1-3 weeks",
-      "rationale": "Uses the strongest repo asset immediately and does not depend on installs, subscriptions, or audience first.",
-      "smallest_test": "Personalized demos on public pricing or travel pages plus a website CTA for a fixed-fee pilot."
+      "rationale": "The extension already proves the hard page-layer behavior. One paid pilot creates revenue, proof, and buyer learning faster than waiting for installs.",
+      "smallest_test": "Personalized outreach to USD-only pricing pages plus a pilot landing page."
     },
     {
       "rank": 2,
-      "id": "package-led-services-and-licensing",
-      "title": "Parser and runtime packaging plus paid services or licensing",
+      "id": "package_led_services_and_licensing",
+      "title": "Parser and runtime packaging plus implementation services or licensing",
       "segment": "developer_b2b",
       "timeframe": "medium_term",
       "revenue_potential": "medium_high",
       "time_to_first_dollar": "3-6 weeks",
-      "rationale": "The package and tests are credible, but the path is blocked by private package settings, missing licensing, and no commercial packaging story.",
-      "smallest_test": "Only after pilot demand appears, extract a smallest embeddable runtime and add a support or licensing offer."
+      "rationale": "The parser core is credible, but the package is still private and there is no buyer proof yet.",
+      "smallest_test": "After pilot demand appears, package the smallest reusable parser and DOM runtime pieces with support."
     },
     {
       "rank": 3,
-      "id": "affiliate-content-and-referrals",
+      "id": "affiliate_content",
       "title": "Use-case content paired with affiliate offers",
       "segment": "creator_affiliate",
       "timeframe": "near_to_medium_term",
       "revenue_potential": "medium",
       "time_to_first_dollar": "4-8 weeks",
-      "rationale": "Wise and Travelpayouts prove the economics, but FX Inline still lacks traffic, analytics, and owned audience.",
-      "smallest_test": "Publish one use-case page and one referral experiment only after basic measurement exists."
+      "rationale": "Wise, Travelpayouts, and shopping assistants prove the economics, but FX Inline lacks traffic.",
+      "smallest_test": "Publish one high-intent use-case page and one affiliate experiment only after basic measurement exists."
     },
     {
       "rank": 4,
-      "id": "consumer-premium-extension",
+      "id": "consumer_premium_extension",
       "title": "Paid consumer extension tier",
       "segment": "consumer",
       "timeframe": "later",
-      "revenue_potential": "medium",
+      "revenue_potential": "low_near_term",
       "time_to_first_dollar": "install_dependent",
-      "rationale": "The category monetizes, but FX Inline has no traction cushion and no public trust layer yet.",
-      "smallest_test": "Do not test until installs, activation, trust, and reviews improve."
+      "rationale": "Users in this category strongly prefer free, private, simple tools. FX Inline has no trust cushion yet.",
+      "smallest_test": "Do not test until installs, activation, and ratings improve."
     }
   ],
+  "monetization_opportunities_by_asset": {
+    "extension": {
+      "consumer": "Weak near-term direct monetization. Best used as a proof and demo engine right now.",
+      "future_paid_feature_ideas": [
+        "saved site profiles",
+        "tax or fee presets",
+        "richer display controls",
+        "shared team presets"
+      ]
+    },
+    "website": {
+      "consumer": "Currently brochure-only.",
+      "b2b": "Highest-value current asset if rewritten into a pilot-sales surface with proof and a CTA."
+    },
+    "open_source_package": {
+      "developer_b2b": "Strong medium-term asset for services or licensing, but blocked by private packaging."
+    },
+    "docs_and_content": {
+      "creator_affiliate": "Useful later for SEO and affiliate monetization once traffic exists."
+    },
+    "partnerships_and_affiliate": {
+      "creator_affiliate": "Real economic path later through money-transfer or travel affiliate programs.",
+      "current_blocker": "No audience yet."
+    },
+    "b2b_api_licensing": {
+      "developer_b2b": "Strongest current path because buyers can pay for localized comprehension without waiting for consumer scale."
+    }
+  },
   "ranked_marketing_channels": [
     {
       "rank": 1,
       "channel": "founder_led_outbound",
-      "timeframe": "near_term",
-      "fit": "No traffic required and aligned to the best revenue path.",
-      "target_audience": "SaaS operators, travel publishers, agencies, price-heavy content sites",
-      "message": "Add local-currency price hints to your existing public pages in days, not months.",
-      "effort": "medium",
-      "revenue_upside": "high"
+      "why_it_fits": "No traffic required and aligned with the best revenue path.",
+      "target_audience": "SaaS operators with USD-only pricing pages, travel publishers, comparison sites, agencies",
+      "message_or_offer": "Add local-currency price hints to your existing pricing page in days, not months.",
+      "likely_effort": "medium",
+      "likely_revenue_upside": "high"
     },
     {
       "rank": 2,
       "channel": "personalized_demo_videos",
-      "timeframe": "near_term",
-      "fit": "The value is visual and specific to each prospect page.",
-      "target_audience": "The same B2B targets reached via outbound",
-      "message": "Here is your own page localized in under a minute.",
-      "effort": "medium",
-      "revenue_upside": "high"
+      "why_it_fits": "The value is visual and page-specific.",
+      "target_audience": "The same B2B prospects reached via outbound",
+      "message_or_offer": "Here is your own page localized with secondary local-currency hints.",
+      "likely_effort": "medium",
+      "likely_revenue_upside": "high"
     },
     {
       "rank": 3,
       "channel": "website_pilot_page",
-      "timeframe": "near_term",
-      "fit": "Outbound needs a serious landing page with proof and a CTA.",
+      "why_it_fits": "Outbound needs a serious landing page with proof and trust notes.",
       "target_audience": "Prospects evaluating the offer",
-      "message": "Request a pilot and watch a short before-and-after demo.",
-      "effort": "medium",
-      "revenue_upside": "high"
+      "message_or_offer": "Request a fixed-fee pilot and see before-and-after proof.",
+      "likely_effort": "medium",
+      "likely_revenue_upside": "high"
     },
     {
       "rank": 4,
       "channel": "browser_marketplaces",
-      "timeframe": "near_term",
-      "fit": "Important for trust and future consumer growth, but not the fastest first-dollar path.",
+      "why_it_fits": "Useful for trust and future consumer growth, but not the fastest first-dollar path.",
       "target_audience": "Shoppers, travelers, deal seekers",
-      "message": "See foreign prices in your currency without leaving the page.",
-      "effort": "medium",
-      "revenue_upside": "medium"
+      "message_or_offer": "See foreign prices in your currency without leaving the page.",
+      "likely_effort": "medium",
+      "likely_revenue_upside": "medium"
     },
     {
       "rank": 5,
-      "channel": "search_seo_use_case_pages",
-      "timeframe": "medium_term",
-      "fit": "Can capture intent around shopping abroad, travel pricing, and SaaS pricing comparison.",
+      "channel": "seo_use_case_pages",
+      "why_it_fits": "Can capture intent around foreign shopping, travel booking, and SaaS pricing comparison.",
       "target_audience": "International shoppers, travelers, remote workers, price-comparison researchers",
-      "message": "Convert Amazon Japan, Booking, or SaaS prices inline instead of switching tabs.",
-      "effort": "high",
-      "revenue_upside": "medium"
+      "message_or_offer": "Convert Amazon Europe, Booking, or SaaS prices inline instead of switching tabs.",
+      "likely_effort": "high",
+      "likely_revenue_upside": "medium"
     },
     {
       "rank": 6,
       "channel": "reddit_and_niche_communities",
-      "timeframe": "near_term",
-      "fit": "Good for qualitative learning and some awareness, weak for first revenue alone.",
-      "target_audience": "Digital nomads, travel hackers, shoppers abroad, side-project communities",
-      "message": "Privacy-first inline currency conversion without tab switching.",
-      "effort": "low_medium",
-      "revenue_upside": "low_medium"
+      "why_it_fits": "Good for demand language and qualitative learning.",
+      "target_audience": "Travelers, browser-extension users, side-project communities",
+      "message_or_offer": "Privacy-light inline conversion that stays out of the way.",
+      "likely_effort": "low_medium",
+      "likely_revenue_upside": "low_medium"
     },
     {
       "rank": 7,
-      "channel": "short_form_video_and_youtube",
-      "timeframe": "near_term",
-      "fit": "The before/after value is easy to demonstrate visually.",
-      "target_audience": "Shoppers, travelers, indie makers, operators",
-      "message": "Watch the same page before and after FX Inline.",
-      "effort": "medium",
-      "revenue_upside": "medium"
+      "channel": "youtube_and_short_form_video",
+      "why_it_fits": "Before-and-after value is easy to demonstrate visually.",
+      "target_audience": "Shoppers, travelers, founders, operators",
+      "message_or_offer": "Watch the same page before and after FX Inline.",
+      "likely_effort": "medium",
+      "likely_revenue_upside": "medium"
     },
     {
       "rank": 8,
       "channel": "developer_communities_after_packaging",
-      "timeframe": "medium_term",
-      "fit": "Good only after licensing and support positioning exist.",
+      "why_it_fits": "Only useful after parser and runtime packaging become real products.",
       "target_audience": "Frontend engineers, agencies, growth teams",
-      "message": "DOM-robust inline localization layer for messy price markup.",
-      "effort": "medium",
-      "revenue_upside": "medium"
-    },
-    {
-      "rank": 9,
-      "channel": "affiliate_content",
-      "timeframe": "later",
-      "fit": "Economically real but blocked by missing traffic.",
-      "target_audience": "People about to transfer money, book travel, or shop abroad",
-      "message": "Understand the price first, then choose how to pay or book.",
-      "effort": "medium",
-      "revenue_upside": "medium"
+      "message_or_offer": "DOM-robust inline localization layer for messy price markup.",
+      "likely_effort": "medium",
+      "likely_revenue_upside": "medium_later"
     }
   ],
   "top_actions": [
     {
       "rank": 1,
       "title": "Choose one wedge and one fixed-fee pilot offer",
-      "timeframe": "near_term",
       "expected_impact": "high",
       "implementation_effort": "low",
-      "dependencies": [
-        "Decide whether the first wedge is SaaS pricing, travel publishers, or comparison pages"
-      ],
+      "dependencies": [],
       "parallelizable": [
-        "Prospect list drafting",
-        "Landing-page copy outline",
-        "Demo asset planning"
+        "prospect list drafting",
+        "landing-page copy outline",
+        "demo concept work"
       ],
       "sequential_dependencies": [
-        "The wedge choice must happen before final site copy and outbound messaging"
+        "The wedge decision must happen before the website rewrite and outbound copy."
       ],
-      "ai_coding_acceleration": "Minimal; the bottleneck is offer clarity, not engineering.",
-      "ai_design_acceleration": "AI can quickly mock tailored proof assets once the wedge is chosen.",
+      "ai_coding_acceleration": "low",
+      "ai_design_acceleration": "high",
       "success_metrics": [
-        "One clear offer statement",
-        "One clear target audience"
+        "one clear target buyer",
+        "one clear offer sentence"
       ]
     },
     {
       "rank": 2,
       "title": "Rewrite the website into a pilot-sales surface",
-      "timeframe": "near_term",
       "expected_impact": "high",
       "implementation_effort": "medium",
       "dependencies": [
-        "Offer chosen",
-        "Contact or booking path chosen"
+        "wedge and offer chosen"
       ],
       "parallelizable": [
-        "Landing-page rewrite",
-        "Trust-page copy",
-        "CTA tracking",
-        "Proof asset design"
+        "copy rewrite",
+        "visual proof blocks",
+        "CTA instrumentation"
       ],
       "sequential_dependencies": [
-        "Final copy should follow the wedge and offer decision"
+        "CTA and analytics should be live before outreach starts."
       ],
-      "ai_coding_acceleration": "AI can rewrite the static website, add new pages, and instrument CTAs in hours.",
-      "ai_design_acceleration": "AI can generate annotated screenshots, hero mockups, and demo composites the same day.",
+      "ai_coding_acceleration": "medium",
+      "ai_design_acceleration": "high",
       "success_metrics": [
-        "Live pilot CTA",
-        "Demo or contact submissions"
+        "one landing page that supports outreach without apology"
       ]
     },
     {
       "rank": 3,
-      "title": "Produce personalized demos and start outbound",
-      "timeframe": "near_term",
+      "title": "Build personalized proof assets and a 30-prospect list",
       "expected_impact": "high",
       "implementation_effort": "medium",
       "dependencies": [
-        "Website must be credible enough to receive prospects"
+        "landing page",
+        "target wedge"
       ],
       "parallelizable": [
-        "Multiple demo clips",
-        "Multiple prospect lists",
-        "Multiple email variants"
+        "prospect research",
+        "screenshot capture",
+        "short demo-video creation"
       ],
       "sequential_dependencies": [
-        "Feedback from early replies should tune the next batch"
+        "Personalized demos should target real prospects, not generic pages."
       ],
-      "ai_coding_acceleration": "Little code required unless a demo page needs a small compatibility tweak.",
-      "ai_design_acceleration": "AI can clean recordings and generate thumbnails or captions quickly.",
+      "ai_coding_acceleration": "medium",
+      "ai_design_acceleration": "high",
       "success_metrics": [
-        "30 outbound messages",
-        "3 serious replies",
-        "1 discovery call"
+        "30 prospects",
+        "10 tailored demos",
+        "3 reusable examples"
       ]
     },
     {
       "rank": 4,
-      "title": "Fix metadata, versioning, and first-run trust leaks",
-      "timeframe": "near_term",
-      "expected_impact": "medium_high",
+      "title": "Run outbound and close one paid pilot",
+      "expected_impact": "very_high",
       "implementation_effort": "medium",
       "dependencies": [
-        "None"
+        "offer",
+        "landing page",
+        "proof assets"
       ],
       "parallelizable": [
-        "Version cleanup",
-        "Manifest polish",
-        "First-run guidance",
-        "Marketplace asset creation"
+        "email outreach",
+        "follow-up templates",
+        "objection handling notes"
       ],
       "sequential_dependencies": [
-        "Public listing refresh should follow the final messaging and proof assets"
+        "Implementation work should only start after real prospect engagement."
       ],
-      "ai_coding_acceleration": "AI can handle manifest, options, and onboarding work quickly.",
-      "ai_design_acceleration": "AI can produce listing images and trust graphics quickly.",
+      "ai_coding_acceleration": "low",
+      "ai_design_acceleration": "low",
       "success_metrics": [
-        "Consistent public version story",
-        "Stronger install and outreach credibility"
+        "30 contacts",
+        "3 serious replies",
+        "1 discovery call",
+        "1 paid pilot"
       ]
     },
     {
       "rank": 5,
-      "title": "Only extract a snippet or public package after sales evidence",
-      "timeframe": "medium_term",
-      "expected_impact": "medium",
+      "title": "Turn the first pilot into proof and decide the next product path",
+      "expected_impact": "high",
       "implementation_effort": "medium",
       "dependencies": [
-        "Pilot interest or explicit prospect demand"
+        "first pilot sale"
       ],
       "parallelizable": [
-        "Licensing decision",
-        "Embeddable-runtime scoping",
-        "Developer-facing packaging outline"
+        "case-study draft",
+        "testimonial request",
+        "reusable integration notes"
       ],
       "sequential_dependencies": [
-        "Do not fully productize before a pilot proves demand"
+        "Packaging decisions should follow actual buyer feedback."
       ],
-      "ai_coding_acceleration": "AI can accelerate runtime extraction once the target shape is clear.",
-      "ai_design_acceleration": "Secondary to engineering and sales learning.",
+      "ai_coding_acceleration": "medium",
+      "ai_design_acceleration": "medium",
       "success_metrics": [
-        "One prospect asks for deployable integration",
-        "One pilot shows productization is worth doing"
+        "1 testimonial",
+        "1 case study",
+        "clear decision between services-first and package-first"
       ]
     }
   ],
   "assumptions": [
-    "The missing docs/revenue-reviews/context directory means there is still no business ground truth for installs, traffic, or monetization constraints.",
-    "No hidden analytics, CRM, or billing system exists outside the repo unless the owner says otherwise.",
-    "Manual service delivery is acceptable for first revenue unless future context contradicts that.",
-    "Marketplace snippets and mirror pages are treated as public evidence, but some user-count numbers can vary slightly by locale or crawl date.",
-    "AI-assisted coding and AI-assisted design are available, so static-site work, page variants, and simple instrumentation can move quickly."
+    "The founder can use AI-assisted coding and AI-assisted design tools to move quickly.",
+    "A one-off fixed-fee pilot can be sold before building subscription infrastructure.",
+    "Target prospects will care more about international price comprehension than about having a full localization suite.",
+    "B2B outbound is acceptable unless later context files say otherwise."
   ],
   "risks": [
-    "The chosen niche may not care enough to pay for display-only currency hints.",
-    "Public version mismatch and weak trust surfaces may suppress installs and outbound response before the product itself is judged.",
-    "Performance or false-positive issues on live pilot pages would hurt delivery and credibility.",
-    "A premature package or snippet extraction could create work before demand is real.",
-    "Launching a premium consumer tier before traction would likely fail and could create bad reviews faster."
+    "No one may care enough to pay for page-layer currency hints.",
+    "Prospects may actually want full localization or checkout changes, which FX Inline does not currently provide.",
+    "Performance or accuracy issues on a live prospect page could kill trust quickly.",
+    "Zero-review public trust and inconsistent versioning may hurt reply rates."
   ],
-  "sources": [
+  "competitor_list_additions_or_changes": [
     {
-      "title": "FX Inline Firefox listing",
-      "url": "https://addons.mozilla.org/en-US/firefox/addon/fx-inline/"
+      "type": "added",
+      "id": "pricetip",
+      "name": "PriceTip",
+      "why_it_matters": "Direct browser competitor with strong rating, hover-first UX, and clear privacy story."
     },
     {
-      "title": "FX Inline Firefox reviews",
-      "url": "https://addons.mozilla.org/en-US/firefox/addon/fx-inline/reviews/"
+      "type": "added",
+      "id": "minimal_currency_converter",
+      "name": "Minimal Currency Converter",
+      "why_it_matters": "Trust-focused competitor that leans on open source and zero permissions."
     },
     {
-      "title": "FX Inline Firefox listing (ru)",
-      "url": "https://addons.mozilla.org/ru/firefox/addon/fx-inline/"
+      "type": "added",
+      "id": "reta",
+      "name": "RETA",
+      "why_it_matters": "Adjacent shopping assistant that sells comparison math and privacy better than FX utilities do."
     },
     {
-      "title": "FX Inline on Extpose",
-      "url": "https://extpose.com/ext/cicoldboionelecmpjpkkdhicjbpfefj"
+      "type": "added",
+      "id": "amazonsaver",
+      "name": "AmazonSaver",
+      "why_it_matters": "Narrow cross-market shopping wedge with clearer ROI than generic conversion."
     },
     {
-      "title": "Currency.Wiki pricing",
-      "url": "https://currency.wiki/pricing"
-    },
-    {
-      "title": "Click Currency Chrome listing",
-      "url": "https://chromewebstore.google.com/detail/click-currency/abbmjlpgpmmkgfhdbbnbhbkacbkbfnbe?hl=en"
-    },
-    {
-      "title": "Click Currency website",
-      "url": "https://clickcurrency.co/"
-    },
-    {
-      "title": "Universal Automatic Currency Converter Firefox listing",
-      "url": "https://addons.mozilla.org/en-US/firefox/addon/ua-currency-converter/"
-    },
-    {
-      "title": "Universal Automatic Currency Converter Firefox reviews",
-      "url": "https://addons.mozilla.org/addon/ua-currency-converter/reviews/"
-    },
-    {
-      "title": "Direct Currency Converter Chrome listing",
-      "url": "https://chromewebstore.google.com/detail/direct-currency-converter/hgdfddnhgpincbchioebogaljemgkpgl"
-    },
-    {
-      "title": "Direct Currency Converter Firefox listing",
-      "url": "https://addons.mozilla.org/en-US/firefox/addon/direct-currency-converter-2/"
-    },
-    {
-      "title": "Direct Currency Converter Firefox reviews",
-      "url": "https://addons.mozilla.org/en-US/firefox/addon/direct-currency-converter-2/reviews/"
-    },
-    {
-      "title": "Rapid Currency Converter Chrome listing",
-      "url": "https://chromewebstore.google.com/detail/rapid-currency-converter/cbbfphmmpeojhblmcbnkedcfbocnmlkm"
-    },
-    {
-      "title": "Currency Converter PRO Chrome listing",
-      "url": "https://chromewebstore.google.com/detail/currency-converter-pro/amlcmfdiddkikfmljhdhhookgjmnpedc?hl=en"
-    },
-    {
-      "title": "CurrencyOS official site",
-      "url": "https://currencyos.pro/"
-    },
-    {
-      "title": "In-line Currency Converter Firefox listing",
-      "url": "https://addons.mozilla.org/en-US/firefox/addon/in-line-currency-converter/"
-    },
-    {
-      "title": "In-line Currency Converter Firefox reviews",
-      "url": "https://addons.mozilla.org/ru/firefox/addon/in-line-currency-converter/reviews/"
-    },
-    {
-      "title": "Currency Converter Injector Firefox listing",
-      "url": "https://addons.mozilla.org/en-US/firefox/addon/currency-converter-injector/"
-    },
-    {
-      "title": "Currency Converter Injector Firefox reviews",
-      "url": "https://addons.mozilla.org/en-US/firefox/addon/currency-converter-injector/reviews/"
-    },
-    {
-      "title": "Xe Currency Converter & Price Switcher Firefox listing",
-      "url": "https://addons.mozilla.org/en-US/firefox/addon/xe-currency-converter/"
-    },
-    {
-      "title": "Xe Currency Converter & Price Switcher Firefox reviews",
-      "url": "https://addons.mozilla.org/ru/firefox/addon/xe-currency-converter/reviews/"
-    },
-    {
-      "title": "Converter.app launch thread on Reddit",
-      "url": "https://www.reddit.com/r/chrome_extensions/comments/1snidrp/i_made_a_currency_converter_browser_extension/"
-    },
-    {
-      "title": "Converter.app Firefox launch thread on Reddit",
-      "url": "https://www.reddit.com/r/firefox/comments/1snyid5/i_made_a_rightclick_currency_converter_adon_for/"
-    },
-    {
-      "title": "CVC Shopify listing",
-      "url": "https://apps.shopify.com/convercy"
-    },
-    {
-      "title": "CVC Shopify reviews",
-      "url": "https://apps.shopify.com/convercy/reviews"
-    },
-    {
-      "title": "MLV Shopify listing",
-      "url": "https://apps.shopify.com/country-pricing-auto-switch"
-    },
-    {
-      "title": "MLV Shopify reviews",
-      "url": "https://apps.shopify.com/country-pricing-auto-switch/reviews"
-    },
-    {
-      "title": "Wise partnerships program",
-      "url": "https://wise.com/gb/affiliate-program"
-    },
-    {
-      "title": "Wise affiliate help article",
-      "url": "https://wise.com/help/articles/2978038/whats-the-wise-affiliate-program"
-    },
-    {
-      "title": "XE Currency Data API pricing",
-      "url": "https://www.xe.com/business/xecurrencydata/"
-    },
-    {
-      "title": "Travelpayouts overview",
-      "url": "https://support.travelpayouts.com/hc/en-us/articles/4407822199954-All-about-Travelpayouts"
+      "type": "updated",
+      "id": "savely",
+      "name": "Savely",
+      "why_it_matters": "Reverified affiliate-driven shopping assistant with clear direct-savings framing."
     }
-  ],
-  "competitor_changes": [
-    "Added Rapid Currency Converter as a newly tracked direct competitor with hover and formatting-centric shopper UX.",
-    "Added Currency Converter PRO as a high-traction substitute extension showing that broad utility plus strong ratings can win install intent.",
-    "Added Shopify localization substitutes CVC and MLV to the canonical competitor set because they compete for merchant budget, not just user attention.",
-    "Tracked a fresh Converter.app extension launch on Reddit on 2026-04-16 and 2026-04-17 as evidence that new entrants still see this category as open.",
-    "FX Inline public metadata remains inconsistent across repo source, generated artifacts, Firefox listings, and Chrome mirror surfaces."
   ],
   "review_themes_and_sentiment_findings": {
     "positive_themes": [
-      "Users value staying on the page and avoiding tab switching.",
-      "Hybrid auto-plus-manual conversion models are well received.",
-      "Privacy, local storage, and minimal permissions help when the core UX works.",
-      "Merchants like location-based pricing and responsive onboarding support."
+      "Inline conversion preserves browsing flow.",
+      "Hover, highlight, and right-click conversion feel natural.",
+      "No-account and local-settings messaging helps.",
+      "Merchant buyers reward responsive support."
     ],
     "negative_themes": [
-      "Complicated setup creates immediate frustration.",
-      "Wrong values or weak defaults destroy trust quickly.",
-      "CPU or memory overload on dynamic sites creates harsh feedback.",
-      "Highlight styles and number formatting can hurt readability.",
-      "Weak mobile support is punished in the ecommerce app market."
+      "Confusing setup gets punished fast.",
+      "Wrong values or stale rates destroy trust.",
+      "Performance problems on dynamic pages create harsh feedback.",
+      "State resets, save bugs, and unreadable highlight styles hurt retention."
     ],
     "feature_requests": [
-      "More currencies and symbol coverage",
-      "Better frequent-currency defaults",
-      "Highlight or display-style controls",
-      "Tax or fee adjustments",
-      "Mobile support",
-      "Allowlist or blocklist controls"
+      "tax or fee handling",
+      "more currencies and symbols",
+      "display and highlight controls",
+      "allowlist or blocklist controls",
+      "better preferred-currency setup",
+      "multi-currency view"
     ],
     "trust_concerns": [
-      "Exposed API keys were explicitly called out in competitor reviews.",
-      "Data collection declarations matter even for small extensions.",
-      "FX Inline still has no review proof and no visible public support surface.",
-      "Version mismatch makes the project look less reliable than the code actually is."
+      "Users notice broad permissions and PII disclosures.",
+      "Users notice exposed API keys.",
+      "FX Inline still has no review proof and no strong public support surface."
     ],
     "revenue_relevant_insights": [
-      "Simplicity, accuracy, and performance drive reviews more than feature breadth.",
-      "Support quality is a major part of perceived value for localization buyers.",
-      "A weak trust surface will hurt both installs and B2B outreach.",
-      "The current extension is better used as proof for selling than as a paid consumer product."
+      "Simplicity is a conversion feature in this category.",
+      "Accuracy is a trust feature in this category.",
+      "Performance is a rating feature in this category.",
+      "Support is a monetization feature for merchant-facing localization products."
     ]
   },
   "missing_context_inputs": [
-    "Actual installs by browser from real dashboards",
-    "Website traffic and sources",
-    "Install-to-activation conversion rate",
-    "Uninstall rate",
-    "Any existing waitlist, mailing list, or social audience",
-    "Whether manual services work is acceptable",
-    "Whether affiliate monetization is allowed",
-    "Any private customer feedback or support emails",
-    "Who controls store-listing updates and assets",
-    "Any target niche already preferred by the owner"
+    "Current install counts by store and week",
+    "Store-listing views and install conversion rates",
+    "Website traffic and referral-source data",
+    "Any support emails or user feedback from real FX Inline users",
+    "Explicit monetization constraints around ads, affiliate links, B2B sales, and analytics",
+    "Founder time budget and support capacity",
+    "Preferred target vertical or geography",
+    "Any known pages where the current extension works exceptionally well"
   ],
   "ai_execution_assumptions_used": [
-    "AI coding tools can parallelize the website rewrite, trust pages, CTA instrumentation, and lightweight onboarding work.",
-    "AI design tools can rapidly create screenshots, thumbnails, annotations, and demo visuals.",
-    "Parallel execution helps on implementation and content production, but wedge selection, buyer outreach, and closing the first pilot remain serial bottlenecks."
-  ]
+    "AI coding can accelerate the website rewrite, instrumentation, and pilot extraction work.",
+    "AI design can accelerate annotated screenshots, demo clips, and landing-page visuals.",
+    "Parallel delivery is realistic for repo audit, research, and asset production, but buyer discovery and closing still remain serial bottlenecks."
+  ],
+  "parallel_execution_used": true,
+  "parallel_workstreams": [
+    "repository audit",
+    "competitor discovery",
+    "marketplace and review mining",
+    "central synthesis"
+  ],
+  "sources": {
+    "repo": [
+      "package.json",
+      "wxt.config.ts",
+      "apps/extension/entrypoints/content/index.tsx",
+      "apps/extension/entrypoints/content/conversionRuntime.ts",
+      "apps/extension/entrypoints/content/inlineConversion.ts",
+      "apps/extension/entrypoints/popup/App.tsx",
+      "apps/extension/entrypoints/options/App.tsx",
+      "apps/extension/utils/appStorage.ts",
+      "apps/extension/utils/rates.ts",
+      "apps/website/index.html",
+      "apps/website/main.js",
+      "apps/website/playground.html",
+      "apps/website/playground.js",
+      "packages/currency-detection/package.json",
+      "packages/currency-detection/README.md",
+      "docs/SAAS_ROADMAP.md",
+      ".github/workflows/ci.yml",
+      ".github/workflows/currency-detection-benchmarks.yml",
+      ".github/workflows/architecture-diagrams.yml"
+    ],
+    "external": [
+      "https://addons.mozilla.org/en-US/firefox/addon/fx-inline/",
+      "https://addons.mozilla.org/en-US/firefox/addon/fx-inline/reviews/",
+      "https://extpose.com/ext/cicoldboionelecmpjpkkdhicjbpfefj",
+      "https://currency.wiki/pricing",
+      "https://currency.wiki/extensions/chrome",
+      "https://chromewebstore.google.com/detail/pricetip-%E2%80%94-currency-toolt/napifcagjkgokhhgfbagpcaedfdmikfk",
+      "https://chromewebstore.google.com/detail/click-currency/abbmjlpgpmmkgfhdbbnbhbkacbkbfnbe?hl=en",
+      "https://chromewebstore.google.com/detail/direct-currency-converter/hgdfddnhgpincbchioebogaljemgkpgl",
+      "https://chromewebstore.google.com/detail/rapid-currency-converter/cbbfphmmpeojhblmcbnkedcfbocnmlkm",
+      "https://chromewebstore.google.com/detail/minimal-currency-converte/meekoegodidgjomlhheckddffabnajpa",
+      "https://www.xe.com/en-us/xe-browser-extension/",
+      "https://www.getsavely.com/",
+      "https://chromewebstore.google.com/detail/savely-price-comparison-f/nikhaokjeplnpmiacenkhmbfoeondkga",
+      "https://retapp.ai/",
+      "https://amazonsaver.net/",
+      "https://apps.shopify.com/country-pricing-auto-switch",
+      "https://apps.shopify.com/country-pricing-auto-switch/reviews",
+      "https://apps.shopify.com/convercy",
+      "https://apps.shopify.com/convercy/reviews",
+      "https://wise.com/gb/affiliate-program/",
+      "https://support.travelpayouts.com/hc/en-us/articles/203955593-What-is-Travelpayouts-and-how-it-works",
+      "https://www.reddit.com/r/chrome_extensions/comments/1snidrp/i_made_a_currency_converter_browser_extension/",
+      "https://www.reddit.com/r/firefox/comments/1snyid5/i_made_a_rightclick_currency_converter_adon_for/"
+    ]
+  }
 }

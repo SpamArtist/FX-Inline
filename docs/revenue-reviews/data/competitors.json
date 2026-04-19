@@ -211,7 +211,7 @@
       "name": "BestPrice Assistant",
       "type": "adjacent_shopping_assistant",
       "first_seen": "2026-04-18",
-      "last_verified": "2026-04-18",
+      "last_verified": "2026-04-19",
       "pricing_model": "Free extension",
       "traction": "Chrome listing showed 4,000 users and 61 ratings at 4.8",
       "positioning": "Shopping assistant with price comparison, offers, store ratings, and automatic euro conversion",
@@ -230,7 +230,7 @@
       "name": "Savely",
       "type": "adjacent_shopping_assistant",
       "first_seen": "2026-04-18",
-      "last_verified": "2026-04-18",
+      "last_verified": "2026-04-19",
       "pricing_model": "Free extension with affiliate commissions",
       "traction": "Chrome listing showed 5,000 users and 24 ratings at 4.3",
       "positioning": "Real-time price comparison and savings while browsing",
@@ -378,6 +378,87 @@
         "Still another lightweight entrant in an easy-to-clone category"
       ],
       "fx_inline_takeaway": "The defensible layer is not the basic extension concept. It is trust, niche focus, and commercial packaging."
+    },
+    {
+      "id": "pricetip",
+      "name": "PriceTip",
+      "type": "direct_extension",
+      "first_seen": "2026-04-19",
+      "last_verified": "2026-04-19",
+      "pricing_model": "Free extension",
+      "traction": "Chrome Web Store showed 7,000 users and 141 ratings at 4.7",
+      "positioning": "Hover-first currency tooltip conversion with automatic rate updates and multilingual packaging",
+      "what_they_do_better": [
+        "Stronger public trust signals",
+        "Simple hover-first messaging",
+        "Clear privacy disclosure",
+        "Broader language reach"
+      ],
+      "what_they_do_worse": [
+        "Still a free utility without a clear business wedge",
+        "Narrower product ambition than a merchant-side offer"
+      ],
+      "fx_inline_takeaway": "Better packaging and clearer controls can outperform cleverer underlying tech."
+    },
+    {
+      "id": "minimal_currency_converter",
+      "name": "Minimal Currency Converter",
+      "type": "substitute_extension",
+      "first_seen": "2026-04-19",
+      "last_verified": "2026-04-19",
+      "pricing_model": "Free extension",
+      "traction": "Chrome Web Store showed 338 users and 13 ratings at 4.5",
+      "positioning": "Open-source, permission-light multi-currency popup with a minimal interface",
+      "what_they_do_better": [
+        "Transparency",
+        "No-permissions trust story",
+        "Open-source credibility"
+      ],
+      "what_they_do_worse": [
+        "Not inline-first",
+        "Less differentiated around page-layer localization"
+      ],
+      "fx_inline_takeaway": "FX Inline cannot claim zero permissions, so it needs to explain its runtime surface much better."
+    },
+    {
+      "id": "reta",
+      "name": "RETA",
+      "type": "adjacent_shopping_assistant",
+      "first_seen": "2026-04-19",
+      "last_verified": "2026-04-19",
+      "pricing_model": "Free Chrome extension",
+      "traction": "Official site was visible; no strong public install or rating signal was verified this run",
+      "positioning": "Private-by-design multi-store comparison with unit price, delivery, coupon-adjusted totals, and optional AI summaries",
+      "what_they_do_better": [
+        "Frames the outcome around better shopping decisions",
+        "Private-by-design copy",
+        "Clear comparison-first messaging"
+      ],
+      "what_they_do_worse": [
+        "No strong public traction proof verified this run",
+        "Broader product scope than a narrow FX wedge"
+      ],
+      "fx_inline_takeaway": "Comparison math and shopping outcomes are easier to market than generic FX conversion."
+    },
+    {
+      "id": "amazonsaver",
+      "name": "AmazonSaver",
+      "type": "adjacent_shopping_assistant",
+      "first_seen": "2026-04-19",
+      "last_verified": "2026-04-19",
+      "pricing_model": "Free browser extension",
+      "traction": "Official site claims support for 10+ Amazon Europe stores and a 5.0 user rating; independent install volume was not verified this run",
+      "positioning": "Cross-market Amazon Europe comparison with automatic currency conversion and explicit savings framing",
+      "what_they_do_better": [
+        "Very clear wedge",
+        "Obvious ROI story",
+        "Easy before-and-after narrative"
+      ],
+      "what_they_do_worse": [
+        "Narrower use case",
+        "Site-claim traction rather than strong independently verified marketplace proof"
+      ],
+      "fx_inline_takeaway": "A narrow wedge with visible savings can be easier to sell than a generic browser utility."
     }
   ]
 }
