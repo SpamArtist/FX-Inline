@@ -1,0 +1,164 @@
+{
+  "date": "2026-04-19",
+  "project": "FX Inline",
+  "summary": "Public review and sentiment data still says the same thing: users reward on-page convenience, accuracy, and low-friction setup, and they punish performance problems, unreadable highlights, weak defaults, and poor support. FX Inline still has no public review proof of its own.",
+  "surfaces": [
+    {
+      "product": "FX Inline",
+      "surface": "Firefox Add-ons",
+      "url": "https://addons.mozilla.org/en-US/firefox/addon/fx-inline/reviews/",
+      "rating": 0,
+      "review_count": 0,
+      "user_count": null,
+      "notes": "No public review proof."
+    },
+    {
+      "product": "FX Inline",
+      "surface": "Chrome Web Store mirror (Extpose)",
+      "url": "https://extpose.com/ext/cicoldboionelecmpjpkkdhicjbpfefj",
+      "rating": 0,
+      "review_count": 0,
+      "user_count": 0,
+      "notes": "Mirror still surfaces 0 installs and 0 votes."
+    },
+    {
+      "product": "Universal Automatic Currency Converter",
+      "surface": "Firefox Add-ons reviews",
+      "url": "https://addons.mozilla.org/addon/ua-currency-converter/reviews/",
+      "rating": 4.2,
+      "review_count": 74,
+      "user_count": 720,
+      "notes": "Positive theme: auto and click-mode flexibility. Negative themes: setup complexity, nonsense conversions, CPU and memory overload on dynamic pages."
+    },
+    {
+      "product": "Direct Currency Converter",
+      "surface": "Firefox Add-ons reviews",
+      "url": "https://addons.mozilla.org/en-US/firefox/addon/direct-currency-converter-2/reviews/",
+      "rating": 3.5,
+      "review_count": 28,
+      "user_count": 188,
+      "notes": "Positive theme: useful for auto conversion. Negative themes: save behavior breaks, currency selection is messy, settings list is hard to use, some wrong-value complaints remain."
+    },
+    {
+      "product": "Currency Converter Injector",
+      "surface": "Firefox Add-ons reviews",
+      "url": "https://addons.mozilla.org/en-US/firefox/addon/currency-converter-injector/reviews/",
+      "rating": 5,
+      "review_count": 2,
+      "user_count": 11,
+      "notes": "Sharp signal despite low scale: a reviewer explicitly called out exposed API keys and another asked for R$ BRL support."
+    },
+    {
+      "product": "In-line Currency Converter",
+      "surface": "Firefox Add-ons listing and reviews",
+      "url": "https://addons.mozilla.org/en-US/firefox/addon/in-line-currency-converter/",
+      "rating": 4,
+      "review_count": 6,
+      "user_count": 29,
+      "notes": "Positive theme: privacy-first and does the core job. Review requests: remove or soften highlight styles, include taxes, support more currencies."
+    },
+    {
+      "product": "Xe Currency Converter & Price Switcher",
+      "surface": "Firefox Add-ons listing and reviews",
+      "url": "https://addons.mozilla.org/en-US/firefox/addon/xe-currency-converter/",
+      "rating": 3,
+      "review_count": 1,
+      "user_count": 188,
+      "notes": "Complaint focused on bad defaults and repeated manual currency selection, despite strong parent-brand trust."
+    },
+    {
+      "product": "MLV Multi Country Pricing",
+      "surface": "Shopify App Store reviews",
+      "url": "https://apps.shopify.com/country-pricing-auto-switch/reviews",
+      "rating": 4.6,
+      "review_count": 406,
+      "user_count": null,
+      "notes": "Strong positive themes: location-based pricing, multi-country setup, and responsive support. Negative signal: merchant complaints become severe when compatibility issues hurt orders."
+    },
+    {
+      "product": "CVC - Multi Currency Converter",
+      "surface": "Shopify App Store reviews",
+      "url": "https://apps.shopify.com/convercy/reviews",
+      "rating": 4.5,
+      "review_count": 146,
+      "user_count": null,
+      "notes": "Positive themes: easy setup, localization value, fast support. Negative signal: a review explicitly complained that the switcher did not work on mobile."
+    },
+    {
+      "product": "Converter.app currency extension",
+      "surface": "Reddit launch threads",
+      "url": "https://www.reddit.com/r/chrome_extensions/comments/1snidrp/i_made_a_currency_converter_browser_extension/",
+      "rating": null,
+      "review_count": null,
+      "user_count": null,
+      "notes": "New launch copy emphasizes right-click conversion, no context switching, and live charts via a broader conversion platform."
+    },
+    {
+      "product": "Category-level user sentiment",
+      "surface": "Reddit discussions",
+      "url": "https://www.reddit.com/r/browsers/comments/1q4bl98/any_browser_or_extension_that_has_operas/",
+      "rating": null,
+      "review_count": null,
+      "user_count": null,
+      "notes": "Users explicitly ask for highlight-to-convert behavior with minimal clicks and care strongly about preserving browsing flow."
+    }
+  ],
+  "themes": {
+    "positive_themes": [
+      "Users value seeing converted prices without leaving the current page.",
+      "Privacy and local-storage messaging helps when it is simple and believable.",
+      "Hybrid auto plus manual conversion modes are appreciated.",
+      "Merchant buyers reward strong onboarding support and fast issue resolution."
+    ],
+    "negative_themes": [
+      "Complicated setup gets punished immediately.",
+      "Wrong values or bad currency defaults kill trust.",
+      "Performance issues on dynamic pages create strong negative reactions.",
+      "Unreadable highlight treatments and poor display choices hurt usability.",
+      "Weak mobile behavior is unacceptable in ecommerce localization contexts."
+    ],
+    "feature_requests": [
+      "More currencies and symbols",
+      "Highlight and display-style controls",
+      "Tax or fee handling",
+      "Frequent-currency defaults or presets",
+      "Mobile support",
+      "Allowlist or blocklist controls"
+    ],
+    "trust_concerns": [
+      "Exposed API keys were explicitly called out in public review text.",
+      "Users expect transparent privacy and permission explanations.",
+      "FX Inline still has no review proof and no public support surface."
+    ],
+    "revenue_relevant_insights": [
+      "Simplicity is a conversion feature in this category.",
+      "Accuracy is a trust feature in this category.",
+      "Performance is a rating feature in this category.",
+      "White-glove support is a monetization feature for merchant-facing localization products."
+    ]
+  },
+  "non_marketplace_signals": [
+    {
+      "surface": "Reddit",
+      "url": "https://www.reddit.com/r/FirefoxAddons/comments/1p8p6yf/forex_buddy_personal_forex_currency_converter/",
+      "insight": "A commenter called out unclear instructions even though the UI looked clean. Setup clarity remains a weak point across the category."
+    },
+    {
+      "surface": "Reddit",
+      "url": "https://www.reddit.com/r/chrome_extensions/comments/1pwb1z5/i_finally_built_a_chrome_extension_to_stop_doing/",
+      "insight": "A reply pointed a new extension creator toward review-exchange tooling, which is a reminder that zero-review cold-start friction is real."
+    },
+    {
+      "surface": "Reddit",
+      "url": "https://www.reddit.com/r/SideProject/comments/1qea9it/an_extension_that_converts_any_foreign_currency/",
+      "insight": "Launch copy leaned heavily on no tracking, no ads, and local processing. Privacy is being sold as a feature, not just as compliance."
+    }
+  ],
+  "review_driven_recommendations": [
+    "Do not launch paid consumer gating before public trust, ratings, and defaults improve.",
+    "Make onboarding and preferred-currency setup much more obvious and faster.",
+    "Explain permissions, local storage, and display-only behavior on the website and listings.",
+    "Keep site controls simple and only add complexity where a real pilot or review pattern justifies it.",
+    "Use support quality as part of the B2B offer instead of treating support as an afterthought."
+  ]
+}

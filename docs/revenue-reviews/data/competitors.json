@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-04-18",
+  "updated_at": "2026-04-19",
   "project": "FX Inline",
   "notes": [
     "Registry maintained from repo-backed revenue reviews.",
@@ -11,9 +11,9 @@
       "name": "Click Currency",
       "type": "direct_extension",
       "first_seen": "2026-04-17",
-      "last_verified": "2026-04-18",
+      "last_verified": "2026-04-19",
       "pricing_model": "Freemium extension with pay-what-you-want lifetime premium",
-      "traction": "Chrome listing showed 384 users and 22 ratings at 2.0",
+      "traction": "Current Chrome listing still shows roughly mid-300 users and 21 ratings at 2.0",
       "positioning": "Right-click currency conversion for shopping, SaaS pricing, travel, and browsing",
       "what_they_do_better": [
         "Actually asks users to pay",
@@ -32,9 +32,9 @@
       "name": "Currency.Wiki Extension",
       "type": "direct_extension",
       "first_seen": "2026-04-18",
-      "last_verified": "2026-04-18",
+      "last_verified": "2026-04-19",
       "pricing_model": "Freemium with Extension Pro at 7.95 USD/month plus paid credit packs",
-      "traction": "Chrome store snippet showed roughly 60,000 users and 4.8 rating",
+      "traction": "Official pricing still supports a real paid extension motion; Chrome store snippet still showed roughly 60,000 users and a 4.8 rating",
       "positioning": "Cross-browser currency platform with in-page conversion, AI scans, website tools, and document conversion",
       "what_they_do_better": [
         "Real monetization architecture",
@@ -53,7 +53,7 @@
       "name": "Chrome Currency Converter",
       "type": "direct_extension",
       "first_seen": "2026-04-18",
-      "last_verified": "2026-04-18",
+      "last_verified": "2026-04-19",
       "pricing_model": "Free extension",
       "traction": "Chrome listing showed 40,000 users and 1.5K ratings at 3.6",
       "positioning": "Automatic in-page conversion with whitelist or blacklist, fee and tax adjustments, popup converter, and many options",
@@ -73,9 +73,9 @@
       "name": "Universal Automatic Currency Converter",
       "type": "direct_extension",
       "first_seen": "2026-04-18",
-      "last_verified": "2026-04-18",
+      "last_verified": "2026-04-19",
       "pricing_model": "Free extension",
-      "traction": "Chrome listing showed 7,000 users and 123 ratings at 4.2; Firefox listing showed 732 users and 73 reviews at 4.2",
+      "traction": "Chrome listing showed about 6,000 users and 118 ratings at 4.2; Firefox listing showed 720 users and 74 reviews at 4.2",
       "positioning": "Highly customizable automatic conversion for all browsing needs",
       "what_they_do_better": [
         "Customization depth",
@@ -94,9 +94,9 @@
       "name": "Direct Currency Converter",
       "type": "direct_extension",
       "first_seen": "2026-04-18",
-      "last_verified": "2026-04-18",
+      "last_verified": "2026-04-19",
       "pricing_model": "Free extension with optional external API key path",
-      "traction": "Chrome listing showed 938 users and 83 ratings at 4.2",
+      "traction": "Chrome listing showed 875 users and 83 ratings at 4.2; Firefox listing showed 188 users and 28 reviews at 3.5",
       "positioning": "Automatic browsing conversion with tooltip details, force-currency mode, URL exclusion, and configurable sources",
       "what_they_do_better": [
         "Browsing-oriented feature set",
@@ -110,11 +110,31 @@
       "fx_inline_takeaway": "Site controls matter, but settings UX cannot be a mess."
     },
     {
+      "id": "rapid_currency_converter",
+      "name": "Rapid Currency Converter",
+      "type": "direct_extension",
+      "first_seen": "2026-04-19",
+      "last_verified": "2026-04-19",
+      "pricing_model": "Free extension",
+      "traction": "Chrome listing showed 293 users and 20 ratings at 4.3",
+      "positioning": "Hover, select, and quick on-page conversion with formatting controls and strong privacy framing",
+      "what_they_do_better": [
+        "Presents the value through shopper convenience",
+        "Ships format controls users can understand",
+        "Pairs on-page and popup conversion cleanly"
+      ],
+      "what_they_do_worse": [
+        "Still small",
+        "Not obviously differentiated beyond convenience UX"
+      ],
+      "fx_inline_takeaway": "Even small entrants package the value around shopping friction better than FX Inline's current copy."
+    },
+    {
       "id": "currencyos",
       "name": "CurrencyOS",
       "type": "direct_extension",
       "first_seen": "2026-04-18",
-      "last_verified": "2026-04-18",
+      "last_verified": "2026-04-19",
       "pricing_model": "Free extension",
       "traction": "Official site was visible; no strong public marketplace traction signal verified this run",
       "positioning": "Chrome extension with onboarding, hourly sync, omnibox conversion, popup conversion, and context-menu flow",
@@ -133,16 +153,16 @@
       "name": "Currency Converter Injector",
       "type": "direct_extension",
       "first_seen": "2026-04-18",
-      "last_verified": "2026-04-18",
+      "last_verified": "2026-04-19",
       "pricing_model": "Free extension",
-      "traction": "Firefox listing showed 15 users and 4.3 rating with 4 reviews",
+      "traction": "Firefox listing showed 11 users and 5 reviews at 4.0",
       "positioning": "Inject converted prices beside originals on any webpage",
       "what_they_do_better": [
         "Clear inline value proposition",
         "New entrant energy and direct use-case framing"
       ],
       "what_they_do_worse": [
-        "Review feedback raised API-key exposure and dynamic-page support issues",
+        "Public review text called out exposed API keys",
         "Tiny scale"
       ],
       "fx_inline_takeaway": "Security sloppiness gets noticed immediately, even at low scale."
@@ -152,12 +172,13 @@
       "name": "In-line Currency Converter",
       "type": "direct_extension",
       "first_seen": "2026-04-18",
-      "last_verified": "2026-04-18",
+      "last_verified": "2026-04-19",
       "pricing_model": "Free extension",
       "traction": "Firefox listing showed 29 users and 6 reviews at 4.0",
       "positioning": "Automatic webpage conversion plus right-click conversion",
       "what_they_do_better": [
         "Hybrid auto and manual model",
+        "Privacy-first messaging",
         "Positive sentiment when it solves the basic use case"
       ],
       "what_they_do_worse": [
@@ -171,7 +192,7 @@
       "name": "Xe Currency Converter & Price Switcher",
       "type": "direct_extension",
       "first_seen": "2026-04-18",
-      "last_verified": "2026-04-18",
+      "last_verified": "2026-04-19",
       "pricing_model": "Free extension tied to Xe brand",
       "traction": "Firefox listing showed 188 users and 1 review at 3.0",
       "positioning": "Brand-led toolbar and on-page conversion with live mid-market rates",
@@ -224,11 +245,71 @@
       "fx_inline_takeaway": "Affiliate and commerce-intent monetization are easier to explain than 'currency conversion' alone."
     },
     {
+      "id": "currency_converter_pro",
+      "name": "Currency Converter PRO",
+      "type": "substitute_extension",
+      "first_seen": "2026-04-19",
+      "last_verified": "2026-04-19",
+      "pricing_model": "Free extension",
+      "traction": "Chrome listing showed 30,000 users and 710 ratings at 4.7",
+      "positioning": "Simple real-time currency converter with broad language coverage, crypto support, and flexible settings",
+      "what_they_do_better": [
+        "High trust from strong ratings",
+        "Cleaner mainstream utility framing",
+        "Broader language support"
+      ],
+      "what_they_do_worse": [
+        "Not inline-first",
+        "Less differentiated on page-layer localization"
+      ],
+      "fx_inline_takeaway": "A clean generic utility with strong ratings can still win the install battle."
+    },
+    {
+      "id": "mlv_multi_country_pricing",
+      "name": "MLV Multi Country Pricing",
+      "type": "ecommerce_localization_app",
+      "first_seen": "2026-04-19",
+      "last_verified": "2026-04-19",
+      "pricing_model": "29 USD/month app with free trial",
+      "traction": "Shopify App Store showed 4.6 from 406 reviews",
+      "positioning": "Country-specific prices, local currency display, and international market localization for Shopify merchants",
+      "what_they_do_better": [
+        "Clear merchant value tied to revenue outcomes",
+        "Large review proof",
+        "Support is treated as part of the product"
+      ],
+      "what_they_do_worse": [
+        "Heavier platform-specific scope",
+        "More complex merchant setup than FX Inline's possible wedge"
+      ],
+      "fx_inline_takeaway": "Merchant money flows to localization products that improve revenue, not to clever browser tech by itself."
+    },
+    {
+      "id": "cvc_multi_currency_converter",
+      "name": "CVC - Multi Currency Converter",
+      "type": "ecommerce_localization_app",
+      "first_seen": "2026-04-19",
+      "last_verified": "2026-04-19",
+      "pricing_model": "Free entry tier with broader localization offer",
+      "traction": "Shopify App Store showed roughly 146 reviews at 4.5",
+      "positioning": "Currency switcher, language translation, and geolocation-based localization for Shopify stores",
+      "what_they_do_better": [
+        "Clear localized-shopping proposition",
+        "Stronger mobile and merchant framing",
+        "Built-for-Shopify credibility"
+      ],
+      "what_they_do_worse": [
+        "Platform dependency",
+        "Wider scope than a fast page-layer wedge needs"
+      ],
+      "fx_inline_takeaway": "If FX Inline targets merchants, it must sell speed and low implementation friction, not generic localization features."
+    },
+    {
       "id": "xe_currency_data_api",
       "name": "XE Currency Data API",
       "type": "b2b_api_substitute",
       "first_seen": "2026-04-17",
-      "last_verified": "2026-04-18",
+      "last_verified": "2026-04-19",
       "pricing_model": "Paid B2B API from 799 USD/year to 4499 USD/year plus add-ons",
       "traction": "Enterprise-grade brand and pricing, used as proof of willingness to pay rather than direct extension competition",
       "positioning": "Reliable FX data infrastructure for business systems",
@@ -247,7 +328,7 @@
       "name": "Wise Partnerships",
       "type": "affiliate_substitute",
       "first_seen": "2026-04-17",
-      "last_verified": "2026-04-18",
+      "last_verified": "2026-04-19",
       "pricing_model": "Referral and partnership commissions",
       "traction": "Global brand with explicit partner and influencer programs",
       "positioning": "Monetize money-transfer and multi-currency financial intent",
@@ -266,7 +347,7 @@
       "name": "Travelpayouts",
       "type": "affiliate_substitute",
       "first_seen": "2026-04-17",
-      "last_verified": "2026-04-18",
+      "last_verified": "2026-04-19",
       "pricing_model": "Travel affiliate payouts and partner tools",
       "traction": "Large partner network used by travel publishers and creators",
       "positioning": "Monetize travel demand across flights, hotels, car rentals, insurance, and more",
@@ -278,6 +359,25 @@
         "Not solving inline conversion itself"
       ],
       "fx_inline_takeaway": "Travel intent can monetize, but FX Inline currently lacks the traffic engine to exploit it."
+    },
+    {
+      "id": "converter_app_currency_extension",
+      "name": "Converter.app Currency Extension",
+      "type": "new_launch_direct_extension",
+      "first_seen": "2026-04-19",
+      "last_verified": "2026-04-19",
+      "pricing_model": "Likely free extension tied to a broader converter.app platform",
+      "traction": "Fresh Reddit launch activity on April 16 and April 17, 2026; public traction not yet verified",
+      "positioning": "Right-click on-page currency conversion linked to a broader converter and charting platform",
+      "what_they_do_better": [
+        "Cross-sells from a broader utility platform",
+        "Frames the value around eliminating context switching"
+      ],
+      "what_they_do_worse": [
+        "No proven traction yet",
+        "Still another lightweight entrant in an easy-to-clone category"
+      ],
+      "fx_inline_takeaway": "The defensible layer is not the basic extension concept. It is trust, niche focus, and commercial packaging."
     }
   ]
 }

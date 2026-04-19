@@ -1,0 +1,160 @@
+{
+  "date": "2026-04-19",
+  "summary": "This run widened the tracked market beyond the obvious inline-converter clones. The biggest update is not a pricing change. It is the clearer pattern that revenue in this space goes to products with trust, onboarding, and a stronger commercial frame than FX Inline currently has. New additions include Rapid Currency Converter, Currency Converter PRO, Shopify localization substitutes, and a fresh Converter.app extension launch.",
+  "added_this_run": [
+    "rapid_currency_converter",
+    "currency_converter_pro",
+    "mlv_multi_country_pricing",
+    "cvc_multi_currency_converter",
+    "converter_app_currency_extension"
+  ],
+  "notable_changes": [
+    {
+      "id": "click_currency",
+      "change": "Current Chrome snippet still shows a weak commercial profile: roughly mid-300 users, 21 ratings, and a 2.0 rating while the site still sells a lifetime premium."
+    },
+    {
+      "id": "universal_automatic_currency_converter",
+      "change": "Firefox listing now surfaces 720 users and 74 reviews, and review snippets still complain about setup complexity, wrong values, and CPU or memory overload."
+    },
+    {
+      "id": "currency_converter_injector",
+      "change": "Firefox listing now shows 11 users and 5 reviews, and the public API-key criticism is still visible in review text."
+    },
+    {
+      "id": "fx_inline_public_metadata",
+      "change": "FX Inline public marketplace metadata remains inconsistent with repo source and generated artifact versions, which is now a serious trust liability."
+    }
+  ],
+  "newly_relevant_products_or_launches": [
+    {
+      "id": "converter_app_extension_launch",
+      "why_it_matters": "Fresh Reddit launch activity on April 16 and April 17, 2026 shows new entrants still see this category as open, and the launch is tied to a broader converter platform rather than a standalone extension.",
+      "sources": [
+        "https://www.reddit.com/r/chrome_extensions/comments/1snidrp/i_made_a_currency_converter_browser_extension/",
+        "https://www.reddit.com/r/firefox/comments/1snyid5/i_made_a_rightclick_currency_converter_adon_for/"
+      ]
+    }
+  ],
+  "competitors_reviewed": [
+    {
+      "id": "currency_wiki_extension",
+      "category": "direct_extension",
+      "traction": "Chrome store snippet showed roughly 60,000 users and a 4.8 rating",
+      "pricing_model": "Freemium with 7.95 USD/month Extension Pro and paid credit packs",
+      "why_it_matters": "Best current proof that browser-based currency conversion can be monetized seriously."
+    },
+    {
+      "id": "chrome_currency_converter",
+      "category": "direct_extension",
+      "traction": "Chrome listing showed 40,000 users and 1.5K ratings at 3.6",
+      "pricing_model": "Free",
+      "why_it_matters": "Large incumbent with middling ratings proves that feature breadth alone does not create love."
+    },
+    {
+      "id": "universal_automatic_currency_converter",
+      "category": "direct_extension",
+      "traction": "About 6,000 Chrome users plus 720 Firefox users",
+      "pricing_model": "Free",
+      "why_it_matters": "Reviews reveal the accuracy, setup, and performance problems buyers punish."
+    },
+    {
+      "id": "direct_currency_converter",
+      "category": "direct_extension",
+      "traction": "875 Chrome users and 83 ratings, plus 188 Firefox users and 28 reviews",
+      "pricing_model": "Free with optional external API-key path",
+      "why_it_matters": "Strong browsing-centric controls create ideas worth copying, but settings friction remains a warning."
+    },
+    {
+      "id": "click_currency",
+      "category": "direct_extension",
+      "traction": "Roughly mid-300 Chrome users and 21 ratings at 2.0",
+      "pricing_model": "Freemium plus pay-what-you-want lifetime premium",
+      "why_it_matters": "Monetization proof plus a warning that weak trust and weak ratings poison monetization."
+    },
+    {
+      "id": "rapid_currency_converter",
+      "category": "direct_extension",
+      "traction": "293 users and 20 ratings at 4.3",
+      "pricing_model": "Free",
+      "why_it_matters": "Shows there is still room for small entrants that package the value around shopper convenience."
+    },
+    {
+      "id": "currencyos",
+      "category": "direct_extension",
+      "traction": "Official site was visible; no strong public traction signal verified this run",
+      "pricing_model": "Free",
+      "why_it_matters": "Its onboarding story is stronger than FX Inline's current site even without obvious monetization."
+    },
+    {
+      "id": "currency_converter_injector",
+      "category": "direct_extension",
+      "traction": "11 Firefox users and 5 reviews at 4.0",
+      "pricing_model": "Free",
+      "why_it_matters": "Tiny scale but sharp review signals around security and missing currency support."
+    },
+    {
+      "id": "in_line_currency_converter",
+      "category": "direct_extension",
+      "traction": "29 Firefox users and 6 reviews at 4.0",
+      "pricing_model": "Free",
+      "why_it_matters": "Proves that privacy-first positioning and a hybrid auto-plus-manual model resonate even at low scale."
+    },
+    {
+      "id": "xe_currency_converter_switcher",
+      "category": "direct_extension",
+      "traction": "188 Firefox users and 1 review at 3.0",
+      "pricing_model": "Free brand-led extension",
+      "why_it_matters": "Brand strength does not rescue weak default UX."
+    },
+    {
+      "id": "currency_converter_pro",
+      "category": "substitute_extension",
+      "traction": "30,000 users and 710 ratings at 4.7",
+      "pricing_model": "Free",
+      "why_it_matters": "Strong ratings and a clean general utility can win the same install intent FX Inline hopes to capture."
+    },
+    {
+      "id": "mlv_multi_country_pricing",
+      "category": "ecommerce_localization_app",
+      "traction": "Shopify App Store shows 4.6 from 406 reviews and 29 USD/month pricing",
+      "pricing_model": "Paid monthly app with free trial",
+      "why_it_matters": "Strong proof that merchants pay for localization when it clearly improves international pricing display."
+    },
+    {
+      "id": "cvc_multi_currency_converter",
+      "category": "ecommerce_localization_app",
+      "traction": "Shopify App Store shows 4.5 from roughly 146 reviews with a free entry tier",
+      "pricing_model": "Free entry tier with broader localization offer",
+      "why_it_matters": "Competes for merchant budget and highlights the importance of mobile compatibility and support."
+    },
+    {
+      "id": "xe_currency_data_api",
+      "category": "b2b_api_substitute",
+      "traction": "Enterprise pricing benchmark",
+      "pricing_model": "Annual paid API plans",
+      "why_it_matters": "Validates B2B willingness to pay for currency infrastructure."
+    },
+    {
+      "id": "wise_partnerships",
+      "category": "affiliate_substitute",
+      "traction": "Global brand with active partner programs",
+      "pricing_model": "Referral commissions",
+      "why_it_matters": "Validates creator and affiliate monetization if traffic ever exists."
+    },
+    {
+      "id": "travelpayouts",
+      "category": "affiliate_substitute",
+      "traction": "Large travel partner network",
+      "pricing_model": "Affiliate payouts",
+      "why_it_matters": "Validates travel-intent monetization, but also shows how far FX Inline is from having a traffic engine."
+    },
+    {
+      "id": "converter_app_currency_extension",
+      "category": "new_launch_direct_extension",
+      "traction": "Fresh Reddit launch activity on April 16 and April 17, 2026; public traction not yet verified",
+      "pricing_model": "Likely free extension tied to a broader converter.app platform",
+      "why_it_matters": "Shows that broader-platform cross-sell may be a more viable angle than a naked standalone utility."
+    }
+  ]
+}
