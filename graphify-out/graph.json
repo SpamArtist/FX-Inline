@@ -156,7 +156,7 @@
       "source_file": "packages/currency-detection/src/magnitude-profiles.js",
       "source_location": "L1",
       "id": "packages_currency_detection_src_magnitude_profiles_js",
-      "community": 11,
+      "community": 10,
       "norm_label": "magnitude-profiles.js"
     },
     {
@@ -165,7 +165,7 @@
       "source_file": "packages/currency-detection/src/magnitude-profiles.js",
       "source_location": "L508",
       "id": "magnitude_profiles_normalizelocale",
-      "community": 11,
+      "community": 10,
       "norm_label": "normalizelocale()"
     },
     {
@@ -174,7 +174,7 @@
       "source_file": "packages/currency-detection/src/magnitude-profiles.js",
       "source_location": "L512",
       "id": "magnitude_profiles_normalizealias",
-      "community": 11,
+      "community": 10,
       "norm_label": "normalizealias()"
     },
     {
@@ -183,7 +183,7 @@
       "source_file": "packages/currency-detection/src/magnitude-profiles.js",
       "source_location": "L516",
       "id": "magnitude_profiles_getlocalecandidates",
-      "community": 11,
+      "community": 10,
       "norm_label": "getlocalecandidates()"
     },
     {
@@ -192,7 +192,7 @@
       "source_file": "packages/currency-detection/src/magnitude-profiles.js",
       "source_location": "L531",
       "id": "magnitude_profiles_dedupeprofiles",
-      "community": 11,
+      "community": 10,
       "norm_label": "dedupeprofiles()"
     },
     {
@@ -201,7 +201,7 @@
       "source_file": "packages/currency-detection/src/magnitude-profiles.js",
       "source_location": "L544",
       "id": "magnitude_profiles_buildprofilealiasmap",
-      "community": 11,
+      "community": 10,
       "norm_label": "buildprofilealiasmap()"
     },
     {
@@ -210,7 +210,7 @@
       "source_file": "packages/currency-detection/src/magnitude-profiles.js",
       "source_location": "L556",
       "id": "magnitude_profiles_mergeprofilealiasmaps",
-      "community": 11,
+      "community": 10,
       "norm_label": "mergeprofilealiasmaps()"
     },
     {
@@ -219,7 +219,7 @@
       "source_file": "packages/currency-detection/src/magnitude-profiles.js",
       "source_location": "L571",
       "id": "magnitude_profiles_getaliasmapcachekey",
-      "community": 11,
+      "community": 10,
       "norm_label": "getaliasmapcachekey()"
     },
     {
@@ -228,7 +228,7 @@
       "source_file": "packages/currency-detection/src/magnitude-profiles.js",
       "source_location": "L576",
       "id": "magnitude_profiles_getprofilesforlocalehint",
-      "community": 11,
+      "community": 10,
       "norm_label": "getprofilesforlocalehint()"
     },
     {
@@ -237,7 +237,7 @@
       "source_file": "packages/currency-detection/src/magnitude-profiles.js",
       "source_location": "L604",
       "id": "magnitude_profiles_buildaliasset",
-      "community": 11,
+      "community": 10,
       "norm_label": "buildaliasset()"
     },
     {
@@ -246,7 +246,7 @@
       "source_file": "packages/currency-detection/src/magnitude-profiles.js",
       "source_location": "L618",
       "id": "magnitude_profiles_validateextraprofiles",
-      "community": 11,
+      "community": 10,
       "norm_label": "validateextraprofiles()"
     },
     {
@@ -255,7 +255,7 @@
       "source_file": "packages/currency-detection/src/magnitude-profiles.js",
       "source_location": "L697",
       "id": "magnitude_profiles_createmagnitudealiasresolver",
-      "community": 11,
+      "community": 10,
       "norm_label": "createmagnitudealiasresolver()"
     },
     {
@@ -264,7 +264,7 @@
       "source_file": "packages/currency-detection/src/parser-core.js",
       "source_location": "L1",
       "id": "packages_currency_detection_src_parser_core_js",
-      "community": 9,
+      "community": 8,
       "norm_label": "parser-core.js"
     },
     {
@@ -273,7 +273,7 @@
       "source_file": "packages/currency-detection/src/parser-core.js",
       "source_location": "L101",
       "id": "parser_core_assertobjectorundefined",
-      "community": 9,
+      "community": 8,
       "norm_label": "assertobjectorundefined()"
     },
     {
@@ -282,7 +282,7 @@
       "source_file": "packages/currency-detection/src/parser-core.js",
       "source_location": "L108",
       "id": "parser_core_normalizecurrencycode",
-      "community": 9,
+      "community": 8,
       "norm_label": "normalizecurrencycode()"
     },
     {
@@ -291,7 +291,7 @@
       "source_file": "packages/currency-detection/src/parser-core.js",
       "source_location": "L123",
       "id": "parser_core_normalizelocalecachekey",
-      "community": 9,
+      "community": 8,
       "norm_label": "normalizelocalecachekey()"
     },
     {
@@ -300,7 +300,7 @@
       "source_file": "packages/currency-detection/src/parser-core.js",
       "source_location": "L127",
       "id": "parser_core_normalizemagnitudealias",
-      "community": 9,
+      "community": 8,
       "norm_label": "normalizemagnitudealias()"
     },
     {
@@ -309,7 +309,7 @@
       "source_file": "packages/currency-detection/src/parser-core.js",
       "source_location": "L131",
       "id": "parser_core_escaperegex",
-      "community": 9,
+      "community": 8,
       "norm_label": "escaperegex()"
     },
     {
@@ -318,7 +318,7 @@
       "source_file": "packages/currency-detection/src/parser-core.js",
       "source_location": "L135",
       "id": "parser_core_striptrailingplus",
-      "community": 9,
+      "community": 8,
       "norm_label": "striptrailingplus()"
     },
     {
@@ -327,7 +327,7 @@
       "source_file": "packages/currency-detection/src/parser-core.js",
       "source_location": "L139",
       "id": "parser_core_resolvelocalehint",
-      "community": 9,
+      "community": 8,
       "norm_label": "resolvelocalehint()"
     },
     {
@@ -336,7 +336,7 @@
       "source_file": "packages/currency-detection/src/parser-core.js",
       "source_location": "L144",
       "id": "parser_core_isusernamewordcharacter",
-      "community": 9,
+      "community": 8,
       "norm_label": "isusernamewordcharacter()"
     },
     {
@@ -345,7 +345,7 @@
       "source_file": "packages/currency-detection/src/parser-core.js",
       "source_location": "L148",
       "id": "parser_core_shouldskiplikelyusernamecurrencymatch",
-      "community": 9,
+      "community": 8,
       "norm_label": "shouldskiplikelyusernamecurrencymatch()"
     },
     {
@@ -354,7 +354,7 @@
       "source_file": "packages/currency-detection/src/parser-core.js",
       "source_location": "L176",
       "id": "parser_core_parseflexiblenumber",
-      "community": 9,
+      "community": 8,
       "norm_label": "parseflexiblenumber()"
     },
     {
@@ -363,7 +363,7 @@
       "source_file": "packages/currency-detection/src/parser-core.js",
       "source_location": "L275",
       "id": "parser_core_createcompiledconfig",
-      "community": 9,
+      "community": 8,
       "norm_label": "createcompiledconfig()"
     },
     {
@@ -372,7 +372,7 @@
       "source_file": "packages/currency-detection/src/parser-core.js",
       "source_location": "L818",
       "id": "parser_core_createcurrencyparser",
-      "community": 9,
+      "community": 8,
       "norm_label": "createcurrencyparser()"
     },
     {
@@ -660,7 +660,7 @@
       "source_file": "apps/extension/utils/magnitudeProfiles.ts",
       "source_location": "L1",
       "id": "apps_extension_utils_magnitudeprofiles_ts",
-      "community": 12,
+      "community": 11,
       "norm_label": "magnitudeprofiles.ts"
     },
     {
@@ -669,7 +669,7 @@
       "source_file": "apps/extension/utils/magnitudeProfiles.ts",
       "source_location": "L515",
       "id": "magnitudeprofiles_normalizelocale",
-      "community": 12,
+      "community": 11,
       "norm_label": "normalizelocale()"
     },
     {
@@ -678,7 +678,7 @@
       "source_file": "apps/extension/utils/magnitudeProfiles.ts",
       "source_location": "L519",
       "id": "magnitudeprofiles_getlocalecandidates",
-      "community": 12,
+      "community": 11,
       "norm_label": "getlocalecandidates()"
     },
     {
@@ -687,7 +687,7 @@
       "source_file": "apps/extension/utils/magnitudeProfiles.ts",
       "source_location": "L534",
       "id": "magnitudeprofiles_dedupeprofiles",
-      "community": 12,
+      "community": 11,
       "norm_label": "dedupeprofiles()"
     },
     {
@@ -696,7 +696,7 @@
       "source_file": "apps/extension/utils/magnitudeProfiles.ts",
       "source_location": "L547",
       "id": "magnitudeprofiles_getprofilesforlocalehint",
-      "community": 12,
+      "community": 11,
       "norm_label": "getprofilesforlocalehint()"
     },
     {
@@ -705,7 +705,7 @@
       "source_file": "apps/extension/utils/magnitudeProfiles.ts",
       "source_location": "L578",
       "id": "magnitudeprofiles_normalizealias",
-      "community": 12,
+      "community": 11,
       "norm_label": "normalizealias()"
     },
     {
@@ -714,7 +714,7 @@
       "source_file": "apps/extension/utils/magnitudeProfiles.ts",
       "source_location": "L582",
       "id": "magnitudeprofiles_buildprofilealiasmap",
-      "community": 12,
+      "community": 11,
       "norm_label": "buildprofilealiasmap()"
     },
     {
@@ -723,7 +723,7 @@
       "source_file": "apps/extension/utils/magnitudeProfiles.ts",
       "source_location": "L600",
       "id": "magnitudeprofiles_mergeprofilealiasmaps",
-      "community": 12,
+      "community": 11,
       "norm_label": "mergeprofilealiasmaps()"
     },
     {
@@ -732,7 +732,7 @@
       "source_file": "apps/extension/utils/magnitudeProfiles.ts",
       "source_location": "L615",
       "id": "magnitudeprofiles_getaliasmapcachekey",
-      "community": 12,
+      "community": 11,
       "norm_label": "getaliasmapcachekey()"
     },
     {
@@ -741,7 +741,7 @@
       "source_file": "apps/extension/utils/magnitudeProfiles.ts",
       "source_location": "L620",
       "id": "magnitudeprofiles_getmagnitudealiasmap",
-      "community": 12,
+      "community": 11,
       "norm_label": "getmagnitudealiasmap()"
     },
     {
@@ -957,7 +957,7 @@
       "source_file": "/Users/xbotpc/Desktop/XBOTPC/Work/Code/currency-conversion-extension-tool-codex-78e0/apps/extension/utils/utils.ts",
       "source_location": "L698",
       "id": "utils_maycontaincurrencytoken",
-      "community": 8,
+      "community": 7,
       "norm_label": "maycontaincurrencytoken()"
     },
     {
@@ -1236,7 +1236,7 @@
       "source_file": "apps/extension/utils/currencyPresentation.ts",
       "source_location": "L1",
       "id": "apps_extension_utils_currencypresentation_ts",
-      "community": 7,
+      "community": 6,
       "norm_label": "currencypresentation.ts"
     },
     {
@@ -1245,7 +1245,7 @@
       "source_file": "apps/extension/utils/currencyPresentation.ts",
       "source_location": "L12",
       "id": "currencypresentation_getdisplaynames",
-      "community": 7,
+      "community": 6,
       "norm_label": "getdisplaynames()"
     },
     {
@@ -1254,7 +1254,7 @@
       "source_file": "apps/extension/utils/currencyPresentation.ts",
       "source_location": "L28",
       "id": "currencypresentation_resolvelocale",
-      "community": 7,
+      "community": 6,
       "norm_label": "resolvelocale()"
     },
     {
@@ -1263,7 +1263,7 @@
       "source_file": "apps/extension/utils/currencyPresentation.ts",
       "source_location": "L32",
       "id": "currencypresentation_getcurrencydisplayname",
-      "community": 7,
+      "community": 6,
       "norm_label": "getcurrencydisplayname()"
     },
     {
@@ -1272,7 +1272,7 @@
       "source_file": "apps/extension/utils/currencyPresentation.ts",
       "source_location": "L55",
       "id": "currencypresentation_getcurrencyicon",
-      "community": 7,
+      "community": 6,
       "norm_label": "getcurrencyicon()"
     },
     {
@@ -1281,7 +1281,7 @@
       "source_file": "apps/extension/utils/currencyPresentation.ts",
       "source_location": "L61",
       "id": "currencypresentation_isamountdraftvalid",
-      "community": 7,
+      "community": 6,
       "norm_label": "isamountdraftvalid()"
     },
     {
@@ -1290,7 +1290,7 @@
       "source_file": "apps/extension/utils/currencyPresentation.ts",
       "source_location": "L65",
       "id": "currencypresentation_getnextamountdraft",
-      "community": 7,
+      "community": 6,
       "norm_label": "getnextamountdraft()"
     },
     {
@@ -1299,7 +1299,7 @@
       "source_file": "apps/extension/utils/currencyPresentation.ts",
       "source_location": "L69",
       "id": "currencypresentation_commitamountdraft",
-      "community": 7,
+      "community": 6,
       "norm_label": "commitamountdraft()"
     },
     {
@@ -1308,7 +1308,7 @@
       "source_file": "apps/extension/utils/currencyPresentation.ts",
       "source_location": "L76",
       "id": "currencypresentation_cancelamountedit",
-      "community": 7,
+      "community": 6,
       "norm_label": "cancelamountedit()"
     },
     {
@@ -1434,7 +1434,7 @@
       "source_file": "apps/extension/components/CurrencyBox/CurrencyBox.tsx",
       "source_location": "L1",
       "id": "apps_extension_components_currencybox_currencybox_tsx",
-      "community": 7,
+      "community": 6,
       "norm_label": "currencybox.tsx"
     },
     {
@@ -1443,7 +1443,7 @@
       "source_file": "apps/extension/components/CurrencyBox/CurrencyBox.tsx",
       "source_location": "L65",
       "id": "currencybox_beginamountedit",
-      "community": 7,
+      "community": 6,
       "norm_label": "beginamountedit()"
     },
     {
@@ -1452,7 +1452,7 @@
       "source_file": "apps/extension/components/CurrencyBox/CurrencyBox.tsx",
       "source_location": "L73",
       "id": "currencybox_handleamountchange",
-      "community": 7,
+      "community": 6,
       "norm_label": "handleamountchange()"
     },
     {
@@ -1461,7 +1461,7 @@
       "source_file": "apps/extension/components/CurrencyBox/CurrencyBox.tsx",
       "source_location": "L84",
       "id": "currencybox_finalizeamountedit",
-      "community": 7,
+      "community": 6,
       "norm_label": "finalizeamountedit()"
     },
     {
@@ -1470,7 +1470,7 @@
       "source_file": "apps/extension/components/CurrencyBox/CurrencyBox.tsx",
       "source_location": "L100",
       "id": "currencybox_revertamountedit",
-      "community": 7,
+      "community": 6,
       "norm_label": "revertamountedit()"
     },
     {
@@ -1479,7 +1479,7 @@
       "source_file": "apps/extension/components/CurrencyBox/CurrencyBox.tsx",
       "source_location": "L108",
       "id": "currencybox_onamountinputkeydown",
-      "community": 7,
+      "community": 6,
       "norm_label": "onamountinputkeydown()"
     },
     {
@@ -2595,7 +2595,7 @@
       "source_file": "apps/website/playground.js",
       "source_location": "L1",
       "id": "apps_website_playground_js",
-      "community": 8,
+      "community": 7,
       "norm_label": "playground.js"
     },
     {
@@ -2604,7 +2604,7 @@
       "source_file": "apps/website/playground.js",
       "source_location": "L40",
       "id": "playground_getlocalehint",
-      "community": 8,
+      "community": 7,
       "norm_label": "getlocalehint()"
     },
     {
@@ -2613,7 +2613,7 @@
       "source_file": "apps/website/playground.js",
       "source_location": "L45",
       "id": "playground_normalizeinput",
-      "community": 8,
+      "community": 7,
       "norm_label": "normalizeinput()"
     },
     {
@@ -2622,7 +2622,7 @@
       "source_file": "apps/website/playground.js",
       "source_location": "L51",
       "id": "playground_updatecount",
-      "community": 8,
+      "community": 7,
       "norm_label": "updatecount()"
     },
     {
@@ -2631,7 +2631,7 @@
       "source_file": "apps/website/playground.js",
       "source_location": "L59",
       "id": "playground_updateinputcharcount",
-      "community": 8,
+      "community": 7,
       "norm_label": "updateinputcharcount()"
     },
     {
@@ -2640,7 +2640,7 @@
       "source_file": "apps/website/playground.js",
       "source_location": "L67",
       "id": "playground_buildlistcopytext",
-      "community": 8,
+      "community": 7,
       "norm_label": "buildlistcopytext()"
     },
     {
@@ -2649,7 +2649,7 @@
       "source_file": "apps/website/playground.js",
       "source_location": "L74",
       "id": "playground_copytext",
-      "community": 8,
+      "community": 7,
       "norm_label": "copytext()"
     },
     {
@@ -2658,7 +2658,7 @@
       "source_file": "apps/website/playground.js",
       "source_location": "L101",
       "id": "playground_flashcopybutton",
-      "community": 8,
+      "community": 7,
       "norm_label": "flashcopybutton()"
     },
     {
@@ -2667,7 +2667,7 @@
       "source_file": "apps/website/playground.js",
       "source_location": "L109",
       "id": "playground_resetresults",
-      "community": 8,
+      "community": 7,
       "norm_label": "resetresults()"
     },
     {
@@ -2676,7 +2676,7 @@
       "source_file": "apps/website/playground.js",
       "source_location": "L116",
       "id": "playground_hasrangeoverlap",
-      "community": 8,
+      "community": 7,
       "norm_label": "hasrangeoverlap()"
     },
     {
@@ -2685,7 +2685,7 @@
       "source_file": "apps/website/playground.js",
       "source_location": "L120",
       "id": "playground_expandsnippetrange",
-      "community": 8,
+      "community": 7,
       "norm_label": "expandsnippetrange()"
     },
     {
@@ -2694,7 +2694,7 @@
       "source_file": "apps/website/playground.js",
       "source_location": "L149",
       "id": "playground_collectpartialmatches",
-      "community": 8,
+      "community": 7,
       "norm_label": "collectpartialmatches()"
     },
     {
@@ -2703,7 +2703,7 @@
       "source_file": "apps/website/playground.js",
       "source_location": "L207",
       "id": "playground_rundetection",
-      "community": 8,
+      "community": 7,
       "norm_label": "rundetection()"
     },
     {
@@ -2712,7 +2712,7 @@
       "source_file": "apps/website/playground.js",
       "source_location": "L232",
       "id": "playground_clearinputtext",
-      "community": 8,
+      "community": 7,
       "norm_label": "clearinputtext()"
     },
     {
@@ -2733,9 +2733,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "readme_fx_inline",
       "community": 24,
-      "norm_label": "fx inline readme"
+      "norm_label": "fx inline readme",
+      "id": "readme_fx_inline"
     },
     {
       "label": "Architecture Diagrams",
@@ -2746,9 +2746,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "readme_architecture_diagrams",
       "community": 24,
-      "norm_label": "architecture diagrams"
+      "norm_label": "architecture diagrams",
+      "id": "readme_architecture_diagrams"
     },
     {
       "label": "Auto-Generated Repository Snapshot",
@@ -2759,9 +2759,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "readme_repo_snapshot",
       "community": 24,
-      "norm_label": "auto-generated repository snapshot"
+      "norm_label": "auto-generated repository snapshot",
+      "id": "readme_repo_snapshot"
     },
     {
       "label": "FX Inline Clone Specification",
@@ -2772,9 +2772,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "docs_new_web_extension_prompt_clone_spec",
-      "community": 10,
-      "norm_label": "fx inline clone specification"
+      "community": 9,
+      "norm_label": "fx inline clone specification",
+      "id": "docs_new_web_extension_prompt_clone_spec"
     },
     {
       "label": "Extension Runtime Concepts",
@@ -2785,9 +2785,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "docs_new_web_extension_prompt_runtime_concepts",
-      "community": 10,
-      "norm_label": "extension runtime concepts"
+      "community": 9,
+      "norm_label": "extension runtime concepts",
+      "id": "docs_new_web_extension_prompt_runtime_concepts"
     },
     {
       "label": "Selection Popup",
@@ -2798,9 +2798,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "selection_popup",
-      "community": 10,
-      "norm_label": "selection popup"
+      "community": 9,
+      "norm_label": "selection popup",
+      "id": "selection_popup"
     },
     {
       "label": "Inline Conversion Runtime",
@@ -2811,9 +2811,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "inline_conversion_runtime",
-      "community": 10,
-      "norm_label": "inline conversion runtime"
+      "community": 9,
+      "norm_label": "inline conversion runtime",
+      "id": "inline_conversion_runtime"
     },
     {
       "label": "Preferred Currency Setting",
@@ -2824,9 +2824,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "preferred_currency_settings",
-      "community": 10,
-      "norm_label": "preferred currency setting"
+      "community": 9,
+      "norm_label": "preferred currency setting",
+      "id": "preferred_currency_settings"
     },
     {
       "label": "Market-Day Rate Cache",
@@ -2837,9 +2837,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "market_day_rate_cache",
-      "community": 10,
-      "norm_label": "market-day rate cache"
+      "community": 9,
+      "norm_label": "market-day rate cache",
+      "id": "market_day_rate_cache"
     },
     {
       "label": "Background Alarm Refresh",
@@ -2850,9 +2850,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "background_alarm_refresh",
-      "community": 10,
-      "norm_label": "background alarm refresh"
+      "community": 9,
+      "norm_label": "background alarm refresh",
+      "id": "background_alarm_refresh"
     },
     {
       "label": "E2E Conversion Checklist",
@@ -2863,9 +2863,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "docs_qa_e2e_checklist_conversion_flows",
-      "community": 10,
-      "norm_label": "e2e conversion checklist"
+      "community": 9,
+      "norm_label": "e2e conversion checklist",
+      "id": "docs_qa_e2e_checklist_conversion_flows"
     },
     {
       "label": "Currency Detection Package Scope",
@@ -2876,9 +2876,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "docs_currency_detection_package_scope",
-      "community": 13,
-      "norm_label": "currency detection package scope"
+      "community": 12,
+      "norm_label": "currency detection package scope",
+      "id": "docs_currency_detection_package_scope"
     },
     {
       "label": "Currency Detection API Rules",
@@ -2889,9 +2889,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "docs_currency_detection_package_api_rules",
-      "community": 13,
-      "norm_label": "currency detection api rules"
+      "community": 12,
+      "norm_label": "currency detection api rules",
+      "id": "docs_currency_detection_package_api_rules"
     },
     {
       "label": "Security Checklist: Manifest and CSP",
@@ -2902,9 +2902,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "docs_security_checklist_manifest_csp",
-      "community": 10,
-      "norm_label": "security checklist: manifest and csp"
+      "community": 9,
+      "norm_label": "security checklist: manifest and csp",
+      "id": "docs_security_checklist_manifest_csp"
     },
     {
       "label": "Security Checklist: Network and DOM Hardening",
@@ -2915,9 +2915,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "docs_security_checklist_hardening",
-      "community": 10,
-      "norm_label": "security checklist: network and dom hardening"
+      "community": 9,
+      "norm_label": "security checklist: network and dom hardening",
+      "id": "docs_security_checklist_hardening"
     },
     {
       "label": "SaaS Roadmap Delivered",
@@ -2928,9 +2928,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "docs_saas_roadmap_delivered",
-      "community": 10,
-      "norm_label": "saas roadmap delivered"
+      "community": 9,
+      "norm_label": "saas roadmap delivered",
+      "id": "docs_saas_roadmap_delivered"
     },
     {
       "label": "SaaS Roadmap Not in Scope",
@@ -2941,9 +2941,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "docs_saas_roadmap_not_in_scope",
-      "community": 13,
-      "norm_label": "saas roadmap not in scope"
+      "community": 12,
+      "norm_label": "saas roadmap not in scope",
+      "id": "docs_saas_roadmap_not_in_scope"
     },
     {
       "label": "2026-04-18 Revenue Review: Trust and Funnel Gap",
@@ -2954,9 +2954,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "docs_revenue_review_2026_04_18_trust_gap",
-      "community": 13,
-      "norm_label": "2026-04-18 revenue review: trust and funnel gap"
+      "community": 12,
+      "norm_label": "2026-04-18 revenue review: trust and funnel gap",
+      "id": "docs_revenue_review_2026_04_18_trust_gap"
     },
     {
       "label": "2026-04-17 Revenue Review: B2B Pilot Thesis",
@@ -2967,9 +2967,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "docs_revenue_review_2026_04_17_b2b_pilot",
-      "community": 13,
-      "norm_label": "2026-04-17 revenue review: b2b pilot thesis"
+      "community": 12,
+      "norm_label": "2026-04-17 revenue review: b2b pilot thesis",
+      "id": "docs_revenue_review_2026_04_17_b2b_pilot"
     },
     {
       "label": "Fixed-Fee B2B Pilot Offer",
@@ -2980,9 +2980,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "b2b_pilot_offer",
-      "community": 13,
-      "norm_label": "fixed-fee b2b pilot offer"
+      "community": 12,
+      "norm_label": "fixed-fee b2b pilot offer",
+      "id": "b2b_pilot_offer"
     },
     {
       "label": "Currency Detection Package API",
@@ -2993,9 +2993,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "packages_currency_detection_readme_api",
-      "community": 13,
-      "norm_label": "currency detection package api"
+      "community": 12,
+      "norm_label": "currency detection package api",
+      "id": "packages_currency_detection_readme_api"
     },
     {
       "label": "FX Inline Settings Options Page",
@@ -3006,9 +3006,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "options_page_settings",
-      "community": 10,
-      "norm_label": "fx inline settings options page"
+      "community": 9,
+      "norm_label": "fx inline settings options page",
+      "id": "options_page_settings"
     },
     {
       "label": "Popup Entry Point Shell",
@@ -3019,9 +3019,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "popup_page_shell",
-      "community": 10,
-      "norm_label": "popup entry point shell"
+      "community": 9,
+      "norm_label": "popup entry point shell",
+      "id": "popup_page_shell"
     },
     {
       "label": "FX Inline Marketing Website",
@@ -3032,9 +3032,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "website_homepage",
-      "community": 13,
-      "norm_label": "fx inline marketing website"
+      "community": 12,
+      "norm_label": "fx inline marketing website",
+      "id": "website_homepage"
     },
     {
       "label": "Currency Detection Playground",
@@ -3045,9 +3045,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "website_playground",
-      "community": 13,
-      "norm_label": "currency detection playground"
+      "community": 12,
+      "norm_label": "currency detection playground",
+      "id": "website_playground"
     },
     {
       "label": "FX Inline Logo",
@@ -3058,9 +3058,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fx_inline_logo",
       "community": 16,
-      "norm_label": "fx inline logo"
+      "norm_label": "fx inline logo",
+      "id": "fx_inline_logo"
     },
     {
       "label": "Rounded Square Background",
@@ -3071,9 +3071,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fx_inline_logo_background",
       "community": 16,
-      "norm_label": "rounded square background"
+      "norm_label": "rounded square background",
+      "id": "fx_inline_logo_background"
     },
     {
       "label": "Circular Ring",
@@ -3084,9 +3084,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fx_inline_logo_ring",
       "community": 16,
-      "norm_label": "circular ring"
+      "norm_label": "circular ring",
+      "id": "fx_inline_logo_ring"
     },
     {
       "label": "Bidirectional Exchange Arrows",
@@ -3097,9 +3097,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fx_inline_logo_arrows",
       "community": 16,
-      "norm_label": "bidirectional exchange arrows"
+      "norm_label": "bidirectional exchange arrows",
+      "id": "fx_inline_logo_arrows"
     },
     {
       "label": "Horizontal Rate Lines",
@@ -3110,9 +3110,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fx_inline_logo_lines",
       "community": 16,
-      "norm_label": "horizontal rate lines"
+      "norm_label": "horizontal rate lines",
+      "id": "fx_inline_logo_lines"
     },
     {
       "label": "Sparkle Mark",
@@ -3123,9 +3123,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fx_inline_logo_mark",
       "community": 16,
-      "norm_label": "sparkle mark"
+      "norm_label": "sparkle mark",
+      "id": "fx_inline_logo_mark"
     },
     {
       "label": "Extension Icon",
@@ -3136,9 +3136,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "48_png_extension_icon",
       "community": 25,
-      "norm_label": "extension icon"
+      "norm_label": "extension icon",
+      "id": "48_png_extension_icon"
     },
     {
       "label": "Refresh/Exchange Ring",
@@ -3149,9 +3149,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "48_png_refresh_exchange_ring",
       "community": 25,
-      "norm_label": "refresh/exchange ring"
+      "norm_label": "refresh/exchange ring",
+      "id": "48_png_refresh_exchange_ring"
     },
     {
       "label": "Central Currency Glyph",
@@ -3162,9 +3162,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "48_png_central_currency_glyph",
       "community": 25,
-      "norm_label": "central currency glyph"
+      "norm_label": "central currency glyph",
+      "id": "48_png_central_currency_glyph"
     },
     {
       "label": "Currency Conversion Extension Icon",
@@ -3175,9 +3175,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "icon_128_png",
       "community": 22,
-      "norm_label": "currency conversion extension icon"
+      "norm_label": "currency conversion extension icon",
+      "id": "icon_128_png"
     },
     {
       "label": "Bidirectional Exchange Motif",
@@ -3188,9 +3188,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "icon_128_png_exchange_motif",
       "community": 22,
-      "norm_label": "bidirectional exchange motif"
+      "norm_label": "bidirectional exchange motif",
+      "id": "icon_128_png_exchange_motif"
     },
     {
       "label": "Cyan Circular Ring",
@@ -3201,9 +3201,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "icon_128_png_cyan_ring",
       "community": 22,
-      "norm_label": "cyan circular ring"
+      "norm_label": "cyan circular ring",
+      "id": "icon_128_png_cyan_ring"
     },
     {
       "label": "Dark Rounded-Square Badge",
@@ -3214,9 +3214,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "icon_128_png_dark_badge",
       "community": 22,
-      "norm_label": "dark rounded-square badge"
+      "norm_label": "dark rounded-square badge",
+      "id": "icon_128_png_dark_badge"
     },
     {
       "label": "Extension Icon Asset",
@@ -3227,9 +3227,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "512_png_extension_icon",
       "community": 14,
-      "norm_label": "extension icon asset"
+      "norm_label": "extension icon asset",
+      "id": "512_png_extension_icon"
     },
     {
       "label": "Currency Conversion / Exchange",
@@ -3240,9 +3240,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "512_png_currency_conversion_concept",
       "community": 14,
-      "norm_label": "currency conversion / exchange"
+      "norm_label": "currency conversion / exchange",
+      "id": "512_png_currency_conversion_concept"
     },
     {
       "label": "Dark Rounded Square Background",
@@ -3253,9 +3253,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "512_png_dark_rounded_square_background",
       "community": 14,
-      "norm_label": "dark rounded square background"
+      "norm_label": "dark rounded square background",
+      "id": "512_png_dark_rounded_square_background"
     },
     {
       "label": "Cyan Circular Ring",
@@ -3266,9 +3266,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "512_png_cyan_ring",
       "community": 14,
-      "norm_label": "cyan circular ring"
+      "norm_label": "cyan circular ring",
+      "id": "512_png_cyan_ring"
     },
     {
       "label": "Horizontal Exchange Arrows",
@@ -3279,9 +3279,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "512_png_exchange_arrows",
       "community": 14,
-      "norm_label": "horizontal exchange arrows"
+      "norm_label": "horizontal exchange arrows",
+      "id": "512_png_exchange_arrows"
     },
     {
       "label": "Letter X Shape",
@@ -3292,9 +3292,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "512_png_letter_x",
       "community": 14,
-      "norm_label": "letter x shape"
+      "norm_label": "letter x shape",
+      "id": "512_png_letter_x"
     },
     {
       "label": "Letter R Shape",
@@ -3305,9 +3305,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "512_png_letter_r",
       "community": 14,
-      "norm_label": "letter r shape"
+      "norm_label": "letter r shape",
+      "id": "512_png_letter_r"
     },
     {
       "label": "16px extension icon",
@@ -3318,9 +3318,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "icon_16_png",
       "community": 66,
-      "norm_label": "16px extension icon"
+      "norm_label": "16px extension icon",
+      "id": "icon_16_png"
     },
     {
       "label": "Currency Conversion Extension Icon",
@@ -3331,9 +3331,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "apps_extension_public_icon_32_png_currency_conversion_extension_icon",
       "community": 67,
-      "norm_label": "currency conversion extension icon"
+      "norm_label": "currency conversion extension icon",
+      "id": "apps_extension_public_icon_32_png_currency_conversion_extension_icon"
     },
     {
       "label": "Currency Conversion App Icon",
@@ -3344,9 +3344,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "96_currency_conversion_app_icon",
       "community": 68,
-      "norm_label": "currency conversion app icon"
+      "norm_label": "currency conversion app icon",
+      "id": "96_currency_conversion_app_icon"
     },
     {
       "label": "Toggle On Icon",
@@ -3357,9 +3357,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "toggle_on_icon",
       "community": 69,
-      "norm_label": "toggle on icon"
+      "norm_label": "toggle on icon",
+      "id": "toggle_on_icon"
     },
     {
       "label": "Drop Down Icon",
@@ -3370,9 +3370,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "drop_down_icon",
       "community": 70,
-      "norm_label": "drop down icon"
+      "norm_label": "drop down icon",
+      "id": "drop_down_icon"
     },
     {
       "label": "Swap Vertical Outline SVG",
@@ -3383,9 +3383,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "swap_vertical_outline_svg_file",
       "community": 35,
-      "norm_label": "swap vertical outline svg"
+      "norm_label": "swap vertical outline svg",
+      "id": "swap_vertical_outline_svg_file"
     },
     {
       "label": "Vertical Swap Icon",
@@ -3396,9 +3396,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "swap_vertical_outline_icon",
       "community": 35,
-      "norm_label": "vertical swap icon"
+      "norm_label": "vertical swap icon",
+      "id": "swap_vertical_outline_icon"
     },
     {
       "label": "Toggle Off Icon",
@@ -3409,9 +3409,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "toggle_off_icon",
       "community": 71,
-      "norm_label": "toggle off icon"
+      "norm_label": "toggle off icon",
+      "id": "toggle_off_icon"
     },
     {
       "label": "Switch Icon",
@@ -3422,9 +3422,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "switch_switch_icon",
       "community": 72,
-      "norm_label": "switch icon"
+      "norm_label": "switch icon",
+      "id": "switch_switch_icon"
     },
     {
       "label": "Add Outline Icon",
@@ -3435,9 +3435,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "add_outline_icon",
       "community": 73,
-      "norm_label": "add outline icon"
+      "norm_label": "add outline icon",
+      "id": "add_outline_icon"
     },
     {
       "label": "FX Inline Site Mark",
@@ -3448,9 +3448,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fx_inline_site_mark",
       "community": 15,
-      "norm_label": "fx inline site mark"
+      "norm_label": "fx inline site mark",
+      "id": "fx_inline_site_mark"
     },
     {
       "label": "Dark Rounded Background",
@@ -3461,9 +3461,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fx_inline_rounded_background",
       "community": 15,
-      "norm_label": "dark rounded background"
+      "norm_label": "dark rounded background",
+      "id": "fx_inline_rounded_background"
     },
     {
       "label": "Cyan Circular Ring",
@@ -3474,9 +3474,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fx_inline_circular_ring",
       "community": 15,
-      "norm_label": "cyan circular ring"
+      "norm_label": "cyan circular ring",
+      "id": "fx_inline_circular_ring"
     },
     {
       "label": "Three Horizontal Lines",
@@ -3487,9 +3487,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fx_inline_horizontal_lines",
       "community": 15,
-      "norm_label": "three horizontal lines"
+      "norm_label": "three horizontal lines",
+      "id": "fx_inline_horizontal_lines"
     },
     {
       "label": "Left Arrow Shape",
@@ -3500,9 +3500,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fx_inline_left_arrow",
       "community": 15,
-      "norm_label": "left arrow shape"
+      "norm_label": "left arrow shape",
+      "id": "fx_inline_left_arrow"
     },
     {
       "label": "Right Arrow Shape",
@@ -3513,9 +3513,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fx_inline_right_arrow",
       "community": 15,
-      "norm_label": "right arrow shape"
+      "norm_label": "right arrow shape",
+      "id": "fx_inline_right_arrow"
     },
     {
       "label": "Currency Conversion Motif",
@@ -3526,9 +3526,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fx_inline_currency_exchange_motif",
       "community": 15,
-      "norm_label": "currency conversion motif"
+      "norm_label": "currency conversion motif",
+      "id": "fx_inline_currency_exchange_motif"
     },
     {
       "label": "Engineering Guidance",
@@ -3539,9 +3539,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "agents_md_engineering_guidance",
       "community": 17,
-      "norm_label": "engineering guidance"
+      "norm_label": "engineering guidance",
+      "id": "agents_md_engineering_guidance"
     },
     {
       "label": "Correctness, Security, and Performance Focus",
@@ -3552,9 +3552,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "agents_md_quality_focus",
       "community": 17,
-      "norm_label": "correctness, security, and performance focus"
+      "norm_label": "correctness, security, and performance focus",
+      "id": "agents_md_quality_focus"
     },
     {
       "label": "Worktree Policy",
@@ -3565,9 +3565,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "agents_md_worktree_policy",
       "community": 36,
-      "norm_label": "worktree policy"
+      "norm_label": "worktree policy",
+      "id": "agents_md_worktree_policy"
     },
     {
       "label": "Strict TypeScript Rules",
@@ -3578,9 +3578,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "agents_md_typescript_strict_rules",
       "community": 17,
-      "norm_label": "strict typescript rules"
+      "norm_label": "strict typescript rules",
+      "id": "agents_md_typescript_strict_rules"
     },
     {
       "label": "Date Handling Policy (Intl then date-fns)",
@@ -3591,9 +3591,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "agents_md_date_handling_policy",
       "community": 17,
-      "norm_label": "date handling policy (intl then date-fns)"
+      "norm_label": "date handling policy (intl then date-fns)",
+      "id": "agents_md_date_handling_policy"
     },
     {
       "label": "No Backward Compatibility Requirement in Development",
@@ -3604,9 +3604,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "agents_md_no_backward_compatibility",
       "community": 17,
-      "norm_label": "no backward compatibility requirement in development"
+      "norm_label": "no backward compatibility requirement in development",
+      "id": "agents_md_no_backward_compatibility"
     },
     {
       "label": "Development Phase Enables Sweeping Changes",
@@ -3617,9 +3617,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "agents_md_dev_phase_rationale",
       "community": 17,
-      "norm_label": "development phase enables sweeping changes"
+      "norm_label": "development phase enables sweeping changes",
+      "id": "agents_md_dev_phase_rationale"
     },
     {
       "label": "GitHub Issue Workflow Rules",
@@ -3630,9 +3630,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "agents_md_git_issue_workflow",
       "community": 36,
-      "norm_label": "github issue workflow rules"
+      "norm_label": "github issue workflow rules",
+      "id": "agents_md_git_issue_workflow"
     },
     {
       "label": "Mandatory Git Workflow",
@@ -3643,9 +3643,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "agents_md_git_workflow_mandate",
       "community": 37,
-      "norm_label": "mandatory git workflow"
+      "norm_label": "mandatory git workflow",
+      "id": "agents_md_git_workflow_mandate"
     },
     {
       "label": "Decision Summary Commit Body Requirement",
@@ -3656,9 +3656,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "agents_md_decision_summary_requirement",
       "community": 37,
-      "norm_label": "decision summary commit body requirement"
+      "norm_label": "decision summary commit body requirement",
+      "id": "agents_md_decision_summary_requirement"
     },
     {
       "label": "Graph Report",
@@ -3669,9 +3669,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "graph_report_md_graph_report",
-      "community": 6,
-      "norm_label": "graph report"
+      "community": 13,
+      "norm_label": "graph report",
+      "id": "graph_report_md_graph_report"
     },
     {
       "label": "Corpus Check",
@@ -3682,9 +3682,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "graph_report_md_corpus_check",
-      "community": 6,
-      "norm_label": "corpus check"
+      "community": 13,
+      "norm_label": "corpus check",
+      "id": "graph_report_md_corpus_check"
     },
     {
       "label": "Graph Structure Adds Value Rationale",
@@ -3695,9 +3695,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "graph_report_md_graph_structure_value_rationale",
-      "community": 6,
-      "norm_label": "graph structure adds value rationale"
+      "community": 13,
+      "norm_label": "graph structure adds value rationale",
+      "id": "graph_report_md_graph_structure_value_rationale"
     },
     {
       "label": "Extraction Mix Metrics",
@@ -3708,9 +3708,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "graph_report_md_extraction_mix",
-      "community": 6,
-      "norm_label": "extraction mix metrics"
+      "community": 13,
+      "norm_label": "extraction mix metrics",
+      "id": "graph_report_md_extraction_mix"
     },
     {
       "label": "Community Hubs Navigation",
@@ -3721,9 +3721,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "graph_report_md_community_hubs",
-      "community": 6,
-      "norm_label": "community hubs navigation"
+      "community": 13,
+      "norm_label": "community hubs navigation",
+      "id": "graph_report_md_community_hubs"
     },
     {
       "label": "God Nodes Core Abstractions",
@@ -3734,9 +3734,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "graph_report_md_god_nodes",
-      "community": 6,
-      "norm_label": "god nodes core abstractions"
+      "community": 13,
+      "norm_label": "god nodes core abstractions",
+      "id": "graph_report_md_god_nodes"
     },
     {
       "label": "Surprising Connections",
@@ -3747,9 +3747,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "graph_report_md_surprising_connections",
-      "community": 6,
-      "norm_label": "surprising connections"
+      "community": 13,
+      "norm_label": "surprising connections",
+      "id": "graph_report_md_surprising_connections"
     },
     {
       "label": "Hyperedges Section",
@@ -3760,139 +3760,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "graph_report_md_hyperedges_section",
-      "community": 6,
-      "norm_label": "hyperedges section"
-    },
-    {
-      "label": "vis-network Library",
-      "file_type": "code",
-      "source_file": "graphify-out/graph.html",
-      "source_location": null,
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "id": "graph_html_vis_network_dependency",
-      "community": 6,
-      "norm_label": "vis-network library"
-    },
-    {
-      "label": "RAW_NODES Dataset",
-      "file_type": "code",
-      "source_file": "graphify-out/graph.html",
-      "source_location": null,
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "id": "graph_html_raw_nodes_dataset",
-      "community": 6,
-      "norm_label": "raw_nodes dataset"
-    },
-    {
-      "label": "RAW_EDGES Dataset",
-      "file_type": "code",
-      "source_file": "graphify-out/graph.html",
-      "source_location": null,
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "id": "graph_html_raw_edges_dataset",
-      "community": 6,
-      "norm_label": "raw_edges dataset"
-    },
-    {
-      "label": "LEGEND Dataset",
-      "file_type": "code",
-      "source_file": "graphify-out/graph.html",
-      "source_location": null,
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "id": "graph_html_legend_dataset",
-      "community": 6,
-      "norm_label": "legend dataset"
-    },
-    {
-      "label": "vis Network Instance",
-      "file_type": "code",
-      "source_file": "graphify-out/graph.html",
-      "source_location": null,
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "id": "graph_html_network_instance",
-      "community": 6,
-      "norm_label": "vis network instance"
-    },
-    {
-      "label": "Node Info Panel",
-      "file_type": "code",
-      "source_file": "graphify-out/graph.html",
-      "source_location": null,
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "id": "graph_html_node_info_panel",
-      "community": 6,
-      "norm_label": "node info panel"
-    },
-    {
-      "label": "Node Search Feature",
-      "file_type": "code",
-      "source_file": "graphify-out/graph.html",
-      "source_location": null,
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "id": "graph_html_search_feature",
-      "community": 6,
-      "norm_label": "node search feature"
-    },
-    {
-      "label": "Community Legend Filter",
-      "file_type": "code",
-      "source_file": "graphify-out/graph.html",
-      "source_location": null,
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "id": "graph_html_community_filter",
-      "community": 6,
-      "norm_label": "community legend filter"
-    },
-    {
-      "label": "Hyperedges Data Overlay",
-      "file_type": "code",
-      "source_file": "graphify-out/graph.html",
-      "source_location": null,
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "id": "graph_html_hyperedges_overlay",
-      "community": 6,
-      "norm_label": "hyperedges data overlay"
-    },
-    {
-      "label": "Hyperedge Region Rendering",
-      "file_type": "code",
-      "source_file": "graphify-out/graph.html",
-      "source_location": null,
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "id": "graph_html_hyperedge_rendering",
-      "community": 6,
-      "norm_label": "hyperedge region rendering"
+      "community": 13,
+      "norm_label": "hyperedges section",
+      "id": "graph_report_md_hyperedges_section"
     }
   ],
   "links": [
@@ -4191,8 +4061,8 @@
       "source_file": "packages/currency-detection/src/parser-core.js",
       "source_location": "L354",
       "weight": 1.0,
-      "_src": "parser_core_createcompiledconfig",
-      "_tgt": "magnitude_profiles_createmagnitudealiasresolver",
+      "_src": "magnitude_profiles_createmagnitudealiasresolver",
+      "_tgt": "parser_core_createcompiledconfig",
       "source": "magnitude_profiles_createmagnitudealiasresolver",
       "target": "parser_core_createcompiledconfig"
     },
@@ -4683,8 +4553,8 @@
       "source_file": "apps/extension/entrypoints/background.ts",
       "source_location": "L18",
       "weight": 1.0,
-      "_src": "background_initializeraterefresh",
-      "_tgt": "rates_getrates",
+      "_src": "rates_getrates",
+      "_tgt": "background_initializeraterefresh",
       "source": "rates_getrates",
       "target": "background_initializeraterefresh"
     },
@@ -4695,8 +4565,8 @@
       "source_file": "apps/extension/entrypoints/content/conversionRuntime/hydration.ts",
       "source_location": "L26",
       "weight": 1.0,
-      "_src": "hydration_refreshsettingsandrates",
-      "_tgt": "rates_getrates",
+      "_src": "rates_getrates",
+      "_tgt": "hydration_refreshsettingsandrates",
       "source": "rates_getrates",
       "target": "hydration_refreshsettingsandrates"
     },
@@ -4731,8 +4601,8 @@
       "source_file": "apps/extension/hooks/useCurrencyReducer.state.ts",
       "source_location": "L85",
       "weight": 1.0,
-      "_src": "usecurrencyreducer_state_convertamount",
-      "_tgt": "ratemath_convertamountwithsnapshot",
+      "_src": "ratemath_convertamountwithsnapshot",
+      "_tgt": "usecurrencyreducer_state_convertamount",
       "source": "ratemath_convertamountwithsnapshot",
       "target": "usecurrencyreducer_state_convertamount"
     },
@@ -4743,8 +4613,8 @@
       "source_file": "apps/extension/entrypoints/content/inlineConversion/amountFormatting.ts",
       "source_location": "L20",
       "weight": 1.0,
-      "_src": "amountformatting_getconvertedamounttext",
-      "_tgt": "ratemath_convertamountwithsnapshot",
+      "_src": "ratemath_convertamountwithsnapshot",
+      "_tgt": "amountformatting_getconvertedamounttext",
       "source": "ratemath_convertamountwithsnapshot",
       "target": "amountformatting_getconvertedamounttext"
     },
@@ -4755,8 +4625,8 @@
       "source_file": "apps/extension/hooks/useCurrencyReducer.state.ts",
       "source_location": "L94",
       "weight": 1.0,
-      "_src": "usecurrencyreducer_state_convertamount",
-      "_tgt": "ratemath_formatconvertedamount",
+      "_src": "ratemath_formatconvertedamount",
+      "_tgt": "usecurrencyreducer_state_convertamount",
       "source": "ratemath_formatconvertedamount",
       "target": "usecurrencyreducer_state_convertamount"
     },
@@ -5127,8 +4997,8 @@
       "source_file": "/Users/xbotpc/Desktop/XBOTPC/Work/Code/currency-conversion-extension-tool-codex-78e0/apps/extension/utils/utils.ts",
       "source_location": "L178",
       "weight": 1.0,
-      "_src": "utils_buildparserartifacts",
-      "_tgt": "magnitudeprofiles_getmagnitudealiasmap",
+      "_src": "magnitudeprofiles_getmagnitudealiasmap",
+      "_tgt": "utils_buildparserartifacts",
       "source": "magnitudeprofiles_getmagnitudealiasmap",
       "target": "utils_buildparserartifacts"
     },
@@ -5799,8 +5669,8 @@
       "source_file": "apps/extension/entrypoints/content/inlineConversion/structuredDecorators.ts",
       "source_location": "L123",
       "weight": 1.0,
-      "_src": "structureddecorators_getsiblingcurrencyrawprice",
-      "_tgt": "utils_parsecurrencyvalue",
+      "_src": "utils_parsecurrencyvalue",
+      "_tgt": "structureddecorators_getsiblingcurrencyrawprice",
       "source": "utils_parsecurrencyvalue",
       "target": "structureddecorators_getsiblingcurrencyrawprice"
     },
@@ -5811,8 +5681,8 @@
       "source_file": "apps/extension/entrypoints/content/inlineConversion/textNodeDecorator.ts",
       "source_location": "L68",
       "weight": 1.0,
-      "_src": "textnodedecorator_getsplitsiblingrawprice",
-      "_tgt": "utils_parsecurrencyvalue",
+      "_src": "utils_parsecurrencyvalue",
+      "_tgt": "textnodedecorator_getsplitsiblingrawprice",
       "source": "utils_parsecurrencyvalue",
       "target": "textnodedecorator_getsplitsiblingrawprice"
     },
@@ -5823,8 +5693,8 @@
       "source_file": "apps/extension/entrypoints/content/inlineConversion/conversionNodes.ts",
       "source_location": "L166",
       "weight": 1.0,
-      "_src": "conversionnodes_refreshexistinginlineconversions",
-      "_tgt": "utils_extractcurrencytextmatches",
+      "_src": "utils_extractcurrencytextmatches",
+      "_tgt": "conversionnodes_refreshexistinginlineconversions",
       "source": "utils_extractcurrencytextmatches",
       "target": "conversionnodes_refreshexistinginlineconversions"
     },
@@ -5835,8 +5705,8 @@
       "source_file": "apps/extension/entrypoints/content/inlineConversion/structuredDecorators.ts",
       "source_location": "L158",
       "weight": 1.0,
-      "_src": "structureddecorators_getsiblingcurrencyrawprice",
-      "_tgt": "utils_extractcurrencytextmatches",
+      "_src": "utils_extractcurrencytextmatches",
+      "_tgt": "structureddecorators_getsiblingcurrencyrawprice",
       "source": "utils_extractcurrencytextmatches",
       "target": "structureddecorators_getsiblingcurrencyrawprice"
     },
@@ -5847,8 +5717,8 @@
       "source_file": "apps/extension/entrypoints/content/inlineConversion/structuredDecorators.ts",
       "source_location": "L213",
       "weight": 1.0,
-      "_src": "structureddecorators_decoratestructuredamazonprices",
-      "_tgt": "utils_extractcurrencytextmatches",
+      "_src": "utils_extractcurrencytextmatches",
+      "_tgt": "structureddecorators_decoratestructuredamazonprices",
       "source": "utils_extractcurrencytextmatches",
       "target": "structureddecorators_decoratestructuredamazonprices"
     },
@@ -5859,8 +5729,8 @@
       "source_file": "apps/extension/entrypoints/content/inlineConversion/structuredDecorators.ts",
       "source_location": "L295",
       "weight": 1.0,
-      "_src": "structureddecorators_decoratestructuredsiblingsymbolprices",
-      "_tgt": "utils_extractcurrencytextmatches",
+      "_src": "utils_extractcurrencytextmatches",
+      "_tgt": "structureddecorators_decoratestructuredsiblingsymbolprices",
       "source": "utils_extractcurrencytextmatches",
       "target": "structureddecorators_decoratestructuredsiblingsymbolprices"
     },
@@ -5871,8 +5741,8 @@
       "source_file": "apps/extension/entrypoints/content/inlineConversion/textNodeDecorator.ts",
       "source_location": "L89",
       "weight": 1.0,
-      "_src": "textnodedecorator_getsplitsiblingrawprice",
-      "_tgt": "utils_extractcurrencytextmatches",
+      "_src": "utils_extractcurrencytextmatches",
+      "_tgt": "textnodedecorator_getsplitsiblingrawprice",
       "source": "utils_extractcurrencytextmatches",
       "target": "textnodedecorator_getsplitsiblingrawprice"
     },
@@ -5883,8 +5753,8 @@
       "source_file": "apps/extension/entrypoints/content/inlineConversion/textNodeDecorator.ts",
       "source_location": "L120",
       "weight": 1.0,
-      "_src": "textnodedecorator_decoratesplitsiblingpriceintextnode",
-      "_tgt": "utils_extractcurrencytextmatches",
+      "_src": "utils_extractcurrencytextmatches",
+      "_tgt": "textnodedecorator_decoratesplitsiblingpriceintextnode",
       "source": "utils_extractcurrencytextmatches",
       "target": "textnodedecorator_decoratesplitsiblingpriceintextnode"
     },
@@ -5895,8 +5765,8 @@
       "source_file": "apps/extension/entrypoints/content/inlineConversion/textNodeDecorator.ts",
       "source_location": "L179",
       "weight": 1.0,
-      "_src": "textnodedecorator_decoratepricesintextnode",
-      "_tgt": "utils_extractcurrencytextmatches",
+      "_src": "utils_extractcurrencytextmatches",
+      "_tgt": "textnodedecorator_decoratepricesintextnode",
       "source": "utils_extractcurrencytextmatches",
       "target": "textnodedecorator_decoratepricesintextnode"
     },
@@ -5907,8 +5777,8 @@
       "source_file": "apps/extension/entrypoints/content/inlineConversion/structuredDecorators.ts",
       "source_location": "L208",
       "weight": 1.0,
-      "_src": "structureddecorators_decoratestructuredamazonprices",
-      "_tgt": "utils_maycontaincurrencytoken",
+      "_src": "utils_maycontaincurrencytoken",
+      "_tgt": "structureddecorators_decoratestructuredamazonprices",
       "source": "utils_maycontaincurrencytoken",
       "target": "structureddecorators_decoratestructuredamazonprices"
     },
@@ -5919,8 +5789,8 @@
       "source_file": "apps/extension/entrypoints/content/inlineConversion/textNodeDecorator.ts",
       "source_location": "L177",
       "weight": 1.0,
-      "_src": "textnodedecorator_decoratepricesintextnode",
-      "_tgt": "utils_maycontaincurrencytoken",
+      "_src": "utils_maycontaincurrencytoken",
+      "_tgt": "textnodedecorator_decoratepricesintextnode",
       "source": "utils_maycontaincurrencytoken",
       "target": "textnodedecorator_decoratepricesintextnode"
     },
@@ -5931,8 +5801,8 @@
       "source_file": "apps/website/playground.js",
       "source_location": "L211",
       "weight": 1.0,
-      "_src": "playground_rundetection",
-      "_tgt": "utils_maycontaincurrencytoken",
+      "_src": "utils_maycontaincurrencytoken",
+      "_tgt": "playground_rundetection",
       "source": "utils_maycontaincurrencytoken",
       "target": "playground_rundetection"
     },
@@ -5943,8 +5813,8 @@
       "source_file": "apps/extension/entrypoints/content/inlineConversion/amountFormatting.ts",
       "source_location": "L29",
       "weight": 1.0,
-      "_src": "amountformatting_getconvertedamounttext",
-      "_tgt": "utils_hasthousandmagnitudehint",
+      "_src": "utils_hasthousandmagnitudehint",
+      "_tgt": "amountformatting_getconvertedamounttext",
       "source": "utils_hasthousandmagnitudehint",
       "target": "amountformatting_getconvertedamounttext"
     },
@@ -5967,8 +5837,8 @@
       "source_file": "apps/extension/utils/currencyPresentation.ts",
       "source_location": "L89",
       "weight": 1.0,
-      "_src": "currencypresentation_formatcurrencyheadlineamount",
-      "_tgt": "utils_formatamountincurrency",
+      "_src": "utils_formatamountincurrency",
+      "_tgt": "currencypresentation_formatcurrencyheadlineamount",
       "source": "utils_formatamountincurrency",
       "target": "currencypresentation_formatcurrencyheadlineamount"
     },
@@ -5979,8 +5849,8 @@
       "source_file": "apps/extension/entrypoints/content/inlineConversion/amountFormatting.ts",
       "source_location": "L33",
       "weight": 1.0,
-      "_src": "amountformatting_getconvertedamounttext",
-      "_tgt": "utils_formatamountincurrency",
+      "_src": "utils_formatamountincurrency",
+      "_tgt": "amountformatting_getconvertedamounttext",
       "source": "utils_formatamountincurrency",
       "target": "amountformatting_getconvertedamounttext"
     },
@@ -6183,8 +6053,8 @@
       "source_file": "apps/extension/entrypoints/content/conversionRuntime.ts",
       "source_location": "L44",
       "weight": 1.0,
-      "_src": "conversionruntime_createcontentconversionruntime",
-      "_tgt": "appstorage_getoriginfromurl",
+      "_src": "appstorage_getoriginfromurl",
+      "_tgt": "conversionruntime_createcontentconversionruntime",
       "source": "appstorage_getoriginfromurl",
       "target": "conversionruntime_createcontentconversionruntime"
     },
@@ -6291,8 +6161,8 @@
       "source_file": "apps/extension/entrypoints/popup/App.tsx",
       "source_location": "L62",
       "weight": 1.0,
-      "_src": "app_loadsettings",
-      "_tgt": "appstorage_getusersettings",
+      "_src": "appstorage_getusersettings",
+      "_tgt": "app_loadsettings",
       "source": "appstorage_getusersettings",
       "target": "app_loadsettings"
     },
@@ -6303,8 +6173,8 @@
       "source_file": "apps/extension/entrypoints/popup/App.tsx",
       "source_location": "L98",
       "weight": 1.0,
-      "_src": "app_ontoggleglobalautoconversion",
-      "_tgt": "appstorage_getusersettings",
+      "_src": "appstorage_getusersettings",
+      "_tgt": "app_ontoggleglobalautoconversion",
       "source": "appstorage_getusersettings",
       "target": "app_ontoggleglobalautoconversion"
     },
@@ -6315,8 +6185,8 @@
       "source_file": "apps/extension/entrypoints/popup/App.tsx",
       "source_location": "L115",
       "weight": 1.0,
-      "_src": "app_ontogglelocalautoconversion",
-      "_tgt": "appstorage_getusersettings",
+      "_src": "appstorage_getusersettings",
+      "_tgt": "app_ontogglelocalautoconversion",
       "source": "appstorage_getusersettings",
       "target": "app_ontogglelocalautoconversion"
     },
@@ -6327,8 +6197,8 @@
       "source_file": "apps/extension/entrypoints/content/conversionRuntime/hydration.ts",
       "source_location": "L25",
       "weight": 1.0,
-      "_src": "hydration_refreshsettingsandrates",
-      "_tgt": "appstorage_getusersettings",
+      "_src": "appstorage_getusersettings",
+      "_tgt": "hydration_refreshsettingsandrates",
       "source": "appstorage_getusersettings",
       "target": "hydration_refreshsettingsandrates"
     },
@@ -6339,8 +6209,8 @@
       "source_file": "apps/extension/entrypoints/popup/App.tsx",
       "source_location": "L91",
       "weight": 1.0,
-      "_src": "app_ontoggleglobalautoconversion",
-      "_tgt": "appstorage_updateusersettings",
+      "_src": "appstorage_updateusersettings",
+      "_tgt": "app_ontoggleglobalautoconversion",
       "source": "appstorage_updateusersettings",
       "target": "app_ontoggleglobalautoconversion"
     },
@@ -6351,8 +6221,8 @@
       "source_file": "apps/extension/entrypoints/popup/App.tsx",
       "source_location": "L125",
       "weight": 1.0,
-      "_src": "app_ontogglelocalautoconversion",
-      "_tgt": "appstorage_updateusersettings",
+      "_src": "appstorage_updateusersettings",
+      "_tgt": "app_ontogglelocalautoconversion",
       "source": "appstorage_updateusersettings",
       "target": "app_ontogglelocalautoconversion"
     },
@@ -6375,8 +6245,8 @@
       "source_file": "apps/extension/entrypoints/popup/App.tsx",
       "source_location": "L72",
       "weight": 1.0,
-      "_src": "app_loadsettings",
-      "_tgt": "appstorage_islocalautoconversionenabledfororigin",
+      "_src": "appstorage_islocalautoconversionenabledfororigin",
+      "_tgt": "app_loadsettings",
       "source": "appstorage_islocalautoconversionenabledfororigin",
       "target": "app_loadsettings"
     },
@@ -6387,8 +6257,8 @@
       "source_file": "apps/extension/entrypoints/popup/App.tsx",
       "source_location": "L129",
       "weight": 1.0,
-      "_src": "app_ontogglelocalautoconversion",
-      "_tgt": "appstorage_islocalautoconversionenabledfororigin",
+      "_src": "appstorage_islocalautoconversionenabledfororigin",
+      "_tgt": "app_ontogglelocalautoconversion",
       "source": "appstorage_islocalautoconversionenabledfororigin",
       "target": "app_ontogglelocalautoconversion"
     },
@@ -6615,8 +6485,8 @@
       "source_file": "apps/extension/components/CurrencyBox/CurrencyBox.tsx",
       "source_location": "L74",
       "weight": 1.0,
-      "_src": "currencybox_handleamountchange",
-      "_tgt": "currencypresentation_getnextamountdraft",
+      "_src": "currencypresentation_getnextamountdraft",
+      "_tgt": "currencybox_handleamountchange",
       "source": "currencypresentation_getnextamountdraft",
       "target": "currencybox_handleamountchange"
     },
@@ -6627,8 +6497,8 @@
       "source_file": "apps/extension/components/CurrencyBox/CurrencyBox.tsx",
       "source_location": "L91",
       "weight": 1.0,
-      "_src": "currencybox_finalizeamountedit",
-      "_tgt": "currencypresentation_commitamountdraft",
+      "_src": "currencypresentation_commitamountdraft",
+      "_tgt": "currencybox_finalizeamountedit",
       "source": "currencypresentation_commitamountdraft",
       "target": "currencybox_finalizeamountedit"
     },
@@ -6639,8 +6509,8 @@
       "source_file": "apps/extension/components/CurrencyBox/CurrencyBox.tsx",
       "source_location": "L104",
       "weight": 1.0,
-      "_src": "currencybox_revertamountedit",
-      "_tgt": "currencypresentation_cancelamountedit",
+      "_src": "currencypresentation_cancelamountedit",
+      "_tgt": "currencybox_revertamountedit",
       "source": "currencypresentation_cancelamountedit",
       "target": "currencybox_revertamountedit"
     },
@@ -7011,8 +6881,8 @@
       "source_file": "apps/extension/entrypoints/content/selectionPopup/state.ts",
       "source_location": "L84",
       "weight": 1.0,
-      "_src": "state_createselectionpopupstatestore",
-      "_tgt": "usecurrencyreducer_state_createinitialcurrenciesstate",
+      "_src": "usecurrencyreducer_state_createinitialcurrenciesstate",
+      "_tgt": "state_createselectionpopupstatestore",
       "source": "usecurrencyreducer_state_createinitialcurrenciesstate",
       "target": "state_createselectionpopupstatestore"
     },
@@ -7479,8 +7349,8 @@
       "source_file": "apps/extension/entrypoints/content/conversionRuntime/partialPass.ts",
       "source_location": "L51",
       "weight": 1.0,
-      "_src": "partialpass_runpartialconversionpass",
-      "_tgt": "inlineconversion_convertvisibleprices",
+      "_src": "inlineconversion_convertvisibleprices",
+      "_tgt": "partialpass_runpartialconversionpass",
       "source": "inlineconversion_convertvisibleprices",
       "target": "partialpass_runpartialconversionpass"
     },
@@ -7731,8 +7601,8 @@
       "source_file": "apps/extension/entrypoints/content/inlineConversion/textNodeDecorator.ts",
       "source_location": "L148",
       "weight": 1.0,
-      "_src": "textnodedecorator_decoratesplitsiblingpriceintextnode",
-      "_tgt": "textcolor_useslighttextcolor",
+      "_src": "textcolor_useslighttextcolor",
+      "_tgt": "textnodedecorator_decoratesplitsiblingpriceintextnode",
       "source": "textcolor_useslighttextcolor",
       "target": "textnodedecorator_decoratesplitsiblingpriceintextnode"
     },
@@ -7743,8 +7613,8 @@
       "source_file": "apps/extension/entrypoints/content/inlineConversion/textNodeDecorator.ts",
       "source_location": "L193",
       "weight": 1.0,
-      "_src": "textnodedecorator_decoratepricesintextnode",
-      "_tgt": "textcolor_useslighttextcolor",
+      "_src": "textcolor_useslighttextcolor",
+      "_tgt": "textnodedecorator_decoratepricesintextnode",
       "source": "textcolor_useslighttextcolor",
       "target": "textnodedecorator_decoratepricesintextnode"
     },
@@ -7755,8 +7625,8 @@
       "source_file": "apps/extension/entrypoints/content/inlineConversion/structuredDecorators.ts",
       "source_location": "L241",
       "weight": 1.0,
-      "_src": "structureddecorators_decoratestructuredamazonprices",
-      "_tgt": "textcolor_useslighttextcolorforelement",
+      "_src": "textcolor_useslighttextcolorforelement",
+      "_tgt": "structureddecorators_decoratestructuredamazonprices",
       "source": "textcolor_useslighttextcolorforelement",
       "target": "structureddecorators_decoratestructuredamazonprices"
     },
@@ -7767,8 +7637,8 @@
       "source_file": "apps/extension/entrypoints/content/inlineConversion/structuredDecorators.ts",
       "source_location": "L323",
       "weight": 1.0,
-      "_src": "structureddecorators_decoratestructuredsiblingsymbolprices",
-      "_tgt": "textcolor_useslighttextcolorforelement",
+      "_src": "textcolor_useslighttextcolorforelement",
+      "_tgt": "structureddecorators_decoratestructuredsiblingsymbolprices",
       "source": "textcolor_useslighttextcolorforelement",
       "target": "structureddecorators_decoratestructuredsiblingsymbolprices"
     },
@@ -8031,8 +7901,8 @@
       "source_file": "apps/extension/entrypoints/content/inlineConversion/structuredDecorators.ts",
       "source_location": "L243",
       "weight": 1.0,
-      "_src": "structureddecorators_decoratestructuredamazonprices",
-      "_tgt": "conversionnodes_setinlineconversioncontent",
+      "_src": "conversionnodes_setinlineconversioncontent",
+      "_tgt": "structureddecorators_decoratestructuredamazonprices",
       "source": "conversionnodes_setinlineconversioncontent",
       "target": "structureddecorators_decoratestructuredamazonprices"
     },
@@ -8043,8 +7913,8 @@
       "source_file": "apps/extension/entrypoints/content/inlineConversion/structuredDecorators.ts",
       "source_location": "L325",
       "weight": 1.0,
-      "_src": "structureddecorators_decoratestructuredsiblingsymbolprices",
-      "_tgt": "conversionnodes_setinlineconversioncontent",
+      "_src": "conversionnodes_setinlineconversioncontent",
+      "_tgt": "structureddecorators_decoratestructuredsiblingsymbolprices",
       "source": "conversionnodes_setinlineconversioncontent",
       "target": "structureddecorators_decoratestructuredsiblingsymbolprices"
     },
@@ -8055,8 +7925,8 @@
       "source_file": "apps/extension/entrypoints/content/inlineConversion/textNodeDecorator.ts",
       "source_location": "L150",
       "weight": 1.0,
-      "_src": "textnodedecorator_decoratesplitsiblingpriceintextnode",
-      "_tgt": "conversionnodes_setinlineconversioncontent",
+      "_src": "conversionnodes_setinlineconversioncontent",
+      "_tgt": "textnodedecorator_decoratesplitsiblingpriceintextnode",
       "source": "conversionnodes_setinlineconversioncontent",
       "target": "textnodedecorator_decoratesplitsiblingpriceintextnode"
     },
@@ -8067,8 +7937,8 @@
       "source_file": "apps/extension/entrypoints/content/inlineConversion/textNodeDecorator.ts",
       "source_location": "L221",
       "weight": 1.0,
-      "_src": "textnodedecorator_decoratepricesintextnode",
-      "_tgt": "conversionnodes_setinlineconversioncontent",
+      "_src": "conversionnodes_setinlineconversioncontent",
+      "_tgt": "textnodedecorator_decoratepricesintextnode",
       "source": "conversionnodes_setinlineconversioncontent",
       "target": "textnodedecorator_decoratepricesintextnode"
     },
@@ -8079,8 +7949,8 @@
       "source_file": "apps/extension/entrypoints/content/inlineConversion/structuredDecorators.ts",
       "source_location": "L239",
       "weight": 1.0,
-      "_src": "structureddecorators_decoratestructuredamazonprices",
-      "_tgt": "conversionnodes_applyconvertedamountcolor",
+      "_src": "conversionnodes_applyconvertedamountcolor",
+      "_tgt": "structureddecorators_decoratestructuredamazonprices",
       "source": "conversionnodes_applyconvertedamountcolor",
       "target": "structureddecorators_decoratestructuredamazonprices"
     },
@@ -8091,8 +7961,8 @@
       "source_file": "apps/extension/entrypoints/content/inlineConversion/structuredDecorators.ts",
       "source_location": "L321",
       "weight": 1.0,
-      "_src": "structureddecorators_decoratestructuredsiblingsymbolprices",
-      "_tgt": "conversionnodes_applyconvertedamountcolor",
+      "_src": "conversionnodes_applyconvertedamountcolor",
+      "_tgt": "structureddecorators_decoratestructuredsiblingsymbolprices",
       "source": "conversionnodes_applyconvertedamountcolor",
       "target": "structureddecorators_decoratestructuredsiblingsymbolprices"
     },
@@ -8103,8 +7973,8 @@
       "source_file": "apps/extension/entrypoints/content/inlineConversion/textNodeDecorator.ts",
       "source_location": "L146",
       "weight": 1.0,
-      "_src": "textnodedecorator_decoratesplitsiblingpriceintextnode",
-      "_tgt": "conversionnodes_applyconvertedamountcolor",
+      "_src": "conversionnodes_applyconvertedamountcolor",
+      "_tgt": "textnodedecorator_decoratesplitsiblingpriceintextnode",
       "source": "conversionnodes_applyconvertedamountcolor",
       "target": "textnodedecorator_decoratesplitsiblingpriceintextnode"
     },
@@ -8115,8 +7985,8 @@
       "source_file": "apps/extension/entrypoints/content/inlineConversion/textNodeDecorator.ts",
       "source_location": "L219",
       "weight": 1.0,
-      "_src": "textnodedecorator_decoratepricesintextnode",
-      "_tgt": "conversionnodes_applyconvertedamountcolor",
+      "_src": "conversionnodes_applyconvertedamountcolor",
+      "_tgt": "textnodedecorator_decoratepricesintextnode",
       "source": "conversionnodes_applyconvertedamountcolor",
       "target": "textnodedecorator_decoratepricesintextnode"
     },
@@ -8139,8 +8009,8 @@
       "source_file": "apps/extension/entrypoints/content/inlineConversion/structuredDecorators.ts",
       "source_location": "L206",
       "weight": 1.0,
-      "_src": "structureddecorators_decoratestructuredamazonprices",
-      "_tgt": "conversionnodes_getinlineaddonnode",
+      "_src": "conversionnodes_getinlineaddonnode",
+      "_tgt": "structureddecorators_decoratestructuredamazonprices",
       "source": "conversionnodes_getinlineaddonnode",
       "target": "structureddecorators_decoratestructuredamazonprices"
     },
@@ -8151,8 +8021,8 @@
       "source_file": "apps/extension/entrypoints/content/inlineConversion/structuredDecorators.ts",
       "source_location": "L278",
       "weight": 1.0,
-      "_src": "structureddecorators_decoratestructuredsiblingsymbolprices",
-      "_tgt": "conversionnodes_getinlineaddonnode",
+      "_src": "conversionnodes_getinlineaddonnode",
+      "_tgt": "structureddecorators_decoratestructuredsiblingsymbolprices",
       "source": "conversionnodes_getinlineaddonnode",
       "target": "structureddecorators_decoratestructuredsiblingsymbolprices"
     },
@@ -8163,8 +8033,8 @@
       "source_file": "apps/extension/entrypoints/content/inlineConversion/textNodeDecorator.ts",
       "source_location": "L114",
       "weight": 1.0,
-      "_src": "textnodedecorator_decoratesplitsiblingpriceintextnode",
-      "_tgt": "conversionnodes_getinlineaddonnode",
+      "_src": "conversionnodes_getinlineaddonnode",
+      "_tgt": "textnodedecorator_decoratesplitsiblingpriceintextnode",
       "source": "conversionnodes_getinlineaddonnode",
       "target": "textnodedecorator_decoratesplitsiblingpriceintextnode"
     },
@@ -9015,8 +8885,8 @@
       "source_file": "docs/SECURITY_CHECKLIST.md",
       "source_location": null,
       "weight": 1.0,
-      "_src": "docs_security_checklist_manifest_csp",
-      "_tgt": "docs_new_web_extension_prompt_clone_spec",
+      "_src": "docs_new_web_extension_prompt_clone_spec",
+      "_tgt": "docs_security_checklist_manifest_csp",
       "source": "docs_new_web_extension_prompt_clone_spec",
       "target": "docs_security_checklist_manifest_csp"
     },
@@ -9087,8 +8957,8 @@
       "source_file": "docs/QA_E2E_CHECKLIST.md",
       "source_location": null,
       "weight": 1.0,
-      "_src": "docs_qa_e2e_checklist_conversion_flows",
-      "_tgt": "docs_new_web_extension_prompt_runtime_concepts",
+      "_src": "docs_new_web_extension_prompt_runtime_concepts",
+      "_tgt": "docs_qa_e2e_checklist_conversion_flows",
       "source": "docs_new_web_extension_prompt_runtime_concepts",
       "target": "docs_qa_e2e_checklist_conversion_flows"
     },
@@ -9099,8 +8969,8 @@
       "source_file": "docs/SECURITY_CHECKLIST.md",
       "source_location": null,
       "weight": 1.0,
-      "_src": "docs_security_checklist_hardening",
-      "_tgt": "docs_new_web_extension_prompt_runtime_concepts",
+      "_src": "docs_new_web_extension_prompt_runtime_concepts",
+      "_tgt": "docs_security_checklist_hardening",
       "source": "docs_new_web_extension_prompt_runtime_concepts",
       "target": "docs_security_checklist_hardening"
     },
@@ -9111,8 +8981,8 @@
       "source_file": "docs/QA_E2E_CHECKLIST.md",
       "source_location": null,
       "weight": 1.0,
-      "_src": "docs_qa_e2e_checklist_conversion_flows",
-      "_tgt": "selection_popup",
+      "_src": "selection_popup",
+      "_tgt": "docs_qa_e2e_checklist_conversion_flows",
       "source": "selection_popup",
       "target": "docs_qa_e2e_checklist_conversion_flows"
     },
@@ -9123,8 +8993,8 @@
       "source_file": "apps/extension/entrypoints/popup/index.html",
       "source_location": null,
       "weight": 1.0,
-      "_src": "popup_page_shell",
-      "_tgt": "selection_popup",
+      "_src": "selection_popup",
+      "_tgt": "popup_page_shell",
       "source": "selection_popup",
       "target": "popup_page_shell"
     },
@@ -9135,8 +9005,8 @@
       "source_file": "docs/QA_E2E_CHECKLIST.md",
       "source_location": null,
       "weight": 1.0,
-      "_src": "docs_qa_e2e_checklist_conversion_flows",
-      "_tgt": "inline_conversion_runtime",
+      "_src": "inline_conversion_runtime",
+      "_tgt": "docs_qa_e2e_checklist_conversion_flows",
       "source": "inline_conversion_runtime",
       "target": "docs_qa_e2e_checklist_conversion_flows"
     },
@@ -9147,8 +9017,8 @@
       "source_file": "docs/SAAS_ROADMAP.md",
       "source_location": null,
       "weight": 1.0,
-      "_src": "docs_saas_roadmap_delivered",
-      "_tgt": "inline_conversion_runtime",
+      "_src": "inline_conversion_runtime",
+      "_tgt": "docs_saas_roadmap_delivered",
       "source": "inline_conversion_runtime",
       "target": "docs_saas_roadmap_delivered"
     },
@@ -9159,8 +9029,8 @@
       "source_file": "docs/SAAS_ROADMAP.md",
       "source_location": null,
       "weight": 1.0,
-      "_src": "docs_saas_roadmap_delivered",
-      "_tgt": "preferred_currency_settings",
+      "_src": "preferred_currency_settings",
+      "_tgt": "docs_saas_roadmap_delivered",
       "source": "preferred_currency_settings",
       "target": "docs_saas_roadmap_delivered"
     },
@@ -9171,8 +9041,8 @@
       "source_file": "apps/extension/entrypoints/options/index.html",
       "source_location": null,
       "weight": 1.0,
-      "_src": "options_page_settings",
-      "_tgt": "preferred_currency_settings",
+      "_src": "preferred_currency_settings",
+      "_tgt": "options_page_settings",
       "source": "preferred_currency_settings",
       "target": "options_page_settings"
     },
@@ -9183,8 +9053,8 @@
       "source_file": "docs/SECURITY_CHECKLIST.md",
       "source_location": null,
       "weight": 1.0,
-      "_src": "docs_security_checklist_hardening",
-      "_tgt": "market_day_rate_cache",
+      "_src": "market_day_rate_cache",
+      "_tgt": "docs_security_checklist_hardening",
       "source": "market_day_rate_cache",
       "target": "docs_security_checklist_hardening"
     },
@@ -9195,8 +9065,8 @@
       "source_file": "docs/SAAS_ROADMAP.md",
       "source_location": null,
       "weight": 1.0,
-      "_src": "docs_saas_roadmap_delivered",
-      "_tgt": "background_alarm_refresh",
+      "_src": "background_alarm_refresh",
+      "_tgt": "docs_saas_roadmap_delivered",
       "source": "background_alarm_refresh",
       "target": "docs_saas_roadmap_delivered"
     },
@@ -9267,8 +9137,8 @@
       "source_file": "docs/revenue-reviews/reports/2026-04-17.md",
       "source_location": null,
       "weight": 1.0,
-      "_src": "docs_revenue_review_2026_04_17_b2b_pilot",
-      "_tgt": "docs_revenue_review_2026_04_18_trust_gap",
+      "_src": "docs_revenue_review_2026_04_18_trust_gap",
+      "_tgt": "docs_revenue_review_2026_04_17_b2b_pilot",
       "source": "docs_revenue_review_2026_04_18_trust_gap",
       "target": "docs_revenue_review_2026_04_17_b2b_pilot"
     },
@@ -9291,8 +9161,8 @@
       "source_file": "apps/website/index.html",
       "source_location": null,
       "weight": 1.0,
-      "_src": "website_homepage",
-      "_tgt": "b2b_pilot_offer",
+      "_src": "b2b_pilot_offer",
+      "_tgt": "website_homepage",
       "source": "b2b_pilot_offer",
       "target": "website_homepage"
     },
@@ -9303,8 +9173,8 @@
       "source_file": "apps/website/playground.html",
       "source_location": null,
       "weight": 1.0,
-      "_src": "website_playground",
-      "_tgt": "b2b_pilot_offer",
+      "_src": "b2b_pilot_offer",
+      "_tgt": "website_playground",
       "source": "b2b_pilot_offer",
       "target": "website_playground"
     },
@@ -9315,8 +9185,8 @@
       "source_file": "apps/website/playground.html",
       "source_location": null,
       "weight": 1.0,
-      "_src": "website_playground",
-      "_tgt": "packages_currency_detection_readme_api",
+      "_src": "packages_currency_detection_readme_api",
+      "_tgt": "website_playground",
       "source": "packages_currency_detection_readme_api",
       "target": "website_playground"
     },
@@ -9531,8 +9401,8 @@
       "source_file": "apps/extension/public/icon/512.png",
       "source_location": null,
       "weight": 1.0,
-      "_src": "512_png_exchange_arrows",
-      "_tgt": "512_png_currency_conversion_concept",
+      "_src": "512_png_currency_conversion_concept",
+      "_tgt": "512_png_exchange_arrows",
       "source": "512_png_currency_conversion_concept",
       "target": "512_png_exchange_arrows"
     },
@@ -9543,8 +9413,8 @@
       "source_file": "apps/extension/public/icon/512.png",
       "source_location": null,
       "weight": 1.0,
-      "_src": "512_png_cyan_ring",
-      "_tgt": "512_png_currency_conversion_concept",
+      "_src": "512_png_currency_conversion_concept",
+      "_tgt": "512_png_cyan_ring",
       "source": "512_png_currency_conversion_concept",
       "target": "512_png_cyan_ring"
     },
@@ -9555,8 +9425,8 @@
       "source_file": "apps/extension/public/icon/512.png",
       "source_location": null,
       "weight": 1.0,
-      "_src": "512_png_letter_x",
-      "_tgt": "512_png_currency_conversion_concept",
+      "_src": "512_png_currency_conversion_concept",
+      "_tgt": "512_png_letter_x",
       "source": "512_png_currency_conversion_concept",
       "target": "512_png_letter_x"
     },
@@ -9567,8 +9437,8 @@
       "source_file": "apps/extension/public/icon/512.png",
       "source_location": null,
       "weight": 1.0,
-      "_src": "512_png_letter_r",
-      "_tgt": "512_png_currency_conversion_concept",
+      "_src": "512_png_currency_conversion_concept",
+      "_tgt": "512_png_letter_r",
       "source": "512_png_currency_conversion_concept",
       "target": "512_png_letter_r"
     },
@@ -9711,8 +9581,8 @@
       "source_file": "AGENTS.md",
       "source_location": null,
       "weight": 1.0,
-      "_src": "agents_md_git_issue_workflow",
-      "_tgt": "agents_md_worktree_policy",
+      "_src": "agents_md_worktree_policy",
+      "_tgt": "agents_md_git_issue_workflow",
       "source": "agents_md_worktree_policy",
       "target": "agents_md_git_issue_workflow"
     },
@@ -9723,8 +9593,8 @@
       "source_file": "AGENTS.md",
       "source_location": null,
       "weight": 1.0,
-      "_src": "agents_md_dev_phase_rationale",
-      "_tgt": "agents_md_no_backward_compatibility",
+      "_src": "agents_md_no_backward_compatibility",
+      "_tgt": "agents_md_dev_phase_rationale",
       "source": "agents_md_no_backward_compatibility",
       "target": "agents_md_dev_phase_rationale"
     },
@@ -9759,8 +9629,8 @@
       "source_file": "graphify-out/GRAPH_REPORT.md",
       "source_location": null,
       "weight": 1.0,
-      "_src": "graph_report_md_graph_structure_value_rationale",
-      "_tgt": "graph_report_md_graph_report",
+      "_src": "graph_report_md_graph_report",
+      "_tgt": "graph_report_md_graph_structure_value_rationale",
       "source": "graph_report_md_graph_report",
       "target": "graph_report_md_graph_structure_value_rationale"
     },
@@ -9823,174 +9693,6 @@
       "_tgt": "graph_report_md_hyperedges_section",
       "source": "graph_report_md_graph_report",
       "target": "graph_report_md_hyperedges_section"
-    },
-    {
-      "relation": "semantically_similar_to",
-      "confidence": "INFERRED",
-      "confidence_score": 0.74,
-      "source_file": "graphify-out/GRAPH_REPORT.md",
-      "source_location": null,
-      "weight": 1.0,
-      "_src": "graph_report_md_community_hubs",
-      "_tgt": "graph_html_legend_dataset",
-      "source": "graph_report_md_community_hubs",
-      "target": "graph_html_legend_dataset"
-    },
-    {
-      "relation": "references",
-      "confidence": "AMBIGUOUS",
-      "confidence_score": 0.22,
-      "source_file": "graphify-out/GRAPH_REPORT.md",
-      "source_location": null,
-      "weight": 1.0,
-      "_src": "graph_report_md_surprising_connections",
-      "_tgt": "graph_html_raw_edges_dataset",
-      "source": "graph_report_md_surprising_connections",
-      "target": "graph_html_raw_edges_dataset"
-    },
-    {
-      "relation": "conceptually_related_to",
-      "confidence": "INFERRED",
-      "confidence_score": 0.87,
-      "source_file": "graphify-out/GRAPH_REPORT.md",
-      "source_location": null,
-      "weight": 1.0,
-      "_src": "graph_report_md_hyperedges_section",
-      "_tgt": "graph_html_hyperedges_overlay",
-      "source": "graph_report_md_hyperedges_section",
-      "target": "graph_html_hyperedges_overlay"
-    },
-    {
-      "relation": "semantically_similar_to",
-      "confidence": "INFERRED",
-      "confidence_score": 0.9,
-      "source_file": "graphify-out/GRAPH_REPORT.md",
-      "source_location": null,
-      "weight": 1.0,
-      "_src": "graph_report_md_hyperedges_section",
-      "_tgt": "graph_html_hyperedge_rendering",
-      "source": "graph_report_md_hyperedges_section",
-      "target": "graph_html_hyperedge_rendering"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "graphify-out/graph.html",
-      "source_location": null,
-      "weight": 1.0,
-      "_src": "graph_html_network_instance",
-      "_tgt": "graph_html_vis_network_dependency",
-      "source": "graph_html_vis_network_dependency",
-      "target": "graph_html_network_instance"
-    },
-    {
-      "relation": "shares_data_with",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "graphify-out/graph.html",
-      "source_location": null,
-      "weight": 1.0,
-      "_src": "graph_html_network_instance",
-      "_tgt": "graph_html_raw_nodes_dataset",
-      "source": "graph_html_raw_nodes_dataset",
-      "target": "graph_html_network_instance"
-    },
-    {
-      "relation": "shares_data_with",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "graphify-out/graph.html",
-      "source_location": null,
-      "weight": 1.0,
-      "_src": "graph_html_search_feature",
-      "_tgt": "graph_html_raw_nodes_dataset",
-      "source": "graph_html_raw_nodes_dataset",
-      "target": "graph_html_search_feature"
-    },
-    {
-      "relation": "shares_data_with",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "graphify-out/graph.html",
-      "source_location": null,
-      "weight": 1.0,
-      "_src": "graph_html_community_filter",
-      "_tgt": "graph_html_raw_nodes_dataset",
-      "source": "graph_html_raw_nodes_dataset",
-      "target": "graph_html_community_filter"
-    },
-    {
-      "relation": "shares_data_with",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "graphify-out/graph.html",
-      "source_location": null,
-      "weight": 1.0,
-      "_src": "graph_html_network_instance",
-      "_tgt": "graph_html_raw_edges_dataset",
-      "source": "graph_html_raw_edges_dataset",
-      "target": "graph_html_network_instance"
-    },
-    {
-      "relation": "shares_data_with",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "graphify-out/graph.html",
-      "source_location": null,
-      "weight": 1.0,
-      "_src": "graph_html_community_filter",
-      "_tgt": "graph_html_legend_dataset",
-      "source": "graph_html_legend_dataset",
-      "target": "graph_html_community_filter"
-    },
-    {
-      "relation": "shares_data_with",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "graphify-out/graph.html",
-      "source_location": null,
-      "weight": 1.0,
-      "_src": "graph_html_node_info_panel",
-      "_tgt": "graph_html_network_instance",
-      "source": "graph_html_network_instance",
-      "target": "graph_html_node_info_panel"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "graphify-out/graph.html",
-      "source_location": null,
-      "weight": 1.0,
-      "_src": "graph_html_search_feature",
-      "_tgt": "graph_html_network_instance",
-      "source": "graph_html_network_instance",
-      "target": "graph_html_search_feature"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "graphify-out/graph.html",
-      "source_location": null,
-      "weight": 1.0,
-      "_src": "graph_html_hyperedge_rendering",
-      "_tgt": "graph_html_network_instance",
-      "source": "graph_html_network_instance",
-      "target": "graph_html_hyperedge_rendering"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "graphify-out/graph.html",
-      "source_location": null,
-      "weight": 1.0,
-      "_src": "graph_html_hyperedge_rendering",
-      "_tgt": "graph_html_hyperedges_overlay",
-      "source": "graph_html_hyperedges_overlay",
-      "target": "graph_html_hyperedge_rendering"
     }
   ],
   "hyperedges": [
