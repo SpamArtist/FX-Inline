@@ -2,8 +2,6 @@ import * as React from "react"
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
 import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react"
 
-import { cn } from "@/utils/utils"
-
 function DropdownMenu({
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Root>) {
@@ -39,7 +37,7 @@ function DropdownMenuContent({
       <DropdownMenuPrimitive.Content
         data-slot="dropdown-menu-content"
         sideOffset={sideOffset}
-        className={cn("ccx-dropdown-menu-content ccx-radix-dropdown-content", className)}
+        className={className ? `ccx-dropdown-menu-content ccx-radix-dropdown-content ${className}` : "ccx-dropdown-menu-content ccx-radix-dropdown-content"}
         {...props}
       />
     </DropdownMenuPrimitive.Portal>
@@ -68,7 +66,7 @@ function DropdownMenuItem({
       data-slot="dropdown-menu-item"
       data-inset={inset}
       data-variant={variant}
-      className={cn("ccx-radix-dropdown-item", className)}
+      className={className ? `ccx-radix-dropdown-item ${className}` : "ccx-radix-dropdown-item"}
       {...props}
     />
   )
@@ -83,7 +81,7 @@ function DropdownMenuCheckboxItem({
   return (
     <DropdownMenuPrimitive.CheckboxItem
       data-slot="dropdown-menu-checkbox-item"
-      className={cn("ccx-radix-dropdown-item ccx-radix-dropdown-item--checkbox", className)}
+      className={className ? `ccx-radix-dropdown-item ccx-radix-dropdown-item--checkbox ${className}` : "ccx-radix-dropdown-item ccx-radix-dropdown-item--checkbox"}
       checked={checked}
       {...props}
     >
@@ -116,7 +114,7 @@ function DropdownMenuRadioItem({
   return (
     <DropdownMenuPrimitive.RadioItem
       data-slot="dropdown-menu-radio-item"
-      className={cn("ccx-radix-dropdown-item ccx-radix-dropdown-item--radio", className)}
+      className={className ? `ccx-radix-dropdown-item ccx-radix-dropdown-item--radio ${className}` : "ccx-radix-dropdown-item ccx-radix-dropdown-item--radio"}
       {...props}
     >
       <span className="ccx-radix-dropdown-indicator" aria-hidden>
@@ -140,7 +138,7 @@ function DropdownMenuLabel({
     <DropdownMenuPrimitive.Label
       data-slot="dropdown-menu-label"
       data-inset={inset}
-      className={cn("ccx-radix-dropdown-label", className)}
+      className={className ? `ccx-radix-dropdown-label ${className}` : "ccx-radix-dropdown-label"}
       {...props}
     />
   )
@@ -153,7 +151,7 @@ function DropdownMenuSeparator({
   return (
     <DropdownMenuPrimitive.Separator
       data-slot="dropdown-menu-separator"
-      className={cn("ccx-radix-dropdown-separator", className)}
+      className={className ? `ccx-radix-dropdown-separator ${className}` : "ccx-radix-dropdown-separator"}
       {...props}
     />
   )
@@ -166,7 +164,7 @@ function DropdownMenuShortcut({
   return (
     <span
       data-slot="dropdown-menu-shortcut"
-      className={cn("ccx-radix-dropdown-shortcut", className)}
+      className={className ? `ccx-radix-dropdown-shortcut ${className}` : "ccx-radix-dropdown-shortcut"}
       {...props}
     />
   )
@@ -190,7 +188,7 @@ function DropdownMenuSubTrigger({
     <DropdownMenuPrimitive.SubTrigger
       data-slot="dropdown-menu-sub-trigger"
       data-inset={inset}
-      className={cn("ccx-radix-dropdown-item ccx-radix-dropdown-sub-trigger", className)}
+      className={className ? `ccx-radix-dropdown-item ccx-radix-dropdown-sub-trigger ${className}` : "ccx-radix-dropdown-item ccx-radix-dropdown-sub-trigger"}
       {...props}
     >
       {children}
@@ -206,7 +204,7 @@ function DropdownMenuSubContent({
   return (
     <DropdownMenuPrimitive.SubContent
       data-slot="dropdown-menu-sub-content"
-      className={cn("ccx-radix-dropdown-content", className)}
+      className={className ? `ccx-radix-dropdown-content ${className}` : "ccx-radix-dropdown-content"}
       {...props}
     />
   )

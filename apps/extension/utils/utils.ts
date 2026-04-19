@@ -1,4 +1,3 @@
-import { clsx, type ClassValue } from "clsx";
 import { CURRENCY_SYMBOLS, ISO_CODES } from "./constants";
 import { CurrencyCode } from "./enums";
 import { getMagnitudeAliasMap } from "./magnitudeProfiles";
@@ -9,10 +8,6 @@ import type {
   CurrencyValueParseResult,
   ParserArtifacts,
 } from "./currencyUtils.types";
-
-export function cn(...inputs: ClassValue[]) {
-  return clsx(inputs);
-}
 
 const CURRENCY_CODE_VALUES = new Set(Object.values(CurrencyCode));
 
