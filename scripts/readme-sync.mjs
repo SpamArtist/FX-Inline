@@ -3,6 +3,7 @@
 import { execSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
+import { getLatestReleaseTag } from "./release/versioning.mjs";
 
 const START_MARKER = "<!-- AUTO-GENERATED:START -->";
 const END_MARKER = "<!-- AUTO-GENERATED:END -->";
@@ -10,10 +11,11 @@ const CHECK_MODE = process.argv.includes("--check");
 
 const repoRoot = process.cwd();
 const readmePath = path.join(repoRoot, "README.md");
-const packageJsonPath = path.join(repoRoot, "package.json");
 const wxtConfigPath = path.join(repoRoot, "wxt.config.ts");
 const ratesPath = path.join(repoRoot, "apps/extension/utils/rates.ts");
 const testsRoot = path.join(repoRoot, "apps/extension/tests");
+const releaseTestsRoot = path.join(repoRoot, "test", "release");
+const packageJsonPath = path.join(repoRoot, "package.json");
 
 function readFileSafe(filePath) {
   try {
@@ -80,9 +82,16 @@ function countTestsBySuite(testFiles) {
   const counts = new Map();
 
   for (const filePath of testFiles) {
-    const relativePath = path.relative(testsRoot, filePath);
-    const [suiteName] = relativePath.split(path.sep);
-    const suiteKey = suiteName || "other";
+    let suiteKey = "other";
+
+    if (filePath.startsWith(`${testsRoot}${path.sep}`)) {
+      const relativePath = path.relative(testsRoot, filePath);
+      const [suiteName] = relativePath.split(path.sep);
+      suiteKey = suiteName || suiteKey;
+    } else if (filePath.startsWith(`${releaseTestsRoot}${path.sep}`)) {
+      suiteKey = "release";
+    }
+
     counts.set(suiteKey, (counts.get(suiteKey) ?? 0) + 1);
   }
 
@@ -124,6 +133,7 @@ function buildAutoSection() {
   const packageJson = JSON.parse(readFileSafe(packageJsonPath));
   const wxtConfigSource = readFileSafe(wxtConfigPath);
   const ratesSource = readFileSafe(ratesPath);
+  const latestReleaseTag = getLatestReleaseTag(repoRoot);
 
   const scripts = packageJson.scripts ?? {};
   const scriptEntries = Object.entries(scripts);
@@ -131,7 +141,10 @@ function buildAutoSection() {
   const hostPermissions = extractStringArrayByKey(wxtConfigSource, "host_permissions");
   const rateProviderUrls = extractRateProviderUrls(ratesSource);
 
-  const testFiles = walkTestFiles(testsRoot);
+  const testFiles = [
+    ...walkTestFiles(testsRoot),
+    ...walkTestFiles(releaseTestsRoot),
+  ];
   const testsBySuite = countTestsBySuite(testFiles);
 
   const knownLayout = [
@@ -154,7 +167,7 @@ function buildAutoSection() {
     "",
     "### Project",
     `- Package: \`${packageJson.name ?? "unknown"}\``,
-    `- Version: \`${packageJson.version ?? "0.0.0"}\``,
+    ...(latestReleaseTag ? [`- Release Tag: \`${latestReleaseTag}\``] : []),
     `- Description: ${packageJson.description ?? "n/a"}`,
     "",
     "### Layout",

@@ -1,6 +1,7 @@
 node_modules
 .DS_Store
 .output
+.release
 .wxt
 backend/data/db.json
 backend/dist
