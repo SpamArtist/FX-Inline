@@ -26,7 +26,6 @@ LikeC4 scaffolding lives in `architecture/likec4/`. The generator now scans the 
 
 ### Project
 - Package: `FX Inline`
-- Version: `0.4.1`
 - Description: FX Inline converts prices directly on webpages into your preferred currency, so you can compare costs without leaving the page.
 
 ### Layout
@@ -46,8 +45,9 @@ LikeC4 scaffolding lives in `architecture/likec4/`. The generator now scans the 
 - `https://api.exchangerate-api.com/v4/latest/USD`
 
 ### Test Inventory
-- Total test files: `17`
+- Total test files: `18`
 - content: `6`
+- release: `1`
 - unit: `11`
 
 ### Scripts
@@ -66,16 +66,25 @@ LikeC4 scaffolding lives in `architecture/likec4/`. The generator now scans the 
 | `npm run build:website` | `vite build --config apps/website/vite.config.mjs` |
 | `npm run zip` | `wxt zip` |
 | `npm run zip:firefox` | `wxt zip -b firefox` |
+| `npm run release:clean` | `node scripts/release/clean.mjs` |
+| `npm run release:dry-run` | `node scripts/release/describe.mjs` |
+| `npm run release:describe:json` | `node scripts/release/describe.mjs --json` |
+| `npm run release:validate-tag` | `node scripts/release/validate-tag.mjs` |
+| `npm run release:build-artifacts` | `node scripts/release/build-artifacts.mjs` |
+| `npm run release:verify-artifacts` | `node scripts/release/verify-artifacts.mjs` |
+| `npm run release:publish:chrome` | `node scripts/release/publish-chrome.mjs` |
+| `npm run release:publish:edge` | `node scripts/release/publish-edge.mjs` |
 | `npm run preview:website` | `vite preview --config apps/website/vite.config.mjs` |
 | `npm run lint` | `eslint .` |
 | `npm run compile` | `tsc --noEmit` |
 | `npm run build:unit` | `tsc -p apps/extension/tsconfig.unit.json` |
 | `npm run build:content-tests` | `tsc -p apps/extension/tsconfig.content-tests.json` |
 | `npm run jest` | `node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand` |
+| `npm run test:release` | `node --test test/release/versioning.test.mjs` |
 | `npm run test:frontend` | `npm run build:unit && npm run jest -- apps/extension/tests/unit` |
 | `npm run test:content` | `npm run build:content-tests && npm run jest -- --config jest.content.config.cjs apps/extension/tests/content` |
 | `npm run test:unit` | `npm run test:frontend` |
-| `npm run test:all` | `npm run test:frontend && npm run test:content` |
+| `npm run test:all` | `npm run test:frontend && npm run test:content && npm run test:release` |
 | `npm run currency-detection:fixtures` | `node packages/currency-detection/scripts/generate-fixtures.mjs` |
 | `npm run currency-detection:baseline` | `npm run build:unit && npm run currency-detection:fixtures && node packages/currency-detection/scripts/generate-legacy-snapshot.mjs` |
 | `npm run currency-detection:test` | `npm run jest -- packages/currency-detection/test` |
@@ -86,13 +95,13 @@ LikeC4 scaffolding lives in `architecture/likec4/`. The generator now scans the 
 | `npm run readme:sync:check` | `node scripts/readme-sync.mjs --check` |
 
 ### Recent Changes (first-parent, excluding README automation commits)
+- 2026-04-19 `2952f84` build: add tag-driven release plumbing
+- 2026-04-19 `9ce0b9f` ci: add tag-driven release workflow
+- 2026-04-19 `833939e` test: add release versioning coverage
 - 2026-04-19 `df53eba` docs: add revenue review for 2026-04-19
 - 2026-04-19 `7d970d3` docs: add revenue review for 2026-04-19
 - 2026-04-19 `c821362` add graphify analysis artifacts (#22)
 - 2026-04-19 `62c524c` Merge branch 'main' of https://github.com/SpamArtist/currency-conversion-extension-tool
 - 2026-04-19 `1a9a591` docs: consolidate repo codex instructions
-- 2026-04-19 `d3e7a4a` docs: add codex worktree policy
-- 2026-04-18 `98e04b4` docs: add revenue review for 2026-04-18
-- 2026-04-18 `030a5e1` scaffold automated LikeC4 architecture diagrams (#20)
 
 <!-- AUTO-GENERATED:END -->
