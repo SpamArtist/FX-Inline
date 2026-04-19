@@ -1,0 +1,19 @@
+{
+  "nodes": [
+    {
+      "id": "toggle_on_icon",
+      "label": "Toggle On Icon",
+      "file_type": "image",
+      "source_file": "apps/extension/assets/toggle-on.svg",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [],
+  "hyperedges": [],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

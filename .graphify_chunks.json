@@ -1,0 +1,106 @@
+[
+  {
+    "chunk_num": 1,
+    "files": [
+      "README.md",
+      "agent.md",
+      "apps/extension/entrypoints/options/index.html",
+      "apps/extension/entrypoints/popup/index.html",
+      "apps/website/index.html",
+      "apps/website/playground.html",
+      "architecture/README.md",
+      "docs/CURRENCY_DETECTION_PACKAGE.md",
+      "docs/NEW_WEB_EXTENSION_PROMPT.md",
+      "docs/QA_E2E_CHECKLIST.md",
+      "docs/SAAS_ROADMAP.md",
+      "docs/SECURITY_CHECKLIST.md",
+      "docs/revenue-reviews/reports/2026-04-17.md",
+      "docs/revenue-reviews/reports/2026-04-18.md",
+      "packages/currency-detection/README.md"
+    ]
+  },
+  {
+    "chunk_num": 2,
+    "files": [
+      "apps/extension/assets/add_outline.svg"
+    ]
+  },
+  {
+    "chunk_num": 3,
+    "files": [
+      "apps/extension/assets/drop_down.svg"
+    ]
+  },
+  {
+    "chunk_num": 4,
+    "files": [
+      "apps/extension/assets/swap_vertical_outline.svg"
+    ]
+  },
+  {
+    "chunk_num": 5,
+    "files": [
+      "apps/extension/assets/switch.svg"
+    ]
+  },
+  {
+    "chunk_num": 6,
+    "files": [
+      "apps/extension/assets/toggle-off.svg"
+    ]
+  },
+  {
+    "chunk_num": 7,
+    "files": [
+      "apps/extension/assets/toggle-on.svg"
+    ]
+  },
+  {
+    "chunk_num": 8,
+    "files": [
+      "apps/extension/public/fx-inline-logo.svg"
+    ]
+  },
+  {
+    "chunk_num": 9,
+    "files": [
+      "apps/extension/public/icon/128.png"
+    ]
+  },
+  {
+    "chunk_num": 10,
+    "files": [
+      "apps/extension/public/icon/16.png"
+    ]
+  },
+  {
+    "chunk_num": 11,
+    "files": [
+      "apps/extension/public/icon/32.png"
+    ]
+  },
+  {
+    "chunk_num": 12,
+    "files": [
+      "apps/extension/public/icon/48.png"
+    ]
+  },
+  {
+    "chunk_num": 13,
+    "files": [
+      "apps/extension/public/icon/512.png"
+    ]
+  },
+  {
+    "chunk_num": 14,
+    "files": [
+      "apps/extension/public/icon/96.png"
+    ]
+  },
+  {
+    "chunk_num": 15,
+    "files": [
+      "apps/website/assets/fx-inline-site-mark.svg"
+    ]
+  }
+]

@@ -1,0 +1,142 @@
+{
+  "nodes": [
+    {
+      "id": "fx_inline_logo",
+      "label": "FX Inline Logo",
+      "file_type": "image",
+      "source_file": "apps/extension/public/fx-inline-logo.svg",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "fx_inline_logo_background",
+      "label": "Rounded Square Background",
+      "file_type": "image",
+      "source_file": "apps/extension/public/fx-inline-logo.svg",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "fx_inline_logo_ring",
+      "label": "Circular Ring",
+      "file_type": "image",
+      "source_file": "apps/extension/public/fx-inline-logo.svg",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "fx_inline_logo_arrows",
+      "label": "Bidirectional Exchange Arrows",
+      "file_type": "image",
+      "source_file": "apps/extension/public/fx-inline-logo.svg",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "fx_inline_logo_lines",
+      "label": "Horizontal Rate Lines",
+      "file_type": "image",
+      "source_file": "apps/extension/public/fx-inline-logo.svg",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "fx_inline_logo_mark",
+      "label": "Sparkle Mark",
+      "file_type": "image",
+      "source_file": "apps/extension/public/fx-inline-logo.svg",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "fx_inline_logo",
+      "target": "fx_inline_logo_background",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "apps/extension/public/fx-inline-logo.svg",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "fx_inline_logo",
+      "target": "fx_inline_logo_ring",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "apps/extension/public/fx-inline-logo.svg",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "fx_inline_logo",
+      "target": "fx_inline_logo_arrows",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "apps/extension/public/fx-inline-logo.svg",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "fx_inline_logo",
+      "target": "fx_inline_logo_lines",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "apps/extension/public/fx-inline-logo.svg",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "fx_inline_logo",
+      "target": "fx_inline_logo_mark",
+      "relation": "conceptually_related_to",
+      "confidence": "AMBIGUOUS",
+      "confidence_score": 0.3,
+      "source_file": "apps/extension/public/fx-inline-logo.svg",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "fx_inline_logo_composition",
+      "label": "Logo Composition",
+      "nodes": [
+        "fx_inline_logo",
+        "fx_inline_logo_background",
+        "fx_inline_logo_ring",
+        "fx_inline_logo_arrows",
+        "fx_inline_logo_lines",
+        "fx_inline_logo_mark"
+      ],
+      "relation": "form",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/extension/public/fx-inline-logo.svg"
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}
