@@ -1,0 +1,606 @@
+{
+  "nodes": [
+    {
+      "id": "readme_fx_inline",
+      "label": "FX Inline README",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "readme_architecture_diagrams",
+      "label": "Architecture Diagrams",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "readme_repo_snapshot",
+      "label": "Auto-Generated Repository Snapshot",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "agent_repo_guidance",
+      "label": "Repository Agent Guidance",
+      "file_type": "document",
+      "source_file": "agent.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "options_page_settings",
+      "label": "FX Inline Settings Options Page",
+      "file_type": "document",
+      "source_file": "apps/extension/entrypoints/options/index.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "popup_page_shell",
+      "label": "Popup Entry Point Shell",
+      "file_type": "document",
+      "source_file": "apps/extension/entrypoints/popup/index.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "website_homepage",
+      "label": "FX Inline Marketing Website",
+      "file_type": "document",
+      "source_file": "apps/website/index.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "website_playground",
+      "label": "Currency Detection Playground",
+      "file_type": "document",
+      "source_file": "apps/website/playground.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "architecture_likec4_scaffold",
+      "label": "LikeC4 Architecture Scaffold",
+      "file_type": "document",
+      "source_file": "architecture/README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_currency_detection_package_scope",
+      "label": "Currency Detection Package Scope",
+      "file_type": "document",
+      "source_file": "docs/CURRENCY_DETECTION_PACKAGE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_currency_detection_package_api_rules",
+      "label": "Currency Detection API Rules",
+      "file_type": "document",
+      "source_file": "docs/CURRENCY_DETECTION_PACKAGE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_new_web_extension_prompt_clone_spec",
+      "label": "FX Inline Clone Specification",
+      "file_type": "document",
+      "source_file": "docs/NEW_WEB_EXTENSION_PROMPT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_new_web_extension_prompt_runtime_concepts",
+      "label": "Extension Runtime Concepts",
+      "file_type": "document",
+      "source_file": "docs/NEW_WEB_EXTENSION_PROMPT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_qa_e2e_checklist_conversion_flows",
+      "label": "E2E Conversion Checklist",
+      "file_type": "document",
+      "source_file": "docs/QA_E2E_CHECKLIST.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_saas_roadmap_delivered",
+      "label": "SaaS Roadmap Delivered",
+      "file_type": "document",
+      "source_file": "docs/SAAS_ROADMAP.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_saas_roadmap_not_in_scope",
+      "label": "SaaS Roadmap Not in Scope",
+      "file_type": "document",
+      "source_file": "docs/SAAS_ROADMAP.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_security_checklist_manifest_csp",
+      "label": "Security Checklist: Manifest and CSP",
+      "file_type": "document",
+      "source_file": "docs/SECURITY_CHECKLIST.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_security_checklist_hardening",
+      "label": "Security Checklist: Network and DOM Hardening",
+      "file_type": "document",
+      "source_file": "docs/SECURITY_CHECKLIST.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_revenue_review_2026_04_17_b2b_pilot",
+      "label": "2026-04-17 Revenue Review: B2B Pilot Thesis",
+      "file_type": "document",
+      "source_file": "docs/revenue-reviews/reports/2026-04-17.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_revenue_review_2026_04_18_trust_gap",
+      "label": "2026-04-18 Revenue Review: Trust and Funnel Gap",
+      "file_type": "document",
+      "source_file": "docs/revenue-reviews/reports/2026-04-18.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "packages_currency_detection_readme_api",
+      "label": "Currency Detection Package API",
+      "file_type": "document",
+      "source_file": "packages/currency-detection/README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "selection_popup",
+      "label": "Selection Popup",
+      "file_type": "document",
+      "source_file": "docs/NEW_WEB_EXTENSION_PROMPT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "inline_conversion_runtime",
+      "label": "Inline Conversion Runtime",
+      "file_type": "document",
+      "source_file": "docs/NEW_WEB_EXTENSION_PROMPT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "preferred_currency_settings",
+      "label": "Preferred Currency Setting",
+      "file_type": "document",
+      "source_file": "docs/NEW_WEB_EXTENSION_PROMPT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "market_day_rate_cache",
+      "label": "Market-Day Rate Cache",
+      "file_type": "document",
+      "source_file": "docs/NEW_WEB_EXTENSION_PROMPT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "background_alarm_refresh",
+      "label": "Background Alarm Refresh",
+      "file_type": "document",
+      "source_file": "docs/NEW_WEB_EXTENSION_PROMPT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "b2b_pilot_offer",
+      "label": "Fixed-Fee B2B Pilot Offer",
+      "file_type": "document",
+      "source_file": "docs/revenue-reviews/reports/2026-04-17.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "readme_fx_inline",
+      "target": "readme_architecture_diagrams",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "readme_fx_inline",
+      "target": "readme_repo_snapshot",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "readme_architecture_diagrams",
+      "target": "architecture_likec4_scaffold",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_currency_detection_package_scope",
+      "target": "packages_currency_detection_readme_api",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/CURRENCY_DETECTION_PACKAGE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_currency_detection_package_api_rules",
+      "target": "packages_currency_detection_readme_api",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/CURRENCY_DETECTION_PACKAGE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_currency_detection_package_scope",
+      "target": "docs_currency_detection_package_api_rules",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.81,
+      "source_file": "docs/CURRENCY_DETECTION_PACKAGE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_new_web_extension_prompt_clone_spec",
+      "target": "docs_new_web_extension_prompt_runtime_concepts",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/NEW_WEB_EXTENSION_PROMPT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_new_web_extension_prompt_runtime_concepts",
+      "target": "selection_popup",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/NEW_WEB_EXTENSION_PROMPT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_new_web_extension_prompt_runtime_concepts",
+      "target": "inline_conversion_runtime",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/NEW_WEB_EXTENSION_PROMPT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_new_web_extension_prompt_runtime_concepts",
+      "target": "preferred_currency_settings",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/NEW_WEB_EXTENSION_PROMPT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_new_web_extension_prompt_runtime_concepts",
+      "target": "market_day_rate_cache",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/NEW_WEB_EXTENSION_PROMPT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_new_web_extension_prompt_runtime_concepts",
+      "target": "background_alarm_refresh",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/NEW_WEB_EXTENSION_PROMPT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_qa_e2e_checklist_conversion_flows",
+      "target": "selection_popup",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/QA_E2E_CHECKLIST.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_qa_e2e_checklist_conversion_flows",
+      "target": "inline_conversion_runtime",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/QA_E2E_CHECKLIST.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_qa_e2e_checklist_conversion_flows",
+      "target": "docs_new_web_extension_prompt_runtime_concepts",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.86,
+      "source_file": "docs/QA_E2E_CHECKLIST.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "options_page_settings",
+      "target": "preferred_currency_settings",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "apps/extension/entrypoints/options/index.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "popup_page_shell",
+      "target": "selection_popup",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.7,
+      "source_file": "apps/extension/entrypoints/popup/index.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "website_playground",
+      "target": "packages_currency_detection_readme_api",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/website/playground.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "website_homepage",
+      "target": "b2b_pilot_offer",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.66,
+      "source_file": "apps/website/index.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "website_playground",
+      "target": "b2b_pilot_offer",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.61,
+      "source_file": "apps/website/playground.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_saas_roadmap_delivered",
+      "target": "inline_conversion_runtime",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/SAAS_ROADMAP.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_saas_roadmap_delivered",
+      "target": "preferred_currency_settings",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/SAAS_ROADMAP.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_saas_roadmap_delivered",
+      "target": "background_alarm_refresh",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/SAAS_ROADMAP.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_saas_roadmap_not_in_scope",
+      "target": "docs_revenue_review_2026_04_18_trust_gap",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.74,
+      "source_file": "docs/SAAS_ROADMAP.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_security_checklist_manifest_csp",
+      "target": "docs_new_web_extension_prompt_clone_spec",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/SECURITY_CHECKLIST.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_security_checklist_hardening",
+      "target": "market_day_rate_cache",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/SECURITY_CHECKLIST.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_security_checklist_hardening",
+      "target": "docs_new_web_extension_prompt_runtime_concepts",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.84,
+      "source_file": "docs/SECURITY_CHECKLIST.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_revenue_review_2026_04_17_b2b_pilot",
+      "target": "b2b_pilot_offer",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/revenue-reviews/reports/2026-04-17.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_revenue_review_2026_04_18_trust_gap",
+      "target": "b2b_pilot_offer",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/revenue-reviews/reports/2026-04-18.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_revenue_review_2026_04_17_b2b_pilot",
+      "target": "docs_revenue_review_2026_04_18_trust_gap",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.93,
+      "source_file": "docs/revenue-reviews/reports/2026-04-17.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

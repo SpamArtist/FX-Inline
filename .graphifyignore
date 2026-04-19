@@ -1,0 +1,29 @@
+# .graphifyignore
+vendor/
+node_modules/
+dist/
+*.generated.py
+test-dist
+**/test-dist
+
+# tests
+test
+tests
+**/tests
+*.test.*
+**/*.test.*
+*.spec.*
+**/*.spec.*
+
+# optional
+coverage
+dist
+build
+likec4
+.github
+packages/**/benchmarks
+packages/**/scripts
+
+generate-likec4-model.mjs
+readme-sync.mjs
+run-likec4.mjs
