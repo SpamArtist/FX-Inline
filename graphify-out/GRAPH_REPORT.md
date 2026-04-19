@@ -1,7 +1,7 @@
 # Graph Report - /Users/xbotpc/Desktop/XBOTPC/Work/Code/currency-conversion-extension-tool-codex-78e0  (2026-04-19)
 
 ## Corpus Check
-- 73 files · ~73,902 words
+- 73 files · ~73,027 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
