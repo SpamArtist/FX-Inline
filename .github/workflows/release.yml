@@ -1,0 +1,364 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  RELEASE_TAG: ${{ github.ref_name }}
+
+jobs:
+  validate-tag:
+    name: Validate Tag
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      release_tag: ${{ steps.describe.outputs.release_tag }}
+      channel: ${{ steps.describe.outputs.channel }}
+      display_version: ${{ steps.describe.outputs.display_version }}
+      manifest_version: ${{ steps.describe.outputs.manifest_version }}
+      is_rc: ${{ steps.describe.outputs.is_rc }}
+      is_final: ${{ steps.describe.outputs.is_final }}
+      artifact_base_name: ${{ steps.describe.outputs.artifact_base_name }}
+      chrome_zip: ${{ steps.describe.outputs.chrome_zip }}
+      sources_zip: ${{ steps.describe.outputs.sources_zip }}
+      chrome_unpacked_archive: ${{ steps.describe.outputs.chrome_unpacked_archive }}
+      firefox_signed_xpi: ${{ steps.describe.outputs.firefox_signed_xpi }}
+      firefox_upload_archive: ${{ steps.describe.outputs.firefox_upload_archive }}
+      previous_release_tag: ${{ steps.describe.outputs.previous_release_tag }}
+      previous_manifest_version: ${{ steps.describe.outputs.previous_manifest_version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate release tag
+        run: node scripts/release/validate-tag.mjs
+
+      - name: Describe release
+        id: describe
+        run: node scripts/release/describe.mjs --github-output
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: validate-tag
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run test suite
+        run: npm run test:all
+
+  build-artifacts:
+    name: Build Artifacts
+    runs-on: ubuntu-latest
+    needs:
+      - validate-tag
+      - test
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install web-ext for RC signing
+        if: needs.validate-tag.outputs.is_rc == 'true'
+        run: npm install --no-save web-ext
+
+      - name: Build release artifacts
+        env:
+          AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
+          AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+        run: node scripts/release/build-artifacts.mjs
+
+      - name: Collect workflow artifacts
+        run: |
+          mkdir -p release-upload
+          cp ".release/${{ needs.validate-tag.outputs.chrome_zip }}" release-upload/
+          cp ".release/${{ needs.validate-tag.outputs.sources_zip }}" release-upload/
+          cp ".release/release.json" release-upload/
+          if [ "${{ needs.validate-tag.outputs.is_rc }}" = "true" ]; then
+            cp ".release/${{ needs.validate-tag.outputs.chrome_unpacked_archive }}" release-upload/
+            cp ".release/${{ needs.validate-tag.outputs.firefox_signed_xpi }}" release-upload/
+          else
+            cp ".release/${{ needs.validate-tag.outputs.firefox_upload_archive }}" release-upload/
+          fi
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-assets-${{ env.RELEASE_TAG }}
+          path: release-upload/*
+          if-no-files-found: error
+          retention-days: 14
+
+  publish-github-release:
+    name: Publish GitHub Release
+    runs-on: ubuntu-latest
+    needs:
+      - validate-tag
+      - build-artifacts
+    permissions:
+      contents: write
+    timeout-minutes: 20
+    outputs:
+      release_url: ${{ steps.publish.outputs.release_url }}
+    steps:
+      - name: Download release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-assets-${{ env.RELEASE_TAG }}
+          path: release-assets
+
+      - name: Create GitHub release
+        id: publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          release_files=(
+            "release-assets/${{ needs.validate-tag.outputs.chrome_zip }}"
+            "release-assets/${{ needs.validate-tag.outputs.sources_zip }}"
+          )
+
+          if [ "${{ needs.validate-tag.outputs.is_rc }}" = "true" ]; then
+            release_files+=(
+              "release-assets/${{ needs.validate-tag.outputs.chrome_unpacked_archive }}"
+              "release-assets/${{ needs.validate-tag.outputs.firefox_signed_xpi }}"
+            )
+          else
+            release_files+=(
+              "release-assets/${{ needs.validate-tag.outputs.firefox_upload_archive }}"
+            )
+          fi
+
+          args=(release create "$RELEASE_TAG")
+          args+=("${release_files[@]}")
+          args+=(--title "$RELEASE_TAG" --generate-notes)
+
+          if [ "${{ needs.validate-tag.outputs.is_rc }}" = "true" ]; then
+            args+=(--prerelease)
+          fi
+
+          gh "${args[@]}"
+
+          release_url="$(gh release view "$RELEASE_TAG" --json url -q '.url')"
+          echo "release_url=$release_url" >> "$GITHUB_OUTPUT"
+
+  publish-chrome:
+    name: Publish Chrome
+    if: needs.validate-tag.outputs.is_final == 'true'
+    runs-on: ubuntu-latest
+    needs:
+      - validate-tag
+      - build-artifacts
+      - publish-github-release
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-assets-${{ env.RELEASE_TAG }}
+          path: release-assets
+
+      - name: Publish Chrome release
+        env:
+          CWS_PUBLISHER_ID: ${{ secrets.CWS_PUBLISHER_ID }}
+          CWS_EXTENSION_ID: ${{ secrets.CWS_EXTENSION_ID }}
+          CWS_SERVICE_ACCOUNT_JSON: ${{ secrets.CWS_SERVICE_ACCOUNT_JSON }}
+          RELEASE_ASSET_DIR: release-assets
+        run: node scripts/release/publish-chrome.mjs
+
+  publish-firefox:
+    name: Publish Firefox
+    if: needs.validate-tag.outputs.is_final == 'true'
+    runs-on: ubuntu-latest
+    needs:
+      - validate-tag
+      - build-artifacts
+      - publish-github-release
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install web-ext
+        run: npm install --no-save web-ext
+
+      - name: Download release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-assets-${{ env.RELEASE_TAG }}
+          path: release-assets
+
+      - name: Publish Firefox release
+        env:
+          AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
+          AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+        run: |
+          rm -rf firefox-listed-source firefox-listed-artifacts
+          mkdir -p firefox-listed-source firefox-listed-artifacts
+          unzip -q "release-assets/${{ needs.validate-tag.outputs.firefox_upload_archive }}" -d firefox-listed-source
+          npm exec -- web-ext sign \
+            --channel listed \
+            --approval-timeout 0 \
+            --source-dir firefox-listed-source \
+            --artifacts-dir firefox-listed-artifacts \
+            --api-key "$AMO_JWT_ISSUER" \
+            --api-secret "$AMO_JWT_SECRET"
+
+  publish-edge:
+    name: Publish Edge
+    if: needs.validate-tag.outputs.is_final == 'true'
+    runs-on: ubuntu-latest
+    needs:
+      - validate-tag
+      - build-artifacts
+      - publish-github-release
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-assets-${{ env.RELEASE_TAG }}
+          path: release-assets
+
+      - name: Publish Edge release
+        env:
+          EDGE_CLIENT_ID: ${{ secrets.EDGE_CLIENT_ID }}
+          EDGE_API_KEY: ${{ secrets.EDGE_API_KEY }}
+          EDGE_PRODUCT_ID: ${{ secrets.EDGE_PRODUCT_ID }}
+          RELEASE_ASSET_DIR: release-assets
+        run: node scripts/release/publish-edge.mjs
+
+  release-summary:
+    name: Release Summary
+    if: always()
+    runs-on: ubuntu-latest
+    needs:
+      - validate-tag
+      - test
+      - build-artifacts
+      - publish-github-release
+      - publish-chrome
+      - publish-firefox
+      - publish-edge
+    timeout-minutes: 10
+    steps:
+      - name: Write release summary
+        run: |
+          release_url="${{ needs.publish-github-release.outputs.release_url }}"
+          if [ -z "$release_url" ]; then
+            release_url="https://github.com/${{ github.repository }}/releases/tag/$RELEASE_TAG"
+          fi
+
+          {
+            echo "# Release Summary"
+            echo
+            echo "- Release tag: \`$RELEASE_TAG\`"
+            echo "- Channel: \`${{ needs.validate-tag.outputs.channel }}\`"
+            echo "- Display version: \`${{ needs.validate-tag.outputs.display_version }}\`"
+            echo "- Manifest version: \`${{ needs.validate-tag.outputs.manifest_version }}\`"
+            if [ -n "${{ needs.validate-tag.outputs.previous_release_tag }}" ]; then
+              echo "- Previous release: \`${{ needs.validate-tag.outputs.previous_release_tag }}\` (\`${{ needs.validate-tag.outputs.previous_manifest_version }}\`)"
+            else
+              echo "- Previous release: \`none\`"
+            fi
+            echo "- GitHub release: $release_url"
+            echo
+            echo "## Assets"
+            echo
+            echo "- Chrome zip: \`${{ needs.validate-tag.outputs.chrome_zip }}\`"
+            echo "- Sources zip: \`${{ needs.validate-tag.outputs.sources_zip }}\`"
+            if [ "${{ needs.validate-tag.outputs.is_rc }}" = "true" ]; then
+              echo "- Chrome unpacked archive: \`${{ needs.validate-tag.outputs.chrome_unpacked_archive }}\`"
+              echo "- Firefox signed XPI: \`${{ needs.validate-tag.outputs.firefox_signed_xpi }}\`"
+            else
+              echo "- Firefox upload archive: \`${{ needs.validate-tag.outputs.firefox_upload_archive }}\`"
+            fi
+            echo
+            echo "## Job Results"
+            echo
+            echo "| Job | Result |"
+            echo "| --- | --- |"
+            echo "| validate-tag | ${{ needs.validate-tag.result }} |"
+            echo "| test | ${{ needs.test.result }} |"
+            echo "| build-artifacts | ${{ needs.build-artifacts.result }} |"
+            echo "| publish-github-release | ${{ needs.publish-github-release.result }} |"
+            echo "| publish-chrome | ${{ needs.publish-chrome.result }} |"
+            echo "| publish-firefox | ${{ needs.publish-firefox.result }} |"
+            echo "| publish-edge | ${{ needs.publish-edge.result }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
