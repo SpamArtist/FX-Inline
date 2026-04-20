@@ -12,7 +12,6 @@ const readmePath = path.join(repoRoot, "README.md");
 const wxtConfigPath = path.join(repoRoot, "wxt.config.ts");
 const ratesPath = path.join(repoRoot, "apps/extension/utils/rates.ts");
 const testsRoot = path.join(repoRoot, "apps/extension/tests");
-const releaseTestsRoot = path.join(repoRoot, "test", "release");
 const packageJsonPath = path.join(repoRoot, "package.json");
 
 function readFileSafe(filePath) {
@@ -86,8 +85,6 @@ function countTestsBySuite(testFiles) {
       const relativePath = path.relative(testsRoot, filePath);
       const [suiteName] = relativePath.split(path.sep);
       suiteKey = suiteName || suiteKey;
-    } else if (filePath.startsWith(`${releaseTestsRoot}${path.sep}`)) {
-      suiteKey = "release";
     }
 
     counts.set(suiteKey, (counts.get(suiteKey) ?? 0) + 1);
@@ -139,10 +136,7 @@ function buildAutoSection() {
   const hostPermissions = extractStringArrayByKey(wxtConfigSource, "host_permissions");
   const rateProviderUrls = extractRateProviderUrls(ratesSource);
 
-  const testFiles = [
-    ...walkTestFiles(testsRoot),
-    ...walkTestFiles(releaseTestsRoot),
-  ];
+  const testFiles = walkTestFiles(testsRoot);
   const testsBySuite = countTestsBySuite(testFiles);
 
   const knownLayout = [
