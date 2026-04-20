@@ -1,6 +1,6 @@
 # FX Inline Roadmap Status
 
-_Last updated: 2026-04-17_
+_Last updated: 2026-04-20_
 
 ## Delivered
 
@@ -56,6 +56,11 @@ _Last updated: 2026-04-17_
 9. Automated quality gates
 - Unit and content tests for parser/runtime/inline behavior.
 - CI workflow runs `npm run test:all` on pull requests and pushes to `main`.
+
+10. Tag-driven release automation
+- GitHub Actions release workflow triggers on tags matching `v*`.
+- Tag format: `vMAJOR.MINOR.PATCH` (final) or `vMAJOR.MINOR.PATCH-rc.N` (RC).
+- Release workflow validates version monotonicity, runs `npm run test:all`, builds artifacts, and publishes a GitHub release (store publishing steps are gated on configured secrets).
 
 ## Current Focus
 

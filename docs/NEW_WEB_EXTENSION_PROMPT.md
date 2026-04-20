@@ -19,6 +19,17 @@ This is a **greenfield** task. Build everything needed from this prompt only.
 - custom CSS theme tokens (`converter-theme.css`) and component CSS,
 - Radix dropdown primitives for currency menus.
 4. Support Chromium and Firefox builds from one codebase. Include Safari conversion notes.
+5. Include CI + release automation:
+   - Workflows under `.github/workflows/`:
+     - `ci.yml` runs `npm run test:all` on PRs and pushes to `main`.
+     - `currency-detection-benchmarks.yml` runs currency detection benchmarks and publishes artifacts/summaries.
+     - `release.yml` is tag-driven (on `push` of tags matching `v*`) and validates the tag, runs tests, builds artifacts, and publishes a GitHub release (store publishing steps are gated on configured secrets).
+   - Release tags and versioning:
+     - Tag format: `vMAJOR.MINOR.PATCH` (final) or `vMAJOR.MINOR.PATCH-rc.N` (RC).
+     - `scripts/release/versioning.mjs` maps final tags to a browser-safe manifest version `MAJOR.MINOR.PATCH.50000`, and RC tags to `MAJOR.MINOR.PATCH.N`.
+     - Local sanity commands:
+       - `RELEASE_TAG=v0.4.1 npm run release:dry-run`
+       - `RELEASE_TAG=v0.4.1 npm run release:validate-tag`
 
 ## 2) Product Identity
 

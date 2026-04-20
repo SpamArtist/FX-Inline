@@ -1,6 +1,6 @@
 # Security Checklist
 
-_Last updated: 2026-04-17_
+_Last updated: 2026-04-20_
 
 ## 1. Manifest surface and CSP
 
@@ -50,5 +50,10 @@ _Last updated: 2026-04-17_
 ## 7. Pre-Ship Checks
 
 - [ ] Run `npm run test:all` before shipping changes.
+- [ ] For tagged releases, validate the tag/version locally:
+  - `RELEASE_TAG=v0.4.1 npm run release:validate-tag`
+  - `RELEASE_TAG=v0.4.1 npm run release:dry-run`
+- [ ] GitHub Actions release workflow (`.github/workflows/release.yml`) keeps least-privilege permissions (only the GitHub release job requires `contents: write`).
+- [ ] Store credentials (Chrome/Edge/AMO) are stored as GitHub Actions secrets and never committed to the repo.
 - [ ] Re-verify permissions/CSP/host permissions after manifest or dependency changes.
 - [ ] Re-test popup/options/content script behavior on Chromium and Firefox builds.

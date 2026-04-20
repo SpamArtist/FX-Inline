@@ -8,6 +8,16 @@ FX Inline converts prices directly on webpages into your preferred currency so y
 
 This README has an auto-generated repository snapshot that updates via `npm run readme:sync` (run it and commit the result after changes that affect the snapshot).
 
+## Releases
+
+- Releases are tag-driven via `.github/workflows/release.yml` (push a tag matching `v*`).
+- Tag format:
+  - Final: `vMAJOR.MINOR.PATCH`
+  - RC: `vMAJOR.MINOR.PATCH-rc.N`
+- Local dry run / validation:
+  - `RELEASE_TAG=v0.4.1 npm run release:dry-run`
+  - `RELEASE_TAG=v0.4.1 npm run release:validate-tag`
+
 <!-- AUTO-GENERATED:START -->
 
 ## Auto-Generated Repository Snapshot
@@ -79,13 +89,13 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run readme:sync:check` | `node scripts/readme-sync.mjs --check` |
 
 ### Recent Changes (first-parent, excluding README automation commits)
-- 2026-04-20 `05e0fee` chore: drop redundant packaging deps
-- 2026-04-20 `f886f8c` chore: remove release toolchain
-- 2026-04-20 `e9bbd49` chore: remove release workflow
-- 2026-04-20 `da76d27` chore: remove architecture and analysis artifacts
+- 2026-04-20 `fe83acc` missing
+- 2026-04-20 `4f5c47d` REMOVED
+- 2026-04-20 `e20a3ce` Merge branch 'main' of https://github.com/SpamArtist/currency-conversion-extension-tool
 - 2026-04-19 `2952f84` build: add tag-driven release plumbing
 - 2026-04-19 `9ce0b9f` ci: add tag-driven release workflow
 - 2026-04-19 `833939e` test: add release versioning coverage
 - 2026-04-19 `df53eba` docs: add revenue review for 2026-04-19
+- 2026-04-19 `7d970d3` docs: add revenue review for 2026-04-19
 
 <!-- AUTO-GENERATED:END -->
