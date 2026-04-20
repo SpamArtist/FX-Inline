@@ -69,6 +69,7 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run readme:sync:check` | `node scripts/readme-sync.mjs --check` |
 
 ### Recent Changes (first-parent, excluding README automation commits)
+- 2026-04-20 `f886f8c` chore: remove release toolchain
 - 2026-04-20 `e9bbd49` chore: remove release workflow
 - 2026-04-20 `da76d27` chore: remove architecture and analysis artifacts
 - 2026-04-19 `2952f84` build: add tag-driven release plumbing
@@ -76,6 +77,5 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 - 2026-04-19 `833939e` test: add release versioning coverage
 - 2026-04-19 `df53eba` docs: add revenue review for 2026-04-19
 - 2026-04-19 `7d970d3` docs: add revenue review for 2026-04-19
-- 2026-04-19 `62c524c` Merge branch 'main' of https://github.com/SpamArtist/currency-conversion-extension-tool
 
 <!-- AUTO-GENERATED:END -->
