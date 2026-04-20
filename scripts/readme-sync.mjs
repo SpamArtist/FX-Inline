@@ -3,8 +3,6 @@
 import { execSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
-import { getLatestReleaseTag } from "./release/versioning.mjs";
-
 const START_MARKER = "<!-- AUTO-GENERATED:START -->";
 const END_MARKER = "<!-- AUTO-GENERATED:END -->";
 const CHECK_MODE = process.argv.includes("--check");
@@ -135,8 +133,6 @@ function buildAutoSection() {
   const packageJson = JSON.parse(readFileSafe(packageJsonPath));
   const wxtConfigSource = readFileSafe(wxtConfigPath);
   const ratesSource = readFileSafe(ratesPath);
-  const latestReleaseTag = getLatestReleaseTag(repoRoot);
-
   const scripts = packageJson.scripts ?? {};
   const scriptEntries = Object.entries(scripts);
   const permissions = extractStringArrayByKey(wxtConfigSource, "permissions");
@@ -168,7 +164,6 @@ function buildAutoSection() {
     "",
     "### Project",
     `- Package: \`${packageJson.name ?? "unknown"}\``,
-    ...(latestReleaseTag ? [`- Release Tag: \`${latestReleaseTag}\``] : []),
     `- Description: ${packageJson.description ?? "n/a"}`,
     "",
     "### Layout",
