@@ -2,18 +2,6 @@ import path from "path";
 import type { OutputBundle, OutputOptions } from "rollup";
 import vitePluginSvgr from "vite-plugin-svgr";
 import { defineConfig } from "wxt";
-import { resolveReleaseTag } from "./scripts/release/versioning.mjs";
-
-const releaseTag = process.env.RELEASE_TAG?.trim();
-const releaseManifestOverrides = releaseTag
-  ? (() => {
-    const release = resolveReleaseTag(releaseTag);
-    return {
-      version: release.manifestVersion,
-      version_name: release.displayVersion,
-    };
-  })()
-  : null;
 
 function hardenFirefoxInnerHtmlAssignments() {
   return {
@@ -60,7 +48,6 @@ export default defineConfig({
         : productionConnectSrc;
 
     return {
-      ...(releaseManifestOverrides ?? {}),
       icons: {
         "16": "icon/16.png",
         "32": "icon/32.png",
