@@ -42,8 +42,7 @@
     "packages/currency-detection/README.md",
     "packages/currency-detection/src",
     "scripts/readme-sync.mjs",
-    "scripts/generate-likec4-model.mjs",
-    "scripts/run-likec4.mjs",
+    "scripts/readme-sync.mjs",
     ".github/workflows/ci.yml",
     ".github/workflows/currency-detection-benchmarks.yml",
     ".github/workflows/architecture-diagrams.yml",
@@ -53,8 +52,7 @@
     "docs/QA_E2E_CHECKLIST.md"
   ],
   "ignored_paths_or_categories": [
-    "LikeC4 and related architecture-generation output",
-    "graphify, Graphify, and generated graph artifacts",
+    "architecture and analysis-generated output",
     "previous narrative revenue reports as analytical ground truth",
     "previous generated daily JSON report artifacts as analytical ground truth",
     "test files as primary analytical inputs",

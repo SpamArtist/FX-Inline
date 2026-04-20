@@ -3,8 +3,6 @@
 import { execSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
-import { getLatestReleaseTag } from "./release/versioning.mjs";
-
 const START_MARKER = "<!-- AUTO-GENERATED:START -->";
 const END_MARKER = "<!-- AUTO-GENERATED:END -->";
 const CHECK_MODE = process.argv.includes("--check");
@@ -14,7 +12,6 @@ const readmePath = path.join(repoRoot, "README.md");
 const wxtConfigPath = path.join(repoRoot, "wxt.config.ts");
 const ratesPath = path.join(repoRoot, "apps/extension/utils/rates.ts");
 const testsRoot = path.join(repoRoot, "apps/extension/tests");
-const releaseTestsRoot = path.join(repoRoot, "test", "release");
 const packageJsonPath = path.join(repoRoot, "package.json");
 
 function readFileSafe(filePath) {
@@ -88,8 +85,6 @@ function countTestsBySuite(testFiles) {
       const relativePath = path.relative(testsRoot, filePath);
       const [suiteName] = relativePath.split(path.sep);
       suiteKey = suiteName || suiteKey;
-    } else if (filePath.startsWith(`${releaseTestsRoot}${path.sep}`)) {
-      suiteKey = "release";
     }
 
     counts.set(suiteKey, (counts.get(suiteKey) ?? 0) + 1);
@@ -104,6 +99,7 @@ function escapeTableText(value) {
 
 function getRecentCommits(limit = 8) {
   const sampleSize = Math.max(limit * 5, 25);
+  const excludedCommitHashes = new Set(["c821362"]);
   const raw = runGitCommand(
     `git log --first-parent --date=short --pretty=format:%h%x1f%ad%x1f%s -n ${sampleSize}`,
   );
@@ -121,6 +117,7 @@ function getRecentCommits(limit = 8) {
     .filter((commit) => {
       const normalizedSubject = commit.subject.toLowerCase();
       return !(
+        excludedCommitHashes.has(commit.hash) ||
         normalizedSubject.includes("docs: sync readme snapshot") ||
         normalizedSubject.includes("readme sync") ||
         normalizedSubject.includes("chore/readme-sync")
@@ -133,8 +130,6 @@ function buildAutoSection() {
   const packageJson = JSON.parse(readFileSafe(packageJsonPath));
   const wxtConfigSource = readFileSafe(wxtConfigPath);
   const ratesSource = readFileSafe(ratesPath);
-  const latestReleaseTag = getLatestReleaseTag(repoRoot);
-
   const scripts = packageJson.scripts ?? {};
   const scriptEntries = Object.entries(scripts);
   const permissions = extractStringArrayByKey(wxtConfigSource, "permissions");
@@ -148,7 +143,6 @@ function buildAutoSection() {
   const testsBySuite = countTestsBySuite(testFiles);
 
   const knownLayout = [
-    ["architecture", "LikeC4 architecture model and generated diagram sources"],
     ["apps/extension", "Browser extension app (WXT + React)"],
     ["apps/website", "Standalone marketing website (Vite)"],
     ["docs", "Project docs and runbooks"],
@@ -167,7 +161,6 @@ function buildAutoSection() {
     "",
     "### Project",
     `- Package: \`${packageJson.name ?? "unknown"}\``,
-    ...(latestReleaseTag ? [`- Release Tag: \`${latestReleaseTag}\``] : []),
     `- Description: ${packageJson.description ?? "n/a"}`,
     "",
     "### Layout",
