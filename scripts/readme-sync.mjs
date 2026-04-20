@@ -104,6 +104,7 @@ function escapeTableText(value) {
 
 function getRecentCommits(limit = 8) {
   const sampleSize = Math.max(limit * 5, 25);
+  const excludedCommitHashes = new Set(["c821362"]);
   const raw = runGitCommand(
     `git log --first-parent --date=short --pretty=format:%h%x1f%ad%x1f%s -n ${sampleSize}`,
   );
@@ -121,6 +122,7 @@ function getRecentCommits(limit = 8) {
     .filter((commit) => {
       const normalizedSubject = commit.subject.toLowerCase();
       return !(
+        excludedCommitHashes.has(commit.hash) ||
         normalizedSubject.includes("docs: sync readme snapshot") ||
         normalizedSubject.includes("readme sync") ||
         normalizedSubject.includes("chore/readme-sync")
@@ -148,7 +150,6 @@ function buildAutoSection() {
   const testsBySuite = countTestsBySuite(testFiles);
 
   const knownLayout = [
-    ["architecture", "LikeC4 architecture model and generated diagram sources"],
     ["apps/extension", "Browser extension app (WXT + React)"],
     ["apps/website", "Standalone marketing website (Vite)"],
     ["docs", "Project docs and runbooks"],
