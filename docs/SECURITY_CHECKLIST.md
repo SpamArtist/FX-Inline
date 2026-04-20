@@ -47,8 +47,8 @@ _Last updated: 2026-04-17_
 - [ ] No browsing history payloads are transmitted; only provider rate endpoints are contacted.
 - [ ] Debug/perf logging is development-default; production logging requires explicit `localStorage` opt-in (`ccx:perf=1`).
 
-## 7. Release gate checks
+## 7. Pre-Ship Checks
 
-- [ ] Run `npm run test:all` before release artifacts.
+- [ ] Run `npm run test:all` before shipping changes.
 - [ ] Re-verify permissions/CSP/host permissions after manifest or dependency changes.
 - [ ] Re-test popup/options/content script behavior on Chromium and Firefox builds.
