@@ -17,6 +17,7 @@
     "utils/constants.ts",
     "utils/currencyPresentation.ts",
     "utils/enums.ts",
+    "utils/installLifecycle.ts",
     "utils/mutationRoots.ts",
     "utils/rateMath.ts",
     "utils/ratePolicy.ts",
