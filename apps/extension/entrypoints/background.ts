@@ -1,8 +1,10 @@
 import { getRates } from "@/utils/rates";
+import { shouldOpenWelcomePage } from "@/utils/installLifecycle";
 import { browser } from "wxt/browser";
 
 const RATE_REFRESH_ALARM = "ccx-refresh-rates";
 const RATE_REFRESH_INTERVAL_MINUTES = 30;
+const WELCOME_PAGE_PATH = "/welcome.html";
 
 async function scheduleRateRefreshAlarm() {
   await browser.alarms.clear(RATE_REFRESH_ALARM);
@@ -23,10 +25,26 @@ function logRateRefreshError(context: string, error: unknown) {
   console.warn(`[ccx] Failed to refresh rates during ${context}`, error);
 }
 
+async function openWelcomePage() {
+  await browser.tabs.create({
+    url: browser.runtime.getURL(WELCOME_PAGE_PATH),
+  });
+}
+
+function logWelcomePageError(error: unknown) {
+  console.warn("[ccx] Failed to open welcome page after install", error);
+}
+
 export default defineBackground(() => {
-  browser.runtime.onInstalled.addListener(() => {
+  browser.runtime.onInstalled.addListener((details) => {
     void initializeRateRefresh(true).catch((error) => {
       logRateRefreshError("onInstalled", error);
+    });
+
+    if (!shouldOpenWelcomePage(details.reason)) return;
+
+    void openWelcomePage().catch((error) => {
+      logWelcomePageError(error);
     });
   });
 
