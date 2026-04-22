@@ -1,0 +1,339 @@
+import {
+  extractCurrencyTextMatches,
+  mayContainCurrencyToken,
+  parseCurrencyValue,
+} from "@fx-inline/currency-detection";
+import { getConvertedAmountText } from "./amountFormatting.js";
+import {
+  applyConvertedAmountColor,
+  getInlineAddonNode,
+  setInlineConversionContent,
+} from "./conversionNodes.js";
+import {
+  AMAZON_HIDDEN_PRICE_ROOT_SELECTOR,
+  AMAZON_PRICE_DECIMAL_SELECTOR,
+  AMAZON_PRICE_FRACTION_SELECTOR,
+  AMAZON_PRICE_SYMBOL_SELECTOR,
+  AMAZON_PRICE_WHOLE_SELECTOR,
+  ARIA_HIDDEN_SELECTOR,
+  DIGIT_REGEX,
+  INLINE_CONVERSION_ADDON_MODE,
+  INLINE_CONVERSION_CLASS,
+} from "./constants.js";
+import { usesLightTextColorForElement } from "./textColor.js";
+
+function getAmazonHiddenPriceRoots(root) {
+  if (
+    !(
+      root instanceof Element ||
+      root instanceof Document ||
+      root instanceof DocumentFragment
+    )
+  ) {
+    return [];
+  }
+
+  const roots = new Set();
+
+  if (root instanceof Element) {
+    if (root.matches(AMAZON_HIDDEN_PRICE_ROOT_SELECTOR)) {
+      roots.add(root);
+    }
+
+    const nearestAncestor = root.closest(AMAZON_HIDDEN_PRICE_ROOT_SELECTOR);
+    if (nearestAncestor) {
+      roots.add(nearestAncestor);
+    }
+  }
+
+  const wholeNodes = root.querySelectorAll(
+    `${AMAZON_HIDDEN_PRICE_ROOT_SELECTOR} ${AMAZON_PRICE_WHOLE_SELECTOR}`,
+  );
+  for (const wholeNode of wholeNodes) {
+    const hiddenRoot = wholeNode.closest(AMAZON_HIDDEN_PRICE_ROOT_SELECTOR);
+    if (hiddenRoot) {
+      roots.add(hiddenRoot);
+    }
+  }
+
+  return Array.from(roots);
+}
+
+function getAriaHiddenRoots(root) {
+  if (
+    !(
+      root instanceof Element ||
+      root instanceof Document ||
+      root instanceof DocumentFragment
+    )
+  ) {
+    return [];
+  }
+
+  const roots = new Set();
+
+  if (root instanceof Element && root.matches(ARIA_HIDDEN_SELECTOR)) {
+    roots.add(root);
+  }
+
+  for (const matched of root.querySelectorAll(ARIA_HIDDEN_SELECTOR)) {
+    roots.add(matched);
+  }
+
+  return Array.from(roots);
+}
+
+function getAmazonStructuredRawPrice(root) {
+  const symbol = root.querySelector(AMAZON_PRICE_SYMBOL_SELECTOR)?.textContent?.trim();
+  const wholeRaw = root
+    .querySelector(AMAZON_PRICE_WHOLE_SELECTOR)
+    ?.textContent?.trim();
+  const whole = wholeRaw?.replace(/[^\d,\u00A0\u202F ]/gu, "").trim();
+
+  if (!symbol || !whole) return null;
+
+  const fractionRaw = root
+    .querySelector(AMAZON_PRICE_FRACTION_SELECTOR)
+    ?.textContent?.trim();
+  const fraction = fractionRaw?.replace(/[^\d]/gu, "").trim();
+  if (!fraction) {
+    return `${symbol}${whole}`;
+  }
+
+  const decimalToken = root
+    .querySelector(AMAZON_PRICE_DECIMAL_SELECTOR)
+    ?.textContent?.trim();
+  const decimal = decimalToken || ".";
+  return `${symbol}${whole}${decimal}${fraction}`;
+}
+
+function areParsedValuesEqual(left, right) {
+  const delta = Math.abs(left - right);
+  const tolerance = Number.EPSILON * Math.max(1, Math.abs(left), Math.abs(right)) * 4;
+  return delta <= tolerance;
+}
+
+function getSiblingCurrencyRawPrice(
+  valueRoot,
+  amountText,
+  localeHint,
+) {
+  const parsedAmount = parseCurrencyValue(amountText, localeHint);
+  if (!parsedAmount.valid || parsedAmount.value === undefined) return null;
+  const amountValue = parsedAmount.value;
+
+  const parent = valueRoot.parentElement;
+  if (!parent) return null;
+
+  const siblings = Array.from(parent.children);
+  const valueIndex = siblings.indexOf(valueRoot);
+  if (valueIndex < 0) return null;
+
+  let matchedRawPrice = null;
+  let nearestDistance = Number.POSITIVE_INFINITY;
+
+  for (let index = 0; index < siblings.length; index += 1) {
+    const sibling = siblings[index];
+    if (sibling === valueRoot) continue;
+    if (sibling.getAttribute("aria-hidden") !== "true") continue;
+
+    const token = sibling.textContent?.replace(/\s+/g, " ").trim();
+    if (!token || token.length > 32) continue;
+
+    const compactToken = token.replace(/\s+/g, "");
+    const rawCandidates = Array.from(
+      new Set([
+        `${compactToken}${amountText}`,
+        `${token} ${amountText}`,
+        `${amountText} ${token}`,
+        `${amountText}${compactToken}`,
+      ]),
+    );
+
+    let parsedRawPrice = null;
+
+    for (const rawCandidate of rawCandidates) {
+      const parsed = extractCurrencyTextMatches(rawCandidate, localeHint);
+      const matched = parsed.find((candidate) =>
+        areParsedValuesEqual(candidate.value, amountValue),
+      );
+      if (!matched) continue;
+
+      parsedRawPrice = matched.raw.trim();
+      if (parsedRawPrice.length) break;
+      parsedRawPrice = null;
+    }
+
+    if (!parsedRawPrice) continue;
+
+    const distance = Math.abs(index - valueIndex);
+    if (distance < nearestDistance) {
+      nearestDistance = distance;
+      matchedRawPrice = parsedRawPrice;
+    }
+  }
+
+  return matchedRawPrice;
+}
+
+function getSanitizedAmountText(root) {
+  const raw = root.textContent?.trim();
+  if (!raw) return null;
+
+  const normalized = raw.replace(/[^\d,.\u00A0\u202F ]/gu, "").trim();
+  if (!normalized || !DIGIT_REGEX.test(normalized)) return null;
+  return normalized;
+}
+
+export function decorateStructuredAmazonPrices(
+  root,
+  preferredCurrency,
+  rateSnapshot,
+  localeHint,
+  lightTextCache,
+) {
+  const hiddenPriceRoots = getAmazonHiddenPriceRoots(root);
+  if (!hiddenPriceRoots.length) return 0;
+
+  let conversionsApplied = 0;
+
+  for (const hiddenPriceRoot of hiddenPriceRoots) {
+    if (hiddenPriceRoot.closest(`.${INLINE_CONVERSION_CLASS}`)) continue;
+
+    const rawPrice = getAmazonStructuredRawPrice(hiddenPriceRoot);
+    const existingAddon = getInlineAddonNode(hiddenPriceRoot);
+
+    if (!rawPrice || !mayContainCurrencyToken(rawPrice)) {
+      existingAddon?.remove();
+      continue;
+    }
+
+    const parsed = extractCurrencyTextMatches(rawPrice, localeHint);
+    const matched = parsed.find((item) => item.raw === rawPrice) || parsed[0];
+    if (!matched) {
+      existingAddon?.remove();
+      continue;
+    }
+
+    const convertedAmount = getConvertedAmountText(
+      matched,
+      preferredCurrency,
+      rateSnapshot,
+      localeHint,
+    );
+    if (!convertedAmount) {
+      existingAddon?.remove();
+      continue;
+    }
+
+    const previousOriginal = existingAddon?.getAttribute("data-original") ?? null;
+    const previousConverted =
+      existingAddon?.querySelector(".ccx-converted-amount")?.textContent ?? null;
+
+    const wrapper = existingAddon ?? document.createElement("span");
+    wrapper.className = INLINE_CONVERSION_CLASS;
+    wrapper.setAttribute("data-ccx-mode", INLINE_CONVERSION_ADDON_MODE);
+    wrapper.setAttribute("data-original", rawPrice);
+    applyConvertedAmountColor(
+      wrapper,
+      usesLightTextColorForElement(hiddenPriceRoot, lightTextCache),
+    );
+    setInlineConversionContent(wrapper, convertedAmount);
+
+    if (!existingAddon) {
+      hiddenPriceRoot.appendChild(wrapper);
+      conversionsApplied += 1;
+      continue;
+    }
+
+    if (
+      previousOriginal !== rawPrice ||
+      previousConverted !== `(${convertedAmount})`
+    ) {
+      conversionsApplied += 1;
+    }
+  }
+
+  return conversionsApplied;
+}
+
+export function decorateStructuredSiblingSymbolPrices(
+  root,
+  preferredCurrency,
+  rateSnapshot,
+  localeHint,
+  lightTextCache,
+) {
+  const ariaHiddenRoots = getAriaHiddenRoots(root);
+  if (!ariaHiddenRoots.length) return 0;
+
+  let conversionsApplied = 0;
+
+  for (const ariaHiddenRoot of ariaHiddenRoots) {
+    if (ariaHiddenRoot.closest(`.${INLINE_CONVERSION_CLASS}`)) continue;
+    if (ariaHiddenRoot.querySelector(AMAZON_PRICE_WHOLE_SELECTOR)) continue;
+
+    const amountText = getSanitizedAmountText(ariaHiddenRoot);
+    if (!amountText) continue;
+
+    const rawPrice = getSiblingCurrencyRawPrice(
+      ariaHiddenRoot,
+      amountText,
+      localeHint,
+    );
+
+    const existingAddon = getInlineAddonNode(ariaHiddenRoot);
+
+    if (!rawPrice) {
+      existingAddon?.remove();
+      continue;
+    }
+
+    const parsed = extractCurrencyTextMatches(rawPrice, localeHint);
+    const matched = parsed.find((item) => item.raw === rawPrice) || parsed[0];
+    if (!matched) {
+      existingAddon?.remove();
+      continue;
+    }
+
+    const convertedAmount = getConvertedAmountText(
+      matched,
+      preferredCurrency,
+      rateSnapshot,
+      localeHint,
+    );
+    if (!convertedAmount) {
+      existingAddon?.remove();
+      continue;
+    }
+
+    const previousOriginal = existingAddon?.getAttribute("data-original") ?? null;
+    const previousConverted =
+      existingAddon?.querySelector(".ccx-converted-amount")?.textContent ?? null;
+
+    const wrapper = existingAddon ?? document.createElement("span");
+    wrapper.className = INLINE_CONVERSION_CLASS;
+    wrapper.setAttribute("data-ccx-mode", INLINE_CONVERSION_ADDON_MODE);
+    wrapper.setAttribute("data-original", rawPrice);
+    applyConvertedAmountColor(
+      wrapper,
+      usesLightTextColorForElement(ariaHiddenRoot, lightTextCache),
+    );
+    setInlineConversionContent(wrapper, convertedAmount);
+
+    if (!existingAddon) {
+      ariaHiddenRoot.appendChild(wrapper);
+      conversionsApplied += 1;
+      continue;
+    }
+
+    if (
+      previousOriginal !== rawPrice ||
+      previousConverted !== `(${convertedAmount})`
+    ) {
+      conversionsApplied += 1;
+    }
+  }
+
+  return conversionsApplied;
+}
