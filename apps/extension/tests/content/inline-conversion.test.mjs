@@ -2,7 +2,7 @@ import {
   INLINE_CONVERSION_CLASS,
   convertVisiblePrices,
 } from "../../test-dist/entrypoints/content/inlineConversion.js";
-import { suppressInlineConversions } from "../../test-dist/entrypoints/content/inlineConversion/conversionNodes.js";
+import { suppressInlineConversions } from "@fx-inline/inline-runtime";
 
 function createRateSnapshot(overrides = {}) {
   const baseSnapshot = {
