@@ -40,8 +40,7 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 - Host: `https://open.er-api.com/*`, `https://api.exchangerate-api.com/*`
 
 ### Exchange Rate Providers
-- `https://open.er-api.com/v6/latest/USD`
-- `https://api.exchangerate-api.com/v4/latest/USD`
+- none detected
 
 ### Test Inventory
 - Total test files: `19`
@@ -83,26 +82,26 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run test:unit` | `npm run test:frontend` |
 | `npm run test:control-plane` | `npm run jest -- apps/control-plane-api/test` |
 | `npm run test:b2b-runtime` | `npm run jest -- apps/website/test/b2b-runtime` |
-| `npm run test:b2b-plugin-sdk` | `npm run jest -- packages/b2b-plugin-sdk/test` |
-| `npm run b2b-plugin:check:acme-pre` | `node packages/b2b-plugin-sdk/scripts/check-deterministic.mjs apps/website/public/b2b/clients/acme/pre.v1.js` |
 | `npm run test:all` | `npm run test:frontend && npm run test:content && npm run test:release` |
 | `npm run currency-detection:fixtures` | `node packages/currency-detection/scripts/generate-fixtures.mjs` |
 | `npm run currency-detection:baseline` | `npm run build:unit && npm run currency-detection:fixtures && node packages/currency-detection/scripts/generate-legacy-snapshot.mjs` |
 | `npm run currency-detection:test` | `npm run jest -- packages/currency-detection/test` |
 | `npm run currency-detection:bench` | `node packages/currency-detection/scripts/run-benchmarks.mjs` |
 | `npm run currency-detection:bench:compare` | `node packages/currency-detection/scripts/compare-benchmarks.mjs` |
+| `npm run inline-runtime:build` | `vite build --config packages/inline-runtime/vite.config.mjs` |
+| `npm run inline-runtime:test` | `npm run jest -- packages/inline-runtime/test` |
 | `npm run postinstall` | `wxt prepare` |
 | `npm run readme:sync` | `node scripts/readme-sync.mjs` |
 | `npm run readme:sync:check` | `node scripts/readme-sync.mjs --check` |
 
 ### Recent Changes (first-parent, excluding README automation commits)
-- 2026-04-23 `0def050` docs: require clerk auth in b2b contracts
-- 2026-04-23 `38fab06` docs: freeze b2b architecture and contracts
-- 2026-04-23 `12247d8` feat: add signed client demo and security runbook
-- 2026-04-23 `0bc5ac2` feat: add secure B2B script runtime core
-- 2026-04-21 `c87eb22` Codex/welcome page install (#25)
-- 2026-04-21 `150c49f` feat: add post-install welcome page (#24)
-- 2026-04-21 `846850d` docs: align release docs with tag-driven workflow
-- 2026-04-20 `fe83acc` missing
+- 2026-04-23 `6f53d92` feat: add dashboard app and runtime control-plane integration
+- 2026-04-23 `629120c` feat: add control-plane api for auth settings and signed manifests
+- 2026-04-23 `9bb496e` docs: require clerk auth in b2b contracts
+- 2026-04-23 `8965f03` docs: freeze b2b architecture and contracts
+- 2026-04-23 `daa30c2` feat: add signed client demo and security runbook
+- 2026-04-23 `34ca43d` feat: add secure B2B script runtime core
+- 2026-04-23 `a3e4b1e` Merge branch 'main' of https://github.com/SpamArtist/currency-conversion-extension-tool
+- 2026-04-23 `8717671` update
 
 <!-- AUTO-GENERATED:END -->

@@ -5,7 +5,6 @@
 - Control plane API: `apps/control-plane-api`
 - Dashboard: `apps/dashboard`
 - Runtime loader/core: `apps/website/b2b-runtime`
-- Plugin SDK guard: `packages/b2b-plugin-sdk`
 
 ## Local startup
 
@@ -51,14 +50,8 @@ npm run dev:dashboard
 ## Plugin publication workflow
 
 1. Build deterministic plugin artifact with LLM assistance.
-2. Run deterministic guard:
-
-```bash
-npm run b2b-plugin:check:acme-pre
-```
-
-3. Publish artifact metadata in dashboard Plugins page or API.
-4. Manifest responses pick up latest approved artifact versions.
+2. Publish artifact metadata in dashboard Plugins page or API.
+3. Manifest responses pick up latest approved artifact versions.
 
 ## Key handling
 

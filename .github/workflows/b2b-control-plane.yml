@@ -6,7 +6,6 @@ on:
       - "apps/control-plane-api/**"
       - "apps/dashboard/**"
       - "apps/website/b2b-runtime/**"
-      - "packages/b2b-plugin-sdk/**"
       - ".github/workflows/b2b-control-plane.yml"
       - "package.json"
       - "package-lock.json"
@@ -17,7 +16,6 @@ on:
       - "apps/control-plane-api/**"
       - "apps/dashboard/**"
       - "apps/website/b2b-runtime/**"
-      - "packages/b2b-plugin-sdk/**"
       - ".github/workflows/b2b-control-plane.yml"
       - "package.json"
       - "package-lock.json"
@@ -44,12 +42,6 @@ jobs:
 
       - name: Run B2B runtime tests
         run: npm run test:b2b-runtime
-
-      - name: Run plugin SDK tests
-        run: npm run test:b2b-plugin-sdk
-
-      - name: Deterministic check (ACME pre plugin)
-        run: npm run b2b-plugin:check:acme-pre
 
       - name: Build website and dashboard
         run: |

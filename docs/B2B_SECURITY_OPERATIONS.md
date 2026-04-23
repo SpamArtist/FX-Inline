@@ -9,7 +9,6 @@ Operational controls for the B2B runtime stack:
 - `apps/control-plane-api`
 - `apps/dashboard`
 - `apps/website/b2b-runtime`
-- `packages/b2b-plugin-sdk`
 
 ## Control Objectives
 

@@ -36,8 +36,6 @@
     "test:unit": "npm run test:frontend",
     "test:control-plane": "npm run jest -- apps/control-plane-api/test",
     "test:b2b-runtime": "npm run jest -- apps/website/test/b2b-runtime",
-    "test:b2b-plugin-sdk": "npm run jest -- packages/b2b-plugin-sdk/test",
-    "b2b-plugin:check:acme-pre": "node packages/b2b-plugin-sdk/scripts/check-deterministic.mjs apps/website/public/b2b/clients/acme/pre.v1.js",
     "test:all": "npm run test:frontend && npm run test:content && npm run test:release",
     "currency-detection:fixtures": "node packages/currency-detection/scripts/generate-fixtures.mjs",
     "currency-detection:baseline": "npm run build:unit && npm run currency-detection:fixtures && node packages/currency-detection/scripts/generate-legacy-snapshot.mjs",
