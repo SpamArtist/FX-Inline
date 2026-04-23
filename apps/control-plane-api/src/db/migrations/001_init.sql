@@ -6,9 +6,14 @@ CREATE TABLE IF NOT EXISTS schema_migrations (
 CREATE TABLE IF NOT EXISTS users (
   id TEXT PRIMARY KEY,
   email TEXT NOT NULL UNIQUE,
+  clerk_user_id TEXT,
   display_name TEXT,
   created_at INTEGER NOT NULL
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_clerk_user_id
+  ON users(clerk_user_id)
+  WHERE clerk_user_id IS NOT NULL;
 
 CREATE TABLE IF NOT EXISTS clients (
   id TEXT PRIMARY KEY,
@@ -72,11 +77,16 @@ CREATE TABLE IF NOT EXISTS manifest_versions (
 CREATE TABLE IF NOT EXISTS sessions (
   id TEXT PRIMARY KEY,
   user_id TEXT NOT NULL,
+  clerk_session_id TEXT,
   csrf_token TEXT NOT NULL,
   expires_at INTEGER NOT NULL,
   created_at INTEGER NOT NULL,
   FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+CREATE INDEX IF NOT EXISTS idx_sessions_clerk_session_id
+  ON sessions(clerk_session_id)
+  WHERE clerk_session_id IS NOT NULL;
 
 CREATE TABLE IF NOT EXISTS audit_events (
   id TEXT PRIMARY KEY,
