@@ -207,6 +207,37 @@ test("supports amazon decorator as explicit post plugin", () => {
   ).not.toBeNull();
 });
 
+test("amazon addon does not duplicate original amount by default", () => {
+  document.body.innerHTML = [
+    '<span class="a-price">',
+    '  <span class="a-offscreen">¥4,680</span>',
+    '  <span id="amazon-hidden-root" aria-hidden="true">',
+    '    <span class="a-price-symbol">¥</span>',
+    '    <span class="a-price-whole">4,680</span>',
+    "  </span>",
+    "</span>",
+  ].join("\n");
+
+  const applied = convertVisiblePrices(
+    "EUR",
+    createRateSnapshot({ rates: { JPY: 110 } }),
+    document.body,
+    {
+      clearExisting: false,
+    },
+  );
+
+  expect(applied).toBe(1);
+  const addon = document.querySelector(
+    '#amazon-hidden-root span.ccx-inline-conversion[data-ccx-mode="addon"]',
+  );
+  expect(addon).not.toBeNull();
+  expect(addon.textContent).not.toContain("¥4,680");
+  expect(addon.querySelector(".ccx-converted-amount").textContent).toMatch(
+    /^\(.+\)$/u,
+  );
+});
+
 test("skips plugins declared for a different phase and reports error", () => {
   document.body.innerHTML = "<div></div>";
   const pluginErrors = [];

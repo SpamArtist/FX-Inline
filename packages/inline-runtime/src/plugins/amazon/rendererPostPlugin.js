@@ -54,10 +54,16 @@ function resolveAmazonRenderPreferences(allPreferences) {
   const defaultPreferences = allPreferences?.default ?? {};
   const sitePreferences = allPreferences?.sites?.[AMAZON_SITE_RENDER_KEY] ?? {};
 
-  return {
+  const resolved = {
     ...defaultPreferences,
     ...sitePreferences,
   };
+
+  if (resolved.showOriginalPrice === undefined) {
+    resolved.showOriginalPrice = false;
+  }
+
+  return resolved;
 }
 
 function applyRenderPreferences(
@@ -66,7 +72,7 @@ function applyRenderPreferences(
   convertedAmount,
   preferences,
 ) {
-  const showOriginalPrice = preferences.showOriginalPrice !== false;
+  const showOriginalPrice = preferences.showOriginalPrice === true;
   setInlineConversionContent(wrapper, convertedAmount, {
     originalText: showOriginalPrice ? rawPrice : "",
   });
