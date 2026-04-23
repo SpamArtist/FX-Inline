@@ -6,20 +6,8 @@ CREATE TABLE IF NOT EXISTS schema_migrations (
 CREATE TABLE IF NOT EXISTS users (
   id TEXT PRIMARY KEY,
   email TEXT NOT NULL UNIQUE,
-  password_hash TEXT,
   display_name TEXT,
   created_at INTEGER NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS oauth_identities (
-  id TEXT PRIMARY KEY,
-  user_id TEXT NOT NULL,
-  provider TEXT NOT NULL,
-  provider_user_id TEXT NOT NULL,
-  email TEXT,
-  created_at INTEGER NOT NULL,
-  UNIQUE(provider, provider_user_id),
-  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS clients (
@@ -88,13 +76,6 @@ CREATE TABLE IF NOT EXISTS sessions (
   expires_at INTEGER NOT NULL,
   created_at INTEGER NOT NULL,
   FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS oauth_states (
-  state TEXT PRIMARY KEY,
-  return_to TEXT NOT NULL,
-  expires_at INTEGER NOT NULL,
-  created_at INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS audit_events (
