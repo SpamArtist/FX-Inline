@@ -92,8 +92,13 @@ async function fetchText(url, fetchImpl = fetch) {
   return response.text();
 }
 
-async function loadVerifiedModule({ url, integrity, fetchImpl }) {
-  const sourceCode = await fetchText(url, fetchImpl);
+function resolveRuntimeUrl(resourceUrl, manifestUrl) {
+  return new URL(resourceUrl, manifestUrl).toString();
+}
+
+async function loadVerifiedModule({ url, integrity, fetchImpl, manifestUrl }) {
+  const resolvedUrl = resolveRuntimeUrl(url, manifestUrl);
+  const sourceCode = await fetchText(resolvedUrl, fetchImpl);
   await assertSha256Integrity(sourceCode, integrity);
 
   const blob = new Blob([sourceCode], { type: "text/javascript" });
@@ -144,11 +149,13 @@ async function loadOptionalSettings(settingsBlock, fetchImpl) {
     return null;
   }
 
+  const resolvedUrl = resolveRuntimeUrl(settingsBlock.url, settingsBlock.manifestUrl);
+
   if (!settingsBlock.integrity) {
-    return fetchJson(settingsBlock.url, fetchImpl);
+    return fetchJson(resolvedUrl, fetchImpl);
   }
 
-  const raw = await fetchText(settingsBlock.url, fetchImpl);
+  const raw = await fetchText(resolvedUrl, fetchImpl);
   await assertSha256Integrity(raw, settingsBlock.integrity);
   return JSON.parse(raw);
 }
@@ -163,15 +170,17 @@ function assertManifestClientId(scriptClientId, manifestClientId) {
 
 function getLoaderConfig(script, overrides) {
   const clientId = getRequiredDataAttribute(script, "fxiClientId");
+  const manifestPublicKeyPem = (
+    overrides.publicKeyPem ||
+    script.dataset.fxiManifestPublicKeyPem ||
+    DEFAULT_MANIFEST_PUBLIC_KEY_PEM
+  ).replace(/\\\\n/gu, "\n");
 
   return {
     clientId,
     manifestUrl: getManifestUrl(script, clientId),
     preferredCurrencyOverride: script.dataset.fxiTargetCurrency?.trim() || null,
-    publicKeyPem:
-      overrides.publicKeyPem ||
-      script.dataset.fxiManifestPublicKeyPem ||
-      DEFAULT_MANIFEST_PUBLIC_KEY_PEM,
+    publicKeyPem: manifestPublicKeyPem,
     debug: parseDebugFlag(script),
   };
 }
@@ -191,7 +200,8 @@ export async function startRuntimeFromScriptTag({
   }
 
   const config = getLoaderConfig(resolvedScript, { publicKeyPem });
-  const manifestEnvelope = await fetchJson(config.manifestUrl, fetchImpl);
+  const manifestUrl = new URL(config.manifestUrl, window.location.href).toString();
+  const manifestEnvelope = await fetchJson(manifestUrl, fetchImpl);
   const manifest = await verifyManifestEnvelope(manifestEnvelope, {
     publicKeyPem: config.publicKeyPem,
   });
@@ -217,11 +227,13 @@ export async function startRuntimeFromScriptTag({
       url: manifest.plugins.pre.url,
       integrity: manifest.plugins.pre.integrity,
       fetchImpl,
+      manifestUrl,
     }),
     loadVerifiedModule({
       url: manifest.plugins.post.url,
       integrity: manifest.plugins.post.integrity,
       fetchImpl,
+      manifestUrl,
     }),
   ]);
 
@@ -229,7 +241,15 @@ export async function startRuntimeFromScriptTag({
     throw new Error("Plugins must expose default exports");
   }
 
-  const remoteSettings = await loadOptionalSettings(manifest.settings, fetchImpl);
+  const remoteSettings = await loadOptionalSettings(
+    manifest.settings
+      ? {
+        ...manifest.settings,
+        manifestUrl,
+      }
+      : null,
+    fetchImpl,
+  );
   const runtimeSettings = mergeUiSettings({
     manifestDefaults: manifest.uiDefaults,
     remoteSettings,
