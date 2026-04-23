@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FX Inline B2B Runtime Demo</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: "IBM Plex Sans", Arial, sans-serif;
+        background: radial-gradient(circle at 10% 20%, #f3f9ff 0, #ffffff 55%);
+        color: #132238;
+      }
+
+      body {
+        margin: 0;
+      }
+
+      main {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 2.5rem 1.2rem 4rem;
+      }
+
+      .hero {
+        border: 1px solid #d5e5ff;
+        background: linear-gradient(160deg, #f8fbff, #ffffff 48%, #eef5ff);
+        border-radius: 18px;
+        padding: 1.4rem;
+        margin-bottom: 1.2rem;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1rem;
+      }
+
+      .panel {
+        border-radius: 14px;
+        border: 1px solid #d7e5fa;
+        padding: 1rem;
+        background: #fff;
+      }
+
+      .plan {
+        border: 1px solid #dce8ff;
+        border-radius: 12px;
+        padding: 0.8rem;
+        margin-bottom: 0.7rem;
+      }
+
+      .plan:last-child {
+        margin-bottom: 0;
+      }
+
+      .acme-plan-price,
+      .acme-price,
+      .acme-price-split {
+        font-size: 1.2rem;
+        font-weight: 700;
+      }
+
+      label {
+        display: block;
+        font-size: 0.85rem;
+        margin-bottom: 0.2rem;
+        color: #27435f;
+      }
+
+      input,
+      select {
+        width: 100%;
+        margin-bottom: 0.7rem;
+        border: 1px solid #b8cce8;
+        border-radius: 8px;
+        padding: 0.45rem 0.55rem;
+        background: #fff;
+      }
+
+      code {
+        background: #edf3ff;
+        padding: 0.15rem 0.35rem;
+        border-radius: 5px;
+      }
+
+      .note {
+        font-size: 0.82rem;
+        color: #365878;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="hero">
+        <h1>FX Inline B2B Script Runtime Demo</h1>
+        <p>
+          This page loads one client-scoped runtime via
+          <code>&lt;script type="module" src="/b2b/loader.v1.js" ...&gt;</code>.
+        </p>
+        <p class="note">
+          Security posture in this demo: signed manifest, host/path allowlist, SHA-256
+          plugin integrity checks, and no page text telemetry.
+        </p>
+      </section>
+
+      <section class="grid">
+        <article class="panel" id="pricing-surface">
+          <h2>Client Pricing Surface</h2>
+
+          <div class="plan">
+            <h3>Starter</h3>
+            <p class="acme-plan-price" data-acme-price="$29.00">$29.00</p>
+          </div>
+
+          <div class="plan">
+            <h3>Growth</h3>
+            <p class="acme-price">USD 149/month</p>
+          </div>
+
+          <div class="plan">
+            <h3>Enterprise</h3>
+            <p class="acme-price-split">
+              <span data-acme-currency-symbol>$</span>
+              <span data-acme-price-whole>999</span>
+              <span data-acme-price-fraction>.00</span>
+              per month
+            </p>
+          </div>
+        </article>
+
+        <aside class="panel">
+          <h2>Post Plugin Settings</h2>
+          <label for="font-scale">Font scale (%)</label>
+          <input id="font-scale" type="number" min="60" max="200" value="90" />
+
+          <label for="font-weight">Font weight</label>
+          <input id="font-weight" type="number" min="300" max="800" value="600" />
+
+          <label for="font-family">Font family</label>
+          <select id="font-family">
+            <option value="inherit">inherit</option>
+            <option value="Inter, sans-serif">Inter, sans-serif</option>
+            <option value="ui-sans-serif, system-ui, sans-serif">ui-sans-serif, system-ui, sans-serif</option>
+            <option value="Arial, sans-serif">Arial, sans-serif</option>
+            <option value="Georgia, serif">Georgia, serif</option>
+            <option value="'IBM Plex Sans', sans-serif">IBM Plex Sans</option>
+          </select>
+
+          <label for="font-color">Font color</label>
+          <input id="font-color" type="text" value="#355aa8" />
+
+          <label for="spacing-em">Spacing (em)</label>
+          <input id="spacing-em" type="number" min="0" max="0.5" step="0.01" value="0.10" />
+
+          <p class="note">
+            Settings update the active runtime instance through
+            <code>window.FXInlineRuntime.updateSettings('acme', ...)</code>.
+          </p>
+        </aside>
+      </section>
+    </main>
+
+    <script type="module" src="./b2b-demo.js"></script>
+    <script
+      type="module"
+      src="/b2b/loader.v1.js"
+      data-fxi-client-id="acme"
+      data-fxi-manifest-url="/b2b/manifests/acme.signed.json"
+      data-fxi-debug="true"
+      defer
+    ></script>
+  </body>
+</html>

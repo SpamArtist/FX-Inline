@@ -1,0 +1,44 @@
+{
+  "manifest": {
+    "schemaVersion": 1,
+    "clientId": "acme",
+    "allowedOrigins": [
+      "http://localhost:5173",
+      "http://127.0.0.1:5173"
+    ],
+    "allowedPathRegex": [
+      "^/b2b-demo(?:/|$)"
+    ],
+    "preferredCurrency": "USD",
+    "parserConfig": {
+      "extraWords": {
+        "credits": "USD"
+      }
+    },
+    "plugins": {
+      "pre": {
+        "url": "/b2b/clients/acme/pre.v1.js",
+        "integrity": "sha256-lu7Y8YbmNXtJXmVFJbtzZgMRjTukAv/Adu+yXIB/qgw="
+      },
+      "post": {
+        "url": "/b2b/clients/acme/post.v1.js",
+        "integrity": "sha256-xYRtIxxmKh/DhPVMKEMgwzr4p65nSJvO1V8NPcabXAA="
+      }
+    },
+    "settings": {
+      "url": "/b2b/settings/acme.json",
+      "integrity": "sha256-sF0f9V/rK3sy8hYnKD0eGnrixf3r6O+D+hKzJ5rOGhw="
+    },
+    "uiDefaults": {
+      "fontScalePct": 90,
+      "fontWeight": 600,
+      "fontFamily": "inherit",
+      "fontColor": "#355aa8",
+      "spacingEm": 0.1
+    },
+    "flags": {
+      "killSwitch": false
+    }
+  },
+  "signature": "LHP0HXRgd9X2k3oR9U/1dohJfp6PyXWSggrPzZJskh/8kYYYUkK13LXEKx75dbAuZcCDxGYCBp3ZTVEKZy6vP1aPsEQF3SkDtQZKRxFIBTPktukj2a84iqfWz2UFBSpcftqh8XkmXuALWM/tWw9EQlZhgR1HFIIK0g3wjtJ9/0qd/L/oqQzGi9ByUDREji3GJp1PDvrrjKtl7UzCR1ASI7B1+dzF5KnXSF20bpAoRjFXUKGeyeeKIGiV1wE3wSzf2NKo649urUy7m7Q1+n0kYS5f0Z53sCxy0JoZR6/ISHPnRaheaIqZ2j344zg7Bwf2L8/4ivvgmuqzmhBB0jHbUg=="
+}
