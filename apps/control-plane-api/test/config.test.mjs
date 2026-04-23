@@ -1,4 +1,4 @@
-import { loadEnv } from "../src/config/env.mjs";
+import { loadEnv } from "../dist/config/env.js";
 
 test("loadEnv validates required numeric and enum values", () => {
   expect(() =>

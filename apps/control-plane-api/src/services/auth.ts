@@ -1,14 +1,21 @@
 import crypto from "node:crypto";
-import { createId } from "../utils/ids.mjs";
-import { hashPassword, verifyPassword } from "../utils/password.mjs";
-import { hoursFromNow, nowMs } from "../utils/time.mjs";
+import { createId } from "../utils/ids.js";
+import { hashPassword, verifyPassword } from "../utils/password.js";
+import { hoursFromNow, nowMs } from "../utils/time.js";
+import type {
+  AuthService,
+  ClientRecord,
+  DatabaseApi,
+  EnvConfig,
+  GoogleProfile,
+  MembershipRole,
+} from "../types.js";
 
-function normalizeEmail(value) {
-  if (typeof value !== "string") return "";
+function normalizeEmail(value: string): string {
   return value.trim().toLowerCase();
 }
 
-function slugify(value) {
+function slugify(value: string): string {
   return value
     .toLowerCase()
     .replace(/[^a-z0-9]+/gu, "-")
@@ -16,15 +23,15 @@ function slugify(value) {
     .slice(0, 40);
 }
 
-function makeCsrfToken() {
+function makeCsrfToken(): string {
   return crypto.randomBytes(24).toString("hex");
 }
 
-function roleCanWrite(role) {
+function roleCanWrite(role: MembershipRole): boolean {
   return role === "owner" || role === "editor";
 }
 
-function createDefaultPluginArtifacts(database, clientId, userId = null) {
+function createDefaultPluginArtifacts(database: DatabaseApi, clientId: string, userId: string | null = null): void {
   database.createPluginArtifact({
     clientId,
     kind: "pre",
@@ -44,8 +51,68 @@ function createDefaultPluginArtifacts(database, clientId, userId = null) {
   });
 }
 
-export function createAuthService({ database, env }) {
-  async function registerLocalUser({ email, password, displayName }) {
+function createWorkspaceClientForUser(
+  database: DatabaseApi,
+  userId: string,
+  normalizedEmail: string,
+  displayName: string,
+): ClientRecord {
+  const candidateSlugBase = slugify(normalizedEmail.split("@")[0] || "client");
+  let candidateSlug = candidateSlugBase || `client-${createId("slug").slice(-6)}`;
+  let suffix = 1;
+
+  while (database.findClientBySlug(candidateSlug)) {
+    candidateSlug = `${candidateSlugBase}-${suffix}`;
+    suffix += 1;
+  }
+
+  const client = database.createClient({
+    slug: candidateSlug,
+    name: `${displayName || normalizedEmail} Workspace`,
+    preferredCurrency: "USD",
+    allowedOrigins: ["http://127.0.0.1:5173", "http://localhost:5173"],
+    allowedPaths: ["^/pricing(?:/|$)", "^/store(?:/|$)", "^/b2b-demo(?:/|$)"],
+  });
+
+  database.addClientMember({
+    clientId: client.id,
+    userId,
+    role: "owner",
+  });
+
+  database.createSettingsVersion({
+    clientId: client.id,
+    settings: {
+      fontScalePct: 90,
+      fontWeight: 600,
+      fontFamily: "inherit",
+      fontColor: "#355aa8",
+      spacingEm: 0.1,
+    },
+    createdByUserId: userId,
+  });
+
+  createDefaultPluginArtifacts(database, client.id, userId);
+
+  return client;
+}
+
+export function createAuthService({
+  database,
+  env,
+}: {
+  database: DatabaseApi;
+  env: EnvConfig;
+}): AuthService {
+  async function registerLocalUser({
+    email,
+    password,
+    displayName,
+  }: {
+    email: string;
+    password: string;
+    displayName: string;
+  }) {
     const normalizedEmail = normalizeEmail(email);
     if (!normalizedEmail.includes("@")) {
       throw new Error("Email must be a valid address");
@@ -62,44 +129,10 @@ export function createAuthService({ database, env }) {
       const user = database.createUser({
         email: normalizedEmail,
         passwordHash,
-        displayName: typeof displayName === "string" ? displayName.trim() : "",
+        displayName: displayName.trim(),
       });
 
-      const candidateSlugBase = slugify(normalizedEmail.split("@")[0] || "client");
-      let candidateSlug = candidateSlugBase || `client-${createId("slug").slice(-6)}`;
-      let suffix = 1;
-
-      while (database.findClientBySlug(candidateSlug)) {
-        candidateSlug = `${candidateSlugBase}-${suffix}`;
-        suffix += 1;
-      }
-
-      const client = database.createClient({
-        slug: candidateSlug,
-        name: `${displayName || normalizedEmail} Workspace`,
-        preferredCurrency: "USD",
-        allowedOrigins: ["http://127.0.0.1:5173", "http://localhost:5173"],
-        allowedPaths: ["^/pricing(?:/|$)", "^/store(?:/|$)", "^/b2b-demo(?:/|$)"],
-      });
-
-      database.addClientMember({
-        clientId: client.id,
-        userId: user.id,
-        role: "owner",
-      });
-
-      database.createSettingsVersion({
-        clientId: client.id,
-        settings: {
-          fontScalePct: 90,
-          fontWeight: 600,
-          fontFamily: "inherit",
-          fontColor: "#355aa8",
-          spacingEm: 0.1,
-        },
-        createdByUserId: user.id,
-      });
-      createDefaultPluginArtifacts(database, client.id, user.id);
+      const client = createWorkspaceClientForUser(database, user.id, normalizedEmail, displayName);
 
       database.createAuditEvent({
         clientId: client.id,
@@ -115,7 +148,13 @@ export function createAuthService({ database, env }) {
     });
   }
 
-  async function loginWithPassword({ email, password }) {
+  async function loginWithPassword({
+    email,
+    password,
+  }: {
+    email: string;
+    password: string;
+  }) {
     const normalizedEmail = normalizeEmail(email);
     const user = database.findUserByEmail(normalizedEmail);
 
@@ -137,17 +176,15 @@ export function createAuthService({ database, env }) {
     return user;
   }
 
-  function createSessionForUser(userId) {
-    const session = database.createSession({
+  function createSessionForUser(userId: string) {
+    return database.createSession({
       userId,
       csrfToken: makeCsrfToken(),
       expiresAt: hoursFromNow(env.sessionTtlHours),
     });
-
-    return session;
   }
 
-  function validateSession(sessionId) {
+  function validateSession(sessionId: string | null) {
     if (!sessionId) return null;
 
     database.deleteExpiredSessions();
@@ -172,12 +209,11 @@ export function createAuthService({ database, env }) {
     };
   }
 
-  function logoutSession(sessionId) {
-    if (!sessionId) return;
+  function logoutSession(sessionId: string): void {
     database.deleteSession(sessionId);
   }
 
-  function createGoogleAuthStart({ returnTo }) {
+  function createGoogleAuthStart({ returnTo }: { returnTo: string }) {
     if (!env.googleClientId || !env.googleRedirectUri) {
       throw new Error("Google OAuth is not configured");
     }
@@ -202,7 +238,7 @@ export function createAuthService({ database, env }) {
     };
   }
 
-  function consumeGoogleState(state) {
+  function consumeGoogleState(state: string) {
     const record = database.consumeOAuthState(state);
     if (!record) return null;
 
@@ -213,7 +249,7 @@ export function createAuthService({ database, env }) {
     return record;
   }
 
-  function upsertGoogleUser({ providerUserId, email, displayName }) {
+  function upsertGoogleUser({ providerUserId, email, displayName }: GoogleProfile) {
     const existingIdentity = database.findOAuthIdentity({
       provider: "google",
       providerUserId,
@@ -290,11 +326,11 @@ export function createAuthService({ database, env }) {
     });
   }
 
-  function getUserClients(userId) {
+  function getUserClients(userId: string) {
     return database.listClientsForUser(userId);
   }
 
-  function getClientAccess({ userId, clientId }) {
+  function getClientAccess({ userId, clientId }: { userId: string; clientId: string }) {
     const membership = database.findClientMembership({ userId, clientId });
     if (!membership) {
       return null;

@@ -4,9 +4,10 @@
   "type": "module",
   "version": "0.1.0",
   "scripts": {
-    "dev": "node src/server.mjs",
-    "start": "node src/server.mjs",
+    "dev": "npm run build && node dist/server.js",
+    "start": "node dist/server.js",
+    "build": "tsc -p tsconfig.json",
     "test": "node --test",
-    "db:migrate": "node src/db/migrate.mjs"
+    "db:migrate": "npm run build && node dist/db/migrate.js"
   }
 }

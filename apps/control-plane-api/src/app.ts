@@ -1,15 +1,30 @@
 import crypto from "node:crypto";
 import { URL } from "node:url";
-import { createCookie, createApiError, parseCookies, sendJson } from "./utils/http.mjs";
+import type { IncomingMessage, ServerResponse } from "node:http";
+import { createCookie, createApiError, parseCookies, sendJson } from "./utils/http.js";
+import type {
+  ApiError,
+  AuthService,
+  ControlPlaneApp,
+  EnvConfig,
+  PluginKind,
+  RouteContext,
+  RouteDefinition,
+  RouteHandler,
+  RouteOptions,
+  RouteResult,
+  RuntimeService,
+  UserRecord,
+} from "./types.js";
 
 const SESSION_COOKIE_NAME = "cp_session";
 
-function createRequestId() {
+function createRequestId(): string {
   return `req_${crypto.randomUUID().replace(/-/gu, "")}`;
 }
 
-function compilePathPattern(pattern) {
-  const keys = [];
+function compilePathPattern(pattern: string): { regex: RegExp; keys: string[] } {
+  const keys: string[] = [];
   const regexPattern = pattern.replace(/:[^/]+/gu, (token) => {
     keys.push(token.slice(1));
     return "([^/]+)";
@@ -22,11 +37,16 @@ function compilePathPattern(pattern) {
 }
 
 function createRouter() {
-  const routes = [];
+  const routes: RouteDefinition[] = [];
 
-  function register(method, pathPattern, options, handler) {
+  function register(
+    method: string,
+    pathPattern: string,
+    options: RouteOptions | RouteHandler,
+    handler?: RouteHandler,
+  ): void {
     const routeOptions = typeof options === "function" ? {} : options;
-    const resolvedHandler = typeof options === "function" ? options : handler;
+    const resolvedHandler = (typeof options === "function" ? options : handler) as RouteHandler;
 
     const compiled = compilePathPattern(pathPattern);
 
@@ -39,14 +59,14 @@ function createRouter() {
     });
   }
 
-  function match(method, pathname) {
+  function match(method: string, pathname: string): { route: RouteDefinition; params: Record<string, string> } | null {
     for (const route of routes) {
       if (route.method !== method) continue;
 
       const matched = route.compiled.regex.exec(pathname);
       if (!matched) continue;
 
-      const params = {};
+      const params: Record<string, string> = {};
       route.compiled.keys.forEach((key, index) => {
         params[key] = decodeURIComponent(matched[index + 1]);
       });
@@ -66,8 +86,8 @@ function createRouter() {
   };
 }
 
-async function readJsonBody(request) {
-  const chunks = [];
+async function readJsonBody(request: IncomingMessage): Promise<Record<string, unknown>> {
+  const chunks: Buffer[] = [];
 
   for await (const chunk of request) {
     chunks.push(Buffer.from(chunk));
@@ -83,17 +103,17 @@ async function readJsonBody(request) {
   }
 
   try {
-    return JSON.parse(bodyText);
+    return JSON.parse(bodyText) as Record<string, unknown>;
   } catch {
     throw createApiError("INVALID_JSON", "Request body must be valid JSON", null, 400);
   }
 }
 
-function hasWritePermission(role) {
+function hasWritePermission(role: string): boolean {
   return role === "owner" || role === "editor";
 }
 
-function userPayload(user) {
+function userPayload(user: UserRecord): Record<string, string> {
   return {
     id: user.id,
     email: user.email,
@@ -101,10 +121,44 @@ function userPayload(user) {
   };
 }
 
-export function createControlPlaneApp({ env, authService, runtimeService }) {
+function toStringValue(value: unknown): string {
+  return typeof value === "string" ? value : "";
+}
+
+function toOptionalStringValue(value: unknown): string | null {
+  return typeof value === "string" && value.trim().length ? value : null;
+}
+
+function asApiError(error: unknown): ApiError {
+  if (
+    error &&
+    typeof error === "object" &&
+    "statusCode" in error &&
+    "payload" in error
+  ) {
+    return error as ApiError;
+  }
+
+  return createApiError(
+    "INTERNAL_ERROR",
+    error instanceof Error ? error.message : "Unexpected server error",
+    null,
+    500,
+  );
+}
+
+export function createControlPlaneApp({
+  env,
+  authService,
+  runtimeService,
+}: {
+  env: EnvConfig;
+  authService: AuthService;
+  runtimeService: RuntimeService;
+}): ControlPlaneApp {
   const router = createRouter();
 
-  router.register("GET", "/health", (_ctx) => {
+  router.register("GET", "/health", () => {
     return {
       statusCode: 200,
       payload: {
@@ -115,7 +169,7 @@ export function createControlPlaneApp({ env, authService, runtimeService }) {
     };
   });
 
-  router.register("GET", "/ready", (_ctx) => {
+  router.register("GET", "/ready", () => {
     return {
       statusCode: 200,
       payload: {
@@ -131,9 +185,9 @@ export function createControlPlaneApp({ env, authService, runtimeService }) {
     const payload = await readJsonBody(ctx.request);
 
     const { user, client } = await authService.registerLocalUser({
-      email: payload.email,
-      password: payload.password,
-      displayName: payload.displayName,
+      email: toStringValue(payload.email),
+      password: toStringValue(payload.password),
+      displayName: toStringValue(payload.displayName),
     });
 
     const session = authService.createSessionForUser(user.id);
@@ -156,8 +210,8 @@ export function createControlPlaneApp({ env, authService, runtimeService }) {
   router.register("POST", "/api/v1/auth/login", async (ctx) => {
     const payload = await readJsonBody(ctx.request);
     const user = await authService.loginWithPassword({
-      email: payload.email,
-      password: payload.password,
+      email: toStringValue(payload.email),
+      password: toStringValue(payload.password),
     });
 
     if (!user) {
@@ -185,22 +239,22 @@ export function createControlPlaneApp({ env, authService, runtimeService }) {
     "/api/v1/auth/logout",
     { requiresAuth: true, requiresCsrf: true },
     async (ctx) => {
-    if (ctx.session) {
-      authService.logoutSession(ctx.session.id);
-    }
+      if (ctx.session) {
+        authService.logoutSession(ctx.session.id);
+      }
 
-    return {
-      statusCode: 200,
-      payload: {
-        success: true,
-      },
-      setCookies: [
-        createCookie(SESSION_COOKIE_NAME, "", {
-          secure: env.nodeEnv === "production",
-          maxAgeSeconds: 0,
-        }),
-      ],
-    };
+      return {
+        statusCode: 200,
+        payload: {
+          success: true,
+        },
+        setCookies: [
+          createCookie(SESSION_COOKIE_NAME, "", {
+            secure: env.nodeEnv === "production",
+            maxAgeSeconds: 0,
+          }),
+        ],
+      };
     },
   );
 
@@ -234,7 +288,7 @@ export function createControlPlaneApp({ env, authService, runtimeService }) {
   });
 
   router.register("GET", "/api/v1/auth/google/start", async (ctx) => {
-    const requestUrl = new URL(ctx.request.url, env.publicOrigin);
+    const requestUrl = new URL(ctx.request.url || "/", env.publicOrigin);
     const returnTo = requestUrl.searchParams.get("returnTo") || `${env.dashboardUrl}/#/settings`;
 
     const { redirectUrl } = authService.createGoogleAuthStart({ returnTo });
@@ -251,7 +305,7 @@ export function createControlPlaneApp({ env, authService, runtimeService }) {
   });
 
   router.register("GET", "/api/v1/auth/google/callback", async (ctx) => {
-    const requestUrl = new URL(ctx.request.url, env.publicOrigin);
+    const requestUrl = new URL(ctx.request.url || "/", env.publicOrigin);
     const state = requestUrl.searchParams.get("state");
     const error = requestUrl.searchParams.get("error");
 
@@ -268,7 +322,7 @@ export function createControlPlaneApp({ env, authService, runtimeService }) {
       throw createApiError("OAUTH_STATE_INVALID", "Invalid or expired OAuth state", null, 400);
     }
 
-    let profile = null;
+    let profile: { providerUserId: string; email: string; displayName: string } | null = null;
 
     if (env.enableMockGoogle) {
       const email =
@@ -327,8 +381,8 @@ export function createControlPlaneApp({ env, authService, runtimeService }) {
     }
 
     const payload = await readJsonBody(ctx.request);
-    const email = payload.email || "demo-google-user@example.com";
-    const displayName = payload.displayName || email.split("@")[0];
+    const email = toOptionalStringValue(payload.email) || "demo-google-user@example.com";
+    const displayName = toOptionalStringValue(payload.displayName) || email.split("@")[0];
 
     const upserted = authService.upsertGoogleUser({
       providerUserId: `mock-google-${email}`,
@@ -375,35 +429,35 @@ export function createControlPlaneApp({ env, authService, runtimeService }) {
     "/api/v1/clients/:clientId/settings/current",
     { requiresAuth: true },
     async (ctx) => {
-    if (!ctx.user) {
-      throw createApiError("AUTH_REQUIRED", "Authentication required", null, 401);
-    }
+      if (!ctx.user) {
+        throw createApiError("AUTH_REQUIRED", "Authentication required", null, 401);
+      }
 
-    const access = authService.getClientAccess({
-      userId: ctx.user.id,
-      clientId: ctx.params.clientId,
-    });
+      const access = authService.getClientAccess({
+        userId: ctx.user.id,
+        clientId: ctx.params.clientId,
+      });
 
-    if (!access) {
-      throw createApiError("CLIENT_ACCESS_DENIED", "Client access denied", null, 403);
-    }
+      if (!access) {
+        throw createApiError("CLIENT_ACCESS_DENIED", "Client access denied", null, 403);
+      }
 
-    const current = runtimeService.getRuntimeSettings(access.client.id);
-    if (!current) {
-      throw createApiError("SETTINGS_NOT_FOUND", "Client settings not found", null, 404);
-    }
+      const current = runtimeService.getRuntimeSettings(access.client.id);
+      if (!current) {
+        throw createApiError("SETTINGS_NOT_FOUND", "Client settings not found", null, 404);
+      }
 
-    return {
-      statusCode: 200,
-      payload: {
-        client: {
-          id: access.client.id,
-          name: access.client.name,
-          role: access.membership.role,
+      return {
+        statusCode: 200,
+        payload: {
+          client: {
+            id: access.client.id,
+            name: access.client.name,
+            role: access.membership.role,
+          },
+          ...current,
         },
-        ...current,
-      },
-    };
+      };
     },
   );
 
@@ -412,31 +466,33 @@ export function createControlPlaneApp({ env, authService, runtimeService }) {
     "/api/v1/clients/:clientId/settings",
     { requiresAuth: true, requiresCsrf: true },
     async (ctx) => {
-    if (!ctx.user || !ctx.session) {
-      throw createApiError("AUTH_REQUIRED", "Authentication required", null, 401);
-    }
+      if (!ctx.user || !ctx.session) {
+        throw createApiError("AUTH_REQUIRED", "Authentication required", null, 401);
+      }
 
-    const access = authService.getClientAccess({
-      userId: ctx.user.id,
-      clientId: ctx.params.clientId,
-    });
+      const access = authService.getClientAccess({
+        userId: ctx.user.id,
+        clientId: ctx.params.clientId,
+      });
 
-    if (!access || !hasWritePermission(access.membership.role)) {
-      throw createApiError("CLIENT_WRITE_FORBIDDEN", "Write access denied", null, 403);
-    }
+      if (!access || !hasWritePermission(access.membership.role)) {
+        throw createApiError("CLIENT_WRITE_FORBIDDEN", "Write access denied", null, 403);
+      }
 
-    const payload = await readJsonBody(ctx.request);
+      const payload = await readJsonBody(ctx.request);
 
-    const updated = runtimeService.updateClientSettings({
-      clientId: access.client.id,
-      settings: payload,
-      userId: ctx.user.id,
-    });
+      const updated = runtimeService.updateClientSettings({
+        clientId: access.client.id,
+        settings: payload,
+        userId: ctx.user.id,
+      });
 
-    return {
-      statusCode: 200,
-      payload: updated,
-    };
+      return {
+        statusCode: 200,
+        payload: {
+          ...updated,
+        },
+      };
     },
   );
 
@@ -445,37 +501,46 @@ export function createControlPlaneApp({ env, authService, runtimeService }) {
     "/api/v1/clients/:clientId/plugins/publish",
     { requiresAuth: true, requiresCsrf: true },
     async (ctx) => {
-    if (!ctx.user || !ctx.session) {
-      throw createApiError("AUTH_REQUIRED", "Authentication required", null, 401);
-    }
+      if (!ctx.user || !ctx.session) {
+        throw createApiError("AUTH_REQUIRED", "Authentication required", null, 401);
+      }
 
-    const access = authService.getClientAccess({
-      userId: ctx.user.id,
-      clientId: ctx.params.clientId,
-    });
+      const access = authService.getClientAccess({
+        userId: ctx.user.id,
+        clientId: ctx.params.clientId,
+      });
 
-    if (!access || !hasWritePermission(access.membership.role)) {
-      throw createApiError("CLIENT_WRITE_FORBIDDEN", "Write access denied", null, 403);
-    }
+      if (!access || !hasWritePermission(access.membership.role)) {
+        throw createApiError("CLIENT_WRITE_FORBIDDEN", "Write access denied", null, 403);
+      }
 
-    const payload = await readJsonBody(ctx.request);
+      const payload = await readJsonBody(ctx.request);
+      const artifactUrl = toOptionalStringValue(payload.artifactUrl);
+      const integrity = toOptionalStringValue(payload.integrity);
+      const kindValue = toStringValue(payload.kind);
 
-    if (typeof payload.artifactUrl !== "string" || typeof payload.integrity !== "string") {
-      throw createApiError("INVALID_PLUGIN_PAYLOAD", "artifactUrl and integrity are required", null, 400);
-    }
+      if (!artifactUrl || !integrity) {
+        throw createApiError("INVALID_PLUGIN_PAYLOAD", "artifactUrl and integrity are required", null, 400);
+      }
 
-    const artifact = runtimeService.publishPluginArtifact({
-      clientId: access.client.id,
-      kind: payload.kind,
-      artifactUrl: payload.artifactUrl,
-      integrity: payload.integrity,
-      userId: ctx.user.id,
-    });
+      if (kindValue !== "pre" && kindValue !== "post") {
+        throw createApiError("INVALID_PLUGIN_PAYLOAD", "kind must be pre or post", null, 400);
+      }
 
-    return {
-      statusCode: 201,
-      payload: artifact,
-    };
+      const artifact = runtimeService.publishPluginArtifact({
+        clientId: access.client.id,
+        kind: kindValue as PluginKind,
+        artifactUrl,
+        integrity,
+        userId: ctx.user.id,
+      });
+
+      return {
+        statusCode: 201,
+        payload: {
+          ...artifact,
+        },
+      };
     },
   );
 
@@ -484,25 +549,25 @@ export function createControlPlaneApp({ env, authService, runtimeService }) {
     "/api/v1/clients/:clientId/install-snippet",
     { requiresAuth: true },
     async (ctx) => {
-    if (!ctx.user) {
-      throw createApiError("AUTH_REQUIRED", "Authentication required", null, 401);
-    }
+      if (!ctx.user) {
+        throw createApiError("AUTH_REQUIRED", "Authentication required", null, 401);
+      }
 
-    const access = authService.getClientAccess({
-      userId: ctx.user.id,
-      clientId: ctx.params.clientId,
-    });
+      const access = authService.getClientAccess({
+        userId: ctx.user.id,
+        clientId: ctx.params.clientId,
+      });
 
-    if (!access) {
-      throw createApiError("CLIENT_ACCESS_DENIED", "Client access denied", null, 403);
-    }
+      if (!access) {
+        throw createApiError("CLIENT_ACCESS_DENIED", "Client access denied", null, 403);
+      }
 
-    return {
-      statusCode: 200,
-      payload: {
-        snippet: runtimeService.getInstallSnippet({ clientId: access.client.id }),
-      },
-    };
+      return {
+        statusCode: 200,
+        payload: {
+          snippet: runtimeService.getInstallSnippet({ clientId: access.client.id }),
+        },
+      };
     },
   );
 
@@ -514,7 +579,9 @@ export function createControlPlaneApp({ env, authService, runtimeService }) {
 
     return {
       statusCode: 200,
-      payload: current,
+      payload: {
+        ...current,
+      },
       headers: {
         "cache-control": "public, max-age=60",
       },
@@ -539,39 +606,40 @@ export function createControlPlaneApp({ env, authService, runtimeService }) {
     };
   });
 
-  router.register("GET", "/api/v1/runtime/public-key", async (_ctx) => {
+  router.register("GET", "/api/v1/runtime/public-key", async () => {
     const metadata = runtimeService.getSigningMetadata();
 
     return {
       statusCode: 200,
-      payload: metadata,
+      payload: {
+        ...metadata,
+      },
       headers: {
         "cache-control": "public, max-age=300",
       },
     };
   });
 
-  async function handle(request, response) {
+  async function handle(request: IncomingMessage, response: ServerResponse): Promise<void> {
     const requestId = createRequestId();
+    const requestUrl = new URL(request.url || "/", env.publicOrigin);
+    const isRuntimePublicRoute = requestUrl.pathname.startsWith("/api/v1/runtime/");
+    const corsHeaders: Record<string, string | string[]> = isRuntimePublicRoute
+      ? {
+        "access-control-allow-origin": "*",
+        "access-control-allow-methods": "GET,OPTIONS",
+        "access-control-allow-headers": "content-type",
+        "x-request-id": requestId,
+      }
+      : {
+        "access-control-allow-origin": env.dashboardUrl,
+        "access-control-allow-credentials": "true",
+        "access-control-allow-methods": "GET,POST,PUT,DELETE,OPTIONS",
+        "access-control-allow-headers": "content-type,x-csrf-token",
+        "x-request-id": requestId,
+      };
 
     try {
-      const requestUrl = new URL(request.url, env.publicOrigin);
-      const isRuntimePublicRoute = requestUrl.pathname.startsWith("/api/v1/runtime/");
-      const corsHeaders = isRuntimePublicRoute
-        ? {
-          "access-control-allow-origin": "*",
-          "access-control-allow-methods": "GET,OPTIONS",
-          "access-control-allow-headers": "content-type",
-          "x-request-id": requestId,
-        }
-        : {
-          "access-control-allow-origin": env.dashboardUrl,
-          "access-control-allow-credentials": "true",
-          "access-control-allow-methods": "GET,POST,PUT,DELETE,OPTIONS",
-          "access-control-allow-headers": "content-type,x-csrf-token",
-          "x-request-id": requestId,
-        };
-
       if (request.method === "OPTIONS") {
         response.writeHead(204, corsHeaders);
         response.end();
@@ -597,11 +665,11 @@ export function createControlPlaneApp({ env, authService, runtimeService }) {
         return;
       }
 
-      const cookies = parseCookies(request.headers.cookie || "");
+      const cookies = parseCookies(typeof request.headers.cookie === "string" ? request.headers.cookie : "");
       const sessionId = cookies[SESSION_COOKIE_NAME] || null;
       const sessionResult = authService.validateSession(sessionId);
 
-      const context = {
+      const context: RouteContext = {
         env,
         request,
         response,
@@ -622,14 +690,15 @@ export function createControlPlaneApp({ env, authService, runtimeService }) {
 
       if (requiresCsrf) {
         const incomingToken = request.headers["x-csrf-token"];
-        if (!context.session || incomingToken !== context.session.csrfToken) {
+        const csrfToken = Array.isArray(incomingToken) ? incomingToken[0] : incomingToken;
+        if (!context.session || csrfToken !== context.session.csrfToken) {
           throw createApiError("CSRF_INVALID", "Invalid CSRF token", null, 403);
         }
       }
 
-      const result = await matchedRoute.route.handler(context);
+      const result: RouteResult = await matchedRoute.route.handler(context);
 
-      const headers = {
+      const headers: Record<string, string | string[]> = {
         ...corsHeaders,
         ...(result.headers || {}),
       };
@@ -654,15 +723,7 @@ export function createControlPlaneApp({ env, authService, runtimeService }) {
         headers,
       );
     } catch (error) {
-      const apiError =
-        error && typeof error === "object" && "statusCode" in error && "payload" in error
-          ? error
-          : createApiError(
-            "INTERNAL_ERROR",
-            error instanceof Error ? error.message : "Unexpected server error",
-            null,
-            500,
-          );
+      const apiError = asApiError(error);
 
       sendJson(
         response,

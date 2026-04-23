@@ -1,9 +1,20 @@
-export function parseCookies(cookieHeader) {
-  if (typeof cookieHeader !== "string" || !cookieHeader.length) {
+import type { ServerResponse } from "node:http";
+import type { ApiError } from "../types.js";
+
+interface CookieOptions {
+  path?: string;
+  httpOnly?: boolean;
+  sameSite?: "Lax" | "Strict" | "None";
+  secure?: boolean;
+  maxAgeSeconds?: number;
+}
+
+export function parseCookies(cookieHeader: string): Record<string, string> {
+  if (!cookieHeader.length) {
     return {};
   }
 
-  const values = {};
+  const values: Record<string, string> = {};
 
   for (const part of cookieHeader.split(";")) {
     const [rawKey, ...rawValueParts] = part.trim().split("=");
@@ -16,7 +27,7 @@ export function parseCookies(cookieHeader) {
   return values;
 }
 
-export function createCookie(name, value, options = {}) {
+export function createCookie(name: string, value: string, options: CookieOptions = {}): string {
   const segments = [`${name}=${encodeURIComponent(value)}`];
 
   segments.push(`Path=${options.path ?? "/"}`);
@@ -39,7 +50,12 @@ export function createCookie(name, value, options = {}) {
   return segments.join("; ");
 }
 
-export function sendJson(response, statusCode, payload, extraHeaders = {}) {
+export function sendJson(
+  response: ServerResponse,
+  statusCode: number,
+  payload: Record<string, unknown>,
+  extraHeaders: Record<string, string | string[]> = {},
+): void {
   const body = JSON.stringify(payload);
 
   response.writeHead(statusCode, {
@@ -51,7 +67,12 @@ export function sendJson(response, statusCode, payload, extraHeaders = {}) {
   response.end(body);
 }
 
-export function createApiError(code, message, details = null, statusCode = 400) {
+export function createApiError(
+  code: string,
+  message: string,
+  details: Record<string, unknown> | null = null,
+  statusCode = 400,
+): ApiError {
   return {
     statusCode,
     payload: {

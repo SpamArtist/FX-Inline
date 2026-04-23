@@ -1,33 +1,136 @@
 import fs from "node:fs";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import { applyMigrations } from "./migrate.mjs";
-import { createId } from "../utils/ids.mjs";
-import { parseJsonSafe } from "../utils/json.mjs";
-import { nowMs } from "../utils/time.mjs";
+import { applyMigrations } from "./migrate.js";
+import { createId } from "../utils/ids.js";
+import { parseJsonSafe } from "../utils/json.js";
+import { nowMs } from "../utils/time.js";
+import type {
+  AuditEventRecord,
+  ClientMembershipRecord,
+  ClientRecord,
+  ClientWithRole,
+  DatabaseApi,
+  ManifestVersionRecord,
+  MembershipRole,
+  OAuthIdentityRecord,
+  OAuthStateRecord,
+  PluginArtifactRecord,
+  PluginArtifactStatus,
+  PluginKind,
+  RuntimeManifest,
+  SessionRecord,
+  SettingsVersionRecord,
+  UiSettings,
+  UserRecord,
+} from "../types.js";
 
-function ensureParentDirectory(filePath) {
+function ensureParentDirectory(filePath: string): void {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
 }
 
-function asJson(value) {
+function asJson(value: unknown): string {
   return JSON.stringify(value);
 }
 
-function rowToSettingsVersion(row) {
+interface UserRow {
+  id: string;
+  email: string;
+  password_hash: string | null;
+  display_name: string;
+  created_at: number;
+}
+
+interface ClientRow {
+  id: string;
+  slug: string;
+  name: string;
+  preferred_currency: string;
+  allowed_origins_json: string;
+  allowed_paths_json: string;
+  created_at: number;
+}
+
+interface ClientWithRoleRow extends ClientRow {
+  role: MembershipRole;
+}
+
+interface MembershipRow {
+  client_id: string;
+  user_id: string;
+  role: MembershipRole;
+  created_at: number;
+}
+
+interface SessionRow {
+  id: string;
+  user_id: string;
+  csrf_token: string;
+  expires_at: number;
+  created_at: number;
+}
+
+interface OAuthStateRow {
+  state: string;
+  return_to: string;
+  expires_at: number;
+  created_at: number;
+}
+
+interface OAuthIdentityRow {
+  id: string;
+  user_id: string;
+  provider: string;
+  provider_user_id: string;
+  email: string;
+  created_at: number;
+}
+
+interface SettingsVersionRow {
+  id: string;
+  client_id: string;
+  version: number;
+  settings_json: string;
+  created_by_user_id: string | null;
+  created_at: number;
+}
+
+interface PluginArtifactRow {
+  id: string;
+  client_id: string;
+  kind: PluginKind;
+  version: number;
+  artifact_url: string;
+  integrity: string;
+  status: PluginArtifactStatus;
+  created_by_user_id: string | null;
+  created_at: number;
+}
+
+interface ManifestVersionRow {
+  version: number;
+}
+
+function rowToSettingsVersion(row: SettingsVersionRow | null | undefined): SettingsVersionRecord | null {
   if (!row) return null;
 
   return {
     id: row.id,
     clientId: row.client_id,
     version: row.version,
-    settings: parseJsonSafe(row.settings_json, {}),
+    settings: parseJsonSafe<UiSettings>(row.settings_json, {
+      fontScalePct: 90,
+      fontWeight: 600,
+      fontFamily: "inherit",
+      fontColor: "#355aa8",
+      spacingEm: 0.1,
+    }),
     createdByUserId: row.created_by_user_id,
     createdAt: row.created_at,
   };
 }
 
-function rowToPluginArtifact(row) {
+function rowToPluginArtifact(row: PluginArtifactRow | null | undefined): PluginArtifactRecord | null {
   if (!row) return null;
 
   return {
@@ -43,14 +146,40 @@ function rowToPluginArtifact(row) {
   };
 }
 
-export function createDatabase({ dbPath }) {
+function rowToClient(row: ClientRow | null | undefined): ClientRecord | null {
+  if (!row) return null;
+
+  return {
+    id: row.id,
+    slug: row.slug,
+    name: row.name,
+    preferredCurrency: row.preferred_currency,
+    allowedOrigins: parseJsonSafe<string[]>(row.allowed_origins_json, []),
+    allowedPaths: parseJsonSafe<string[]>(row.allowed_paths_json, []),
+    createdAt: row.created_at,
+  };
+}
+
+function rowToUser(row: UserRow | null | undefined): UserRecord | null {
+  if (!row) return null;
+
+  return {
+    id: row.id,
+    email: row.email,
+    passwordHash: row.password_hash,
+    displayName: row.display_name,
+    createdAt: row.created_at,
+  };
+}
+
+export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
   ensureParentDirectory(dbPath);
   const database = new DatabaseSync(dbPath);
   database.exec("PRAGMA journal_mode = WAL;");
   database.exec("PRAGMA foreign_keys = ON;");
   applyMigrations(database);
 
-  function runTransaction(callback) {
+  function runTransaction<T>(callback: () => T): T {
     database.exec("BEGIN");
 
     try {
@@ -63,8 +192,16 @@ export function createDatabase({ dbPath }) {
     }
   }
 
-  function createUser({ email, passwordHash, displayName }) {
-    const record = {
+  function createUser({
+    email,
+    passwordHash,
+    displayName,
+  }: {
+    email: string;
+    passwordHash: string | null;
+    displayName: string;
+  }): UserRecord {
+    const record: UserRecord = {
       id: createId("usr"),
       email,
       passwordHash,
@@ -88,46 +225,42 @@ export function createDatabase({ dbPath }) {
     return record;
   }
 
-  function findUserByEmail(email) {
+  function findUserByEmail(email: string): UserRecord | null {
     const row = database
       .prepare(
         `SELECT id, email, password_hash, display_name, created_at
          FROM users WHERE lower(email) = lower(?)`,
       )
-      .get(email);
+      .get(email) as UserRow | undefined;
 
-    if (!row) return null;
-
-    return {
-      id: row.id,
-      email: row.email,
-      passwordHash: row.password_hash,
-      displayName: row.display_name,
-      createdAt: row.created_at,
-    };
+    return rowToUser(row);
   }
 
-  function findUserById(userId) {
+  function findUserById(userId: string): UserRecord | null {
     const row = database
       .prepare(
         `SELECT id, email, password_hash, display_name, created_at
          FROM users WHERE id = ?`,
       )
-      .get(userId);
+      .get(userId) as UserRow | undefined;
 
-    if (!row) return null;
-
-    return {
-      id: row.id,
-      email: row.email,
-      passwordHash: row.password_hash,
-      displayName: row.display_name,
-      createdAt: row.created_at,
-    };
+    return rowToUser(row);
   }
 
-  function createClient({ slug, name, preferredCurrency, allowedOrigins, allowedPaths }) {
-    const record = {
+  function createClient({
+    slug,
+    name,
+    preferredCurrency,
+    allowedOrigins,
+    allowedPaths,
+  }: {
+    slug: string;
+    name: string;
+    preferredCurrency: string;
+    allowedOrigins: string[];
+    allowedPaths: string[];
+  }): ClientRecord {
+    const record: ClientRecord = {
       id: createId("clt"),
       slug,
       name,
@@ -162,49 +295,29 @@ export function createDatabase({ dbPath }) {
     return record;
   }
 
-  function findClientById(clientId) {
+  function findClientById(clientId: string): ClientRecord | null {
     const row = database
       .prepare(
         `SELECT id, slug, name, preferred_currency, allowed_origins_json, allowed_paths_json, created_at
          FROM clients WHERE id = ?`,
       )
-      .get(clientId);
+      .get(clientId) as ClientRow | undefined;
 
-    if (!row) return null;
-
-    return {
-      id: row.id,
-      slug: row.slug,
-      name: row.name,
-      preferredCurrency: row.preferred_currency,
-      allowedOrigins: parseJsonSafe(row.allowed_origins_json, []),
-      allowedPaths: parseJsonSafe(row.allowed_paths_json, []),
-      createdAt: row.created_at,
-    };
+    return rowToClient(row);
   }
 
-  function findClientBySlug(slug) {
+  function findClientBySlug(slug: string): ClientRecord | null {
     const row = database
       .prepare(
         `SELECT id, slug, name, preferred_currency, allowed_origins_json, allowed_paths_json, created_at
          FROM clients WHERE slug = ?`,
       )
-      .get(slug);
+      .get(slug) as ClientRow | undefined;
 
-    if (!row) return null;
-
-    return {
-      id: row.id,
-      slug: row.slug,
-      name: row.name,
-      preferredCurrency: row.preferred_currency,
-      allowedOrigins: parseJsonSafe(row.allowed_origins_json, []),
-      allowedPaths: parseJsonSafe(row.allowed_paths_json, []),
-      createdAt: row.created_at,
-    };
+    return rowToClient(row);
   }
 
-  function listClientsForUser(userId) {
+  function listClientsForUser(userId: string): ClientWithRole[] {
     const rows = database
       .prepare(
         `SELECT c.id, c.slug, c.name, c.preferred_currency, c.allowed_origins_json, c.allowed_paths_json, c.created_at, m.role
@@ -213,21 +326,29 @@ export function createDatabase({ dbPath }) {
          WHERE m.user_id = ?
          ORDER BY c.created_at ASC`,
       )
-      .all(userId);
+      .all(userId) as unknown as ClientWithRoleRow[];
 
     return rows.map((row) => ({
       id: row.id,
       slug: row.slug,
       name: row.name,
       preferredCurrency: row.preferred_currency,
-      allowedOrigins: parseJsonSafe(row.allowed_origins_json, []),
-      allowedPaths: parseJsonSafe(row.allowed_paths_json, []),
+      allowedOrigins: parseJsonSafe<string[]>(row.allowed_origins_json, []),
+      allowedPaths: parseJsonSafe<string[]>(row.allowed_paths_json, []),
       createdAt: row.created_at,
       role: row.role,
     }));
   }
 
-  function addClientMember({ clientId, userId, role }) {
+  function addClientMember({
+    clientId,
+    userId,
+    role,
+  }: {
+    clientId: string;
+    userId: string;
+    role: MembershipRole;
+  }): void {
     database
       .prepare(
         `INSERT INTO client_members (client_id, user_id, role, created_at)
@@ -236,13 +357,19 @@ export function createDatabase({ dbPath }) {
       .run(clientId, userId, role, nowMs());
   }
 
-  function findClientMembership({ clientId, userId }) {
+  function findClientMembership({
+    clientId,
+    userId,
+  }: {
+    clientId: string;
+    userId: string;
+  }): ClientMembershipRecord | null {
     const row = database
       .prepare(
         `SELECT client_id, user_id, role, created_at
          FROM client_members WHERE client_id = ? AND user_id = ?`,
       )
-      .get(clientId, userId);
+      .get(clientId, userId) as MembershipRow | undefined;
 
     if (!row) return null;
 
@@ -254,8 +381,16 @@ export function createDatabase({ dbPath }) {
     };
   }
 
-  function createSession({ userId, csrfToken, expiresAt }) {
-    const session = {
+  function createSession({
+    userId,
+    csrfToken,
+    expiresAt,
+  }: {
+    userId: string;
+    csrfToken: string;
+    expiresAt: number;
+  }): SessionRecord {
+    const session: SessionRecord = {
       id: createId("ses"),
       userId,
       csrfToken,
@@ -279,13 +414,13 @@ export function createDatabase({ dbPath }) {
     return session;
   }
 
-  function findSession(sessionId) {
+  function findSession(sessionId: string): SessionRecord | null {
     const row = database
       .prepare(
         `SELECT id, user_id, csrf_token, expires_at, created_at
          FROM sessions WHERE id = ?`,
       )
-      .get(sessionId);
+      .get(sessionId) as SessionRow | undefined;
 
     if (!row) return null;
 
@@ -298,17 +433,23 @@ export function createDatabase({ dbPath }) {
     };
   }
 
-  function deleteSession(sessionId) {
+  function deleteSession(sessionId: string): void {
     database.prepare("DELETE FROM sessions WHERE id = ?").run(sessionId);
   }
 
-  function deleteExpiredSessions() {
+  function deleteExpiredSessions(): void {
     database
       .prepare("DELETE FROM sessions WHERE expires_at <= ?")
       .run(nowMs());
   }
 
-  function createOAuthState({ returnTo, expiresAt }) {
+  function createOAuthState({
+    returnTo,
+    expiresAt,
+  }: {
+    returnTo: string;
+    expiresAt: number;
+  }): OAuthStateRecord {
     const state = createId("st");
     const createdAt = nowMs();
 
@@ -327,14 +468,14 @@ export function createDatabase({ dbPath }) {
     };
   }
 
-  function consumeOAuthState(state) {
+  function consumeOAuthState(state: string): OAuthStateRecord | null {
     return runTransaction(() => {
       const row = database
         .prepare(
           `SELECT state, return_to, expires_at, created_at
            FROM oauth_states WHERE state = ?`,
         )
-        .get(state);
+        .get(state) as OAuthStateRow | undefined;
 
       if (!row) return null;
 
@@ -349,14 +490,20 @@ export function createDatabase({ dbPath }) {
     });
   }
 
-  function findOAuthIdentity({ provider, providerUserId }) {
+  function findOAuthIdentity({
+    provider,
+    providerUserId,
+  }: {
+    provider: string;
+    providerUserId: string;
+  }): OAuthIdentityRecord | null {
     const row = database
       .prepare(
         `SELECT id, user_id, provider, provider_user_id, email, created_at
          FROM oauth_identities
          WHERE provider = ? AND provider_user_id = ?`,
       )
-      .get(provider, providerUserId);
+      .get(provider, providerUserId) as OAuthIdentityRow | undefined;
 
     if (!row) return null;
 
@@ -370,8 +517,18 @@ export function createDatabase({ dbPath }) {
     };
   }
 
-  function createOAuthIdentity({ userId, provider, providerUserId, email }) {
-    const identity = {
+  function createOAuthIdentity({
+    userId,
+    provider,
+    providerUserId,
+    email,
+  }: {
+    userId: string;
+    provider: string;
+    providerUserId: string;
+    email: string;
+  }): OAuthIdentityRecord {
+    const identity: OAuthIdentityRecord = {
       id: createId("oauth"),
       userId,
       provider,
@@ -403,7 +560,7 @@ export function createDatabase({ dbPath }) {
     return identity;
   }
 
-  function getLatestSettingsVersion(clientId) {
+  function getLatestSettingsVersion(clientId: string): SettingsVersionRecord | null {
     const row = database
       .prepare(
         `SELECT id, client_id, version, settings_json, created_by_user_id, created_at
@@ -412,16 +569,24 @@ export function createDatabase({ dbPath }) {
          ORDER BY version DESC
          LIMIT 1`,
       )
-      .get(clientId);
+      .get(clientId) as SettingsVersionRow | undefined;
 
     return rowToSettingsVersion(row);
   }
 
-  function createSettingsVersion({ clientId, settings, createdByUserId }) {
+  function createSettingsVersion({
+    clientId,
+    settings,
+    createdByUserId,
+  }: {
+    clientId: string;
+    settings: UiSettings;
+    createdByUserId: string | null;
+  }): SettingsVersionRecord {
     const latest = getLatestSettingsVersion(clientId);
 
     const nextVersion = latest ? latest.version + 1 : 1;
-    const record = {
+    const record: SettingsVersionRecord = {
       id: createId("set"),
       clientId,
       version: nextVersion,
@@ -453,7 +618,13 @@ export function createDatabase({ dbPath }) {
     return record;
   }
 
-  function getLatestPluginArtifact({ clientId, kind }) {
+  function getLatestPluginArtifact({
+    clientId,
+    kind,
+  }: {
+    clientId: string;
+    kind: PluginKind;
+  }): PluginArtifactRecord | null {
     const row = database
       .prepare(
         `SELECT id, client_id, kind, version, artifact_url, integrity, status, created_by_user_id, created_at
@@ -462,7 +633,7 @@ export function createDatabase({ dbPath }) {
          ORDER BY version DESC
          LIMIT 1`,
       )
-      .get(clientId, kind);
+      .get(clientId, kind) as PluginArtifactRow | undefined;
 
     return rowToPluginArtifact(row);
   }
@@ -474,11 +645,18 @@ export function createDatabase({ dbPath }) {
     integrity,
     createdByUserId,
     status = "approved",
-  }) {
+  }: {
+    clientId: string;
+    kind: PluginKind;
+    artifactUrl: string;
+    integrity: string;
+    createdByUserId: string | null;
+    status?: PluginArtifactStatus;
+  }): PluginArtifactRecord {
     const latest = getLatestPluginArtifact({ clientId, kind });
     const nextVersion = latest ? latest.version + 1 : 1;
 
-    const record = {
+    const record: PluginArtifactRecord = {
       id: createId("plg"),
       clientId,
       kind,
@@ -519,7 +697,17 @@ export function createDatabase({ dbPath }) {
     return record;
   }
 
-  function createManifestVersion({ clientId, manifest, signature, keyId }) {
+  function createManifestVersion({
+    clientId,
+    manifest,
+    signature,
+    keyId,
+  }: {
+    clientId: string;
+    manifest: RuntimeManifest;
+    signature: string;
+    keyId: string;
+  }): ManifestVersionRecord {
     const latest = database
       .prepare(
         `SELECT version FROM manifest_versions
@@ -527,11 +715,11 @@ export function createDatabase({ dbPath }) {
          ORDER BY version DESC
          LIMIT 1`,
       )
-      .get(clientId);
+      .get(clientId) as ManifestVersionRow | undefined;
 
     const nextVersion = latest ? latest.version + 1 : 1;
 
-    const record = {
+    const record: ManifestVersionRecord = {
       id: createId("mfs"),
       clientId,
       version: nextVersion,
@@ -566,8 +754,18 @@ export function createDatabase({ dbPath }) {
     return record;
   }
 
-  function createAuditEvent({ clientId = null, userId = null, eventType, payload = null }) {
-    const record = {
+  function createAuditEvent({
+    clientId = null,
+    userId = null,
+    eventType,
+    payload = null,
+  }: {
+    clientId?: string | null;
+    userId?: string | null;
+    eventType: string;
+    payload?: Record<string, unknown> | null;
+  }): AuditEventRecord {
+    const record: AuditEventRecord = {
       id: createId("aud"),
       clientId,
       userId,
@@ -599,7 +797,7 @@ export function createDatabase({ dbPath }) {
     return record;
   }
 
-  function seedDemoData() {
+  function seedDemoData(): ClientRecord {
     const existingClient = findClientBySlug("acme");
     if (existingClient) return existingClient;
 

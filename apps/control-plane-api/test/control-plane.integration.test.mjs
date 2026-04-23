@@ -2,7 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { Readable } from "node:stream";
-import { createServerInstance } from "../src/server.mjs";
+import { createServerInstance } from "../dist/server.js";
 
 function createTestDatabasePath() {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), "cp-api-test-"));

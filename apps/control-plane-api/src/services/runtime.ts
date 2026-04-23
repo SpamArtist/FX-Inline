@@ -1,8 +1,38 @@
-import { nowMs } from "../utils/time.mjs";
-import { sanitizeUiSettings } from "./settings.mjs";
+import { nowMs } from "../utils/time.js";
+import { sanitizeUiSettings } from "./settings.js";
+import type {
+  ClientRecord,
+  DatabaseApi,
+  EnvConfig,
+  PluginArtifactRecord,
+  PluginKind,
+  RuntimeManifest,
+  RuntimeService,
+  SettingsVersionRecord,
+  SigningService,
+  UiSettingsInput,
+} from "../types.js";
 
-export function createRuntimeService({ database, signingService, env }) {
-  function buildRuntimeManifest({ client, settingsVersion, prePlugin, postPlugin }) {
+export function createRuntimeService({
+  database,
+  signingService,
+  env,
+}: {
+  database: DatabaseApi;
+  signingService: SigningService;
+  env: EnvConfig;
+}): RuntimeService {
+  function buildRuntimeManifest({
+    client,
+    settingsVersion,
+    prePlugin,
+    postPlugin,
+  }: {
+    client: ClientRecord;
+    settingsVersion: SettingsVersionRecord;
+    prePlugin: PluginArtifactRecord;
+    postPlugin: PluginArtifactRecord;
+  }): RuntimeManifest {
     const issuedAt = nowMs();
     const expiresAt = issuedAt + 5 * 60 * 1000;
 
@@ -45,7 +75,7 @@ export function createRuntimeService({ database, signingService, env }) {
     };
   }
 
-  function getSignedManifestForClient(clientId) {
+  function getSignedManifestForClient(clientId: string) {
     const client = database.findClientById(clientId);
     if (!client) {
       return null;
@@ -94,7 +124,7 @@ export function createRuntimeService({ database, signingService, env }) {
     };
   }
 
-  function getRuntimeSettings(clientId) {
+  function getRuntimeSettings(clientId: string) {
     const settingsVersion = database.getLatestSettingsVersion(clientId);
     if (!settingsVersion) {
       return null;
@@ -107,7 +137,15 @@ export function createRuntimeService({ database, signingService, env }) {
     };
   }
 
-  function updateClientSettings({ clientId, settings, userId }) {
+  function updateClientSettings({
+    clientId,
+    settings,
+    userId,
+  }: {
+    clientId: string;
+    settings: UiSettingsInput;
+    userId: string;
+  }) {
     const sanitized = sanitizeUiSettings(settings);
 
     const version = database.createSettingsVersion({
@@ -132,7 +170,19 @@ export function createRuntimeService({ database, signingService, env }) {
     };
   }
 
-  function publishPluginArtifact({ clientId, kind, artifactUrl, integrity, userId }) {
+  function publishPluginArtifact({
+    clientId,
+    kind,
+    artifactUrl,
+    integrity,
+    userId,
+  }: {
+    clientId: string;
+    kind: PluginKind;
+    artifactUrl: string;
+    integrity: string;
+    userId: string;
+  }) {
     if (kind !== "pre" && kind !== "post") {
       throw new Error("Plugin kind must be pre or post");
     }
@@ -159,7 +209,7 @@ export function createRuntimeService({ database, signingService, env }) {
     return artifact;
   }
 
-  function getInstallSnippet({ clientId }) {
+  function getInstallSnippet({ clientId }: { clientId: string }): string {
     const manifestUrl = new URL(`/api/v1/runtime/${clientId}/manifest`, env.publicOrigin).toString();
     const publicKeyPem = signingService
       .getPublicKeyPem()

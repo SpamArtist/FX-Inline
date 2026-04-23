@@ -1,3 +1,5 @@
+import type { UiSettings, UiSettingsInput } from "../types.js";
+
 const FONT_FAMILY_ALLOWLIST = new Set([
   "inherit",
   "Inter, sans-serif",
@@ -7,7 +9,7 @@ const FONT_FAMILY_ALLOWLIST = new Set([
   "'IBM Plex Sans', sans-serif",
 ]);
 
-function clampNumber(value, minimum, maximum, fallback) {
+function clampNumber(value: unknown, minimum: number, maximum: number, fallback: number): number {
   if (typeof value !== "number" || !Number.isFinite(value)) {
     return fallback;
   }
@@ -17,7 +19,7 @@ function clampNumber(value, minimum, maximum, fallback) {
   return value;
 }
 
-function sanitizeColor(value, fallback) {
+function sanitizeColor(value: unknown, fallback: string): string {
   if (typeof value !== "string") return fallback;
   const normalized = value.trim();
 
@@ -34,7 +36,7 @@ function sanitizeColor(value, fallback) {
   return fallback;
 }
 
-function sanitizeFontFamily(value, fallback) {
+function sanitizeFontFamily(value: unknown, fallback: string): string {
   if (typeof value !== "string") return fallback;
   const normalized = value.trim();
   if (!FONT_FAMILY_ALLOWLIST.has(normalized)) {
@@ -44,7 +46,7 @@ function sanitizeFontFamily(value, fallback) {
   return normalized;
 }
 
-export const DEFAULT_UI_SETTINGS = {
+export const DEFAULT_UI_SETTINGS: UiSettings = {
   fontScalePct: 90,
   fontWeight: 600,
   fontFamily: "inherit",
@@ -52,7 +54,7 @@ export const DEFAULT_UI_SETTINGS = {
   spacingEm: 0.1,
 };
 
-export function sanitizeUiSettings(input) {
+export function sanitizeUiSettings(input: UiSettingsInput): UiSettings {
   const payload = input && typeof input === "object" ? input : {};
 
   return {

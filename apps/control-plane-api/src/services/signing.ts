@@ -1,9 +1,18 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
-import { canonicalizeJson } from "../utils/json.mjs";
+import { canonicalizeJson } from "../utils/json.js";
+import type { RuntimeManifest, SigningService } from "../types.js";
 
-function readPrivateKeyFromPath(privateKeyPath) {
+interface ActiveKey {
+  privateKeyPem: string;
+  publicKeyPem: string;
+  keyId: string;
+  privateKeyPath: string;
+  publicKeyPath: string | null;
+}
+
+function readPrivateKeyFromPath(privateKeyPath: string): string | null {
   if (!privateKeyPath) {
     return null;
   }
@@ -15,7 +24,7 @@ function readPrivateKeyFromPath(privateKeyPath) {
   return fs.readFileSync(privateKeyPath, "utf8");
 }
 
-function ensureDevKeyPair(directoryPath) {
+function ensureDevKeyPair(directoryPath: string): ActiveKey {
   fs.mkdirSync(directoryPath, { recursive: true });
 
   const privateKeyPath = path.join(directoryPath, "manifest-dev-private.pem");
@@ -45,32 +54,45 @@ function ensureDevKeyPair(directoryPath) {
     format: "pem",
   });
 
-  fs.writeFileSync(privateKeyPath, privateKeyPem);
-  fs.writeFileSync(publicKeyPath, publicKeyPem);
+  const privateKeyPemText =
+    typeof privateKeyPem === "string" ? privateKeyPem : privateKeyPem.toString("utf8");
+  const publicKeyPemText =
+    typeof publicKeyPem === "string" ? publicKeyPem : publicKeyPem.toString("utf8");
+
+  fs.writeFileSync(privateKeyPath, privateKeyPemText);
+  fs.writeFileSync(publicKeyPath, publicKeyPemText);
 
   return {
-    privateKeyPem,
-    publicKeyPem,
+    privateKeyPem: privateKeyPemText,
+    publicKeyPem: publicKeyPemText,
     keyId: "dev-local-key",
     privateKeyPath,
     publicKeyPath,
   };
 }
 
-function derivePublicKeyPem(privateKeyPem) {
+function derivePublicKeyPem(privateKeyPem: string): string {
   const privateKey = crypto.createPrivateKey(privateKeyPem);
   const publicKey = crypto.createPublicKey(privateKey);
 
-  return publicKey.export({
+  const publicKeyPem = publicKey.export({
     type: "spki",
     format: "pem",
   });
+
+  return typeof publicKeyPem === "string" ? publicKeyPem : publicKeyPem.toString("utf8");
 }
 
-export function createSigningService({ privateKeyPath, fallbackDirectory }) {
+export function createSigningService({
+  privateKeyPath,
+  fallbackDirectory,
+}: {
+  privateKeyPath: string;
+  fallbackDirectory: string;
+}): SigningService {
   const configuredPrivateKey = readPrivateKeyFromPath(privateKeyPath);
 
-  const activeKey = configuredPrivateKey
+  const activeKey: ActiveKey = configuredPrivateKey
     ? {
       privateKeyPem: configuredPrivateKey,
       publicKeyPem: derivePublicKeyPem(configuredPrivateKey),
@@ -80,7 +102,7 @@ export function createSigningService({ privateKeyPath, fallbackDirectory }) {
     }
     : ensureDevKeyPair(fallbackDirectory);
 
-  function signManifest(manifestPayload) {
+  function signManifest(manifestPayload: RuntimeManifest) {
     const canonicalPayload = canonicalizeJson(manifestPayload);
 
     const signer = crypto.createSign("SHA256");

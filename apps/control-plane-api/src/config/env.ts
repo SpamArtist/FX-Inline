@@ -1,6 +1,7 @@
 import path from "node:path";
+import type { EnvConfig, NodeEnv } from "../types.js";
 
-function asString(value, fallback = "") {
+function asString(value: unknown, fallback = ""): string {
   if (typeof value !== "string") {
     return fallback;
   }
@@ -8,35 +9,38 @@ function asString(value, fallback = "") {
   return value.trim();
 }
 
-function asInteger(value, fallback) {
-  const parsed = Number.parseInt(value ?? "", 10);
+function asInteger(value: unknown, fallback: number): number {
+  const parsed = Number.parseInt(String(value ?? ""), 10);
   if (Number.isNaN(parsed)) return fallback;
   return parsed;
 }
 
-function assertBooleanString(value, key) {
+function assertBooleanString(value: string, key: string): boolean {
   if (value === "true") return true;
   if (value === "false") return false;
   throw new Error(`${key} must be 'true' or 'false'`);
 }
 
-function normalizePemString(value) {
+function normalizePemString(value: string): string {
   if (!value) return "";
   return value.replace(/\\n/gu, "\n");
 }
 
-export function loadEnv(overrides = {}) {
-  const source = {
-    ...process.env,
+function asNodeEnv(value: string): NodeEnv {
+  if (value === "development" || value === "test" || value === "production") {
+    return value;
+  }
+
+  throw new Error("NODE_ENV must be development, test, or production");
+}
+
+export function loadEnv(overrides: Record<string, string | undefined> = {}): EnvConfig {
+  const source: Record<string, string | undefined> = {
+    ...(process.env as Record<string, string | undefined>),
     ...overrides,
   };
 
-  const nodeEnv = asString(source.NODE_ENV, "development");
-  const allowedEnvs = new Set(["development", "test", "production"]);
-
-  if (!allowedEnvs.has(nodeEnv)) {
-    throw new Error("NODE_ENV must be development, test, or production");
-  }
+  const nodeEnv = asNodeEnv(asString(source.NODE_ENV, "development"));
 
   const port = asInteger(source.CONTROL_PLANE_PORT, 8787);
   if (!Number.isFinite(port) || port < 0 || port > 65535) {

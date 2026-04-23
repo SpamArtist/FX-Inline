@@ -1,21 +1,21 @@
-export function parseJsonSafe(input, fallback = null) {
+export function parseJsonSafe<T>(input: string | null | undefined, fallback: T): T {
   if (typeof input !== "string") return fallback;
 
   try {
-    return JSON.parse(input);
+    return JSON.parse(input) as T;
   } catch {
     return fallback;
   }
 }
 
-function normalizeValue(value) {
+function normalizeValue(value: unknown): unknown {
   if (Array.isArray(value)) {
     return value.map((item) => normalizeValue(item));
   }
 
   if (value && typeof value === "object") {
     return Object.fromEntries(
-      Object.entries(value)
+      Object.entries(value as Record<string, unknown>)
         .sort(([leftKey], [rightKey]) => leftKey.localeCompare(rightKey))
         .map(([key, nestedValue]) => [key, normalizeValue(nestedValue)]),
     );
@@ -24,6 +24,6 @@ function normalizeValue(value) {
   return value;
 }
 
-export function canonicalizeJson(value) {
+export function canonicalizeJson(value: unknown): string {
   return JSON.stringify(normalizeValue(value));
 }

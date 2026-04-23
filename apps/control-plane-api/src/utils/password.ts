@@ -2,7 +2,7 @@ import crypto from "node:crypto";
 
 const SCRYPT_KEY_LENGTH = 64;
 
-function runScrypt(password, salt) {
+function runScrypt(password: string, salt: string): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     crypto.scrypt(password, salt, SCRYPT_KEY_LENGTH, (error, derivedKey) => {
       if (error) {
@@ -10,22 +10,22 @@ function runScrypt(password, salt) {
         return;
       }
 
-      resolve(derivedKey);
+      resolve(Buffer.from(derivedKey));
     });
   });
 }
 
-export async function hashPassword(password) {
-  if (typeof password !== "string" || password.length < 10) {
+export async function hashPassword(password: string): Promise<string> {
+  if (password.length < 10) {
     throw new Error("Password must be at least 10 characters");
   }
 
   const salt = crypto.randomBytes(16).toString("hex");
   const derivedKey = await runScrypt(password, salt);
-  return `scrypt$${salt}$${Buffer.from(derivedKey).toString("hex")}`;
+  return `scrypt$${salt}$${derivedKey.toString("hex")}`;
 }
 
-export async function verifyPassword(password, encodedHash) {
+export async function verifyPassword(password: string, encodedHash: string | null): Promise<boolean> {
   if (typeof encodedHash !== "string") {
     return false;
   }

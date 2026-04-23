@@ -1,11 +1,27 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import type { DatabaseSync } from "node:sqlite";
 
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
-const migrationsDirectory = path.join(currentDirectory, "migrations");
+const distMigrationsDirectory = path.join(currentDirectory, "migrations");
+const sourceMigrationsDirectory = path.resolve(currentDirectory, "../../src/db/migrations");
 
-export function applyMigrations(database) {
+function resolveMigrationsDirectory(): string {
+  if (fs.existsSync(distMigrationsDirectory)) {
+    return distMigrationsDirectory;
+  }
+
+  return sourceMigrationsDirectory;
+}
+
+interface MigrationRow {
+  id: string;
+}
+
+export function applyMigrations(database: DatabaseSync): void {
+  const migrationsDirectory = resolveMigrationsDirectory();
+
   database.exec(`
     CREATE TABLE IF NOT EXISTS schema_migrations (
       id TEXT PRIMARY KEY,
@@ -19,9 +35,9 @@ export function applyMigrations(database) {
     .sort((leftFile, rightFile) => leftFile.localeCompare(rightFile));
 
   const appliedIds = new Set(
-    database
+    (database
       .prepare("SELECT id FROM schema_migrations")
-      .all()
+      .all() as unknown as MigrationRow[])
       .map((row) => row.id),
   );
 

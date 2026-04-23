@@ -54,12 +54,13 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run dev` | `wxt` |
 | `npm run dev:firefox` | `wxt -b firefox` |
 | `npm run dev:website` | `vite --config apps/website/vite.config.mjs` |
-| `npm run dev:dashboard` | `vite --config apps/dashboard/vite.config.mjs` |
-| `npm run dev:control-plane` | `node apps/control-plane-api/src/server.mjs` |
+| `npm run dev:dashboard` | `vite --config apps/dashboard/vite.config.ts` |
+| `npm run dev:control-plane` | `npm run build:control-plane && node apps/control-plane-api/dist/server.js` |
 | `npm run build` | `wxt build` |
 | `npm run build:firefox` | `wxt build -b firefox` |
 | `npm run build:website` | `vite build --config apps/website/vite.config.mjs` |
-| `npm run build:dashboard` | `vite build --config apps/dashboard/vite.config.mjs` |
+| `npm run build:dashboard` | `vite build --config apps/dashboard/vite.config.ts` |
+| `npm run build:control-plane` | `tsc -p apps/control-plane-api/tsconfig.json` |
 | `npm run zip` | `wxt zip` |
 | `npm run zip:firefox` | `wxt zip -b firefox` |
 | `npm run release:clean` | `node scripts/release/clean.mjs` |
@@ -80,7 +81,7 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run test:frontend` | `npm run build:unit && npm run jest -- apps/extension/tests/unit` |
 | `npm run test:content` | `npm run build:content-tests && npm run jest -- --config jest.content.config.cjs apps/extension/tests/content` |
 | `npm run test:unit` | `npm run test:frontend` |
-| `npm run test:control-plane` | `npm run jest -- apps/control-plane-api/test` |
+| `npm run test:control-plane` | `npm run build:control-plane && npm run jest -- apps/control-plane-api/test` |
 | `npm run test:b2b-runtime` | `npm run jest -- apps/website/test/b2b-runtime` |
 | `npm run test:all` | `npm run test:frontend && npm run test:content && npm run test:release` |
 | `npm run currency-detection:fixtures` | `node packages/currency-detection/scripts/generate-fixtures.mjs` |
@@ -95,6 +96,7 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run readme:sync:check` | `node scripts/readme-sync.mjs --check` |
 
 ### Recent Changes (first-parent, excluding README automation commits)
+- 2026-04-23 `0354f19` refactor: remove b2b plugin sdk guardrails
 - 2026-04-23 `6f53d92` feat: add dashboard app and runtime control-plane integration
 - 2026-04-23 `629120c` feat: add control-plane api for auth settings and signed manifests
 - 2026-04-23 `9bb496e` docs: require clerk auth in b2b contracts
@@ -102,6 +104,5 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 - 2026-04-23 `daa30c2` feat: add signed client demo and security runbook
 - 2026-04-23 `34ca43d` feat: add secure B2B script runtime core
 - 2026-04-23 `a3e4b1e` Merge branch 'main' of https://github.com/SpamArtist/currency-conversion-extension-tool
-- 2026-04-23 `8717671` update
 
 <!-- AUTO-GENERATED:END -->

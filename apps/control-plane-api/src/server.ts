@@ -1,17 +1,17 @@
 import http from "node:http";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { loadEnv } from "./config/env.mjs";
-import { createDatabase } from "./db/database.mjs";
-import { createAuthService } from "./services/auth.mjs";
-import { createRuntimeService } from "./services/runtime.mjs";
-import { createSigningService } from "./services/signing.mjs";
-import { createControlPlaneApp } from "./app.mjs";
+import { loadEnv } from "./config/env.js";
+import { createDatabase } from "./db/database.js";
+import { createAuthService } from "./services/auth.js";
+import { createRuntimeService } from "./services/runtime.js";
+import { createSigningService } from "./services/signing.js";
+import { createControlPlaneApp } from "./app.js";
 
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(currentDirectory, "../../..");
 
-function resolveDbPath(dbPath) {
+function resolveDbPath(dbPath: string): string {
   if (path.isAbsolute(dbPath)) {
     return dbPath;
   }
@@ -19,7 +19,7 @@ function resolveDbPath(dbPath) {
   return path.resolve(repositoryRoot, dbPath);
 }
 
-export function createServerInstance(envOverrides = {}) {
+export function createServerInstance(envOverrides: Record<string, string | undefined> = {}) {
   const env = loadEnv(envOverrides);
 
   const database = createDatabase({
