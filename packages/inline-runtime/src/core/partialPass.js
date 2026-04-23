@@ -33,9 +33,11 @@ export function runPartialConversionPass(
       clearExisting: false,
       maxNodesPerPass: options.maxNodesPerPass,
       onPerfSample: options.onPerfSample,
+      includeDefaultPrePlugins: options.includeDefaultPrePlugins,
       prePlugins: options.prePlugins,
       postPlugins: options.postPlugins,
       includeDefaultPostPlugins: options.includeDefaultPostPlugins,
+      clientRenderPreferences: options.clientRenderPreferences,
       onPluginError: options.onPluginError,
     });
   }

@@ -2,6 +2,7 @@
 
 import {
   amazonStructuredAddonPlugin,
+  amazonStructuredRendererPostPlugin,
   convertVisiblePrices,
   suppressInlineConversions,
 } from "../src/index.js";
@@ -195,6 +196,7 @@ test("supports amazon decorator as explicit post plugin", () => {
 
   const applied = convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
     clearExisting: false,
+    includeDefaultPrePlugins: false,
     includeDefaultPostPlugins: false,
     postPlugins: [amazonStructuredAddonPlugin],
   });
@@ -235,6 +237,168 @@ test("skips plugins declared for a different phase and reports error", () => {
   expect(pluginErrors[0].error.message).toContain(
     'declared for "post" phase but ran in "pre" phase',
   );
+});
+
+test("supports pass-scoped metadata handoff from pre detector to post renderer", () => {
+  document.body.innerHTML = "<div>$100</div>";
+  const observed = [];
+
+  const prePlugin = {
+    name: "detector",
+    phase: "pre",
+    apply({ passContext, passId }) {
+      passContext.push("demo", "metadata", { passId, tag: "detected" });
+      return 0;
+    },
+  };
+
+  const postPlugin = {
+    name: "renderer",
+    phase: "post",
+    apply({ passContext, passId }) {
+      const entries = passContext.consume("demo", "metadata");
+      observed.push({
+        passId,
+        count: Array.isArray(entries) ? entries.length : 0,
+      });
+      return 0;
+    },
+  };
+
+  convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
+    clearExisting: false,
+    includeDefaultPrePlugins: false,
+    includeDefaultPostPlugins: false,
+    prePlugins: [prePlugin],
+    postPlugins: [postPlugin],
+  });
+
+  expect(observed).toHaveLength(1);
+  expect(observed[0].count).toBe(1);
+  expect(observed[0].passId).toMatch(/^inline-pass-/u);
+});
+
+test("does not leak pre/post pass metadata across conversion calls", () => {
+  document.body.innerHTML = "<div>$100</div>";
+
+  let conversionRound = 0;
+  const seenCounts = [];
+
+  const prePlugin = {
+    name: "detector",
+    phase: "pre",
+    apply({ passContext }) {
+      if (conversionRound === 0) {
+        passContext.push("demo", "metadata", { round: conversionRound });
+      }
+      conversionRound += 1;
+      return 0;
+    },
+  };
+
+  const postPlugin = {
+    name: "renderer",
+    phase: "post",
+    apply({ passContext }) {
+      const entries = passContext.consume("demo", "metadata");
+      seenCounts.push(Array.isArray(entries) ? entries.length : 0);
+      return 0;
+    },
+  };
+
+  convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
+    clearExisting: false,
+    includeDefaultPrePlugins: false,
+    includeDefaultPostPlugins: false,
+    prePlugins: [prePlugin],
+    postPlugins: [postPlugin],
+  });
+
+  convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
+    clearExisting: false,
+    includeDefaultPrePlugins: false,
+    includeDefaultPostPlugins: false,
+    prePlugins: [prePlugin],
+    postPlugins: [postPlugin],
+  });
+
+  expect(seenCounts).toEqual([1, 0]);
+});
+
+test("amazon renderer applies client render preferences", () => {
+  document.body.innerHTML = [
+    '<span id="amazon-root" aria-hidden="true">',
+    '  <span class="a-price-symbol">$</span>',
+    '  <span class="a-price-whole">199</span>',
+    '  <span class="a-price-decimal">.</span>',
+    '  <span class="a-price-fraction">99</span>',
+    '</span>',
+  ].join("\n");
+
+  const applied = convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
+    clearExisting: false,
+    clientRenderPreferences: {
+      sites: {
+        amazon: {
+          showOriginalPrice: false,
+          convertedPrefix: "≈ ",
+          convertedSuffix: " incl",
+          wrapperClassName: "client-wrapper",
+          convertedAmountClassName: "client-amount",
+          colorStrategy: "inherit",
+        },
+      },
+    },
+  });
+
+  expect(applied).toBe(1);
+  const addon = document.querySelector(
+    '#amazon-root span.ccx-inline-conversion[data-ccx-mode="addon"]',
+  );
+  expect(addon).not.toBeNull();
+  expect(addon.classList.contains("client-wrapper")).toBe(true);
+  expect(addon.style.getPropertyValue("--ccx-converted-color")).toBe("currentColor");
+  expect(addon.textContent).toContain("≈ ");
+  expect(addon.textContent).toContain(" incl");
+  expect(addon.textContent).not.toContain("$199.99");
+  expect(addon.querySelector(".ccx-converted-amount").classList.contains("client-amount")).toBe(
+    true,
+  );
+});
+
+test("amazon renderer ignores stale candidates from pre detection", () => {
+  document.body.innerHTML = [
+    '<span id="amazon-root" aria-hidden="true">',
+    '  <span class="a-price-symbol">$</span>',
+    '  <span class="a-price-whole">199</span>',
+    '</span>',
+  ].join("\n");
+
+  const staleDetectorPrePlugin = {
+    name: "stale-detector",
+    phase: "pre",
+    apply({ root, passContext }) {
+      const hostNode = root.querySelector("#amazon-root");
+      passContext.set("site:amazon", "structured-candidates", [
+        { hostNode, detectedRawPrice: "$199" },
+      ]);
+      hostNode?.remove();
+      return 0;
+    },
+  };
+
+  const applied = convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
+    clearExisting: false,
+    includeDefaultPrePlugins: false,
+    includeDefaultPostPlugins: false,
+    prePlugins: [staleDetectorPrePlugin],
+    postPlugins: [amazonStructuredRendererPostPlugin],
+  });
+
+  expect(applied).toBe(0);
+  expect(
+    document.querySelector('#amazon-root span.ccx-inline-conversion[data-ccx-mode="addon"]'),
+  ).toBeNull();
 });
 
 test("reports perf sample shape with reached node limit", () => {

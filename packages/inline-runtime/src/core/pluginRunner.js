@@ -67,9 +67,10 @@ export function runInlineConversionPlugins(plugins, context, expectedPhase) {
     const declaredPhase = getPluginPhase(plugin);
     if (declaredPhase && expectedPhase && declaredPhase !== expectedPhase) {
       const pluginName = getPluginName(plugin);
+      const passSuffix = context?.passId ? ` (pass ${context.passId})` : "";
       context.onPluginError?.(
         new Error(
-          `Inline conversion plugin "${pluginName}" is declared for "${declaredPhase}" phase but ran in "${expectedPhase}" phase.`,
+          `Inline conversion plugin "${pluginName}" is declared for "${declaredPhase}" phase but ran in "${expectedPhase}" phase${passSuffix}.`,
         ),
         plugin,
       );

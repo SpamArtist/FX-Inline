@@ -30,6 +30,7 @@ export function createInlineRuntime(options = {}) {
   let root = options.root ?? document.body;
   let preferredCurrency = options.preferredCurrency ?? null;
   let rateSnapshot = options.rateSnapshot ?? null;
+  let clientRenderPreferences = options.clientRenderPreferences ?? null;
   let enabled = options.enabled ?? true;
   let observeMutations = options.observeMutations ?? true;
   const autoFetchRates = options.autoFetchRates ?? false;
@@ -99,9 +100,11 @@ export function createInlineRuntime(options = {}) {
         refreshExisting: true,
         onPerfSample: options.onPerfSample,
         onNodeLimitReached: options.onNodeLimitReached,
+        includeDefaultPrePlugins: options.includeDefaultPrePlugins,
         prePlugins: options.prePlugins,
         postPlugins: options.postPlugins,
         includeDefaultPostPlugins: options.includeDefaultPostPlugins,
+        clientRenderPreferences,
         onPluginError: options.onPluginError,
       });
     } finally {
@@ -160,9 +163,11 @@ export function createInlineRuntime(options = {}) {
             timeBudgetMs: PARTIAL_CONVERSION_TIME_BUDGET_MS,
             maxNodesPerPass: PARTIAL_CONVERSION_MAX_NODES_PER_PASS,
             onPerfSample: options.onPerfSample,
+            includeDefaultPrePlugins: options.includeDefaultPrePlugins,
             prePlugins: options.prePlugins,
             postPlugins: options.postPlugins,
             includeDefaultPostPlugins: options.includeDefaultPostPlugins,
+            clientRenderPreferences,
             onPluginError: options.onPluginError,
           },
         );
@@ -278,6 +283,13 @@ export function createInlineRuntime(options = {}) {
     }
   }
 
+  function setClientRenderPreferences(nextPreferences) {
+    clientRenderPreferences = nextPreferences ?? null;
+    if (isRunning) {
+      void scheduleFullConversion();
+    }
+  }
+
   function setRoot(nextRoot) {
     if (!(nextRoot instanceof Node)) {
       throw new Error("FX Inline runtime root must be a Node.");
@@ -326,6 +338,7 @@ export function createInlineRuntime(options = {}) {
     setPreferredCurrency,
     setRateSnapshot,
     setEnabled,
+    setClientRenderPreferences,
     destroy,
     enqueueMutationRoots,
     shouldIgnoreMutations,

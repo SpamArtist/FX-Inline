@@ -3,7 +3,10 @@ import { clearInlineConversions, suppressInlineConversions } from "./core/conver
 import { convertVisiblePrices } from "./core/convertVisiblePrices.js";
 import { formatAmountInCurrency } from "./formatting.js";
 import {
+  AMAZON_STRUCTURED_DETECTOR_PRE_PLUGIN_NAME,
   AMAZON_STRUCTURED_ADDON_PLUGIN_NAME,
+  amazonStructuredDetectorPrePlugin,
+  amazonStructuredRendererPostPlugin,
   amazonStructuredAddonPlugin,
 } from "./plugins/amazon/structuredAddonPlugin.js";
 
@@ -13,6 +16,9 @@ export {
   suppressInlineConversions,
   clearInlineConversions,
   formatAmountInCurrency,
+  AMAZON_STRUCTURED_DETECTOR_PRE_PLUGIN_NAME,
   AMAZON_STRUCTURED_ADDON_PLUGIN_NAME,
+  amazonStructuredDetectorPrePlugin,
+  amazonStructuredRendererPostPlugin,
   amazonStructuredAddonPlugin,
 };

@@ -101,6 +101,13 @@ test("passes plugin configuration into full conversion calls", async () => {
   const prePlugin = jest.fn();
   const postPlugin = jest.fn();
   const onPluginError = jest.fn();
+  const clientRenderPreferences = {
+    sites: {
+      amazon: {
+        showOriginalPrice: false,
+      },
+    },
+  };
 
   const runtime = createInlineRuntime({
     root: document.body,
@@ -108,9 +115,11 @@ test("passes plugin configuration into full conversion calls", async () => {
     rateSnapshot: createSnapshot(),
     enabled: true,
     observeMutations: false,
+    includeDefaultPrePlugins: false,
     prePlugins: [prePlugin],
     postPlugins: [postPlugin],
     includeDefaultPostPlugins: false,
+    clientRenderPreferences,
     onPluginError,
   });
 
@@ -123,9 +132,11 @@ test("passes plugin configuration into full conversion calls", async () => {
     expect.objectContaining({ base: "USD" }),
     document.body,
     expect.objectContaining({
+      includeDefaultPrePlugins: false,
       prePlugins: [prePlugin],
       postPlugins: [postPlugin],
       includeDefaultPostPlugins: false,
+      clientRenderPreferences,
       onPluginError,
     }),
   );
@@ -181,6 +192,12 @@ test("enqueueMutationRoots runs partial conversion with debounce", async () => {
 
   expect(runPartialConversionPassMock).toHaveBeenCalledTimes(1);
   expect(runPartialConversionPassMock.mock.calls[0][0]).toEqual([rootA]);
+  expect(runPartialConversionPassMock.mock.calls[0][4]).toEqual(
+    expect.objectContaining({
+      includeDefaultPrePlugins: undefined,
+      clientRenderPreferences: null,
+    }),
+  );
 });
 
 test("shouldIgnoreMutations remains true until suppression release delay elapses", async () => {
@@ -229,4 +246,47 @@ test("autoFetchRates fetches snapshot when none is provided", async () => {
 
   expect(getRatesMock).toHaveBeenCalledWith({ forceRefresh: false });
   expect(convertVisiblePricesMock).toHaveBeenCalledTimes(1);
+});
+
+test("setClientRenderPreferences schedules a conversion with updated preferences", async () => {
+  const { createInlineRuntime } = await importControllerWithMocks();
+  const runtime = createInlineRuntime({
+    root: document.body,
+    preferredCurrency: "EUR",
+    rateSnapshot: createSnapshot(),
+    enabled: true,
+    observeMutations: false,
+  });
+
+  runtime.start();
+  jest.advanceTimersByTime(200);
+  await Promise.resolve();
+  convertVisiblePricesMock.mockClear();
+
+  runtime.setClientRenderPreferences({
+    sites: {
+      amazon: {
+        convertedSuffix: " incl",
+      },
+    },
+  });
+
+  jest.advanceTimersByTime(200);
+  await Promise.resolve();
+
+  expect(convertVisiblePricesMock).toHaveBeenCalledTimes(1);
+  expect(convertVisiblePricesMock).toHaveBeenCalledWith(
+    "EUR",
+    expect.objectContaining({ base: "USD" }),
+    document.body,
+    expect.objectContaining({
+      clientRenderPreferences: {
+        sites: {
+          amazon: {
+            convertedSuffix: " incl",
+          },
+        },
+      },
+    }),
+  );
 });

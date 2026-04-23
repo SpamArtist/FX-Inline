@@ -19,12 +19,39 @@ export type InlineConversionPerfSample = {
   reachedNodeLimit: boolean;
 };
 
+export type InlineSiteRenderPreferences = {
+  wrapperClassName?: string;
+  convertedAmountClassName?: string;
+  showOriginalPrice?: boolean;
+  convertedPrefix?: string;
+  convertedSuffix?: string;
+  colorStrategy?: "auto" | "inherit";
+};
+
+export type InlineRenderPreferences = {
+  default?: InlineSiteRenderPreferences;
+  sites?: Record<string, InlineSiteRenderPreferences>;
+};
+
+export type InlinePassContext = {
+  passId: string;
+  set: (namespace: string, key: string, value: unknown) => unknown;
+  get: (namespace: string, key: string) => unknown;
+  consume: (namespace: string, key: string) => unknown;
+  push: (namespace: string, key: string, item: unknown) => number;
+  list: (namespace: string, key: string) => unknown[];
+  clear: () => void;
+};
+
 export type InlineConversionPluginContext = {
   root: ParentNode;
   preferredCurrency: CurrencyCodeLike;
   rateSnapshot: RateSnapshotLike;
   localeHint: string | null;
   lightTextCache: WeakMap<Element, boolean>;
+  passId: string;
+  passContext: InlinePassContext;
+  clientRenderPreferences?: InlineRenderPreferences | null;
   onPluginError?: (error: unknown, plugin: InlineConversionPlugin) => void;
 };
 
@@ -67,9 +94,11 @@ export type ConvertVisiblePricesOptions = {
   maxNodesPerPass?: number;
   onPerfSample?: (sample: InlineConversionPerfSample) => void;
   onNodeLimitReached?: (maxNodesPerPass: number) => void;
+  includeDefaultPrePlugins?: boolean;
   prePlugins?: InlineConversionPrePlugin[];
   postPlugins?: InlineConversionPostPlugin[];
   includeDefaultPostPlugins?: boolean;
+  clientRenderPreferences?: InlineRenderPreferences | null;
   onPluginError?: (error: unknown, plugin: InlineConversionPlugin) => void;
 };
 
@@ -87,9 +116,11 @@ export type InlineRuntimeOptions = {
   autoFetchRates?: boolean;
   onPerfSample?: (sample: InlineConversionPerfSample) => void;
   onNodeLimitReached?: (maxNodesPerPass: number) => void;
+  includeDefaultPrePlugins?: boolean;
   prePlugins?: InlineConversionPrePlugin[];
   postPlugins?: InlineConversionPostPlugin[];
   includeDefaultPostPlugins?: boolean;
+  clientRenderPreferences?: InlineRenderPreferences | null;
   onPluginError?: (error: unknown, plugin: InlineConversionPlugin) => void;
   onError?: (error: unknown) => void;
   shouldExcludeMutationRoot?: (root: ParentNode) => boolean;
@@ -102,6 +133,7 @@ export type InlineRuntimeController = {
   setPreferredCurrency: (currency: CurrencyCodeLike | null) => void;
   setRateSnapshot: (snapshot: RateSnapshotLike | null) => void;
   setEnabled: (enabled: boolean) => void;
+  setClientRenderPreferences: (preferences: InlineRenderPreferences | null) => void;
   destroy: () => void;
   enqueueMutationRoots: (roots: ParentNode[]) => void;
   shouldIgnoreMutations: () => boolean;
@@ -132,7 +164,21 @@ export function formatAmountInCurrency(
   },
 ): string;
 
+export const AMAZON_STRUCTURED_DETECTOR_PRE_PLUGIN_NAME: "amazon-structured-detector";
+
+export const amazonStructuredDetectorPrePlugin: {
+  name: "amazon-structured-detector";
+  phase: "pre";
+  apply: (context: InlineConversionPluginContext) => number;
+};
+
 export const AMAZON_STRUCTURED_ADDON_PLUGIN_NAME: "amazon-structured-addon";
+
+export const amazonStructuredRendererPostPlugin: {
+  name: "amazon-structured-addon";
+  phase: "post";
+  apply: (context: InlineConversionPluginContext) => number;
+};
 
 export const amazonStructuredAddonPlugin: {
   name: "amazon-structured-addon";

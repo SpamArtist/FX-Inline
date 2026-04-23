@@ -13,6 +13,7 @@ import {
   INLINE_CONVERSION_ADDON_MODE,
   INLINE_CONVERSION_CLASS,
 } from "./constants.js";
+import { pushCoreConversionEvent } from "./conversionMetadata.js";
 import { usesLightTextColor } from "./textColor.js";
 
 const AMOUNT_ONLY_TEXT_REGEX = /^[+-]?\d[\d,.\u00A0\u202F ]*$/u;
@@ -103,6 +104,8 @@ function decorateSplitSiblingPriceInTextNode(
   rateSnapshot,
   localeHint,
   lightTextCache,
+  passContext,
+  passId,
 ) {
   const amountRoot = textNode.parentElement;
   if (!amountRoot || amountRoot.closest(`.${INLINE_CONVERSION_CLASS}`)) return 0;
@@ -149,6 +152,13 @@ function decorateSplitSiblingPriceInTextNode(
 
   if (!existingAddon) {
     amountRoot.appendChild(wrapper);
+    pushCoreConversionEvent(passContext, passId, {
+      source: "split-sibling",
+      rawPrice,
+      convertedAmount,
+      hostNode: amountRoot,
+      wrapperNode: wrapper,
+    });
     return 1;
   }
 
@@ -156,6 +166,14 @@ function decorateSplitSiblingPriceInTextNode(
     previousOriginal !== rawPrice ||
     previousConverted !== `(${convertedAmount})`
   ) {
+    pushCoreConversionEvent(passContext, passId, {
+      source: "split-sibling",
+      rawPrice,
+      convertedAmount,
+      hostNode: amountRoot,
+      wrapperNode: wrapper,
+      refreshed: true,
+    });
     return 1;
   }
 
@@ -168,6 +186,8 @@ export function decoratePricesInTextNode(
   rateSnapshot,
   localeHint,
   lightTextCache,
+  passContext,
+  passId,
 ) {
   const text = textNode.nodeValue;
   if (!text?.trim()) return 0;
@@ -185,6 +205,8 @@ export function decoratePricesInTextNode(
       rateSnapshot,
       localeHint,
       lightTextCache,
+      passContext,
+      passId,
     );
   }
 
@@ -221,6 +243,17 @@ export function decoratePricesInTextNode(
     });
 
     fragment.append(wrapper);
+    pushCoreConversionEvent(passContext, passId, {
+      source: "text-node",
+      rawPrice: match.raw,
+      convertedAmount,
+      hostNode: textNode.parentElement,
+      wrapperNode: wrapper,
+      textRange: {
+        start: match.start,
+        end: match.end,
+      },
+    });
     cursor = match.end;
     conversionsApplied += 1;
   }

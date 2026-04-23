@@ -14,6 +14,7 @@ import {
   INLINE_CONVERSION_ADDON_MODE,
   INLINE_CONVERSION_CLASS,
 } from "./constants.js";
+import { pushCoreConversionEvent } from "./conversionMetadata.js";
 import { usesLightTextColorForElement } from "./textColor.js";
 
 function getAriaHiddenRoots(root) {
@@ -124,6 +125,8 @@ export function decorateStructuredSiblingSymbolPrices(
   rateSnapshot,
   localeHint,
   lightTextCache,
+  passContext,
+  passId,
 ) {
   const ariaHiddenRoots = getAriaHiddenRoots(root);
   if (!ariaHiddenRoots.length) return 0;
@@ -183,6 +186,13 @@ export function decorateStructuredSiblingSymbolPrices(
 
     if (!existingAddon) {
       ariaHiddenRoot.appendChild(wrapper);
+      pushCoreConversionEvent(passContext, passId, {
+        source: "structured-sibling",
+        rawPrice,
+        convertedAmount,
+        hostNode: ariaHiddenRoot,
+        wrapperNode: wrapper,
+      });
       conversionsApplied += 1;
       continue;
     }
@@ -191,6 +201,14 @@ export function decorateStructuredSiblingSymbolPrices(
       previousOriginal !== rawPrice ||
       previousConverted !== `(${convertedAmount})`
     ) {
+      pushCoreConversionEvent(passContext, passId, {
+        source: "structured-sibling",
+        rawPrice,
+        convertedAmount,
+        hostNode: ariaHiddenRoot,
+        wrapperNode: wrapper,
+        refreshed: true,
+      });
       conversionsApplied += 1;
     }
   }
