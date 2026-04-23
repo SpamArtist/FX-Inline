@@ -19,9 +19,14 @@ function createTestInstance() {
     CONTROL_PLANE_DB_PATH: dbPath,
     CONTROL_PLANE_DASHBOARD_URL: "http://127.0.0.1:5174",
     CONTROL_PLANE_PUBLIC_ORIGIN: "http://127.0.0.1:8787",
-    CONTROL_PLANE_ENABLE_MOCK_GOOGLE: "true",
+    CONTROL_PLANE_ENABLE_MOCK_CLERK: "true",
     CONTROL_PLANE_MANIFEST_PRIVATE_KEY_PATH: "",
   });
+}
+
+function makeMockClerkToken(payload) {
+  const encoded = Buffer.from(JSON.stringify(payload), "utf8").toString("base64url");
+  return `mock-clerk:${encoded}`;
 }
 
 async function invoke(app, { method = "GET", url, body, cookie, csrf }) {
@@ -90,22 +95,44 @@ test("health and readiness endpoints return success", async () => {
   expect(ready.payload.status).toBe("ready");
 });
 
-test("register, login, csrf, settings update, and runtime manifest flow", async () => {
+test("mock Clerk login, csrf, settings update, and runtime manifest flow", async () => {
   const instance = createTestInstance();
 
-  const register = await invoke(instance.app, {
+  const login = await invoke(instance.app, {
     method: "POST",
-    url: "/api/v1/auth/register",
+    url: "/api/v1/auth/login",
     body: {
-      email: "owner@example.com",
-      password: "mysecurepassword",
-      displayName: "Owner",
+      clerkSessionToken: makeMockClerkToken({
+        clerkUserId: "user_owner",
+        clerkSessionId: "sess_owner",
+        email: "owner@example.com",
+        displayName: "Owner",
+      }),
     },
   });
 
-  expect(register.status).toBe(201);
+  expect(login.status).toBe(200);
+  expect(login.payload.user.email).toBe("owner@example.com");
+  expect(login.payload.user.clerkUserId).toBe("user_owner");
+  expect(login.payload.created).toBe(true);
 
-  const sessionCookie = parseSetCookie(register.headers);
+  const secondLogin = await invoke(instance.app, {
+    method: "POST",
+    url: "/api/v1/auth/login",
+    body: {
+      clerkSessionToken: makeMockClerkToken({
+        clerkUserId: "user_owner",
+        clerkSessionId: "sess_owner_2",
+        email: "owner@example.com",
+        displayName: "Owner",
+      }),
+    },
+  });
+
+  expect(secondLogin.status).toBe(200);
+  expect(secondLogin.payload.created).toBe(false);
+
+  const sessionCookie = parseSetCookie(secondLogin.headers);
   expect(sessionCookie).toContain("cp_session=");
 
   const me = await invoke(instance.app, {
@@ -114,6 +141,7 @@ test("register, login, csrf, settings update, and runtime manifest flow", async 
   });
 
   expect(me.status).toBe(200);
+  expect(me.payload.user.clerkUserId).toBe("user_owner");
   expect(me.payload.clients.length).toBeGreaterThan(0);
 
   const clientId = me.payload.clients[0].id;
@@ -157,17 +185,45 @@ test("register, login, csrf, settings update, and runtime manifest flow", async 
   expect(installSnippet.payload.snippet).toContain("data-fxi-client-id");
 });
 
-test("mock google login creates session when enabled", async () => {
+test("local register endpoint is disabled for Clerk-only auth", async () => {
+  const instance = createTestInstance();
+
+  const register = await invoke(instance.app, {
+    method: "POST",
+    url: "/api/v1/auth/register",
+    body: {
+      email: "owner@example.com",
+      password: "mysecurepassword",
+      displayName: "Owner",
+    },
+  });
+
+  expect(register.status).toBe(410);
+  expect(register.payload.error.code).toBe("AUTH_REGISTER_DISABLED");
+});
+
+test("mock Clerk login creates session when enabled", async () => {
+  const instance = createTestInstance();
+
+  const response = await invoke(instance.app, {
+    url: "/api/v1/auth/clerk/config",
+  });
+
+  expect(response.status).toBe(200);
+  expect(response.payload.mockEnabled).toBe(true);
+});
+
+test("login returns 400 when Clerk token is missing", async () => {
   const instance = createTestInstance();
 
   const response = await invoke(instance.app, {
     method: "POST",
-    url: "/api/v1/auth/google/mock",
+    url: "/api/v1/auth/login",
     body: {
-      email: "google-user@example.com",
+      clerkSessionToken: "",
     },
   });
 
-  expect(response.status).toBe(200);
-  expect(parseSetCookie(response.headers)).toContain("cp_session=");
+  expect(response.status).toBe(400);
+  expect(response.payload.error.code).toBe("AUTH_CLERK_TOKEN_MISSING");
 });
