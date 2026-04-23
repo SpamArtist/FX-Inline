@@ -55,9 +55,12 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run dev` | `wxt` |
 | `npm run dev:firefox` | `wxt -b firefox` |
 | `npm run dev:website` | `vite --config apps/website/vite.config.mjs` |
+| `npm run dev:dashboard` | `vite --config apps/dashboard/vite.config.mjs` |
+| `npm run dev:control-plane` | `node apps/control-plane-api/src/server.mjs` |
 | `npm run build` | `wxt build` |
 | `npm run build:firefox` | `wxt build -b firefox` |
 | `npm run build:website` | `vite build --config apps/website/vite.config.mjs` |
+| `npm run build:dashboard` | `vite build --config apps/dashboard/vite.config.mjs` |
 | `npm run zip` | `wxt zip` |
 | `npm run zip:firefox` | `wxt zip -b firefox` |
 | `npm run release:clean` | `node scripts/release/clean.mjs` |
@@ -78,7 +81,10 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run test:frontend` | `npm run build:unit && npm run jest -- apps/extension/tests/unit` |
 | `npm run test:content` | `npm run build:content-tests && npm run jest -- --config jest.content.config.cjs apps/extension/tests/content` |
 | `npm run test:unit` | `npm run test:frontend` |
+| `npm run test:control-plane` | `npm run jest -- apps/control-plane-api/test` |
 | `npm run test:b2b-runtime` | `npm run jest -- apps/website/test/b2b-runtime` |
+| `npm run test:b2b-plugin-sdk` | `npm run jest -- packages/b2b-plugin-sdk/test` |
+| `npm run b2b-plugin:check:acme-pre` | `node packages/b2b-plugin-sdk/scripts/check-deterministic.mjs apps/website/public/b2b/clients/acme/pre.v1.js` |
 | `npm run test:all` | `npm run test:frontend && npm run test:content && npm run test:release` |
 | `npm run currency-detection:fixtures` | `node packages/currency-detection/scripts/generate-fixtures.mjs` |
 | `npm run currency-detection:baseline` | `npm run build:unit && npm run currency-detection:fixtures && node packages/currency-detection/scripts/generate-legacy-snapshot.mjs` |
@@ -90,13 +96,13 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run readme:sync:check` | `node scripts/readme-sync.mjs --check` |
 
 ### Recent Changes (first-parent, excluding README automation commits)
+- 2026-04-23 `0def050` docs: require clerk auth in b2b contracts
+- 2026-04-23 `38fab06` docs: freeze b2b architecture and contracts
+- 2026-04-23 `12247d8` feat: add signed client demo and security runbook
+- 2026-04-23 `0bc5ac2` feat: add secure B2B script runtime core
 - 2026-04-21 `c87eb22` Codex/welcome page install (#25)
 - 2026-04-21 `150c49f` feat: add post-install welcome page (#24)
 - 2026-04-21 `846850d` docs: align release docs with tag-driven workflow
 - 2026-04-20 `fe83acc` missing
-- 2026-04-20 `4f5c47d` REMOVED
-- 2026-04-20 `e20a3ce` Merge branch 'main' of https://github.com/SpamArtist/currency-conversion-extension-tool
-- 2026-04-19 `2952f84` build: add tag-driven release plumbing
-- 2026-04-19 `9ce0b9f` ci: add tag-driven release workflow
 
 <!-- AUTO-GENERATED:END -->

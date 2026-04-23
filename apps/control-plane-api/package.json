@@ -1,0 +1,12 @@
+{
+  "name": "@fx-inline/control-plane-api",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "node src/server.mjs",
+    "start": "node src/server.mjs",
+    "test": "node --test",
+    "db:migrate": "node src/db/migrate.mjs"
+  }
+}
