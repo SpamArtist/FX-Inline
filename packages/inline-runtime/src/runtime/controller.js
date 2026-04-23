@@ -99,6 +99,10 @@ export function createInlineRuntime(options = {}) {
         refreshExisting: true,
         onPerfSample: options.onPerfSample,
         onNodeLimitReached: options.onNodeLimitReached,
+        prePlugins: options.prePlugins,
+        postPlugins: options.postPlugins,
+        includeDefaultPostPlugins: options.includeDefaultPostPlugins,
+        onPluginError: options.onPluginError,
       });
     } finally {
       releaseMutationSuppression();
@@ -156,6 +160,10 @@ export function createInlineRuntime(options = {}) {
             timeBudgetMs: PARTIAL_CONVERSION_TIME_BUDGET_MS,
             maxNodesPerPass: PARTIAL_CONVERSION_MAX_NODES_PER_PASS,
             onPerfSample: options.onPerfSample,
+            prePlugins: options.prePlugins,
+            postPlugins: options.postPlugins,
+            includeDefaultPostPlugins: options.includeDefaultPostPlugins,
+            onPluginError: options.onPluginError,
           },
         );
 

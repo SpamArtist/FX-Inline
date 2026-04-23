@@ -96,6 +96,41 @@ test("start schedules a full conversion using provided snapshot", async () => {
   );
 });
 
+test("passes plugin configuration into full conversion calls", async () => {
+  const { createInlineRuntime } = await importControllerWithMocks();
+  const prePlugin = jest.fn();
+  const postPlugin = jest.fn();
+  const onPluginError = jest.fn();
+
+  const runtime = createInlineRuntime({
+    root: document.body,
+    preferredCurrency: "EUR",
+    rateSnapshot: createSnapshot(),
+    enabled: true,
+    observeMutations: false,
+    prePlugins: [prePlugin],
+    postPlugins: [postPlugin],
+    includeDefaultPostPlugins: false,
+    onPluginError,
+  });
+
+  runtime.start();
+  jest.advanceTimersByTime(200);
+  await Promise.resolve();
+
+  expect(convertVisiblePricesMock).toHaveBeenCalledWith(
+    "EUR",
+    expect.objectContaining({ base: "USD" }),
+    document.body,
+    expect.objectContaining({
+      prePlugins: [prePlugin],
+      postPlugins: [postPlugin],
+      includeDefaultPostPlugins: false,
+      onPluginError,
+    }),
+  );
+});
+
 test("setEnabled(false) suppresses wrappers and skips conversion", async () => {
   const { createInlineRuntime } = await importControllerWithMocks();
 

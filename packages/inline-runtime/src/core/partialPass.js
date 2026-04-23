@@ -33,6 +33,10 @@ export function runPartialConversionPass(
       clearExisting: false,
       maxNodesPerPass: options.maxNodesPerPass,
       onPerfSample: options.onPerfSample,
+      prePlugins: options.prePlugins,
+      postPlugins: options.postPlugins,
+      includeDefaultPostPlugins: options.includeDefaultPostPlugins,
+      onPluginError: options.onPluginError,
     });
   }
 

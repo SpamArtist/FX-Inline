@@ -3,12 +3,13 @@ import {
   refreshExistingInlineConversions,
 } from "./conversionNodes.js";
 import { shouldSkipTextNode } from "./domGuards.js";
+import { runInlineConversionPlugins } from "./pluginRunner.js";
 import { ensureInlineConversionStyles } from "./styles.js";
-import {
-  decorateStructuredAmazonPrices,
-  decorateStructuredSiblingSymbolPrices,
-} from "./structuredDecorators.js";
+import { decorateStructuredSiblingSymbolPrices } from "./structuredDecorators.js";
 import { decoratePricesInTextNode } from "./textNodeDecorator.js";
+import { amazonStructuredAddonPlugin } from "../plugins/amazonStructuredAddonPlugin.js";
+
+const DEFAULT_POST_PLUGINS = [amazonStructuredAddonPlugin];
 
 export function convertVisiblePrices(
   preferredCurrency,
@@ -49,6 +50,14 @@ export function convertVisiblePrices(
   const textNodes = [];
   const maxNodesPerPass = options?.maxNodesPerPass ?? 15000;
   const lightTextCache = new WeakMap();
+  const pluginContext = {
+    root,
+    preferredCurrency,
+    rateSnapshot,
+    localeHint,
+    lightTextCache,
+    onPluginError: options?.onPluginError,
+  };
 
   while (walker.nextNode() && textNodes.length < maxNodesPerPass) {
     const textNode = walker.currentNode;
@@ -64,6 +73,11 @@ export function convertVisiblePrices(
   let totalConversions = refreshedConversions;
   const decorateStartedAt = capturePerf ? performance.now() : 0;
 
+  totalConversions += runInlineConversionPlugins(
+    options?.prePlugins,
+    pluginContext,
+  );
+
   for (const node of textNodes) {
     totalConversions += decoratePricesInTextNode(
       node,
@@ -74,14 +88,6 @@ export function convertVisiblePrices(
     );
   }
 
-  totalConversions += decorateStructuredAmazonPrices(
-    root,
-    preferredCurrency,
-    rateSnapshot,
-    localeHint,
-    lightTextCache,
-  );
-
   totalConversions += decorateStructuredSiblingSymbolPrices(
     root,
     preferredCurrency,
@@ -89,6 +95,13 @@ export function convertVisiblePrices(
     localeHint,
     lightTextCache,
   );
+
+  const includeDefaultPostPlugins = options?.includeDefaultPostPlugins !== false;
+  const postPlugins = includeDefaultPostPlugins
+    ? [...DEFAULT_POST_PLUGINS, ...(options?.postPlugins ?? [])]
+    : (options?.postPlugins ?? []);
+
+  totalConversions += runInlineConversionPlugins(postPlugins, pluginContext);
 
   if (capturePerf && options?.onPerfSample) {
     const decorateNodesMs = performance.now() - decorateStartedAt;

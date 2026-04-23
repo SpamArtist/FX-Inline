@@ -1,6 +1,7 @@
 /** @jest-environment jsdom */
 
 import {
+  amazonStructuredAddonPlugin,
   convertVisiblePrices,
   suppressInlineConversions,
 } from "../src/index.js";
@@ -159,6 +160,49 @@ test("adds structured add-on conversions for amazon-style and sibling-symbol pri
   );
   expect(siblingAddon).not.toBeNull();
   expect(siblingAddon.getAttribute("data-original")).toBe("$2500");
+});
+
+test("allows disabling default post plugins so amazon-specific logic can be detached", () => {
+  document.body.innerHTML = [
+    '<span id="amazon-root" aria-hidden="true">',
+    '  <span class="a-price-symbol">$</span>',
+    '  <span class="a-price-whole">199</span>',
+    '  <span class="a-price-decimal">.</span>',
+    '  <span class="a-price-fraction">99</span>',
+    '</span>',
+  ].join("\n");
+
+  const applied = convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
+    clearExisting: false,
+    includeDefaultPostPlugins: false,
+  });
+
+  expect(applied).toBe(0);
+  expect(
+    document.querySelector('#amazon-root span.ccx-inline-conversion[data-ccx-mode="addon"]'),
+  ).toBeNull();
+});
+
+test("supports amazon decorator as explicit post plugin", () => {
+  document.body.innerHTML = [
+    '<span id="amazon-root" aria-hidden="true">',
+    '  <span class="a-price-symbol">$</span>',
+    '  <span class="a-price-whole">199</span>',
+    '  <span class="a-price-decimal">.</span>',
+    '  <span class="a-price-fraction">99</span>',
+    '</span>',
+  ].join("\n");
+
+  const applied = convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
+    clearExisting: false,
+    includeDefaultPostPlugins: false,
+    postPlugins: [amazonStructuredAddonPlugin],
+  });
+
+  expect(applied).toBe(1);
+  expect(
+    document.querySelector('#amazon-root span.ccx-inline-conversion[data-ccx-mode="addon"]'),
+  ).not.toBeNull();
 });
 
 test("reports perf sample shape with reached node limit", () => {

@@ -19,12 +19,39 @@ export type InlineConversionPerfSample = {
   reachedNodeLimit: boolean;
 };
 
+export type InlineConversionPluginContext = {
+  root: ParentNode;
+  preferredCurrency: CurrencyCodeLike;
+  rateSnapshot: RateSnapshotLike;
+  localeHint: string | null;
+  lightTextCache: WeakMap<Element, boolean>;
+  onPluginError?: (error: unknown, plugin: InlineConversionPlugin) => void;
+};
+
+export type InlineConversionPluginResult =
+  | number
+  | {
+      conversionsApplied: number;
+    }
+  | void;
+
+export type InlineConversionPlugin =
+  | ((context: InlineConversionPluginContext) => InlineConversionPluginResult)
+  | {
+      name?: string;
+      apply: (context: InlineConversionPluginContext) => InlineConversionPluginResult;
+    };
+
 export type ConvertVisiblePricesOptions = {
   clearExisting?: boolean;
   refreshExisting?: boolean;
   maxNodesPerPass?: number;
   onPerfSample?: (sample: InlineConversionPerfSample) => void;
   onNodeLimitReached?: (maxNodesPerPass: number) => void;
+  prePlugins?: InlineConversionPlugin[];
+  postPlugins?: InlineConversionPlugin[];
+  includeDefaultPostPlugins?: boolean;
+  onPluginError?: (error: unknown, plugin: InlineConversionPlugin) => void;
 };
 
 export type InlineRuntimeRefreshOptions = {
@@ -41,6 +68,10 @@ export type InlineRuntimeOptions = {
   autoFetchRates?: boolean;
   onPerfSample?: (sample: InlineConversionPerfSample) => void;
   onNodeLimitReached?: (maxNodesPerPass: number) => void;
+  prePlugins?: InlineConversionPlugin[];
+  postPlugins?: InlineConversionPlugin[];
+  includeDefaultPostPlugins?: boolean;
+  onPluginError?: (error: unknown, plugin: InlineConversionPlugin) => void;
   onError?: (error: unknown) => void;
   shouldExcludeMutationRoot?: (root: ParentNode) => boolean;
 };
@@ -81,3 +112,10 @@ export function formatAmountInCurrency(
     compactThreshold?: number;
   },
 ): string;
+
+export const AMAZON_STRUCTURED_ADDON_PLUGIN_NAME: "amazon-structured-addon";
+
+export const amazonStructuredAddonPlugin: {
+  name: "amazon-structured-addon";
+  apply: (context: InlineConversionPluginContext) => number;
+};
