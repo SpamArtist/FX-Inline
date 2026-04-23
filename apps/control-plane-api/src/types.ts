@@ -39,7 +39,6 @@ export type UiSettingsInput = Partial<UiSettings> | Record<string, unknown>;
 export interface UserRecord {
   id: string;
   email: string;
-  passwordHash: string | null;
   clerkUserId: string | null;
   displayName: string;
   createdAt: number;
@@ -72,22 +71,6 @@ export interface SessionRecord {
   clerkSessionId: string | null;
   csrfToken: string;
   expiresAt: number;
-  createdAt: number;
-}
-
-export interface OAuthStateRecord {
-  state: string;
-  returnTo: string;
-  expiresAt: number;
-  createdAt: number;
-}
-
-export interface OAuthIdentityRecord {
-  id: string;
-  userId: string;
-  provider: string;
-  providerUserId: string;
-  email: string;
   createdAt: number;
 }
 
@@ -225,7 +208,6 @@ export interface DatabaseApi {
   database: DatabaseSync;
   createUser(input: {
     email: string;
-    passwordHash: string | null;
     clerkUserId: string | null;
     displayName: string;
   }): UserRecord;
@@ -266,21 +248,6 @@ export interface DatabaseApi {
   findSession(sessionId: string): SessionRecord | null;
   deleteSession(sessionId: string): void;
   deleteExpiredSessions(): void;
-  createOAuthState(input: {
-    returnTo: string;
-    expiresAt: number;
-  }): OAuthStateRecord;
-  consumeOAuthState(state: string): OAuthStateRecord | null;
-  findOAuthIdentity(input: {
-    provider: string;
-    providerUserId: string;
-  }): OAuthIdentityRecord | null;
-  createOAuthIdentity(input: {
-    userId: string;
-    provider: string;
-    providerUserId: string;
-    email: string;
-  }): OAuthIdentityRecord;
   getLatestSettingsVersion(clientId: string): SettingsVersionRecord | null;
   createSettingsVersion(input: {
     clientId: string;

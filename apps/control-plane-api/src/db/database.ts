@@ -13,8 +13,6 @@ import type {
   DatabaseApi,
   ManifestVersionRecord,
   MembershipRole,
-  OAuthIdentityRecord,
-  OAuthStateRecord,
   PluginArtifactRecord,
   PluginArtifactStatus,
   PluginKind,
@@ -36,7 +34,6 @@ function asJson(value: unknown): string {
 interface UserRow {
   id: string;
   email: string;
-  password_hash: string | null;
   clerk_user_id: string | null;
   display_name: string;
   created_at: number;
@@ -69,22 +66,6 @@ interface SessionRow {
   clerk_session_id: string | null;
   csrf_token: string;
   expires_at: number;
-  created_at: number;
-}
-
-interface OAuthStateRow {
-  state: string;
-  return_to: string;
-  expires_at: number;
-  created_at: number;
-}
-
-interface OAuthIdentityRow {
-  id: string;
-  user_id: string;
-  provider: string;
-  provider_user_id: string;
-  email: string;
   created_at: number;
 }
 
@@ -168,7 +149,6 @@ function rowToUser(row: UserRow | null | undefined): UserRecord | null {
   return {
     id: row.id,
     email: row.email,
-    passwordHash: row.password_hash,
     clerkUserId: row.clerk_user_id,
     displayName: row.display_name,
     createdAt: row.created_at,
@@ -197,19 +177,16 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
 
   function createUser({
     email,
-    passwordHash,
     clerkUserId,
     displayName,
   }: {
     email: string;
-    passwordHash: string | null;
     clerkUserId: string | null;
     displayName: string;
   }): UserRecord {
     const record: UserRecord = {
       id: createId("usr"),
       email,
-      passwordHash,
       clerkUserId,
       displayName,
       createdAt: nowMs(),
@@ -217,13 +194,12 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
 
     database
       .prepare(
-        `INSERT INTO users (id, email, password_hash, clerk_user_id, display_name, created_at)
-         VALUES (?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO users (id, email, clerk_user_id, display_name, created_at)
+         VALUES (?, ?, ?, ?, ?)`,
       )
       .run(
         record.id,
         record.email,
-        record.passwordHash,
         record.clerkUserId,
         record.displayName,
         record.createdAt,
@@ -262,7 +238,7 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
   function findUserByEmail(email: string): UserRecord | null {
     const row = database
       .prepare(
-        `SELECT id, email, password_hash, clerk_user_id, display_name, created_at
+        `SELECT id, email, clerk_user_id, display_name, created_at
          FROM users WHERE lower(email) = lower(?)`,
       )
       .get(email) as UserRow | undefined;
@@ -273,7 +249,7 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
   function findUserByClerkUserId(clerkUserId: string): UserRecord | null {
     const row = database
       .prepare(
-        `SELECT id, email, password_hash, clerk_user_id, display_name, created_at
+        `SELECT id, email, clerk_user_id, display_name, created_at
          FROM users WHERE clerk_user_id = ?`,
       )
       .get(clerkUserId) as UserRow | undefined;
@@ -284,7 +260,7 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
   function findUserById(userId: string): UserRecord | null {
     const row = database
       .prepare(
-        `SELECT id, email, password_hash, clerk_user_id, display_name, created_at
+        `SELECT id, email, clerk_user_id, display_name, created_at
          FROM users WHERE id = ?`,
       )
       .get(userId) as UserRow | undefined;
@@ -491,123 +467,6 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
     database
       .prepare("DELETE FROM sessions WHERE expires_at <= ?")
       .run(nowMs());
-  }
-
-  function createOAuthState({
-    returnTo,
-    expiresAt,
-  }: {
-    returnTo: string;
-    expiresAt: number;
-  }): OAuthStateRecord {
-    const state = createId("st");
-    const createdAt = nowMs();
-
-    database
-      .prepare(
-        `INSERT INTO oauth_states (state, return_to, expires_at, created_at)
-         VALUES (?, ?, ?, ?)`,
-      )
-      .run(state, returnTo, expiresAt, createdAt);
-
-    return {
-      state,
-      returnTo,
-      expiresAt,
-      createdAt,
-    };
-  }
-
-  function consumeOAuthState(state: string): OAuthStateRecord | null {
-    return runTransaction(() => {
-      const row = database
-        .prepare(
-          `SELECT state, return_to, expires_at, created_at
-           FROM oauth_states WHERE state = ?`,
-        )
-        .get(state) as OAuthStateRow | undefined;
-
-      if (!row) return null;
-
-      database.prepare("DELETE FROM oauth_states WHERE state = ?").run(state);
-
-      return {
-        state: row.state,
-        returnTo: row.return_to,
-        expiresAt: row.expires_at,
-        createdAt: row.created_at,
-      };
-    });
-  }
-
-  function findOAuthIdentity({
-    provider,
-    providerUserId,
-  }: {
-    provider: string;
-    providerUserId: string;
-  }): OAuthIdentityRecord | null {
-    const row = database
-      .prepare(
-        `SELECT id, user_id, provider, provider_user_id, email, created_at
-         FROM oauth_identities
-         WHERE provider = ? AND provider_user_id = ?`,
-      )
-      .get(provider, providerUserId) as OAuthIdentityRow | undefined;
-
-    if (!row) return null;
-
-    return {
-      id: row.id,
-      userId: row.user_id,
-      provider: row.provider,
-      providerUserId: row.provider_user_id,
-      email: row.email,
-      createdAt: row.created_at,
-    };
-  }
-
-  function createOAuthIdentity({
-    userId,
-    provider,
-    providerUserId,
-    email,
-  }: {
-    userId: string;
-    provider: string;
-    providerUserId: string;
-    email: string;
-  }): OAuthIdentityRecord {
-    const identity: OAuthIdentityRecord = {
-      id: createId("oauth"),
-      userId,
-      provider,
-      providerUserId,
-      email,
-      createdAt: nowMs(),
-    };
-
-    database
-      .prepare(
-        `INSERT INTO oauth_identities (
-          id,
-          user_id,
-          provider,
-          provider_user_id,
-          email,
-          created_at
-        ) VALUES (?, ?, ?, ?, ?, ?)`,
-      )
-      .run(
-        identity.id,
-        identity.userId,
-        identity.provider,
-        identity.providerUserId,
-        identity.email,
-        identity.createdAt,
-      );
-
-    return identity;
   }
 
   function getLatestSettingsVersion(clientId: string): SettingsVersionRecord | null {
@@ -909,10 +768,6 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
     findSession,
     deleteSession,
     deleteExpiredSessions,
-    createOAuthState,
-    consumeOAuthState,
-    findOAuthIdentity,
-    createOAuthIdentity,
     getLatestSettingsVersion,
     createSettingsVersion,
     getLatestPluginArtifact,

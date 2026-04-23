@@ -181,15 +181,6 @@ export function createControlPlaneApp({
     };
   });
 
-  router.register("POST", "/api/v1/auth/register", async () => {
-    throw createApiError(
-      "AUTH_REGISTER_DISABLED",
-      "Local registration is disabled. Use Clerk sign-in.",
-      null,
-      410,
-    );
-  });
-
   router.register("POST", "/api/v1/auth/login", async (ctx) => {
     const payload = await readJsonBody(ctx.request);
     const clerkSessionToken = toStringValue(payload.clerkSessionToken);

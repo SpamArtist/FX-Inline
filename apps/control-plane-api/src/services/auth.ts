@@ -141,7 +141,6 @@ function resolveUserFromClerkIdentity(
 
   const user = database.createUser({
     email: normalizedEmail,
-    passwordHash: null,
     clerkUserId: identity.clerkUserId,
     displayName: identity.displayName,
   });

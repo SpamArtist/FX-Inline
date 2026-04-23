@@ -185,23 +185,6 @@ test("mock Clerk login, csrf, settings update, and runtime manifest flow", async
   expect(installSnippet.payload.snippet).toContain("data-fxi-client-id");
 });
 
-test("local register endpoint is disabled for Clerk-only auth", async () => {
-  const instance = createTestInstance();
-
-  const register = await invoke(instance.app, {
-    method: "POST",
-    url: "/api/v1/auth/register",
-    body: {
-      email: "owner@example.com",
-      password: "mysecurepassword",
-      displayName: "Owner",
-    },
-  });
-
-  expect(register.status).toBe(410);
-  expect(register.payload.error.code).toBe("AUTH_REGISTER_DISABLED");
-});
-
 test("mock Clerk login creates session when enabled", async () => {
   const instance = createTestInstance();
 
