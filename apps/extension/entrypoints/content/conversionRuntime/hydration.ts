@@ -1,5 +1,5 @@
 import { getUserSettings } from "@/utils/appStorage";
-import { getRates } from "@/utils/rates";
+import { getRates } from "@/utils/rates/index";
 import type { RateSnapshot } from "@/utils/rates.types";
 import type { PerfPayload } from "../perfLogger.types";
 

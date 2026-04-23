@@ -1,6 +1,6 @@
 import { DEFAULT_STARTING_CURRENCY } from "../utils/constants";
 import { ActionType, CurrencyCode } from "../utils/enums";
-import { convertAmountWithSnapshot, formatConvertedAmount } from "../utils/rateMath";
+import { convertAmountWithSnapshot, formatConvertedAmount } from "../utils/rateMath/index";
 import type { RateSnapshot } from "../utils/rates.types";
 import type { CurrencyState, DispatchAction } from "../utils/types";
 

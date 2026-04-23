@@ -31,7 +31,7 @@ async function importSelectionPopupModuleWithMocks() {
     getUserSettings: getUserSettingsMock,
   }));
 
-  await jest.unstable_mockModule("../../test-dist/utils/rates.js", () => ({
+  await jest.unstable_mockModule("../../test-dist/utils/rates/index.js", () => ({
     getRates: getRatesMock,
   }));
 

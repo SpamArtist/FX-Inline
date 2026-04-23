@@ -20,7 +20,7 @@ export async function loadCurrencyReducerHydration(
   if (!readUserSettings || !readRates) {
     const [{ getUserSettings }, { getRates }] = await Promise.all([
       import("../utils/appStorage"),
-      import("../utils/rates"),
+      import("../utils/rates/index"),
     ]);
     readUserSettings = readUserSettings ?? getUserSettings;
     readRates = readRates ?? getRates;

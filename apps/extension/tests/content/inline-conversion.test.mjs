@@ -2,7 +2,7 @@ import {
   INLINE_CONVERSION_CLASS,
   convertVisiblePrices,
 } from "../../test-dist/entrypoints/content/inlineConversion.js";
-import { suppressInlineConversions } from "../../test-dist/entrypoints/content/inlineConversion/conversionNodes.js";
+import { suppressInlineConversions } from "@fx-inline/inline-runtime";
 
 function createRateSnapshot(overrides = {}) {
   const baseSnapshot = {
@@ -266,6 +266,37 @@ test("adds structured add-on conversions for Amazon-style and sibling-symbol pri
   expect(
     siblingWordAddon.querySelector(".ccx-converted-amount").textContent,
   ).toMatch(/^\(.+\)$/);
+});
+
+test("does not duplicate amazon original amount text in addon by default", () => {
+  document.body.innerHTML = [
+    '<span class="a-price">',
+    '  <span class="a-offscreen">¥4,680</span>',
+    '  <span id="amazon-hidden-root" aria-hidden="true">',
+    '    <span class="a-price-symbol">¥</span>',
+    '    <span class="a-price-whole">4,680</span>',
+    "  </span>",
+    "</span>",
+  ].join("\n");
+
+  const applied = convertVisiblePrices(
+    "EUR",
+    createRateSnapshot({ rates: { JPY: 110 } }),
+    document.body,
+    {
+      clearExisting: false,
+    },
+  );
+
+  expect(applied).toBe(1);
+  const addon = document.querySelector(
+    '#amazon-hidden-root span.ccx-inline-conversion[data-ccx-mode="addon"]',
+  );
+  expect(addon).not.toBeNull();
+  expect(addon.textContent).not.toContain("¥4,680");
+  expect(addon.querySelector(".ccx-converted-amount").textContent).toMatch(
+    /^\(.+\)$/u,
+  );
 });
 
 test("adds conversion when amount and yen/month token are split across sibling nodes", () => {

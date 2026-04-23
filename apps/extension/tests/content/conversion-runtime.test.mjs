@@ -2,8 +2,16 @@ import { jest } from "@jest/globals";
 
 const getUserSettingsMock = jest.fn();
 const getRatesMock = jest.fn();
-const convertVisiblePricesMock = jest.fn();
-const suppressInlineConversionsMock = jest.fn();
+
+const createInlineRuntimeMock = jest.fn();
+const controllerStartMock = jest.fn();
+const controllerDestroyMock = jest.fn();
+const controllerSetPreferredCurrencyMock = jest.fn();
+const controllerSetRateSnapshotMock = jest.fn();
+const controllerSetEnabledMock = jest.fn();
+const controllerEnqueueMutationRootsMock = jest.fn();
+const controllerShouldIgnoreMutationsMock = jest.fn();
+const controllerRefreshMock = jest.fn();
 
 function createRateSnapshot(overrides = {}) {
   const base = {
@@ -26,6 +34,19 @@ function createRateSnapshot(overrides = {}) {
   };
 }
 
+function resetControllerMocks() {
+  controllerStartMock.mockReset();
+  controllerDestroyMock.mockReset();
+  controllerSetPreferredCurrencyMock.mockReset();
+  controllerSetRateSnapshotMock.mockReset();
+  controllerSetEnabledMock.mockReset();
+  controllerEnqueueMutationRootsMock.mockReset();
+  controllerShouldIgnoreMutationsMock.mockReset();
+  controllerRefreshMock.mockReset();
+
+  controllerShouldIgnoreMutationsMock.mockReturnValue(false);
+}
+
 async function importRuntimeModuleWithMocks() {
   jest.resetModules();
 
@@ -45,23 +66,14 @@ async function importRuntimeModuleWithMocks() {
       return settings?.localAutoConversionByOrigin?.[origin] !== false;
     },
   }));
-  await jest.unstable_mockModule("@/utils/rates", () => ({
+
+  await jest.unstable_mockModule("@/utils/rates/index", () => ({
     getRates: getRatesMock,
   }));
 
-  await jest.unstable_mockModule(
-    "../../test-dist/entrypoints/content/inlineConversion.js",
-    () => ({
-      INLINE_CONVERSION_CLASS: "ccx-inline-conversion",
-      convertVisiblePrices: convertVisiblePricesMock,
-    }),
-  );
-  await jest.unstable_mockModule(
-    "../../test-dist/entrypoints/content/inlineConversion/conversionNodes.js",
-    () => ({
-      suppressInlineConversions: suppressInlineConversionsMock,
-    }),
-  );
+  await jest.unstable_mockModule("@fx-inline/inline-runtime", () => ({
+    createInlineRuntime: createInlineRuntimeMock,
+  }));
 
   return import("../../test-dist/entrypoints/content/conversionRuntime.js");
 }
@@ -69,15 +81,29 @@ async function importRuntimeModuleWithMocks() {
 beforeEach(() => {
   jest.useFakeTimers();
   jest.clearAllMocks();
+  resetControllerMocks();
 
   getUserSettingsMock.mockResolvedValue({
     preferredCurrency: "EUR",
     globalAutoConversionEnabled: true,
     localAutoConversionByOrigin: {},
   });
+
   getRatesMock.mockResolvedValue(createRateSnapshot());
-  convertVisiblePricesMock.mockReturnValue(1);
-  suppressInlineConversionsMock.mockReturnValue(0);
+
+  createInlineRuntimeMock.mockReturnValue({
+    start: controllerStartMock,
+    stop: jest.fn(),
+    refresh: controllerRefreshMock,
+    setPreferredCurrency: controllerSetPreferredCurrencyMock,
+    setRateSnapshot: controllerSetRateSnapshotMock,
+    setEnabled: controllerSetEnabledMock,
+    destroy: controllerDestroyMock,
+    enqueueMutationRoots: controllerEnqueueMutationRootsMock,
+    shouldIgnoreMutations: controllerShouldIgnoreMutationsMock,
+    setRoot: jest.fn(),
+    setObserveMutations: jest.fn(),
+  });
 
   document.body.innerHTML = "<div id=\"root\"></div>";
   window.localStorage.removeItem("ccx:perf");
@@ -91,7 +117,7 @@ afterEach(() => {
   window.localStorage.removeItem("ccx:perf");
 });
 
-test("initialize hydrates settings/rates and schedules inline conversion", async () => {
+test("initialize hydrates settings/rates, applies runtime state, and starts controller", async () => {
   const { createContentConversionRuntime } = await importRuntimeModuleWithMocks();
   const runtime = createContentConversionRuntime();
 
@@ -99,106 +125,50 @@ test("initialize hydrates settings/rates and schedules inline conversion", async
 
   expect(getUserSettingsMock).toHaveBeenCalledTimes(1);
   expect(getRatesMock).toHaveBeenCalledWith({ forceRefresh: false });
-  expect(convertVisiblePricesMock).not.toHaveBeenCalled();
 
-  jest.advanceTimersByTime(200);
-
-  expect(convertVisiblePricesMock).toHaveBeenCalledTimes(1);
-  const conversionCallArgs = convertVisiblePricesMock.mock.calls[0];
-  expect(conversionCallArgs[2]).toBe(document.body);
-  expect(conversionCallArgs[3]).toMatchObject({
-    clearExisting: false,
-    refreshExisting: true,
-  });
+  expect(controllerSetPreferredCurrencyMock).toHaveBeenCalledWith("EUR");
+  expect(controllerSetRateSnapshotMock).toHaveBeenCalledWith(
+    expect.objectContaining({ base: "USD" }),
+  );
+  expect(controllerSetEnabledMock).toHaveBeenCalledWith(true);
+  expect(controllerStartMock).toHaveBeenCalledTimes(1);
 });
 
-test("settings updates debounce conversion scheduling when preferred currency changes", async () => {
+test("settings updates debounce a fresh settings/rates hydration", async () => {
   const { createContentConversionRuntime } = await importRuntimeModuleWithMocks();
   const runtime = createContentConversionRuntime();
 
   await runtime.initialize();
-  jest.advanceTimersByTime(200);
-  convertVisiblePricesMock.mockClear();
+  controllerSetPreferredCurrencyMock.mockClear();
+  controllerSetRateSnapshotMock.mockClear();
+  controllerSetEnabledMock.mockClear();
 
   await runtime.onSettingsStorageUpdate(
     { preferredCurrency: "INR" },
     { preferredCurrency: "EUR" },
   );
 
-  jest.advanceTimersByTime(1400);
-  expect(convertVisiblePricesMock).toHaveBeenCalledTimes(0);
-
-  jest.advanceTimersByTime(199);
-  expect(convertVisiblePricesMock).toHaveBeenCalledTimes(0);
+  jest.advanceTimersByTime(1399);
+  expect(getUserSettingsMock).toHaveBeenCalledTimes(1);
+  expect(getRatesMock).toHaveBeenCalledTimes(1);
 
   jest.advanceTimersByTime(1);
-  expect(convertVisiblePricesMock).toHaveBeenCalledTimes(1);
+
+  for (let i = 0; i < 5; i += 1) {
+    await Promise.resolve();
+  }
 
   expect(getUserSettingsMock).toHaveBeenCalledTimes(2);
   expect(getRatesMock).toHaveBeenCalledTimes(2);
+
+  expect(controllerSetPreferredCurrencyMock).toHaveBeenCalledWith("EUR");
+  expect(controllerSetEnabledMock).toHaveBeenCalledWith(true);
+  expect(controllerSetRateSnapshotMock).toHaveBeenCalledWith(
+    expect.objectContaining({ base: "USD" }),
+  );
 });
 
-test("partial conversion defers remaining roots when time budget is exceeded", async () => {
-  const { createContentConversionRuntime } = await importRuntimeModuleWithMocks();
-  const runtime = createContentConversionRuntime();
-
-  await runtime.initialize();
-  jest.advanceTimersByTime(200);
-  convertVisiblePricesMock.mockClear();
-
-  const rootA = document.createElement("div");
-  const rootB = document.createElement("div");
-  document.body.append(rootA, rootB);
-
-  const nowSpy = jest.spyOn(performance, "now");
-  let callCount = 0;
-  nowSpy.mockImplementation(() => {
-    callCount += 1;
-
-    if (callCount === 1) return 0;
-    if (callCount === 2) return 20;
-
-    return 20;
-  });
-
-  runtime.enqueueMutationRoots([rootA, rootB]);
-
-  jest.advanceTimersByTime(120);
-  expect(convertVisiblePricesMock).toHaveBeenCalledTimes(1);
-  expect(convertVisiblePricesMock.mock.calls[0][2]).toBe(rootA);
-  expect(convertVisiblePricesMock.mock.calls[0][3]).toMatchObject({
-    clearExisting: false,
-    maxNodesPerPass: 4000,
-  });
-
-  jest.advanceTimersByTime(27);
-  expect(convertVisiblePricesMock).toHaveBeenCalledTimes(1);
-
-  jest.advanceTimersByTime(1);
-  expect(convertVisiblePricesMock).toHaveBeenCalledTimes(2);
-  expect(convertVisiblePricesMock.mock.calls[1][2]).toBe(rootB);
-});
-
-test("shouldIgnoreMutations stays true until suppression delay is released", async () => {
-  const { createContentConversionRuntime } = await importRuntimeModuleWithMocks();
-  const runtime = createContentConversionRuntime();
-
-  await runtime.initialize();
-
-  expect(runtime.shouldIgnoreMutations()).toBe(false);
-
-  jest.advanceTimersByTime(200);
-  expect(convertVisiblePricesMock).toHaveBeenCalledTimes(1);
-  expect(runtime.shouldIgnoreMutations()).toBe(true);
-
-  jest.advanceTimersByTime(399);
-  expect(runtime.shouldIgnoreMutations()).toBe(true);
-
-  jest.advanceTimersByTime(1);
-  expect(runtime.shouldIgnoreMutations()).toBe(false);
-});
-
-test("disabling auto-conversion suppresses wrappers without running conversion", async () => {
+test("initialize reflects disabled auto-conversion in runtime state", async () => {
   getUserSettingsMock.mockResolvedValue({
     preferredCurrency: "EUR",
     globalAutoConversionEnabled: false,
@@ -209,37 +179,52 @@ test("disabling auto-conversion suppresses wrappers without running conversion",
   const runtime = createContentConversionRuntime();
 
   await runtime.initialize();
-  jest.advanceTimersByTime(200);
 
-  expect(suppressInlineConversionsMock).toHaveBeenCalledTimes(1);
-  expect(suppressInlineConversionsMock).toHaveBeenCalledWith(document.body);
-  expect(convertVisiblePricesMock).toHaveBeenCalledTimes(0);
+  expect(controllerSetEnabledMock).toHaveBeenCalledWith(false);
 });
 
-test("re-enabling auto-conversion refreshes rates before scheduling in-place updates", async () => {
+test("enqueueMutationRoots delegates to shared runtime controller", async () => {
   const { createContentConversionRuntime } = await importRuntimeModuleWithMocks();
   const runtime = createContentConversionRuntime();
 
   await runtime.initialize();
-  jest.advanceTimersByTime(200);
-  convertVisiblePricesMock.mockClear();
 
-  await runtime.onSettingsStorageUpdate(
-    {
-      preferredCurrency: "EUR",
-      globalAutoConversionEnabled: true,
-      localAutoConversionByOrigin: {},
-    },
-    {
-      preferredCurrency: "EUR",
-      globalAutoConversionEnabled: false,
-      localAutoConversionByOrigin: {},
-    },
-  );
+  const rootA = document.createElement("div");
+  const rootB = document.createElement("div");
 
-  expect(getRatesMock).toHaveBeenCalledTimes(2);
-  expect(getRatesMock).toHaveBeenLastCalledWith({ forceRefresh: false });
+  runtime.enqueueMutationRoots([rootA, rootB]);
 
-  jest.advanceTimersByTime(1600);
-  expect(convertVisiblePricesMock).toHaveBeenCalledTimes(1);
+  expect(controllerEnqueueMutationRootsMock).toHaveBeenCalledWith([rootA, rootB]);
+});
+
+test("shouldIgnoreMutations delegates to shared runtime controller", async () => {
+  controllerShouldIgnoreMutationsMock.mockReturnValue(true);
+
+  const { createContentConversionRuntime } = await importRuntimeModuleWithMocks();
+  const runtime = createContentConversionRuntime();
+
+  await runtime.initialize();
+
+  expect(runtime.shouldIgnoreMutations()).toBe(true);
+});
+
+test("recordSelectionConversion triggers shared runtime refresh", async () => {
+  const { createContentConversionRuntime } = await importRuntimeModuleWithMocks();
+  const runtime = createContentConversionRuntime();
+
+  await runtime.initialize();
+
+  runtime.recordSelectionConversion();
+
+  expect(controllerRefreshMock).toHaveBeenCalledTimes(1);
+});
+
+test("cleanup destroys the shared runtime controller", async () => {
+  const { createContentConversionRuntime } = await importRuntimeModuleWithMocks();
+  const runtime = createContentConversionRuntime();
+
+  await runtime.initialize();
+  runtime.cleanup();
+
+  expect(controllerDestroyMock).toHaveBeenCalledTimes(1);
 });
