@@ -2,12 +2,12 @@ import {
   extractCurrencyTextMatches,
   mayContainCurrencyToken,
 } from "@fx-inline/currency-detection";
-import { getConvertedAmountText } from "./amountFormatting.js";
+import { getConvertedAmountText } from "../../core/amountFormatting.js";
 import {
   applyConvertedAmountColor,
   getInlineAddonNode,
   setInlineConversionContent,
-} from "./conversionNodes.js";
+} from "../../core/conversionNodes.js";
 import {
   AMAZON_HIDDEN_PRICE_ROOT_SELECTOR,
   AMAZON_PRICE_DECIMAL_SELECTOR,
@@ -16,8 +16,8 @@ import {
   AMAZON_PRICE_WHOLE_SELECTOR,
   INLINE_CONVERSION_ADDON_MODE,
   INLINE_CONVERSION_CLASS,
-} from "./constants.js";
-import { usesLightTextColorForElement } from "./textColor.js";
+} from "../../core/constants.js";
+import { usesLightTextColorForElement } from "../../core/textColor.js";
 
 function getAmazonHiddenPriceRoots(root) {
   if (
