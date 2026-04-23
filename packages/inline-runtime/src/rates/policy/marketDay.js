@@ -1,13 +1,13 @@
-function toEasternDate(now = new Date()): Date {
+function toEasternDate(now = new Date()) {
   return new Date(now.toLocaleString("en-US", { timeZone: "America/New_York" }));
 }
 
-function isWeekend(date: Date): boolean {
+function isWeekend(date) {
   const day = date.getDay();
   return day === 0 || day === 6;
 }
 
-function getPreviousBusinessDay(date: Date): Date {
+function getPreviousBusinessDay(date) {
   const copy = new Date(date);
   copy.setDate(copy.getDate() - 1);
 
@@ -18,14 +18,14 @@ function getPreviousBusinessDay(date: Date): Date {
   return copy;
 }
 
-function toDateKey(date: Date): string {
+function toDateKey(date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
 
-export function getMarketDayKey(now = new Date()): string {
+export function getMarketDayKey(now = new Date()) {
   const easternNow = toEasternDate(now);
 
   while (isWeekend(easternNow)) {
@@ -42,17 +42,6 @@ export function getMarketDayKey(now = new Date()): string {
   return toDateKey(easternNow);
 }
 
-export function shouldUseTtlCache(
-  fetchedAt: number,
-  ttlMs: number,
-  now = Date.now(),
-): boolean {
-  return now - fetchedAt <= ttlMs;
-}
-
-export function shouldUseMarketDayCache(
-  marketDayKey: string | undefined,
-  now = new Date(),
-): boolean {
+export function shouldUseMarketDayCache(marketDayKey, now = new Date()) {
   return marketDayKey === getMarketDayKey(now);
 }

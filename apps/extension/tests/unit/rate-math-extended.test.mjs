@@ -1,7 +1,7 @@
 import {
   convertAmountWithSnapshot,
   formatConvertedAmount,
-} from "../../test-dist/utils/rateMath.js";
+} from "../../test-dist/utils/rateMath/index.js";
 
 const snapshot = {
   rates: {

@@ -37,12 +37,15 @@
     "currency-detection:test": "npm run jest -- packages/currency-detection/test",
     "currency-detection:bench": "node packages/currency-detection/scripts/run-benchmarks.mjs",
     "currency-detection:bench:compare": "node packages/currency-detection/scripts/compare-benchmarks.mjs",
+    "inline-runtime:build": "vite build --config packages/inline-runtime/vite.config.mjs",
+    "inline-runtime:test": "npm run jest -- packages/inline-runtime/test",
     "postinstall": "wxt prepare",
     "readme:sync": "node scripts/readme-sync.mjs",
     "readme:sync:check": "node scripts/readme-sync.mjs --check"
   },
   "dependencies": {
     "@fx-inline/currency-detection": "file:packages/currency-detection",
+    "@fx-inline/inline-runtime": "file:packages/inline-runtime",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
     "@radix-ui/react-label": "^2.1.8",
     "babel-plugin-react-compiler": "^1.0.0",

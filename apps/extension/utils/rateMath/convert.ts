@@ -1,5 +1,5 @@
-import { CurrencyCode } from "./enums";
-import type { RateSnapshotLike } from "./rateMath.types";
+import { CurrencyCode } from "../enums";
+import type { RateSnapshotLike } from "../rateMath.types";
 
 export function convertAmountWithSnapshot(
   amount: number,
@@ -23,8 +23,4 @@ export function convertAmountWithSnapshot(
   }
 
   return (amount * targetRate) / sourceRate;
-}
-
-export function formatConvertedAmount(amount: number, precision = 4): string {
-  return amount.toFixed(precision);
 }

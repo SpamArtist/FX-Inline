@@ -2,7 +2,7 @@ import {
   getMarketDayKey,
   shouldUseMarketDayCache,
   shouldUseTtlCache,
-} from "../../test-dist/utils/ratePolicy.js";
+} from "../../test-dist/utils/ratePolicy/index.js";
 
 test("market-day key handles weekend and pre-open rollover", () => {
   const saturday = getMarketDayKey(new Date("2026-03-07T16:00:00.000Z"));
