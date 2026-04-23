@@ -65,3 +65,12 @@ Example:
 - If any detail is uncertain, state assumptions explicitly in the commit description.
 - In the final response, include commit hash and committed file list.
 - Do not ask for permission for `git add` or `git commit` to create a commit.
+
+
+## Ignore rules:
+- Ignore the `LikeC4/` folder completely unless the user explicitly asks otherwise.
+- Ignore any `graphify/`, `Graphify/`, graph-generation folders, graph-export folders, architecture-diagram output folders, and related generated graph artifacts unless the user explicitly asks otherwise.
+- Ignore graph-related generated files and derivatives, including generated diagrams, generated graph JSON, generated topology snapshots, rendered architecture exports, and similar graphification artifacts.
+- Ignore previously generated narrative reports under `docs/revenue-reviews/reports/` when analyzing the product, codebase, or market position.
+- Ignore previously generated per-run summary files such as `docs/revenue-reviews/data/YYYY-MM-DD.json` and other past generated report artifacts as analytical source material.
+- Do not let prior generated reports recursively shape the current run’s conclusions.
