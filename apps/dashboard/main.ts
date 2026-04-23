@@ -8,6 +8,7 @@ interface DashboardUser {
   id: string;
   email: string;
   displayName: string;
+  clerkUserId: string | null;
 }
 
 interface DashboardClient {
@@ -246,37 +247,20 @@ function renderLoginPage(): void {
   appRoot.innerHTML = authLayout(`
     <section class="grid">
       <article class="panel">
-        <h2>Login</h2>
+        <h2>Login With Clerk Session</h2>
         <form id="login-form">
-          <label>Email</label>
-          <input name="email" type="email" required />
-          <label>Password</label>
-          <input name="password" type="password" minlength="10" required />
+          <label>Clerk session token</label>
+          <textarea name="clerkSessionToken" rows="5" placeholder="Paste Clerk __session JWT or mock-clerk token" required></textarea>
+          <label>Clerk user ID (optional)</label>
+          <input name="clerkUserId" placeholder="user_..." />
           <button class="primary" type="submit">Login</button>
         </form>
+        <p class="notice">Use Clerk to obtain a valid session token, then exchange it with the control-plane API.</p>
       </article>
       <article class="panel">
-        <h2>Create account</h2>
-        <form id="register-form">
-          <label>Display name</label>
-          <input name="displayName" required />
-          <label>Email</label>
-          <input name="email" type="email" required />
-          <label>Password (min 10 chars)</label>
-          <input name="password" type="password" minlength="10" required />
-          <button class="primary" type="submit">Register</button>
-        </form>
-      </article>
-      <article class="panel">
-        <h2>Google login</h2>
-        <p class="notice">Use live OAuth in configured environments or mock mode locally.</p>
-        <form id="google-mock-form">
-          <label>Google email</label>
-          <input name="email" type="email" value="demo-google-user@example.com" required />
-          <button type="submit">Login with Google (Mock)</button>
-        </form>
-        <hr />
-        <button id="google-live-btn">Start Google OAuth</button>
+        <h2>Local Mock Token (Dev/Test)</h2>
+        <p class="notice">If mock Clerk mode is enabled in the API, you can log in with token value <code>mock-clerk</code>.</p>
+        <button id="use-mock-token">Use mock-clerk token</button>
       </article>
     </section>
   `);
@@ -290,14 +274,14 @@ function renderLoginPage(): void {
       await apiRequest("/api/v1/auth/login", {
         method: "POST",
         body: JSON.stringify({
-          email: String(formData.get("email") || ""),
-          password: String(formData.get("password") || ""),
+          clerkSessionToken: String(formData.get("clerkSessionToken") || ""),
+          clerkUserId: String(formData.get("clerkUserId") || ""),
         }),
       });
 
       await loadSession();
       await ensureCsrfToken();
-      setNotice("Logged in successfully.");
+      setNotice("Logged in successfully via Clerk.");
       setHashRoute("/settings");
     } catch (error) {
       setError(getErrorMessage(error));
@@ -305,57 +289,11 @@ function renderLoginPage(): void {
     }
   });
 
-  document.getElementById("register-form")?.addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    const formData = new FormData(eventForm(event));
-
-    try {
-      await apiRequest("/api/v1/auth/register", {
-        method: "POST",
-        body: JSON.stringify({
-          displayName: String(formData.get("displayName") || ""),
-          email: String(formData.get("email") || ""),
-          password: String(formData.get("password") || ""),
-        }),
-      });
-
-      await loadSession();
-      await ensureCsrfToken();
-      setNotice("Account created.");
-      setHashRoute("/settings");
-    } catch (error) {
-      setError(getErrorMessage(error));
-      render();
+  document.getElementById("use-mock-token")?.addEventListener("click", () => {
+    const tokenField = document.querySelector("textarea[name='clerkSessionToken']");
+    if (tokenField instanceof HTMLTextAreaElement) {
+      tokenField.value = "mock-clerk";
     }
-  });
-
-  document.getElementById("google-mock-form")?.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const formData = new FormData(eventForm(event));
-
-    try {
-      await apiRequest("/api/v1/auth/google/mock", {
-        method: "POST",
-        body: JSON.stringify({
-          email: String(formData.get("email") || ""),
-        }),
-      });
-
-      await loadSession();
-      await ensureCsrfToken();
-      setNotice("Google mock login successful.");
-      setHashRoute("/settings");
-    } catch (error) {
-      setError(getErrorMessage(error));
-      render();
-    }
-  });
-
-  document.getElementById("google-live-btn")?.addEventListener("click", () => {
-    const returnTo = `${window.location.origin}${window.location.pathname}#/settings`;
-    const url = `${state.apiOrigin}/api/v1/auth/google/start?returnTo=${encodeURIComponent(returnTo)}`;
-    window.location.assign(url);
   });
 }
 
