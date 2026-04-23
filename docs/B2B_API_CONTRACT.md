@@ -1,7 +1,7 @@
 # B2B Control-Plane API Contract (Phase 0 Freeze)
 
 - Date: 2026-04-23
-- Schema Revision: `b2b-api-r1`
+- Schema Revision: `b2b-api-r2`
 - Base Path: `/api/v1`
 
 ## Normative Language
@@ -21,7 +21,7 @@ This document defines the versioned HTTP contract for all B2B dashboard and runt
 ## Out Of Scope For This Phase
 
 - Backend endpoint implementation.
-- OAuth provider registration/configuration code.
+- Clerk dashboard/provider connection configuration code.
 - Session store implementation details.
 - Generated SDK/client library code.
 
@@ -47,11 +47,11 @@ All non-2xx responses MUST be:
 
 ```json
 {
-  "code": "AUTH_INVALID_CREDENTIALS",
-  "message": "Invalid email or password.",
+  "code": "AUTH_CLERK_TOKEN_INVALID",
+  "message": "Clerk session token is invalid or expired.",
   "requestId": "req_01HT9EJQY9M6",
   "details": {
-    "field": "email"
+    "field": "clerkSessionToken"
   }
 }
 ```
@@ -65,10 +65,17 @@ Field requirements:
 
 ## Auth And Session Contract
 
+## Auth Provider Freeze (Clerk)
+
+- Clerk MUST be the sole identity provider for authentication in `v1`.
+- Password-based local authentication MUST NOT be implemented.
+- `POST /api/v1/auth/login` MUST exchange a Clerk-issued session token for an API session.
+- OAuth start/callback endpoints under `/api/v1/auth/oauth/:provider/*` MUST proxy Clerk-managed provider flows only.
+
 ## Session Cookie
 
 - Name: `fxi_session`
-- Type: opaque signed session ID
+- Type: opaque signed control-plane session ID derived from verified Clerk session
 - Scope: `Path=/`
 - Flags:
   - MUST be `HttpOnly`
@@ -77,9 +84,12 @@ Field requirements:
 - TTL:
   - Idle timeout: 8 hours
   - Absolute timeout: 24 hours
+- Session binding:
+  - MUST store `clerkUserId` and `clerkSessionId` references server-side.
+  - MUST reject session creation when Clerk token/session verification fails.
 - Rotation:
-  - MUST rotate on successful login.
-  - MUST rotate on successful OAuth callback.
+  - MUST rotate on successful Clerk session exchange.
+  - MUST rotate on successful Clerk OAuth callback.
 
 ## CSRF Contract
 
@@ -90,11 +100,11 @@ Field requirements:
   - `GET /api/v1/users/me`
 - Missing/invalid CSRF on mutating endpoints MUST return `403` with `code=AUTH_CSRF_INVALID`.
 
-## OAuth State Contract
+## Clerk OAuth State Contract
 
 - `start` endpoint MUST mint a one-time state token valid for 10 minutes.
 - `callback` endpoint MUST reject missing, mismatched, or expired state.
-- State replay MUST return `400` with `code=AUTH_OAUTH_STATE_INVALID`.
+- State replay MUST return `400` with `code=AUTH_CLERK_OAUTH_STATE_INVALID`.
 
 ## Canonical Entities (API Shapes)
 
@@ -102,6 +112,8 @@ Field requirements:
 {
   "User": {
     "userId": "usr_123",
+    "identityProvider": "clerk",
+    "identitySubject": "user_2abcXYZ",
     "email": "owner@example.com",
     "displayName": "Owner Name",
     "status": "active"
@@ -143,7 +155,7 @@ Field requirements:
 
 ## Endpoint Contracts
 
-## 1) Auth: Login
+## 1) Auth: Clerk Session Exchange
 
 - Method/Path: `POST /api/v1/auth/login`
 - Auth: Public
@@ -153,8 +165,8 @@ Request:
 
 ```json
 {
-  "email": "owner@example.com",
-  "password": "correct-horse-battery-staple"
+  "clerkSessionToken": "sess_tok_abc123",
+  "clerkUserId": "user_2abcXYZ"
 }
 ```
 
@@ -166,6 +178,8 @@ Success `200`:
   "data": {
     "user": {
       "userId": "usr_123",
+      "identityProvider": "clerk",
+      "identitySubject": "user_2abcXYZ",
       "email": "owner@example.com",
       "displayName": "Owner Name",
       "status": "active"
@@ -198,7 +212,7 @@ Success `200`:
 }
 ```
 
-## 3) OAuth Start
+## 3) Clerk OAuth Start
 
 - Method/Path: `GET /api/v1/auth/oauth/:provider/start`
 - Auth: Public
@@ -210,14 +224,14 @@ Success `200`:
 {
   "requestId": "req_03",
   "data": {
-    "authorizationUrl": "https://provider.example/oauth/authorize?...",
-    "state": "oauth_state_opaque_01",
+    "authorizationUrl": "https://clerk.fxi.example/v1/oauth/authorize?...",
+    "state": "clerk_oauth_state_opaque_01",
     "expiresAt": "2026-04-23T10:15:00Z"
   }
 }
 ```
 
-## 4) OAuth Callback
+## 4) Clerk OAuth Callback
 
 - Method/Path: `GET /api/v1/auth/oauth/:provider/callback`
 - Auth: Public
@@ -232,6 +246,8 @@ Success `200`:
   "data": {
     "user": {
       "userId": "usr_123",
+      "identityProvider": "clerk",
+      "identitySubject": "user_2abcXYZ",
       "email": "owner@example.com",
       "displayName": "Owner Name",
       "status": "active"
@@ -255,6 +271,8 @@ Success `200`:
   "data": {
     "user": {
       "userId": "usr_123",
+      "identityProvider": "clerk",
+      "identitySubject": "user_2abcXYZ",
       "email": "owner@example.com",
       "displayName": "Owner Name",
       "status": "active"
@@ -564,7 +582,7 @@ Authorization rules:
 
 | Endpoint | Limit | Key |
 | --- | --- | --- |
-| `POST /api/v1/auth/login` | 10/min + 30/hour | IP + normalized email |
+| `POST /api/v1/auth/login` | 10/min + 30/hour | IP + clerkUserId |
 | `GET /api/v1/auth/oauth/:provider/start` | 20/min | IP |
 | `GET /api/v1/auth/oauth/:provider/callback` | 20/min | IP |
 | `PUT /api/v1/clients/:clientId/settings` | 60/min | userId + clientId |

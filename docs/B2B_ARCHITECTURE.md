@@ -1,7 +1,7 @@
 # B2B Architecture Contract (Phase 0 Freeze)
 
 - Date: 2026-04-23
-- Schema Revision: `b2b-arch-r1`
+- Schema Revision: `b2b-arch-r2`
 - Status: Normative contract for implementation phases
 
 ## Normative Language
@@ -16,7 +16,7 @@ This document freezes the implementation-ready architecture for the B2B control 
 
 - This document does not define pixel-level UI implementation.
 - This document does not define DB schema migration scripts.
-- This document does not define provider-specific OAuth internals beyond endpoint contracts.
+- This document does not define Clerk SDK-level integration internals beyond endpoint contracts.
 - This document does not define billing or invoicing workflows.
 
 ## Out Of Scope For This Phase
@@ -38,6 +38,7 @@ The system is composed of five primary subsystems:
 
 2. Control-Plane API
 - Authoritative API for auth, membership, settings, plugin artifacts, manifest issue, and snippet generation.
+- Uses Clerk as the sole identity provider for login/session validation.
 - Enforces tenant isolation and role-based authorization.
 - Emits request-scoped IDs for auditability.
 
@@ -57,12 +58,19 @@ The system is composed of five primary subsystems:
 - Signs canonical manifest payloads using key identified by `kid`.
 - Provides public key metadata to verifier trust stores.
 
+## Auth Provider Freeze (Clerk)
+
+- Clerk MUST be the only auth provider for this architecture revision.
+- `/api/v1/auth/login` MUST exchange Clerk session tokens; local password auth MUST NOT be implemented.
+- `/api/v1/auth/oauth/:provider/*` flows MUST execute through Clerk-managed OAuth connections.
+- `User` and `Session` entities MUST maintain Clerk identity references (`clerkUserId`, `clerkSessionId`).
+
 ## Canonical Data Entities
 
 All workflows MUST use the following canonical entities:
 
 - `User`
-  - `userId`, `email`, `displayName`, `status`
+  - `userId`, `clerkUserId`, `email`, `displayName`, `status`
 - `Client`
   - `clientId`, `name`, `status`, `createdAt`
 - `Membership`
@@ -74,7 +82,7 @@ All workflows MUST use the following canonical entities:
 - `ManifestEnvelope`
   - `manifestId`, `schemaVersion`, `manifest`, `signature`, `alg`, `kid`, `issuedAt`, `expiresAt`
 - `Session`
-  - `sessionId`, `userId`, `csrfToken`, `issuedAt`, `expiresAt`
+  - `sessionId`, `userId`, `clerkSessionId`, `csrfToken`, `issuedAt`, `expiresAt`
 
 ## Trust Boundaries And Threat Surface
 
@@ -90,6 +98,7 @@ Primary threats:
 ## Boundary 2: Dashboard Client vs Control-Plane API
 
 - All mutating endpoints MUST require authenticated session and CSRF validation.
+- Authenticated session creation MUST require successful Clerk token/session verification.
 - Authorization MUST be membership- and role-based.
 
 Primary threats:
@@ -128,7 +137,7 @@ Primary threats:
 | Component | Responsibility | Owned By | Contract Surface |
 | --- | --- | --- | --- |
 | Dashboard App | Auth UX, settings UX, plugin/version management UX | Web App Team | `/api/v1/auth/*`, `/api/v1/users/me`, `/api/v1/clients/*` |
-| Control-Plane API | Auth/session, authz, tenant isolation, settings, snippets, manifest issue | Platform API Team | `/api/v1/**` |
+| Control-Plane API | Clerk-backed auth/session, authz, tenant isolation, settings, snippets, manifest issue | Platform API Team | `/api/v1/**` |
 | Manifest Signing Service | Canonicalization, signature issuance, key rotation metadata | Security Platform Team | Internal signer API + `kid` distribution policy |
 | Plugin Artifact Hosting | Immutable plugin artifact hosting and retrieval | Artifact Platform Team | Artifact URLs referenced by manifest |
 | Runtime Loader | Signature verification, allowlist/path checks, plugin execution guardrails | Runtime Team | Public manifest/settings/plugin fetch behavior |
@@ -178,8 +187,8 @@ Primary threats:
 
 | Step | Endpoint(s) | Entity | Runtime Behavior |
 | --- | --- | --- | --- |
-| User submits credentials | `POST /api/v1/auth/login` | `Session`, `User` | Runtime unaffected |
-| Session established | `Set-Cookie: fxi_session` + response csrf token | `Session` | Dashboard stores CSRF token in memory; runtime still unauthenticated |
+| Dashboard submits Clerk session token | `POST /api/v1/auth/login` | `Session`, `User` | Runtime unaffected |
+| Session established | `Set-Cookie: fxi_session` + response csrf token after Clerk verification | `Session` | Dashboard stores CSRF token in memory; runtime still unauthenticated |
 | User state resolved | `GET /api/v1/users/me` | `User`, `Membership` | Dashboard can conditionally display client scopes |
 
 ## Flow B: Settings Update

@@ -1,7 +1,7 @@
 # B2B Delivery Phases (Index)
 
 - Date: 2026-04-23
-- Schema Revision: `b2b-phases-r1`
+- Schema Revision: `b2b-phases-r2`
 - Purpose: One-line goals and measurable acceptance gates for Phases 1-14
 
 ## Normative Language
@@ -22,8 +22,8 @@ The key words MUST, MUST NOT, REQUIRED, SHALL, SHOULD, SHOULD NOT, and MAY are t
 
 | Phase | Goal | Measurable Gate |
 | --- | --- | --- |
-| 1 | Establish tenant/auth domain model in control plane | Contract tests pass for `User`, `Client`, `Membership`, and role checks on all `/api/v1/clients/:clientId/*` routes |
-| 2 | Implement login/logout/oauth/session lifecycle | End-to-end auth tests pass for credential login, OAuth callback, session rotation, and CSRF rejection paths |
+| 1 | Establish tenant/auth domain model in control plane | Contract tests pass for `User`, `Client`, `Membership`, Clerk identity mappings (`clerkUserId`, `clerkSessionId`), and role checks on all `/api/v1/clients/:clientId/*` routes |
+| 2 | Implement Clerk-based login/logout/oauth/session lifecycle | End-to-end auth tests pass for Clerk session token exchange, Clerk OAuth callback, session rotation, and CSRF rejection paths |
 | 3 | Implement settings read/write with optimistic versioning | `GET/PUT /clients/:clientId/settings` pass validation tests and produce monotonic `settingsVersion` |
 | 4 | Implement plugin artifact publish/list immutability | Publish endpoint rejects duplicate `stage+version`; list endpoint returns immutable digest/url pairs |
 | 5 | Implement manifest issue service and signing integration | `POST /manifests/issue` returns signed envelope; signature verification test vector suite passes 100% |

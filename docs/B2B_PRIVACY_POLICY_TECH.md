@@ -1,7 +1,7 @@
 # B2B Privacy And Data-Handling Technical Policy (Phase 0 Freeze)
 
 - Date: 2026-04-23
-- Schema Revision: `b2b-privacy-r1`
+- Schema Revision: `b2b-privacy-r2`
 - Scope: Dashboard, control-plane API, manifest/artifact serving, runtime loader telemetry boundaries
 
 ## Normative Language
@@ -31,9 +31,10 @@ This document freezes technical privacy controls and operational data policies f
 Data elements:
 
 - `User.userId`
+- `clerkUserId`
 - `email`
 - `displayName`
-- auth provider subject ID (OAuth)
+- `clerkSessionId`
 - session metadata (`sessionId`, expiry timestamps)
 
 Purpose:
@@ -89,7 +90,7 @@ Storage class:
   - `X-FXI-Page-Path` (pathname only)
 - Runtime network requests MUST use `referrerPolicy=no-referrer`.
 - Runtime requests to manifest/settings/plugin URLs SHOULD use `credentials=omit` unless explicit same-origin credentials are required and approved by Security Platform.
-- Dashboard and API logs MUST avoid storing plaintext passwords, OAuth auth codes, session IDs, CSRF tokens, and signatures.
+- Dashboard and API logs MUST avoid storing plaintext passwords, Clerk session tokens, OAuth auth codes, session IDs, CSRF tokens, and signatures.
 
 ## Logging Policy
 
@@ -109,6 +110,7 @@ Only the following fields MAY be logged by default:
 
 - The following fields MUST be redacted or excluded entirely:
   - `password`
+  - `clerkSessionToken`, Clerk session JWT (`__session`)
   - OAuth `code`, `access_token`, `refresh_token`, `id_token`
   - `Set-Cookie`, session cookie value, CSRF token
   - Raw `X-FXI-Page-Path` when it may contain identifiers (store hashed form)
