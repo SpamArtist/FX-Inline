@@ -25,6 +25,18 @@ export default defineConfig({
       input: {
         index: path.resolve(currentDirectory, "index.html"),
         playground: path.resolve(currentDirectory, "playground.html"),
+        b2bDemo: path.resolve(currentDirectory, "b2b-demo.html"),
+        b2bLoaderV1: path.resolve(currentDirectory, "b2b/loader.v1.js"),
+      },
+      output: {
+        entryFileNames: (chunkInfo) => {
+          if (chunkInfo.name === "b2bLoaderV1") {
+            return "b2b/loader.v1.js";
+          }
+          return "assets/[name].js";
+        },
+        chunkFileNames: "assets/[name]-[hash].js",
+        assetFileNames: "assets/[name]-[hash][extname]",
       },
     },
   },
