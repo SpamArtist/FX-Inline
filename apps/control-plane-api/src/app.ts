@@ -181,52 +181,45 @@ export function createControlPlaneApp({
     };
   });
 
-  router.register("POST", "/api/v1/auth/register", async (ctx) => {
-    const payload = await readJsonBody(ctx.request);
-
-    const { user, client } = await authService.registerLocalUser({
-      email: toStringValue(payload.email),
-      password: toStringValue(payload.password),
-      displayName: toStringValue(payload.displayName),
-    });
-
-    const session = authService.createSessionForUser(user.id);
-
-    return {
-      statusCode: 201,
-      payload: {
-        user: userPayload(user),
-        client,
-      },
-      setCookies: [
-        createCookie(SESSION_COOKIE_NAME, session.id, {
-          secure: env.nodeEnv === "production",
-          maxAgeSeconds: env.sessionTtlHours * 60 * 60,
-        }),
-      ],
-    };
+  router.register("POST", "/api/v1/auth/register", async () => {
+    throw createApiError(
+      "AUTH_REGISTER_DISABLED",
+      "Local registration is disabled. Use Clerk sign-in.",
+      null,
+      410,
+    );
   });
 
   router.register("POST", "/api/v1/auth/login", async (ctx) => {
     const payload = await readJsonBody(ctx.request);
-    const user = await authService.loginWithPassword({
-      email: toStringValue(payload.email),
-      password: toStringValue(payload.password),
-    });
+    const clerkSessionToken = toStringValue(payload.clerkSessionToken);
+    const clerkUserId = toOptionalStringValue(payload.clerkUserId);
 
-    if (!user) {
-      throw createApiError("AUTH_INVALID_CREDENTIALS", "Invalid email or password", null, 401);
+    if (!clerkSessionToken.length) {
+      throw createApiError(
+        "AUTH_CLERK_TOKEN_MISSING",
+        "clerkSessionToken is required",
+        { field: "clerkSessionToken" },
+        400,
+      );
     }
 
-    const session = authService.createSessionForUser(user.id);
+    const login = await authService.loginWithClerkSession({
+      clerkSessionToken,
+      clerkUserId,
+    });
 
     return {
       statusCode: 200,
       payload: {
-        user: userPayload(user),
+        user: {
+          ...userPayload(login.user),
+          clerkUserId: login.user.clerkUserId,
+        },
+        created: login.created,
       },
       setCookies: [
-        createCookie(SESSION_COOKIE_NAME, session.id, {
+        createCookie(SESSION_COOKIE_NAME, login.session.id, {
           secure: env.nodeEnv === "production",
           maxAgeSeconds: env.sessionTtlHours * 60 * 60,
         }),
@@ -268,7 +261,10 @@ export function createControlPlaneApp({
     return {
       statusCode: 200,
       payload: {
-        user: userPayload(ctx.user),
+        user: {
+          ...userPayload(ctx.user),
+          clerkUserId: ctx.user.clerkUserId,
+        },
         clients,
       },
     };
@@ -287,127 +283,17 @@ export function createControlPlaneApp({
     };
   });
 
-  router.register("GET", "/api/v1/auth/google/start", async (ctx) => {
-    const requestUrl = new URL(ctx.request.url || "/", env.publicOrigin);
-    const returnTo = requestUrl.searchParams.get("returnTo") || `${env.dashboardUrl}/#/settings`;
-
-    const { redirectUrl } = authService.createGoogleAuthStart({ returnTo });
-
-    return {
-      statusCode: 302,
-      headers: {
-        location: redirectUrl,
-      },
-      payload: {
-        redirectUrl,
-      },
-    };
-  });
-
-  router.register("GET", "/api/v1/auth/google/callback", async (ctx) => {
-    const requestUrl = new URL(ctx.request.url || "/", env.publicOrigin);
-    const state = requestUrl.searchParams.get("state");
-    const error = requestUrl.searchParams.get("error");
-
-    if (error) {
-      throw createApiError("OAUTH_ERROR", `Google OAuth failed: ${error}`, null, 400);
-    }
-
-    if (!state) {
-      throw createApiError("OAUTH_STATE_MISSING", "Missing OAuth state", null, 400);
-    }
-
-    const consumedState = authService.consumeGoogleState(state);
-    if (!consumedState) {
-      throw createApiError("OAUTH_STATE_INVALID", "Invalid or expired OAuth state", null, 400);
-    }
-
-    let profile: { providerUserId: string; email: string; displayName: string } | null = null;
-
-    if (env.enableMockGoogle) {
-      const email =
-        requestUrl.searchParams.get("mockEmail") ||
-        requestUrl.searchParams.get("email") ||
-        "demo-google-user@example.com";
-
-      profile = {
-        providerUserId: `mock-google-${email}`,
-        email,
-        displayName: requestUrl.searchParams.get("name") || email.split("@")[0],
-      };
-    }
-
-    if (!profile) {
-      throw createApiError(
-        "OAUTH_NOT_CONFIGURED",
-        "Google token exchange is not configured in this environment",
-        null,
-        501,
-      );
-    }
-
-    const upserted = authService.upsertGoogleUser(profile);
-    if (!upserted?.user) {
-      throw createApiError("OAUTH_USER_ERROR", "Failed to resolve Google user", null, 500);
-    }
-
-    const session = authService.createSessionForUser(upserted.user.id);
-
-    return {
-      statusCode: 302,
-      headers: {
-        location: consumedState.returnTo,
-      },
-      payload: {
-        redirectTo: consumedState.returnTo,
-      },
-      setCookies: [
-        createCookie(SESSION_COOKIE_NAME, session.id, {
-          secure: env.nodeEnv === "production",
-          maxAgeSeconds: env.sessionTtlHours * 60 * 60,
-        }),
-      ],
-    };
-  });
-
-  router.register("POST", "/api/v1/auth/google/mock", async (ctx) => {
-    if (!env.enableMockGoogle) {
-      throw createApiError(
-        "OAUTH_NOT_CONFIGURED",
-        "Mock Google login is disabled in this environment",
-        null,
-        403,
-      );
-    }
-
-    const payload = await readJsonBody(ctx.request);
-    const email = toOptionalStringValue(payload.email) || "demo-google-user@example.com";
-    const displayName = toOptionalStringValue(payload.displayName) || email.split("@")[0];
-
-    const upserted = authService.upsertGoogleUser({
-      providerUserId: `mock-google-${email}`,
-      email,
-      displayName,
-    });
-
-    if (!upserted?.user) {
-      throw createApiError("OAUTH_USER_ERROR", "Failed to resolve Google user", null, 500);
-    }
-
-    const session = authService.createSessionForUser(upserted.user.id);
-
+  router.register("GET", "/api/v1/auth/clerk/config", async () => {
     return {
       statusCode: 200,
       payload: {
-        user: userPayload(upserted.user),
-        mocked: true,
+        publishableKey: env.clerkPublishableKey,
+        authorizedParties: env.clerkAuthorizedParties,
+        mockEnabled: env.enableMockClerk,
       },
-      setCookies: [
-        createCookie(SESSION_COOKIE_NAME, session.id, {
-          secure: env.nodeEnv === "production",
-          maxAgeSeconds: env.sessionTtlHours * 60 * 60,
-        }),
-      ],
+      headers: {
+        "cache-control": "no-store",
+      },
     };
   });
 

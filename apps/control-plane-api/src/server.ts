@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { loadEnv } from "./config/env.js";
 import { createDatabase } from "./db/database.js";
 import { createAuthService } from "./services/auth.js";
+import { createClerkAuthService } from "./services/clerk.js";
 import { createRuntimeService } from "./services/runtime.js";
 import { createSigningService } from "./services/signing.js";
 import { createControlPlaneApp } from "./app.js";
@@ -33,9 +34,12 @@ export function createServerInstance(envOverrides: Record<string, string | undef
     fallbackDirectory: path.resolve(repositoryRoot, "apps/control-plane-api/.data"),
   });
 
+  const clerkAuthService = createClerkAuthService(env);
+
   const authService = createAuthService({
     database,
     env,
+    clerkAuthService,
   });
 
   const runtimeService = createRuntimeService({

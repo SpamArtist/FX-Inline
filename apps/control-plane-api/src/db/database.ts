@@ -37,6 +37,7 @@ interface UserRow {
   id: string;
   email: string;
   password_hash: string | null;
+  clerk_user_id: string | null;
   display_name: string;
   created_at: number;
 }
@@ -65,6 +66,7 @@ interface MembershipRow {
 interface SessionRow {
   id: string;
   user_id: string;
+  clerk_session_id: string | null;
   csrf_token: string;
   expires_at: number;
   created_at: number;
@@ -167,6 +169,7 @@ function rowToUser(row: UserRow | null | undefined): UserRecord | null {
     id: row.id,
     email: row.email,
     passwordHash: row.password_hash,
+    clerkUserId: row.clerk_user_id,
     displayName: row.display_name,
     createdAt: row.created_at,
   };
@@ -195,29 +198,33 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
   function createUser({
     email,
     passwordHash,
+    clerkUserId,
     displayName,
   }: {
     email: string;
     passwordHash: string | null;
+    clerkUserId: string | null;
     displayName: string;
   }): UserRecord {
     const record: UserRecord = {
       id: createId("usr"),
       email,
       passwordHash,
+      clerkUserId,
       displayName,
       createdAt: nowMs(),
     };
 
     database
       .prepare(
-        `INSERT INTO users (id, email, password_hash, display_name, created_at)
-         VALUES (?, ?, ?, ?, ?)`,
+        `INSERT INTO users (id, email, password_hash, clerk_user_id, display_name, created_at)
+         VALUES (?, ?, ?, ?, ?, ?)`,
       )
       .run(
         record.id,
         record.email,
         record.passwordHash,
+        record.clerkUserId,
         record.displayName,
         record.createdAt,
       );
@@ -225,10 +232,37 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
     return record;
   }
 
+  function updateUserIdentity({
+    userId,
+    email,
+    displayName,
+    clerkUserId,
+  }: {
+    userId: string;
+    email: string;
+    displayName: string;
+    clerkUserId: string;
+  }): UserRecord {
+    database
+      .prepare(
+        `UPDATE users
+         SET email = ?, display_name = ?, clerk_user_id = ?
+         WHERE id = ?`,
+      )
+      .run(email, displayName, clerkUserId, userId);
+
+    const updated = findUserById(userId);
+    if (!updated) {
+      throw new Error("Failed to load updated user identity");
+    }
+
+    return updated;
+  }
+
   function findUserByEmail(email: string): UserRecord | null {
     const row = database
       .prepare(
-        `SELECT id, email, password_hash, display_name, created_at
+        `SELECT id, email, password_hash, clerk_user_id, display_name, created_at
          FROM users WHERE lower(email) = lower(?)`,
       )
       .get(email) as UserRow | undefined;
@@ -236,10 +270,21 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
     return rowToUser(row);
   }
 
+  function findUserByClerkUserId(clerkUserId: string): UserRecord | null {
+    const row = database
+      .prepare(
+        `SELECT id, email, password_hash, clerk_user_id, display_name, created_at
+         FROM users WHERE clerk_user_id = ?`,
+      )
+      .get(clerkUserId) as UserRow | undefined;
+
+    return rowToUser(row);
+  }
+
   function findUserById(userId: string): UserRecord | null {
     const row = database
       .prepare(
-        `SELECT id, email, password_hash, display_name, created_at
+        `SELECT id, email, password_hash, clerk_user_id, display_name, created_at
          FROM users WHERE id = ?`,
       )
       .get(userId) as UserRow | undefined;
@@ -383,16 +428,19 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
 
   function createSession({
     userId,
+    clerkSessionId,
     csrfToken,
     expiresAt,
   }: {
     userId: string;
+    clerkSessionId: string | null;
     csrfToken: string;
     expiresAt: number;
   }): SessionRecord {
     const session: SessionRecord = {
       id: createId("ses"),
       userId,
+      clerkSessionId,
       csrfToken,
       expiresAt,
       createdAt: nowMs(),
@@ -400,12 +448,13 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
 
     database
       .prepare(
-        `INSERT INTO sessions (id, user_id, csrf_token, expires_at, created_at)
-         VALUES (?, ?, ?, ?, ?)`,
+        `INSERT INTO sessions (id, user_id, clerk_session_id, csrf_token, expires_at, created_at)
+         VALUES (?, ?, ?, ?, ?, ?)`,
       )
       .run(
         session.id,
         session.userId,
+        session.clerkSessionId,
         session.csrfToken,
         session.expiresAt,
         session.createdAt,
@@ -417,7 +466,7 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
   function findSession(sessionId: string): SessionRecord | null {
     const row = database
       .prepare(
-        `SELECT id, user_id, csrf_token, expires_at, created_at
+        `SELECT id, user_id, clerk_session_id, csrf_token, expires_at, created_at
          FROM sessions WHERE id = ?`,
       )
       .get(sessionId) as SessionRow | undefined;
@@ -427,6 +476,7 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
     return {
       id: row.id,
       userId: row.user_id,
+      clerkSessionId: row.clerk_session_id,
       csrfToken: row.csrf_token,
       expiresAt: row.expires_at,
       createdAt: row.created_at,
@@ -845,7 +895,9 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
   return {
     database,
     createUser,
+    updateUserIdentity,
     findUserByEmail,
+    findUserByClerkUserId,
     findUserById,
     createClient,
     findClientById,

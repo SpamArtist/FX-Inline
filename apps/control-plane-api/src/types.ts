@@ -13,14 +13,17 @@ export interface EnvConfig {
   dbPath: string;
   sessionTtlHours: number;
   manifestPrivateKeyPath: string;
-  googleClientId: string;
-  googleClientSecret: string;
-  googleRedirectUri: string;
   dashboardUrl: string;
   runtimeLoaderUrl: string;
   publicOrigin: string;
-  enableMockGoogle: boolean;
   manifestPublicKeyPem: string;
+  clerkSecretKey: string;
+  clerkPublishableKey: string;
+  clerkApiUrl: string;
+  clerkJwksUrl: string;
+  clerkJwtPublicKey: string;
+  clerkAuthorizedParties: string[];
+  enableMockClerk: boolean;
 }
 
 export interface UiSettings {
@@ -37,6 +40,7 @@ export interface UserRecord {
   id: string;
   email: string;
   passwordHash: string | null;
+  clerkUserId: string | null;
   displayName: string;
   createdAt: number;
 }
@@ -65,6 +69,7 @@ export interface ClientMembershipRecord {
 export interface SessionRecord {
   id: string;
   userId: string;
+  clerkSessionId: string | null;
   csrfToken: string;
   expiresAt: number;
   createdAt: number;
@@ -137,22 +142,6 @@ export interface SessionValidationResult {
   user: UserRecord;
 }
 
-export interface GoogleProfile {
-  providerUserId: string;
-  email: string;
-  displayName: string;
-}
-
-export interface UpsertGoogleUserResult {
-  user: UserRecord;
-  created: boolean;
-}
-
-export interface RegisterLocalUserResult {
-  user: UserRecord;
-  client: ClientRecord;
-}
-
 export interface RuntimeManifest {
   schemaVersion: number;
   clientId: string;
@@ -218,14 +207,36 @@ export interface SigningService {
   };
 }
 
+export interface ClerkVerifiedIdentity {
+  clerkUserId: string;
+  clerkSessionId: string;
+  email: string;
+  displayName: string;
+}
+
+export interface ClerkAuthService {
+  verifySessionToken(input: {
+    clerkSessionToken: string;
+    clerkUserId?: string | null;
+  }): Promise<ClerkVerifiedIdentity>;
+}
+
 export interface DatabaseApi {
   database: DatabaseSync;
   createUser(input: {
     email: string;
     passwordHash: string | null;
+    clerkUserId: string | null;
     displayName: string;
   }): UserRecord;
+  updateUserIdentity(input: {
+    userId: string;
+    email: string;
+    displayName: string;
+    clerkUserId: string;
+  }): UserRecord;
   findUserByEmail(email: string): UserRecord | null;
+  findUserByClerkUserId(clerkUserId: string): UserRecord | null;
   findUserById(userId: string): UserRecord | null;
   createClient(input: {
     slug: string;
@@ -248,6 +259,7 @@ export interface DatabaseApi {
   }): ClientMembershipRecord | null;
   createSession(input: {
     userId: string;
+    clerkSessionId: string | null;
     csrfToken: string;
     expiresAt: number;
   }): SessionRecord;
@@ -304,26 +316,17 @@ export interface DatabaseApi {
 }
 
 export interface AuthService {
-  registerLocalUser(input: {
-    email: string;
-    password: string;
-    displayName: string;
-  }): Promise<RegisterLocalUserResult>;
-  loginWithPassword(input: {
-    email: string;
-    password: string;
-  }): Promise<UserRecord | null>;
-  createSessionForUser(userId: string): SessionRecord;
+  loginWithClerkSession(input: {
+    clerkSessionToken: string;
+    clerkUserId?: string | null;
+  }): Promise<{
+    user: UserRecord;
+    session: SessionRecord;
+    created: boolean;
+  }>;
+  createSessionForUser(userId: string, clerkSessionId: string | null): SessionRecord;
   validateSession(sessionId: string | null): SessionValidationResult | null;
   logoutSession(sessionId: string): void;
-  createGoogleAuthStart(input: {
-    returnTo: string;
-  }): {
-    state: string;
-    redirectUrl: string;
-  };
-  consumeGoogleState(state: string): OAuthStateRecord | null;
-  upsertGoogleUser(profile: GoogleProfile): UpsertGoogleUserResult | null;
   getUserClients(userId: string): ClientWithRole[];
   getClientAccess(input: {
     userId: string;

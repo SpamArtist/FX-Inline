@@ -1,14 +1,15 @@
 import crypto from "node:crypto";
 import { createId } from "../utils/ids.js";
-import { hashPassword, verifyPassword } from "../utils/password.js";
 import { hoursFromNow, nowMs } from "../utils/time.js";
 import type {
   AuthService,
   ClientRecord,
+  ClerkAuthService,
+  ClerkVerifiedIdentity,
   DatabaseApi,
   EnvConfig,
-  GoogleProfile,
   MembershipRole,
+  UserRecord,
 } from "../types.js";
 
 function normalizeEmail(value: string): string {
@@ -97,90 +98,114 @@ function createWorkspaceClientForUser(
   return client;
 }
 
+function resolveUserFromClerkIdentity(
+  database: DatabaseApi,
+  identity: ClerkVerifiedIdentity,
+): { user: UserRecord; created: boolean } {
+  const normalizedEmail = normalizeEmail(identity.email);
+
+  const byClerkId = database.findUserByClerkUserId(identity.clerkUserId);
+  if (byClerkId) {
+    const needsUpdate =
+      byClerkId.email !== normalizedEmail ||
+      byClerkId.displayName !== identity.displayName ||
+      byClerkId.clerkUserId !== identity.clerkUserId;
+
+    if (!needsUpdate) {
+      return { user: byClerkId, created: false };
+    }
+
+    return {
+      user: database.updateUserIdentity({
+        userId: byClerkId.id,
+        email: normalizedEmail,
+        displayName: identity.displayName,
+        clerkUserId: identity.clerkUserId,
+      }),
+      created: false,
+    };
+  }
+
+  const byEmail = database.findUserByEmail(normalizedEmail);
+  if (byEmail) {
+    return {
+      user: database.updateUserIdentity({
+        userId: byEmail.id,
+        email: normalizedEmail,
+        displayName: identity.displayName,
+        clerkUserId: identity.clerkUserId,
+      }),
+      created: false,
+    };
+  }
+
+  const user = database.createUser({
+    email: normalizedEmail,
+    passwordHash: null,
+    clerkUserId: identity.clerkUserId,
+    displayName: identity.displayName,
+  });
+
+  createWorkspaceClientForUser(database, user.id, normalizedEmail, identity.displayName);
+
+  return {
+    user,
+    created: true,
+  };
+}
+
 export function createAuthService({
   database,
   env,
+  clerkAuthService,
 }: {
   database: DatabaseApi;
   env: EnvConfig;
+  clerkAuthService: ClerkAuthService;
 }): AuthService {
-  async function registerLocalUser({
-    email,
-    password,
-    displayName,
+  function createSessionForUser(userId: string, clerkSessionId: string | null) {
+    return database.createSession({
+      userId,
+      clerkSessionId,
+      csrfToken: makeCsrfToken(),
+      expiresAt: hoursFromNow(env.sessionTtlHours),
+    });
+  }
+
+  async function loginWithClerkSession({
+    clerkSessionToken,
+    clerkUserId,
   }: {
-    email: string;
-    password: string;
-    displayName: string;
+    clerkSessionToken: string;
+    clerkUserId?: string | null;
   }) {
-    const normalizedEmail = normalizeEmail(email);
-    if (!normalizedEmail.includes("@")) {
-      throw new Error("Email must be a valid address");
-    }
-
-    const existingUser = database.findUserByEmail(normalizedEmail);
-    if (existingUser) {
-      throw new Error("An account with this email already exists");
-    }
-
-    const passwordHash = await hashPassword(password);
+    const verifiedIdentity = await clerkAuthService.verifySessionToken({
+      clerkSessionToken,
+      clerkUserId,
+    });
 
     return database.runTransaction(() => {
-      const user = database.createUser({
-        email: normalizedEmail,
-        passwordHash,
-        displayName: displayName.trim(),
-      });
-
-      const client = createWorkspaceClientForUser(database, user.id, normalizedEmail, displayName);
+      const resolvedUser = resolveUserFromClerkIdentity(database, verifiedIdentity);
+      const session = createSessionForUser(
+        resolvedUser.user.id,
+        verifiedIdentity.clerkSessionId,
+      );
 
       database.createAuditEvent({
-        clientId: client.id,
-        userId: user.id,
-        eventType: "auth.register",
-        payload: { method: "password" },
+        userId: resolvedUser.user.id,
+        eventType: "auth.login",
+        payload: {
+          method: "clerk",
+          clerkUserId: verifiedIdentity.clerkUserId,
+          clerkSessionId: verifiedIdentity.clerkSessionId,
+        },
       });
 
       return {
-        user,
-        client,
+        user: resolvedUser.user,
+        session,
+        created: resolvedUser.created,
       };
-    });
-  }
-
-  async function loginWithPassword({
-    email,
-    password,
-  }: {
-    email: string;
-    password: string;
-  }) {
-    const normalizedEmail = normalizeEmail(email);
-    const user = database.findUserByEmail(normalizedEmail);
-
-    if (!user || !user.passwordHash) {
-      return null;
-    }
-
-    const validPassword = await verifyPassword(password, user.passwordHash);
-    if (!validPassword) {
-      return null;
-    }
-
-    database.createAuditEvent({
-      userId: user.id,
-      eventType: "auth.login",
-      payload: { method: "password" },
-    });
-
-    return user;
-  }
-
-  function createSessionForUser(userId: string) {
-    return database.createSession({
-      userId,
-      csrfToken: makeCsrfToken(),
-      expiresAt: hoursFromNow(env.sessionTtlHours),
     });
   }
 
@@ -213,119 +238,6 @@ export function createAuthService({
     database.deleteSession(sessionId);
   }
 
-  function createGoogleAuthStart({ returnTo }: { returnTo: string }) {
-    if (!env.googleClientId || !env.googleRedirectUri) {
-      throw new Error("Google OAuth is not configured");
-    }
-
-    const oauthState = database.createOAuthState({
-      returnTo,
-      expiresAt: hoursFromNow(1),
-    });
-
-    const redirectUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
-    redirectUrl.searchParams.set("client_id", env.googleClientId);
-    redirectUrl.searchParams.set("redirect_uri", env.googleRedirectUri);
-    redirectUrl.searchParams.set("response_type", "code");
-    redirectUrl.searchParams.set("scope", "openid email profile");
-    redirectUrl.searchParams.set("state", oauthState.state);
-    redirectUrl.searchParams.set("access_type", "offline");
-    redirectUrl.searchParams.set("prompt", "consent");
-
-    return {
-      state: oauthState.state,
-      redirectUrl: redirectUrl.toString(),
-    };
-  }
-
-  function consumeGoogleState(state: string) {
-    const record = database.consumeOAuthState(state);
-    if (!record) return null;
-
-    if (record.expiresAt <= nowMs()) {
-      return null;
-    }
-
-    return record;
-  }
-
-  function upsertGoogleUser({ providerUserId, email, displayName }: GoogleProfile) {
-    const existingIdentity = database.findOAuthIdentity({
-      provider: "google",
-      providerUserId,
-    });
-
-    if (existingIdentity) {
-      const user = database.findUserById(existingIdentity.userId);
-      if (!user) return null;
-
-      return {
-        user,
-        created: false,
-      };
-    }
-
-    const normalizedEmail = normalizeEmail(email);
-
-    return database.runTransaction(() => {
-      let user = database.findUserByEmail(normalizedEmail);
-
-      if (!user) {
-        user = database.createUser({
-          email: normalizedEmail,
-          passwordHash: null,
-          displayName,
-        });
-
-        const slug = `${slugify(normalizedEmail.split("@")[0] || "google-user")}-${user.id.slice(-5)}`;
-        const client = database.createClient({
-          slug,
-          name: `${displayName || normalizedEmail} Workspace`,
-          preferredCurrency: "USD",
-          allowedOrigins: ["http://127.0.0.1:5173", "http://localhost:5173"],
-          allowedPaths: ["^/pricing(?:/|$)", "^/store(?:/|$)", "^/b2b-demo(?:/|$)"],
-        });
-
-        database.addClientMember({
-          clientId: client.id,
-          userId: user.id,
-          role: "owner",
-        });
-
-        database.createSettingsVersion({
-          clientId: client.id,
-          settings: {
-            fontScalePct: 90,
-            fontWeight: 600,
-            fontFamily: "inherit",
-            fontColor: "#355aa8",
-            spacingEm: 0.1,
-          },
-          createdByUserId: user.id,
-        });
-        createDefaultPluginArtifacts(database, client.id, user.id);
-      }
-
-      database.createOAuthIdentity({
-        userId: user.id,
-        provider: "google",
-        providerUserId,
-        email: normalizedEmail,
-      });
-
-      database.createAuditEvent({
-        userId: user.id,
-        eventType: "auth.login",
-        payload: { method: "google" },
-      });
-
-      return {
-        user,
-        created: true,
-      };
-    });
-  }
-
   function getUserClients(userId: string) {
     return database.listClientsForUser(userId);
   }
@@ -349,14 +261,10 @@ export function createAuthService({
   }
 
   return {
-    registerLocalUser,
-    loginWithPassword,
+    loginWithClerkSession,
     createSessionForUser,
     validateSession,
     logoutSession,
-    createGoogleAuthStart,
-    consumeGoogleState,
-    upsertGoogleUser,
     getUserClients,
     getClientAccess,
   };
