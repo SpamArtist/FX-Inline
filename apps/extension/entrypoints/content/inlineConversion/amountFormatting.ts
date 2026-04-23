@@ -1,5 +1,5 @@
 import { CurrencyCode } from "@/utils/enums";
-import { convertAmountWithSnapshot } from "@/utils/rateMath";
+import { convertAmountWithSnapshot } from "@/utils/rateMath/index";
 import type { CurrencyTextMatch } from "@/utils/currencyUtils.types";
 import type { RateSnapshot } from "@/utils/rates.types";
 import { formatAmountInCurrency, hasThousandMagnitudeHint } from "@/utils/utils";

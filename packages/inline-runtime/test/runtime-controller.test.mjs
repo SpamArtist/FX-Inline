@@ -23,7 +23,7 @@ async function importControllerWithMocks() {
     runPartialConversionPass: runPartialConversionPassMock,
   }));
 
-  await jest.unstable_mockModule("../src/rates.js", () => ({
+  await jest.unstable_mockModule("../src/rates/index.js", () => ({
     getRates: getRatesMock,
   }));
 

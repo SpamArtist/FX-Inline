@@ -2,7 +2,7 @@ import {
   getMarketDayKey,
   shouldUseMarketDayCache,
   shouldUseTtlCache,
-} from "../../test-dist/utils/ratePolicy.js";
+} from "../../test-dist/utils/ratePolicy/index.js";
 
 test("getMarketDayKey returns same market day after open", () => {
   const result = getMarketDayKey(new Date("2026-03-02T15:00:00.000Z"));

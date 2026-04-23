@@ -67,7 +67,7 @@ async function importRuntimeModuleWithMocks() {
     },
   }));
 
-  await jest.unstable_mockModule("@/utils/rates", () => ({
+  await jest.unstable_mockModule("@/utils/rates/index", () => ({
     getRates: getRatesMock,
   }));
 

@@ -1,7 +1,7 @@
 import { jest } from "@jest/globals";
 
-import { getMarketDayKey } from "../src/marketDay.js";
-import { __setMemoryRateCacheForTests, getRates } from "../src/rates.js";
+import { getMarketDayKey } from "../src/rates/policy/marketDay.js";
+import { __setMemoryRateCacheForTests, getRates } from "../src/rates/index.js";
 
 beforeEach(() => {
   jest.clearAllMocks();

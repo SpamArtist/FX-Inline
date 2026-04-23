@@ -5,7 +5,7 @@ import {
 import { convertVisiblePrices } from "../core/convertVisiblePrices.js";
 import { runPartialConversionPass } from "../core/partialPass.js";
 import { collectMutationConversionRoots } from "../mutationRoots.js";
-import { getRates } from "../rates.js";
+import { getRates } from "../rates/index.js";
 import {
   FULL_CONVERSION_DEBOUNCE_MS,
   MUTATION_SUPPRESSION_RELEASE_MS,

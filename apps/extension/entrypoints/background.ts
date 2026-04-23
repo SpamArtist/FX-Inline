@@ -1,4 +1,4 @@
-import { getRates } from "@/utils/rates";
+import { getRates } from "@/utils/rates/index";
 import { shouldOpenWelcomePage } from "@/utils/installLifecycle";
 import { browser } from "wxt/browser";
 
