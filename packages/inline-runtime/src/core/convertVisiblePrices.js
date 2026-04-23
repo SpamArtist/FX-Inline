@@ -3,11 +3,15 @@ import {
   refreshExistingInlineConversions,
 } from "./conversionNodes.js";
 import { shouldSkipTextNode } from "./domGuards.js";
-import { runInlineConversionPlugins } from "./pluginRunner.js";
+import {
+  INLINE_PLUGIN_PHASE_POST,
+  INLINE_PLUGIN_PHASE_PRE,
+  runInlineConversionPlugins,
+} from "./pluginRunner.js";
 import { ensureInlineConversionStyles } from "./styles.js";
 import { decorateStructuredSiblingSymbolPrices } from "./structuredDecorators.js";
 import { decoratePricesInTextNode } from "./textNodeDecorator.js";
-import { amazonStructuredAddonPlugin } from "../plugins/amazonStructuredAddonPlugin.js";
+import { amazonStructuredAddonPlugin } from "../plugins/amazon/structuredAddonPlugin.js";
 
 const DEFAULT_POST_PLUGINS = [amazonStructuredAddonPlugin];
 
@@ -76,6 +80,7 @@ export function convertVisiblePrices(
   totalConversions += runInlineConversionPlugins(
     options?.prePlugins,
     pluginContext,
+    INLINE_PLUGIN_PHASE_PRE,
   );
 
   for (const node of textNodes) {
@@ -101,7 +106,11 @@ export function convertVisiblePrices(
     ? [...DEFAULT_POST_PLUGINS, ...(options?.postPlugins ?? [])]
     : (options?.postPlugins ?? []);
 
-  totalConversions += runInlineConversionPlugins(postPlugins, pluginContext);
+  totalConversions += runInlineConversionPlugins(
+    postPlugins,
+    pluginContext,
+    INLINE_PLUGIN_PHASE_POST,
+  );
 
   if (capturePerf && options?.onPerfSample) {
     const decorateNodesMs = performance.now() - decorateStartedAt;

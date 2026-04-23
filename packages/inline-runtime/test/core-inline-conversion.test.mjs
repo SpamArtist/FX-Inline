@@ -205,6 +205,38 @@ test("supports amazon decorator as explicit post plugin", () => {
   ).not.toBeNull();
 });
 
+test("skips plugins declared for a different phase and reports error", () => {
+  document.body.innerHTML = "<div></div>";
+  const pluginErrors = [];
+  let applyCalls = 0;
+
+  const postPhasePlugin = {
+    name: "post-only",
+    phase: "post",
+    apply() {
+      applyCalls += 1;
+      return 1;
+    },
+  };
+
+  convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
+    clearExisting: false,
+    includeDefaultPostPlugins: false,
+    prePlugins: [postPhasePlugin],
+    onPluginError: (error, plugin) => {
+      pluginErrors.push({ error, plugin });
+    },
+  });
+
+  expect(applyCalls).toBe(0);
+  expect(pluginErrors).toHaveLength(1);
+  expect(pluginErrors[0].plugin).toBe(postPhasePlugin);
+  expect(pluginErrors[0].error).toBeInstanceOf(Error);
+  expect(pluginErrors[0].error.message).toContain(
+    'declared for "post" phase but ran in "pre" phase',
+  );
+});
+
 test("reports perf sample shape with reached node limit", () => {
   document.body.innerHTML = "<p>$100</p><p>$200</p><p>$300</p>";
 

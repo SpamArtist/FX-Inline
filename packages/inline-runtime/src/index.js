@@ -5,7 +5,7 @@ import { formatAmountInCurrency } from "./formatting.js";
 import {
   AMAZON_STRUCTURED_ADDON_PLUGIN_NAME,
   amazonStructuredAddonPlugin,
-} from "./plugins/amazonStructuredAddonPlugin.js";
+} from "./plugins/amazon/structuredAddonPlugin.js";
 
 export {
   createInlineRuntime,

@@ -3,11 +3,6 @@ export const INLINE_CONVERSION_STYLE_ID = "ccx-inline-conversion-style";
 export const INLINE_COMPACT_THRESHOLD = 100_000;
 export const INLINE_CONVERSION_ADDON_MODE = "addon";
 
-export const AMAZON_HIDDEN_PRICE_ROOT_SELECTOR = 'span[aria-hidden="true"]';
-export const AMAZON_PRICE_SYMBOL_SELECTOR = ".a-price-symbol";
-export const AMAZON_PRICE_WHOLE_SELECTOR = ".a-price-whole";
-export const AMAZON_PRICE_DECIMAL_SELECTOR = ".a-price-decimal";
-export const AMAZON_PRICE_FRACTION_SELECTOR = ".a-price-fraction";
 export const ARIA_HIDDEN_SELECTOR = '[aria-hidden="true"]';
 
 export const INLINE_CONVERSION_CSS = `

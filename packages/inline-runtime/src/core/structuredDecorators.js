@@ -9,7 +9,6 @@ import {
   setInlineConversionContent,
 } from "./conversionNodes.js";
 import {
-  AMAZON_PRICE_WHOLE_SELECTOR,
   ARIA_HIDDEN_SELECTOR,
   DIGIT_REGEX,
   INLINE_CONVERSION_ADDON_MODE,
@@ -133,7 +132,6 @@ export function decorateStructuredSiblingSymbolPrices(
 
   for (const ariaHiddenRoot of ariaHiddenRoots) {
     if (ariaHiddenRoot.closest(`.${INLINE_CONVERSION_CLASS}`)) continue;
-    if (ariaHiddenRoot.querySelector(AMAZON_PRICE_WHOLE_SELECTOR)) continue;
 
     const amountText = getSanitizedAmountText(ariaHiddenRoot);
     if (!amountText) continue;

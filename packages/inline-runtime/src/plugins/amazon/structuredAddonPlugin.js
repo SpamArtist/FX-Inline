@@ -9,15 +9,18 @@ import {
   setInlineConversionContent,
 } from "../../core/conversionNodes.js";
 import {
-  AMAZON_HIDDEN_PRICE_ROOT_SELECTOR,
-  AMAZON_PRICE_DECIMAL_SELECTOR,
-  AMAZON_PRICE_FRACTION_SELECTOR,
-  AMAZON_PRICE_SYMBOL_SELECTOR,
-  AMAZON_PRICE_WHOLE_SELECTOR,
   INLINE_CONVERSION_ADDON_MODE,
   INLINE_CONVERSION_CLASS,
 } from "../../core/constants.js";
 import { usesLightTextColorForElement } from "../../core/textColor.js";
+
+const AMAZON_HIDDEN_PRICE_ROOT_SELECTOR = 'span[aria-hidden="true"]';
+const AMAZON_PRICE_SYMBOL_SELECTOR = ".a-price-symbol";
+const AMAZON_PRICE_WHOLE_SELECTOR = ".a-price-whole";
+const AMAZON_PRICE_DECIMAL_SELECTOR = ".a-price-decimal";
+const AMAZON_PRICE_FRACTION_SELECTOR = ".a-price-fraction";
+
+export const AMAZON_STRUCTURED_ADDON_PLUGIN_NAME = "amazon-structured-addon";
 
 function getAmazonHiddenPriceRoots(root) {
   if (
@@ -80,7 +83,7 @@ function getAmazonStructuredRawPrice(root) {
   return `${symbol}${whole}${decimal}${fraction}`;
 }
 
-export function decorateStructuredAmazonPrices(
+function decorateStructuredAmazonPrices(
   root,
   preferredCurrency,
   rateSnapshot,
@@ -151,3 +154,23 @@ export function decorateStructuredAmazonPrices(
 
   return conversionsApplied;
 }
+
+export const amazonStructuredAddonPlugin = {
+  name: AMAZON_STRUCTURED_ADDON_PLUGIN_NAME,
+  phase: "post",
+  apply({
+    root,
+    preferredCurrency,
+    rateSnapshot,
+    localeHint,
+    lightTextCache,
+  }) {
+    return decorateStructuredAmazonPrices(
+      root,
+      preferredCurrency,
+      rateSnapshot,
+      localeHint,
+      lightTextCache,
+    );
+  },
+};

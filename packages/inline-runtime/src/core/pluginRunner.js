@@ -1,3 +1,6 @@
+export const INLINE_PLUGIN_PHASE_PRE = "pre";
+export const INLINE_PLUGIN_PHASE_POST = "post";
+
 function getPluginExecutor(plugin) {
   if (typeof plugin === "function") {
     return plugin;
@@ -8,6 +11,29 @@ function getPluginExecutor(plugin) {
   }
 
   return null;
+}
+
+function getPluginPhase(plugin) {
+  if (!plugin || typeof plugin !== "object") {
+    return null;
+  }
+
+  if (
+    plugin.phase === INLINE_PLUGIN_PHASE_PRE ||
+    plugin.phase === INLINE_PLUGIN_PHASE_POST
+  ) {
+    return plugin.phase;
+  }
+
+  return null;
+}
+
+function getPluginName(plugin) {
+  if (plugin && typeof plugin === "object" && typeof plugin.name === "string") {
+    return plugin.name;
+  }
+
+  return "<anonymous>";
 }
 
 function normalizeConversionCount(result) {
@@ -27,7 +53,7 @@ function normalizeConversionCount(result) {
   return 0;
 }
 
-export function runInlineConversionPlugins(plugins, context) {
+export function runInlineConversionPlugins(plugins, context, expectedPhase) {
   if (!Array.isArray(plugins) || plugins.length === 0) {
     return 0;
   }
@@ -37,6 +63,18 @@ export function runInlineConversionPlugins(plugins, context) {
   for (const plugin of plugins) {
     const execute = getPluginExecutor(plugin);
     if (!execute) continue;
+
+    const declaredPhase = getPluginPhase(plugin);
+    if (declaredPhase && expectedPhase && declaredPhase !== expectedPhase) {
+      const pluginName = getPluginName(plugin);
+      context.onPluginError?.(
+        new Error(
+          `Inline conversion plugin "${pluginName}" is declared for "${declaredPhase}" phase but ran in "${expectedPhase}" phase.`,
+        ),
+        plugin,
+      );
+      continue;
+    }
 
     try {
       const result = execute(context);

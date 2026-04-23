@@ -35,10 +35,29 @@ export type InlineConversionPluginResult =
     }
   | void;
 
+export type InlineConversionPluginPhase = "pre" | "post";
+
 export type InlineConversionPlugin =
   | ((context: InlineConversionPluginContext) => InlineConversionPluginResult)
   | {
       name?: string;
+      phase?: InlineConversionPluginPhase;
+      apply: (context: InlineConversionPluginContext) => InlineConversionPluginResult;
+    };
+
+export type InlineConversionPrePlugin =
+  | ((context: InlineConversionPluginContext) => InlineConversionPluginResult)
+  | {
+      name?: string;
+      phase?: "pre";
+      apply: (context: InlineConversionPluginContext) => InlineConversionPluginResult;
+    };
+
+export type InlineConversionPostPlugin =
+  | ((context: InlineConversionPluginContext) => InlineConversionPluginResult)
+  | {
+      name?: string;
+      phase?: "post";
       apply: (context: InlineConversionPluginContext) => InlineConversionPluginResult;
     };
 
@@ -48,8 +67,8 @@ export type ConvertVisiblePricesOptions = {
   maxNodesPerPass?: number;
   onPerfSample?: (sample: InlineConversionPerfSample) => void;
   onNodeLimitReached?: (maxNodesPerPass: number) => void;
-  prePlugins?: InlineConversionPlugin[];
-  postPlugins?: InlineConversionPlugin[];
+  prePlugins?: InlineConversionPrePlugin[];
+  postPlugins?: InlineConversionPostPlugin[];
   includeDefaultPostPlugins?: boolean;
   onPluginError?: (error: unknown, plugin: InlineConversionPlugin) => void;
 };
@@ -68,8 +87,8 @@ export type InlineRuntimeOptions = {
   autoFetchRates?: boolean;
   onPerfSample?: (sample: InlineConversionPerfSample) => void;
   onNodeLimitReached?: (maxNodesPerPass: number) => void;
-  prePlugins?: InlineConversionPlugin[];
-  postPlugins?: InlineConversionPlugin[];
+  prePlugins?: InlineConversionPrePlugin[];
+  postPlugins?: InlineConversionPostPlugin[];
   includeDefaultPostPlugins?: boolean;
   onPluginError?: (error: unknown, plugin: InlineConversionPlugin) => void;
   onError?: (error: unknown) => void;
@@ -117,5 +136,6 @@ export const AMAZON_STRUCTURED_ADDON_PLUGIN_NAME: "amazon-structured-addon";
 
 export const amazonStructuredAddonPlugin: {
   name: "amazon-structured-addon";
+  phase: "post";
   apply: (context: InlineConversionPluginContext) => number;
 };
