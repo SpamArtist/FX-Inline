@@ -1,7 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import type { DatabaseSync } from "node:sqlite";
 
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 const distMigrationsDirectory = path.join(currentDirectory, "migrations");
@@ -15,17 +14,22 @@ function resolveMigrationsDirectory(): string {
   return sourceMigrationsDirectory;
 }
 
-interface MigrationRow {
-  id: string;
+export interface MigrationExecutor {
+  query(
+    sqlText: string,
+    params?: unknown[],
+  ): Promise<Record<string, unknown>[]>;
+  execute(sqlText: string): Promise<void>;
+  withTransaction<T>(callback: (tx: MigrationExecutor) => Promise<T>): Promise<T>;
 }
 
-export function applyMigrations(database: DatabaseSync): void {
+export async function applyMigrations(executor: MigrationExecutor): Promise<void> {
   const migrationsDirectory = resolveMigrationsDirectory();
 
-  database.exec(`
+  await executor.execute(`
     CREATE TABLE IF NOT EXISTS schema_migrations (
       id TEXT PRIMARY KEY,
-      applied_at INTEGER NOT NULL
+      applied_at BIGINT NOT NULL
     );
   `);
 
@@ -34,11 +38,11 @@ export function applyMigrations(database: DatabaseSync): void {
     .filter((fileName) => fileName.endsWith(".sql"))
     .sort((leftFile, rightFile) => leftFile.localeCompare(rightFile));
 
+  const appliedRows = await executor.query("SELECT id FROM schema_migrations");
   const appliedIds = new Set(
-    (database
-      .prepare("SELECT id FROM schema_migrations")
-      .all() as unknown as MigrationRow[])
-      .map((row) => row.id),
+    appliedRows
+      .map((row) => row.id)
+      .filter((id): id is string => typeof id === "string"),
   );
 
   for (const fileName of files) {
@@ -49,17 +53,12 @@ export function applyMigrations(database: DatabaseSync): void {
     const absoluteFilePath = path.join(migrationsDirectory, fileName);
     const migrationSql = fs.readFileSync(absoluteFilePath, "utf8");
 
-    database.exec("BEGIN");
-
-    try {
-      database.exec(migrationSql);
-      database
-        .prepare("INSERT INTO schema_migrations (id, applied_at) VALUES (?, ?)")
-        .run(fileName, Date.now());
-      database.exec("COMMIT");
-    } catch (error) {
-      database.exec("ROLLBACK");
-      throw error;
-    }
+    await executor.withTransaction(async (tx) => {
+      await tx.execute(migrationSql);
+      await tx.query(
+        "INSERT INTO schema_migrations (id, applied_at) VALUES ($1, $2)",
+        [fileName, Date.now()],
+      );
+    });
   }
 }

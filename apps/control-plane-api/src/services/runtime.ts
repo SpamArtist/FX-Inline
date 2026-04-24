@@ -75,22 +75,22 @@ export function createRuntimeService({
     };
   }
 
-  function getSignedManifestForClient(clientId: string) {
-    const client = database.findClientById(clientId);
+  async function getSignedManifestForClient(clientId: string) {
+    const client = await database.findClientById(clientId);
     if (!client) {
       return null;
     }
 
-    const settingsVersion = database.getLatestSettingsVersion(client.id);
+    const settingsVersion = await database.getLatestSettingsVersion(client.id);
     if (!settingsVersion) {
       throw new Error("Missing client settings version");
     }
 
-    const prePlugin = database.getLatestPluginArtifact({
+    const prePlugin = await database.getLatestPluginArtifact({
       clientId: client.id,
       kind: "pre",
     });
-    const postPlugin = database.getLatestPluginArtifact({
+    const postPlugin = await database.getLatestPluginArtifact({
       clientId: client.id,
       kind: "post",
     });
@@ -108,7 +108,7 @@ export function createRuntimeService({
 
     const { signature, keyId } = signingService.signManifest(manifest);
 
-    database.createManifestVersion({
+    await database.createManifestVersion({
       clientId: client.id,
       manifest,
       signature,
@@ -124,8 +124,8 @@ export function createRuntimeService({
     };
   }
 
-  function getRuntimeSettings(clientId: string) {
-    const settingsVersion = database.getLatestSettingsVersion(clientId);
+  async function getRuntimeSettings(clientId: string) {
+    const settingsVersion = await database.getLatestSettingsVersion(clientId);
     if (!settingsVersion) {
       return null;
     }
@@ -137,7 +137,7 @@ export function createRuntimeService({
     };
   }
 
-  function updateClientSettings({
+  async function updateClientSettings({
     clientId,
     settings,
     userId,
@@ -148,13 +148,13 @@ export function createRuntimeService({
   }) {
     const sanitized = sanitizeUiSettings(settings);
 
-    const version = database.createSettingsVersion({
+    const version = await database.createSettingsVersion({
       clientId,
       settings: sanitized,
       createdByUserId: userId,
     });
 
-    database.createAuditEvent({
+    await database.createAuditEvent({
       clientId,
       userId,
       eventType: "settings.update",
@@ -170,7 +170,7 @@ export function createRuntimeService({
     };
   }
 
-  function publishPluginArtifact({
+  async function publishPluginArtifact({
     clientId,
     kind,
     artifactUrl,
@@ -187,7 +187,7 @@ export function createRuntimeService({
       throw new Error("Plugin kind must be pre or post");
     }
 
-    const artifact = database.createPluginArtifact({
+    const artifact = await database.createPluginArtifact({
       clientId,
       kind,
       artifactUrl,
@@ -196,7 +196,7 @@ export function createRuntimeService({
       status: "approved",
     });
 
-    database.createAuditEvent({
+    await database.createAuditEvent({
       clientId,
       userId,
       eventType: "plugin.publish",

@@ -224,7 +224,7 @@ export function createControlPlaneApp({
     { requiresAuth: true, requiresCsrf: true },
     async (ctx) => {
       if (ctx.session) {
-        authService.logoutSession(ctx.session.id);
+        await authService.logoutSession(ctx.session.id);
       }
 
       return {
@@ -247,7 +247,7 @@ export function createControlPlaneApp({
       throw createApiError("AUTH_REQUIRED", "Authentication required", null, 401);
     }
 
-    const clients = authService.getUserClients(ctx.user.id);
+    const clients = await authService.getUserClients(ctx.user.id);
 
     return {
       statusCode: 200,
@@ -296,7 +296,7 @@ export function createControlPlaneApp({
     return {
       statusCode: 200,
       payload: {
-        clients: authService.getUserClients(ctx.user.id),
+        clients: await authService.getUserClients(ctx.user.id),
       },
     };
   });
@@ -310,7 +310,7 @@ export function createControlPlaneApp({
         throw createApiError("AUTH_REQUIRED", "Authentication required", null, 401);
       }
 
-      const access = authService.getClientAccess({
+      const access = await authService.getClientAccess({
         userId: ctx.user.id,
         clientId: ctx.params.clientId,
       });
@@ -319,7 +319,7 @@ export function createControlPlaneApp({
         throw createApiError("CLIENT_ACCESS_DENIED", "Client access denied", null, 403);
       }
 
-      const current = runtimeService.getRuntimeSettings(access.client.id);
+      const current = await runtimeService.getRuntimeSettings(access.client.id);
       if (!current) {
         throw createApiError("SETTINGS_NOT_FOUND", "Client settings not found", null, 404);
       }
@@ -347,7 +347,7 @@ export function createControlPlaneApp({
         throw createApiError("AUTH_REQUIRED", "Authentication required", null, 401);
       }
 
-      const access = authService.getClientAccess({
+      const access = await authService.getClientAccess({
         userId: ctx.user.id,
         clientId: ctx.params.clientId,
       });
@@ -358,7 +358,7 @@ export function createControlPlaneApp({
 
       const payload = await readJsonBody(ctx.request);
 
-      const updated = runtimeService.updateClientSettings({
+      const updated = await runtimeService.updateClientSettings({
         clientId: access.client.id,
         settings: payload,
         userId: ctx.user.id,
@@ -382,7 +382,7 @@ export function createControlPlaneApp({
         throw createApiError("AUTH_REQUIRED", "Authentication required", null, 401);
       }
 
-      const access = authService.getClientAccess({
+      const access = await authService.getClientAccess({
         userId: ctx.user.id,
         clientId: ctx.params.clientId,
       });
@@ -404,7 +404,7 @@ export function createControlPlaneApp({
         throw createApiError("INVALID_PLUGIN_PAYLOAD", "kind must be pre or post", null, 400);
       }
 
-      const artifact = runtimeService.publishPluginArtifact({
+      const artifact = await runtimeService.publishPluginArtifact({
         clientId: access.client.id,
         kind: kindValue as PluginKind,
         artifactUrl,
@@ -430,7 +430,7 @@ export function createControlPlaneApp({
         throw createApiError("AUTH_REQUIRED", "Authentication required", null, 401);
       }
 
-      const access = authService.getClientAccess({
+      const access = await authService.getClientAccess({
         userId: ctx.user.id,
         clientId: ctx.params.clientId,
       });
@@ -449,7 +449,7 @@ export function createControlPlaneApp({
   );
 
   router.register("GET", "/api/v1/runtime/:clientId/settings", async (ctx) => {
-    const current = runtimeService.getRuntimeSettings(ctx.params.clientId);
+    const current = await runtimeService.getRuntimeSettings(ctx.params.clientId);
     if (!current) {
       throw createApiError("SETTINGS_NOT_FOUND", "Runtime settings not found", null, 404);
     }
@@ -466,7 +466,7 @@ export function createControlPlaneApp({
   });
 
   router.register("GET", "/api/v1/runtime/:clientId/manifest", async (ctx) => {
-    const result = runtimeService.getSignedManifestForClient(ctx.params.clientId);
+    const result = await runtimeService.getSignedManifestForClient(ctx.params.clientId);
     if (!result) {
       throw createApiError("MANIFEST_NOT_FOUND", "Client runtime manifest not found", null, 404);
     }
@@ -544,7 +544,7 @@ export function createControlPlaneApp({
 
       const cookies = parseCookies(typeof request.headers.cookie === "string" ? request.headers.cookie : "");
       const sessionId = cookies[SESSION_COOKIE_NAME] || null;
-      const sessionResult = authService.validateSession(sessionId);
+      const sessionResult = await authService.validateSession(sessionId);
 
       const context: RouteContext = {
         env,

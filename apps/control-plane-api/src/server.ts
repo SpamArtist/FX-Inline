@@ -12,22 +12,35 @@ import { createControlPlaneApp } from "./app.js";
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(currentDirectory, "../../..");
 
-function resolveDbPath(dbPath: string): string {
-  if (path.isAbsolute(dbPath)) {
-    return dbPath;
+function resolveDatabaseUrl(databaseUrl: string): string {
+  if (databaseUrl.startsWith("postgres://") || databaseUrl.startsWith("postgresql://")) {
+    return databaseUrl;
   }
 
-  return path.resolve(repositoryRoot, dbPath);
+  if (!databaseUrl.startsWith("pglite://")) {
+    return databaseUrl;
+  }
+
+  const pgliteTarget = databaseUrl.slice("pglite://".length);
+  if (!pgliteTarget.length || pgliteTarget === ":memory:") {
+    return "pglite://:memory:";
+  }
+
+  if (path.isAbsolute(pgliteTarget)) {
+    return `pglite://${pgliteTarget}`;
+  }
+
+  return `pglite://${path.resolve(repositoryRoot, pgliteTarget)}`;
 }
 
-export function createServerInstance(envOverrides: Record<string, string | undefined> = {}) {
+export async function createServerInstance(envOverrides: Record<string, string | undefined> = {}) {
   const env = loadEnv(envOverrides);
 
-  const database = createDatabase({
-    dbPath: resolveDbPath(env.dbPath),
+  const database = await createDatabase({
+    databaseUrl: resolveDatabaseUrl(env.databaseUrl),
   });
 
-  database.seedDemoData();
+  await database.seedDemoData();
 
   const signingService = createSigningService({
     privateKeyPath: env.manifestPrivateKeyPath,
@@ -65,7 +78,7 @@ export function createServerInstance(envOverrides: Record<string, string | undef
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const { env, server } = createServerInstance();
+  const { env, server } = await createServerInstance();
 
   server.listen(env.port, env.host, () => {
     console.log(`[control-plane-api] listening at http://${env.host}:${env.port}`);

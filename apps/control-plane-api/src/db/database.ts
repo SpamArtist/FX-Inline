@@ -1,7 +1,22 @@
 import fs from "node:fs";
 import path from "node:path";
-import { DatabaseSync } from "node:sqlite";
-import { applyMigrations } from "./migrate.js";
+import { PGlite } from "@electric-sql/pglite";
+import { and, asc, desc, eq, lte, sql } from "drizzle-orm";
+import { drizzle as drizzleNodePg, type NodePgDatabase } from "drizzle-orm/node-postgres";
+import { drizzle as drizzlePglite, type PgliteDatabase } from "drizzle-orm/pglite";
+import { type PoolClient, type QueryResultRow, Pool } from "pg";
+import { applyMigrations, type MigrationExecutor } from "./migrate.js";
+import {
+  auditEventsTable,
+  clientMembersTable,
+  clientsTable,
+  clientSettingsVersionsTable,
+  controlPlaneSchema,
+  manifestVersionsTable,
+  pluginArtifactsTable,
+  sessionsTable,
+  usersTable,
+} from "./schema.js";
 import { createId } from "../utils/ids.js";
 import { parseJsonSafe } from "../utils/json.js";
 import { nowMs } from "../utils/time.js";
@@ -23,6 +38,8 @@ import type {
   UserRecord,
 } from "../types.js";
 
+type DrizzleDb = NodePgDatabase<typeof controlPlaneSchema> | PgliteDatabase<typeof controlPlaneSchema>;
+
 function ensureParentDirectory(filePath: string): void {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
 }
@@ -31,151 +48,130 @@ function asJson(value: unknown): string {
   return JSON.stringify(value);
 }
 
-interface UserRow {
-  id: string;
-  email: string;
-  clerk_user_id: string | null;
-  display_name: string;
-  created_at: number;
-}
-
-interface ClientRow {
-  id: string;
-  slug: string;
-  name: string;
-  preferred_currency: string;
-  allowed_origins_json: string;
-  allowed_paths_json: string;
-  created_at: number;
-}
-
-interface ClientWithRoleRow extends ClientRow {
-  role: MembershipRole;
-}
-
-interface MembershipRow {
-  client_id: string;
-  user_id: string;
-  role: MembershipRole;
-  created_at: number;
-}
-
-interface SessionRow {
-  id: string;
-  user_id: string;
-  clerk_session_id: string | null;
-  csrf_token: string;
-  expires_at: number;
-  created_at: number;
-}
-
-interface SettingsVersionRow {
-  id: string;
-  client_id: string;
-  version: number;
-  settings_json: string;
-  created_by_user_id: string | null;
-  created_at: number;
-}
-
-interface PluginArtifactRow {
-  id: string;
-  client_id: string;
-  kind: PluginKind;
-  version: number;
-  artifact_url: string;
-  integrity: string;
-  status: PluginArtifactStatus;
-  created_by_user_id: string | null;
-  created_at: number;
-}
-
-interface ManifestVersionRow {
-  version: number;
-}
-
-function rowToSettingsVersion(row: SettingsVersionRow | null | undefined): SettingsVersionRecord | null {
+function toUserRecord(row: typeof usersTable.$inferSelect | null | undefined): UserRecord | null {
   if (!row) return null;
 
   return {
     id: row.id,
-    clientId: row.client_id,
-    version: row.version,
-    settings: parseJsonSafe<UiSettings>(row.settings_json, {
-      fontScalePct: 90,
-      fontWeight: 600,
-      fontFamily: "inherit",
-      fontColor: "#355aa8",
-      spacingEm: 0.1,
-    }),
-    createdByUserId: row.created_by_user_id,
-    createdAt: row.created_at,
+    email: row.email,
+    clerkUserId: row.clerkUserId,
+    displayName: row.displayName ?? "",
+    createdAt: row.createdAt,
   };
 }
 
-function rowToPluginArtifact(row: PluginArtifactRow | null | undefined): PluginArtifactRecord | null {
-  if (!row) return null;
-
-  return {
-    id: row.id,
-    clientId: row.client_id,
-    kind: row.kind,
-    version: row.version,
-    artifactUrl: row.artifact_url,
-    integrity: row.integrity,
-    status: row.status,
-    createdByUserId: row.created_by_user_id,
-    createdAt: row.created_at,
-  };
-}
-
-function rowToClient(row: ClientRow | null | undefined): ClientRecord | null {
+function toClientRecord(row: typeof clientsTable.$inferSelect | null | undefined): ClientRecord | null {
   if (!row) return null;
 
   return {
     id: row.id,
     slug: row.slug,
     name: row.name,
-    preferredCurrency: row.preferred_currency,
-    allowedOrigins: parseJsonSafe<string[]>(row.allowed_origins_json, []),
-    allowedPaths: parseJsonSafe<string[]>(row.allowed_paths_json, []),
-    createdAt: row.created_at,
+    preferredCurrency: row.preferredCurrency,
+    allowedOrigins: parseJsonSafe<string[]>(row.allowedOriginsJson, []),
+    allowedPaths: parseJsonSafe<string[]>(row.allowedPathsJson, []),
+    createdAt: row.createdAt,
   };
 }
 
-function rowToUser(row: UserRow | null | undefined): UserRecord | null {
+function toSettingsVersionRecord(
+  row: typeof clientSettingsVersionsTable.$inferSelect | null | undefined,
+): SettingsVersionRecord | null {
   if (!row) return null;
 
   return {
     id: row.id,
-    email: row.email,
-    clerkUserId: row.clerk_user_id,
-    displayName: row.display_name,
-    createdAt: row.created_at,
+    clientId: row.clientId,
+    version: row.version,
+    settings: parseJsonSafe<UiSettings>(row.settingsJson, {
+      fontScalePct: 90,
+      fontWeight: 600,
+      fontFamily: "inherit",
+      fontColor: "#355aa8",
+      spacingEm: 0.1,
+    }),
+    createdByUserId: row.createdByUserId,
+    createdAt: row.createdAt,
   };
 }
 
-export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
-  ensureParentDirectory(dbPath);
-  const database = new DatabaseSync(dbPath);
-  database.exec("PRAGMA journal_mode = WAL;");
-  database.exec("PRAGMA foreign_keys = ON;");
-  applyMigrations(database);
+function toPluginArtifactRecord(
+  row: typeof pluginArtifactsTable.$inferSelect | null | undefined,
+): PluginArtifactRecord | null {
+  if (!row) return null;
 
-  function runTransaction<T>(callback: () => T): T {
-    database.exec("BEGIN");
+  return {
+    id: row.id,
+    clientId: row.clientId,
+    kind: row.kind as PluginKind,
+    version: row.version,
+    artifactUrl: row.artifactUrl,
+    integrity: row.integrity,
+    status: row.status as PluginArtifactStatus,
+    createdByUserId: row.createdByUserId,
+    createdAt: row.createdAt,
+  };
+}
 
-    try {
-      const result = callback();
-      database.exec("COMMIT");
-      return result;
-    } catch (error) {
-      database.exec("ROLLBACK");
-      throw error;
-    }
+function toSessionRecord(row: typeof sessionsTable.$inferSelect | null | undefined): SessionRecord | null {
+  if (!row) return null;
+
+  return {
+    id: row.id,
+    userId: row.userId,
+    clerkSessionId: row.clerkSessionId,
+    csrfToken: row.csrfToken,
+    expiresAt: row.expiresAt,
+    createdAt: row.createdAt,
+  };
+}
+
+function toMembershipRecord(
+  row: typeof clientMembersTable.$inferSelect | null | undefined,
+): ClientMembershipRecord | null {
+  if (!row) return null;
+
+  return {
+    clientId: row.clientId,
+    userId: row.userId,
+    role: row.role as MembershipRole,
+    createdAt: row.createdAt,
+  };
+}
+
+async function queryPgRows<T extends QueryResultRow>(
+  client: Pool | PoolClient,
+  sqlText: string,
+  params: unknown[] = [],
+): Promise<T[]> {
+  const result = await client.query<T>(sqlText, params);
+  return result.rows;
+}
+
+async function queryPgliteRows<T extends Record<string, unknown>>(
+  database: PGlite,
+  sqlText: string,
+  params: unknown[] = [],
+): Promise<T[]> {
+  const result = await database.query<T>(sqlText, params);
+  if (Array.isArray(result)) {
+    return result;
   }
 
-  function createUser({
+  const withRows = result as { rows?: T[] };
+  return withRows.rows ?? [];
+}
+
+function createDatabaseApi({
+  db,
+  close,
+  runInTransaction,
+}: {
+  db: DrizzleDb;
+  close: () => Promise<void>;
+  runInTransaction: <T>(callback: (txDb: DrizzleDb) => Promise<T>) => Promise<T>;
+}): DatabaseApi {
+  async function createUser({
     email,
     clerkUserId,
     displayName,
@@ -183,7 +179,7 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
     email: string;
     clerkUserId: string | null;
     displayName: string;
-  }): UserRecord {
+  }): Promise<UserRecord> {
     const record: UserRecord = {
       id: createId("usr"),
       email,
@@ -192,23 +188,18 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
       createdAt: nowMs(),
     };
 
-    database
-      .prepare(
-        `INSERT INTO users (id, email, clerk_user_id, display_name, created_at)
-         VALUES (?, ?, ?, ?, ?)`,
-      )
-      .run(
-        record.id,
-        record.email,
-        record.clerkUserId,
-        record.displayName,
-        record.createdAt,
-      );
+    await db.insert(usersTable).values({
+      id: record.id,
+      email: record.email,
+      clerkUserId: record.clerkUserId,
+      displayName: record.displayName,
+      createdAt: record.createdAt,
+    });
 
     return record;
   }
 
-  function updateUserIdentity({
+  async function updateUserIdentity({
     userId,
     email,
     displayName,
@@ -218,16 +209,17 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
     email: string;
     displayName: string;
     clerkUserId: string;
-  }): UserRecord {
-    database
-      .prepare(
-        `UPDATE users
-         SET email = ?, display_name = ?, clerk_user_id = ?
-         WHERE id = ?`,
-      )
-      .run(email, displayName, clerkUserId, userId);
+  }): Promise<UserRecord> {
+    await db
+      .update(usersTable)
+      .set({
+        email,
+        displayName,
+        clerkUserId,
+      })
+      .where(eq(usersTable.id, userId));
 
-    const updated = findUserById(userId);
+    const updated = await findUserById(userId);
     if (!updated) {
       throw new Error("Failed to load updated user identity");
     }
@@ -235,40 +227,37 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
     return updated;
   }
 
-  function findUserByEmail(email: string): UserRecord | null {
-    const row = database
-      .prepare(
-        `SELECT id, email, clerk_user_id, display_name, created_at
-         FROM users WHERE lower(email) = lower(?)`,
-      )
-      .get(email) as UserRow | undefined;
+  async function findUserByEmail(email: string): Promise<UserRecord | null> {
+    const rows = await db
+      .select()
+      .from(usersTable)
+      .where(sql`lower(${usersTable.email}) = lower(${email})`)
+      .limit(1);
 
-    return rowToUser(row);
+    return toUserRecord(rows[0]);
   }
 
-  function findUserByClerkUserId(clerkUserId: string): UserRecord | null {
-    const row = database
-      .prepare(
-        `SELECT id, email, clerk_user_id, display_name, created_at
-         FROM users WHERE clerk_user_id = ?`,
-      )
-      .get(clerkUserId) as UserRow | undefined;
+  async function findUserByClerkUserId(clerkUserId: string): Promise<UserRecord | null> {
+    const rows = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.clerkUserId, clerkUserId))
+      .limit(1);
 
-    return rowToUser(row);
+    return toUserRecord(rows[0]);
   }
 
-  function findUserById(userId: string): UserRecord | null {
-    const row = database
-      .prepare(
-        `SELECT id, email, clerk_user_id, display_name, created_at
-         FROM users WHERE id = ?`,
-      )
-      .get(userId) as UserRow | undefined;
+  async function findUserById(userId: string): Promise<UserRecord | null> {
+    const rows = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.id, userId))
+      .limit(1);
 
-    return rowToUser(row);
+    return toUserRecord(rows[0]);
   }
 
-  function createClient({
+  async function createClient({
     slug,
     name,
     preferredCurrency,
@@ -280,7 +269,7 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
     preferredCurrency: string;
     allowedOrigins: string[];
     allowedPaths: string[];
-  }): ClientRecord {
+  }): Promise<ClientRecord> {
     const record: ClientRecord = {
       id: createId("clt"),
       slug,
@@ -291,77 +280,69 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
       createdAt: nowMs(),
     };
 
-    database
-      .prepare(
-        `INSERT INTO clients (
-          id,
-          slug,
-          name,
-          preferred_currency,
-          allowed_origins_json,
-          allowed_paths_json,
-          created_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      )
-      .run(
-        record.id,
-        record.slug,
-        record.name,
-        record.preferredCurrency,
-        asJson(record.allowedOrigins),
-        asJson(record.allowedPaths),
-        record.createdAt,
-      );
+    await db.insert(clientsTable).values({
+      id: record.id,
+      slug: record.slug,
+      name: record.name,
+      preferredCurrency: record.preferredCurrency,
+      allowedOriginsJson: asJson(record.allowedOrigins),
+      allowedPathsJson: asJson(record.allowedPaths),
+      createdAt: record.createdAt,
+    });
 
     return record;
   }
 
-  function findClientById(clientId: string): ClientRecord | null {
-    const row = database
-      .prepare(
-        `SELECT id, slug, name, preferred_currency, allowed_origins_json, allowed_paths_json, created_at
-         FROM clients WHERE id = ?`,
-      )
-      .get(clientId) as ClientRow | undefined;
+  async function findClientById(clientId: string): Promise<ClientRecord | null> {
+    const rows = await db
+      .select()
+      .from(clientsTable)
+      .where(eq(clientsTable.id, clientId))
+      .limit(1);
 
-    return rowToClient(row);
+    return toClientRecord(rows[0]);
   }
 
-  function findClientBySlug(slug: string): ClientRecord | null {
-    const row = database
-      .prepare(
-        `SELECT id, slug, name, preferred_currency, allowed_origins_json, allowed_paths_json, created_at
-         FROM clients WHERE slug = ?`,
-      )
-      .get(slug) as ClientRow | undefined;
+  async function findClientBySlug(slug: string): Promise<ClientRecord | null> {
+    const rows = await db
+      .select()
+      .from(clientsTable)
+      .where(eq(clientsTable.slug, slug))
+      .limit(1);
 
-    return rowToClient(row);
+    return toClientRecord(rows[0]);
   }
 
-  function listClientsForUser(userId: string): ClientWithRole[] {
-    const rows = database
-      .prepare(
-        `SELECT c.id, c.slug, c.name, c.preferred_currency, c.allowed_origins_json, c.allowed_paths_json, c.created_at, m.role
-         FROM clients c
-         INNER JOIN client_members m ON m.client_id = c.id
-         WHERE m.user_id = ?
-         ORDER BY c.created_at ASC`,
-      )
-      .all(userId) as unknown as ClientWithRoleRow[];
+  async function listClientsForUser(userId: string): Promise<ClientWithRole[]> {
+    const rows = await db
+      .select({
+        id: clientsTable.id,
+        slug: clientsTable.slug,
+        name: clientsTable.name,
+        preferredCurrency: clientsTable.preferredCurrency,
+        allowedOriginsJson: clientsTable.allowedOriginsJson,
+        allowedPathsJson: clientsTable.allowedPathsJson,
+        createdAt: clientsTable.createdAt,
+        role: clientMembersTable.role,
+      })
+      .from(clientsTable)
+      .innerJoin(clientMembersTable, eq(clientMembersTable.clientId, clientsTable.id))
+      .where(eq(clientMembersTable.userId, userId))
+      .orderBy(asc(clientsTable.createdAt));
 
     return rows.map((row) => ({
       id: row.id,
       slug: row.slug,
       name: row.name,
-      preferredCurrency: row.preferred_currency,
-      allowedOrigins: parseJsonSafe<string[]>(row.allowed_origins_json, []),
-      allowedPaths: parseJsonSafe<string[]>(row.allowed_paths_json, []),
-      createdAt: row.created_at,
-      role: row.role,
+      preferredCurrency: row.preferredCurrency,
+      allowedOrigins: parseJsonSafe<string[]>(row.allowedOriginsJson, []),
+      allowedPaths: parseJsonSafe<string[]>(row.allowedPathsJson, []),
+      createdAt: row.createdAt,
+      role: row.role as MembershipRole,
     }));
   }
 
-  function addClientMember({
+  async function addClientMember({
     clientId,
     userId,
     role,
@@ -369,40 +350,32 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
     clientId: string;
     userId: string;
     role: MembershipRole;
-  }): void {
-    database
-      .prepare(
-        `INSERT INTO client_members (client_id, user_id, role, created_at)
-         VALUES (?, ?, ?, ?)`,
-      )
-      .run(clientId, userId, role, nowMs());
+  }): Promise<void> {
+    await db.insert(clientMembersTable).values({
+      clientId,
+      userId,
+      role,
+      createdAt: nowMs(),
+    });
   }
 
-  function findClientMembership({
+  async function findClientMembership({
     clientId,
     userId,
   }: {
     clientId: string;
     userId: string;
-  }): ClientMembershipRecord | null {
-    const row = database
-      .prepare(
-        `SELECT client_id, user_id, role, created_at
-         FROM client_members WHERE client_id = ? AND user_id = ?`,
-      )
-      .get(clientId, userId) as MembershipRow | undefined;
+  }): Promise<ClientMembershipRecord | null> {
+    const rows = await db
+      .select()
+      .from(clientMembersTable)
+      .where(and(eq(clientMembersTable.clientId, clientId), eq(clientMembersTable.userId, userId)))
+      .limit(1);
 
-    if (!row) return null;
-
-    return {
-      clientId: row.client_id,
-      userId: row.user_id,
-      role: row.role,
-      createdAt: row.created_at,
-    };
+    return toMembershipRecord(rows[0]);
   }
 
-  function createSession({
+  async function createSession({
     userId,
     clerkSessionId,
     csrfToken,
@@ -412,7 +385,7 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
     clerkSessionId: string | null;
     csrfToken: string;
     expiresAt: number;
-  }): SessionRecord {
+  }): Promise<SessionRecord> {
     const session: SessionRecord = {
       id: createId("ses"),
       userId,
@@ -422,68 +395,48 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
       createdAt: nowMs(),
     };
 
-    database
-      .prepare(
-        `INSERT INTO sessions (id, user_id, clerk_session_id, csrf_token, expires_at, created_at)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-      )
-      .run(
-        session.id,
-        session.userId,
-        session.clerkSessionId,
-        session.csrfToken,
-        session.expiresAt,
-        session.createdAt,
-      );
+    await db.insert(sessionsTable).values({
+      id: session.id,
+      userId: session.userId,
+      clerkSessionId: session.clerkSessionId,
+      csrfToken: session.csrfToken,
+      expiresAt: session.expiresAt,
+      createdAt: session.createdAt,
+    });
 
     return session;
   }
 
-  function findSession(sessionId: string): SessionRecord | null {
-    const row = database
-      .prepare(
-        `SELECT id, user_id, clerk_session_id, csrf_token, expires_at, created_at
-         FROM sessions WHERE id = ?`,
-      )
-      .get(sessionId) as SessionRow | undefined;
+  async function findSession(sessionId: string): Promise<SessionRecord | null> {
+    const rows = await db
+      .select()
+      .from(sessionsTable)
+      .where(eq(sessionsTable.id, sessionId))
+      .limit(1);
 
-    if (!row) return null;
-
-    return {
-      id: row.id,
-      userId: row.user_id,
-      clerkSessionId: row.clerk_session_id,
-      csrfToken: row.csrf_token,
-      expiresAt: row.expires_at,
-      createdAt: row.created_at,
-    };
+    return toSessionRecord(rows[0]);
   }
 
-  function deleteSession(sessionId: string): void {
-    database.prepare("DELETE FROM sessions WHERE id = ?").run(sessionId);
+  async function deleteSession(sessionId: string): Promise<void> {
+    await db.delete(sessionsTable).where(eq(sessionsTable.id, sessionId));
   }
 
-  function deleteExpiredSessions(): void {
-    database
-      .prepare("DELETE FROM sessions WHERE expires_at <= ?")
-      .run(nowMs());
+  async function deleteExpiredSessions(): Promise<void> {
+    await db.delete(sessionsTable).where(lte(sessionsTable.expiresAt, nowMs()));
   }
 
-  function getLatestSettingsVersion(clientId: string): SettingsVersionRecord | null {
-    const row = database
-      .prepare(
-        `SELECT id, client_id, version, settings_json, created_by_user_id, created_at
-         FROM client_settings_versions
-         WHERE client_id = ?
-         ORDER BY version DESC
-         LIMIT 1`,
-      )
-      .get(clientId) as SettingsVersionRow | undefined;
+  async function getLatestSettingsVersion(clientId: string): Promise<SettingsVersionRecord | null> {
+    const rows = await db
+      .select()
+      .from(clientSettingsVersionsTable)
+      .where(eq(clientSettingsVersionsTable.clientId, clientId))
+      .orderBy(desc(clientSettingsVersionsTable.version))
+      .limit(1);
 
-    return rowToSettingsVersion(row);
+    return toSettingsVersionRecord(rows[0]);
   }
 
-  function createSettingsVersion({
+  async function createSettingsVersion({
     clientId,
     settings,
     createdByUserId,
@@ -491,10 +444,10 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
     clientId: string;
     settings: UiSettings;
     createdByUserId: string | null;
-  }): SettingsVersionRecord {
-    const latest = getLatestSettingsVersion(clientId);
-
+  }): Promise<SettingsVersionRecord> {
+    const latest = await getLatestSettingsVersion(clientId);
     const nextVersion = latest ? latest.version + 1 : 1;
+
     const record: SettingsVersionRecord = {
       id: createId("set"),
       clientId,
@@ -504,50 +457,42 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
       createdAt: nowMs(),
     };
 
-    database
-      .prepare(
-        `INSERT INTO client_settings_versions (
-          id,
-          client_id,
-          version,
-          settings_json,
-          created_by_user_id,
-          created_at
-        ) VALUES (?, ?, ?, ?, ?, ?)`,
-      )
-      .run(
-        record.id,
-        record.clientId,
-        record.version,
-        asJson(record.settings),
-        record.createdByUserId,
-        record.createdAt,
-      );
+    await db.insert(clientSettingsVersionsTable).values({
+      id: record.id,
+      clientId: record.clientId,
+      version: record.version,
+      settingsJson: asJson(record.settings),
+      createdByUserId: record.createdByUserId,
+      createdAt: record.createdAt,
+    });
 
     return record;
   }
 
-  function getLatestPluginArtifact({
+  async function getLatestPluginArtifact({
     clientId,
     kind,
   }: {
     clientId: string;
     kind: PluginKind;
-  }): PluginArtifactRecord | null {
-    const row = database
-      .prepare(
-        `SELECT id, client_id, kind, version, artifact_url, integrity, status, created_by_user_id, created_at
-         FROM plugin_artifacts
-         WHERE client_id = ? AND kind = ? AND status = 'approved'
-         ORDER BY version DESC
-         LIMIT 1`,
+  }): Promise<PluginArtifactRecord | null> {
+    const rows = await db
+      .select()
+      .from(pluginArtifactsTable)
+      .where(
+        and(
+          eq(pluginArtifactsTable.clientId, clientId),
+          eq(pluginArtifactsTable.kind, kind),
+          eq(pluginArtifactsTable.status, "approved"),
+        ),
       )
-      .get(clientId, kind) as PluginArtifactRow | undefined;
+      .orderBy(desc(pluginArtifactsTable.version))
+      .limit(1);
 
-    return rowToPluginArtifact(row);
+    return toPluginArtifactRecord(rows[0]);
   }
 
-  function createPluginArtifact({
+  async function createPluginArtifact({
     clientId,
     kind,
     artifactUrl,
@@ -561,8 +506,8 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
     integrity: string;
     createdByUserId: string | null;
     status?: PluginArtifactStatus;
-  }): PluginArtifactRecord {
-    const latest = getLatestPluginArtifact({ clientId, kind });
+  }): Promise<PluginArtifactRecord> {
+    const latest = await getLatestPluginArtifact({ clientId, kind });
     const nextVersion = latest ? latest.version + 1 : 1;
 
     const record: PluginArtifactRecord = {
@@ -577,36 +522,22 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
       createdAt: nowMs(),
     };
 
-    database
-      .prepare(
-        `INSERT INTO plugin_artifacts (
-          id,
-          client_id,
-          kind,
-          version,
-          artifact_url,
-          integrity,
-          status,
-          created_by_user_id,
-          created_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      )
-      .run(
-        record.id,
-        record.clientId,
-        record.kind,
-        record.version,
-        record.artifactUrl,
-        record.integrity,
-        record.status,
-        record.createdByUserId,
-        record.createdAt,
-      );
+    await db.insert(pluginArtifactsTable).values({
+      id: record.id,
+      clientId: record.clientId,
+      kind: record.kind,
+      version: record.version,
+      artifactUrl: record.artifactUrl,
+      integrity: record.integrity,
+      status: record.status,
+      createdByUserId: record.createdByUserId,
+      createdAt: record.createdAt,
+    });
 
     return record;
   }
 
-  function createManifestVersion({
+  async function createManifestVersion({
     clientId,
     manifest,
     signature,
@@ -616,17 +547,15 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
     manifest: RuntimeManifest;
     signature: string;
     keyId: string;
-  }): ManifestVersionRecord {
-    const latest = database
-      .prepare(
-        `SELECT version FROM manifest_versions
-         WHERE client_id = ?
-         ORDER BY version DESC
-         LIMIT 1`,
-      )
-      .get(clientId) as ManifestVersionRow | undefined;
+  }): Promise<ManifestVersionRecord> {
+    const latestRows = await db
+      .select({ version: manifestVersionsTable.version })
+      .from(manifestVersionsTable)
+      .where(eq(manifestVersionsTable.clientId, clientId))
+      .orderBy(desc(manifestVersionsTable.version))
+      .limit(1);
 
-    const nextVersion = latest ? latest.version + 1 : 1;
+    const nextVersion = latestRows[0] ? latestRows[0].version + 1 : 1;
 
     const record: ManifestVersionRecord = {
       id: createId("mfs"),
@@ -638,32 +567,20 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
       createdAt: nowMs(),
     };
 
-    database
-      .prepare(
-        `INSERT INTO manifest_versions (
-          id,
-          client_id,
-          version,
-          manifest_json,
-          signature,
-          key_id,
-          created_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      )
-      .run(
-        record.id,
-        record.clientId,
-        record.version,
-        asJson(record.manifest),
-        record.signature,
-        record.keyId,
-        record.createdAt,
-      );
+    await db.insert(manifestVersionsTable).values({
+      id: record.id,
+      clientId: record.clientId,
+      version: record.version,
+      manifestJson: asJson(record.manifest),
+      signature: record.signature,
+      keyId: record.keyId,
+      createdAt: record.createdAt,
+    });
 
     return record;
   }
 
-  function createAuditEvent({
+  async function createAuditEvent({
     clientId = null,
     userId = null,
     eventType,
@@ -673,7 +590,7 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
     userId?: string | null;
     eventType: string;
     payload?: Record<string, unknown> | null;
-  }): AuditEventRecord {
+  }): Promise<AuditEventRecord> {
     const record: AuditEventRecord = {
       id: createId("aud"),
       clientId,
@@ -683,34 +600,23 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
       createdAt: nowMs(),
     };
 
-    database
-      .prepare(
-        `INSERT INTO audit_events (
-          id,
-          client_id,
-          user_id,
-          event_type,
-          payload_json,
-          created_at
-        ) VALUES (?, ?, ?, ?, ?, ?)`,
-      )
-      .run(
-        record.id,
-        record.clientId,
-        record.userId,
-        record.eventType,
-        record.payload ? asJson(record.payload) : null,
-        record.createdAt,
-      );
+    await db.insert(auditEventsTable).values({
+      id: record.id,
+      clientId: record.clientId,
+      userId: record.userId,
+      eventType: record.eventType,
+      payloadJson: record.payload ? asJson(record.payload) : null,
+      createdAt: record.createdAt,
+    });
 
     return record;
   }
 
-  function seedDemoData(): ClientRecord {
-    const existingClient = findClientBySlug("acme");
+  async function seedDemoData(): Promise<ClientRecord> {
+    const existingClient = await findClientBySlug("acme");
     if (existingClient) return existingClient;
 
-    const client = createClient({
+    const client = await createClient({
       slug: "acme",
       name: "ACME Inc",
       preferredCurrency: "USD",
@@ -718,7 +624,7 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
       allowedPaths: ["^/b2b-demo(?:/|$)", "^/pricing(?:/|$)", "^/store(?:/|$)"],
     });
 
-    createSettingsVersion({
+    await createSettingsVersion({
       clientId: client.id,
       settings: {
         fontScalePct: 90,
@@ -730,7 +636,7 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
       createdByUserId: null,
     });
 
-    createPluginArtifact({
+    await createPluginArtifact({
       clientId: client.id,
       kind: "pre",
       artifactUrl: "/b2b/clients/acme/pre.v1.js",
@@ -739,7 +645,7 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
       status: "approved",
     });
 
-    createPluginArtifact({
+    await createPluginArtifact({
       clientId: client.id,
       kind: "post",
       artifactUrl: "/b2b/clients/acme/post.v1.js",
@@ -751,8 +657,20 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
     return client;
   }
 
+  async function runTransaction<T>(callback: (tx: DatabaseApi) => Promise<T>): Promise<T> {
+    return runInTransaction(async (txDb) => {
+      const txApi = createDatabaseApi({
+        db: txDb,
+        close: async () => {},
+        runInTransaction: async <U>(nestedCallback: (nestedTxDb: DrizzleDb) => Promise<U>) =>
+          nestedCallback(txDb),
+      });
+      return callback(txApi);
+    });
+  }
+
   return {
-    database,
+    close,
     createUser,
     updateUserIdentity,
     findUserByEmail,
@@ -777,4 +695,138 @@ export function createDatabase({ dbPath }: { dbPath: string }): DatabaseApi {
     seedDemoData,
     runTransaction,
   };
+}
+
+export async function createDatabase({
+  databaseUrl,
+}: {
+  databaseUrl: string;
+}): Promise<DatabaseApi> {
+  if (databaseUrl.startsWith("pglite://")) {
+    const pgliteTarget = databaseUrl.slice("pglite://".length);
+    const pglite =
+      !pgliteTarget.length || pgliteTarget === ":memory:"
+        ? new PGlite()
+        : (() => {
+          ensureParentDirectory(pgliteTarget);
+          return new PGlite(pgliteTarget);
+        })();
+
+    const migrationExecutor: MigrationExecutor = {
+      query: async (sqlText: string, params: unknown[] = []) =>
+        queryPgliteRows<Record<string, unknown>>(pglite, sqlText, params),
+      execute: async (sqlText: string) => {
+        await pglite.exec(sqlText);
+      },
+      withTransaction: async <T>(callback: (tx: MigrationExecutor) => Promise<T>) => {
+        await pglite.exec("BEGIN");
+        try {
+          const txExecutor: MigrationExecutor = {
+            query: async (
+              sqlText: string,
+              params: unknown[] = [],
+            ) => queryPgliteRows<Record<string, unknown>>(pglite, sqlText, params),
+            execute: async (sqlText: string) => {
+              await pglite.exec(sqlText);
+            },
+            withTransaction: async <U>(txCallback: (tx: MigrationExecutor) => Promise<U>) =>
+              txCallback(txExecutor),
+          };
+          const result = await callback(txExecutor);
+          await pglite.exec("COMMIT");
+          return result;
+        } catch (error) {
+          await pglite.exec("ROLLBACK");
+          throw error;
+        }
+      },
+    };
+
+    await applyMigrations(migrationExecutor);
+
+    const db = drizzlePglite(pglite, { schema: controlPlaneSchema });
+
+    return createDatabaseApi({
+      db,
+      close: async () => {
+        if (typeof pglite.close === "function") {
+          await pglite.close();
+        }
+      },
+      runInTransaction: async <T>(callback: (txDb: DrizzleDb) => Promise<T>) => {
+        await pglite.exec("BEGIN");
+        try {
+          const txDb = drizzlePglite(pglite, { schema: controlPlaneSchema });
+          const result = await callback(txDb);
+          await pglite.exec("COMMIT");
+          return result;
+        } catch (error) {
+          await pglite.exec("ROLLBACK");
+          throw error;
+        }
+      },
+    });
+  }
+
+  const pool = new Pool({
+    connectionString: databaseUrl,
+  });
+
+  const migrationExecutor: MigrationExecutor = {
+    query: async (sqlText: string, params: unknown[] = []) =>
+      queryPgRows<Record<string, unknown> & QueryResultRow>(pool, sqlText, params),
+    execute: async (sqlText: string) => {
+      await pool.query(sqlText);
+    },
+    withTransaction: async <T>(callback: (tx: MigrationExecutor) => Promise<T>) => {
+      const client = await pool.connect();
+      try {
+        await client.query("BEGIN");
+        const txExecutor: MigrationExecutor = {
+          query: async (sqlText: string, params: unknown[] = []) =>
+            queryPgRows<Record<string, unknown> & QueryResultRow>(client, sqlText, params),
+          execute: async (sqlText: string) => {
+            await client.query(sqlText);
+          },
+          withTransaction: async <U>(txCallback: (tx: MigrationExecutor) => Promise<U>) =>
+            txCallback(txExecutor),
+        };
+
+        const result = await callback(txExecutor);
+        await client.query("COMMIT");
+        return result;
+      } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+      } finally {
+        client.release();
+      }
+    },
+  };
+
+  await applyMigrations(migrationExecutor);
+
+  const db = drizzleNodePg(pool, { schema: controlPlaneSchema });
+
+  return createDatabaseApi({
+    db,
+    close: async () => {
+      await pool.end();
+    },
+    runInTransaction: async <T>(callback: (txDb: DrizzleDb) => Promise<T>) => {
+      const client = await pool.connect();
+      try {
+        await client.query("BEGIN");
+        const txDb = drizzleNodePg(client, { schema: controlPlaneSchema });
+        const result = await callback(txDb);
+        await client.query("COMMIT");
+        return result;
+      } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+      } finally {
+        client.release();
+      }
+    },
+  });
 }

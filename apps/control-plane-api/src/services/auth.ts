@@ -32,8 +32,12 @@ function roleCanWrite(role: MembershipRole): boolean {
   return role === "owner" || role === "editor";
 }
 
-function createDefaultPluginArtifacts(database: DatabaseApi, clientId: string, userId: string | null = null): void {
-  database.createPluginArtifact({
+async function createDefaultPluginArtifacts(
+  database: DatabaseApi,
+  clientId: string,
+  userId: string | null = null,
+): Promise<void> {
+  await database.createPluginArtifact({
     clientId,
     kind: "pre",
     artifactUrl: "/b2b/clients/acme/pre.v1.js",
@@ -42,7 +46,7 @@ function createDefaultPluginArtifacts(database: DatabaseApi, clientId: string, u
     status: "approved",
   });
 
-  database.createPluginArtifact({
+  await database.createPluginArtifact({
     clientId,
     kind: "post",
     artifactUrl: "/b2b/clients/acme/post.v1.js",
@@ -52,22 +56,22 @@ function createDefaultPluginArtifacts(database: DatabaseApi, clientId: string, u
   });
 }
 
-function createWorkspaceClientForUser(
+async function createWorkspaceClientForUser(
   database: DatabaseApi,
   userId: string,
   normalizedEmail: string,
   displayName: string,
-): ClientRecord {
+): Promise<ClientRecord> {
   const candidateSlugBase = slugify(normalizedEmail.split("@")[0] || "client");
   let candidateSlug = candidateSlugBase || `client-${createId("slug").slice(-6)}`;
   let suffix = 1;
 
-  while (database.findClientBySlug(candidateSlug)) {
+  while (await database.findClientBySlug(candidateSlug)) {
     candidateSlug = `${candidateSlugBase}-${suffix}`;
     suffix += 1;
   }
 
-  const client = database.createClient({
+  const client = await database.createClient({
     slug: candidateSlug,
     name: `${displayName || normalizedEmail} Workspace`,
     preferredCurrency: "USD",
@@ -75,13 +79,13 @@ function createWorkspaceClientForUser(
     allowedPaths: ["^/pricing(?:/|$)", "^/store(?:/|$)", "^/b2b-demo(?:/|$)"],
   });
 
-  database.addClientMember({
+  await database.addClientMember({
     clientId: client.id,
     userId,
     role: "owner",
   });
 
-  database.createSettingsVersion({
+  await database.createSettingsVersion({
     clientId: client.id,
     settings: {
       fontScalePct: 90,
@@ -93,18 +97,18 @@ function createWorkspaceClientForUser(
     createdByUserId: userId,
   });
 
-  createDefaultPluginArtifacts(database, client.id, userId);
+  await createDefaultPluginArtifacts(database, client.id, userId);
 
   return client;
 }
 
-function resolveUserFromClerkIdentity(
+async function resolveUserFromClerkIdentity(
   database: DatabaseApi,
   identity: ClerkVerifiedIdentity,
-): { user: UserRecord; created: boolean } {
+): Promise<{ user: UserRecord; created: boolean }> {
   const normalizedEmail = normalizeEmail(identity.email);
 
-  const byClerkId = database.findUserByClerkUserId(identity.clerkUserId);
+  const byClerkId = await database.findUserByClerkUserId(identity.clerkUserId);
   if (byClerkId) {
     const needsUpdate =
       byClerkId.email !== normalizedEmail ||
@@ -116,7 +120,7 @@ function resolveUserFromClerkIdentity(
     }
 
     return {
-      user: database.updateUserIdentity({
+      user: await database.updateUserIdentity({
         userId: byClerkId.id,
         email: normalizedEmail,
         displayName: identity.displayName,
@@ -126,10 +130,10 @@ function resolveUserFromClerkIdentity(
     };
   }
 
-  const byEmail = database.findUserByEmail(normalizedEmail);
+  const byEmail = await database.findUserByEmail(normalizedEmail);
   if (byEmail) {
     return {
-      user: database.updateUserIdentity({
+      user: await database.updateUserIdentity({
         userId: byEmail.id,
         email: normalizedEmail,
         displayName: identity.displayName,
@@ -139,13 +143,13 @@ function resolveUserFromClerkIdentity(
     };
   }
 
-  const user = database.createUser({
+  const user = await database.createUser({
     email: normalizedEmail,
     clerkUserId: identity.clerkUserId,
     displayName: identity.displayName,
   });
 
-  createWorkspaceClientForUser(database, user.id, normalizedEmail, identity.displayName);
+  await createWorkspaceClientForUser(database, user.id, normalizedEmail, identity.displayName);
 
   return {
     user,
@@ -162,13 +166,21 @@ export function createAuthService({
   env: EnvConfig;
   clerkAuthService: ClerkAuthService;
 }): AuthService {
-  function createSessionForUser(userId: string, clerkSessionId: string | null) {
-    return database.createSession({
+  async function createSessionForDatabase(
+    targetDatabase: DatabaseApi,
+    userId: string,
+    clerkSessionId: string | null,
+  ) {
+    return targetDatabase.createSession({
       userId,
       clerkSessionId,
       csrfToken: makeCsrfToken(),
       expiresAt: hoursFromNow(env.sessionTtlHours),
     });
+  }
+
+  async function createSessionForUser(userId: string, clerkSessionId: string | null) {
+    return createSessionForDatabase(database, userId, clerkSessionId);
   }
 
   async function loginWithClerkSession({
@@ -183,14 +195,15 @@ export function createAuthService({
       clerkUserId,
     });
 
-    return database.runTransaction(() => {
-      const resolvedUser = resolveUserFromClerkIdentity(database, verifiedIdentity);
-      const session = createSessionForUser(
+    return database.runTransaction(async (tx) => {
+      const resolvedUser = await resolveUserFromClerkIdentity(tx, verifiedIdentity);
+      const session = await createSessionForDatabase(
+        tx,
         resolvedUser.user.id,
         verifiedIdentity.clerkSessionId,
       );
 
-      database.createAuditEvent({
+      await tx.createAuditEvent({
         userId: resolvedUser.user.id,
         eventType: "auth.login",
         payload: {
@@ -208,22 +221,22 @@ export function createAuthService({
     });
   }
 
-  function validateSession(sessionId: string | null) {
+  async function validateSession(sessionId: string | null) {
     if (!sessionId) return null;
 
-    database.deleteExpiredSessions();
+    await database.deleteExpiredSessions();
 
-    const session = database.findSession(sessionId);
+    const session = await database.findSession(sessionId);
     if (!session) return null;
 
     if (session.expiresAt <= nowMs()) {
-      database.deleteSession(session.id);
+      await database.deleteSession(session.id);
       return null;
     }
 
-    const user = database.findUserById(session.userId);
+    const user = await database.findUserById(session.userId);
     if (!user) {
-      database.deleteSession(session.id);
+      await database.deleteSession(session.id);
       return null;
     }
 
@@ -233,21 +246,21 @@ export function createAuthService({
     };
   }
 
-  function logoutSession(sessionId: string): void {
-    database.deleteSession(sessionId);
+  async function logoutSession(sessionId: string): Promise<void> {
+    await database.deleteSession(sessionId);
   }
 
-  function getUserClients(userId: string) {
+  async function getUserClients(userId: string) {
     return database.listClientsForUser(userId);
   }
 
-  function getClientAccess({ userId, clientId }: { userId: string; clientId: string }) {
-    const membership = database.findClientMembership({ userId, clientId });
+  async function getClientAccess({ userId, clientId }: { userId: string; clientId: string }) {
+    const membership = await database.findClientMembership({ userId, clientId });
     if (!membership) {
       return null;
     }
 
-    const client = database.findClientById(clientId);
+    const client = await database.findClientById(clientId);
     if (!client) {
       return null;
     }

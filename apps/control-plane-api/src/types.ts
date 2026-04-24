@@ -1,5 +1,4 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import type { DatabaseSync } from "node:sqlite";
 
 export type NodeEnv = "development" | "test" | "production";
 export type MembershipRole = "owner" | "editor" | "viewer";
@@ -10,7 +9,7 @@ export interface EnvConfig {
   nodeEnv: NodeEnv;
   port: number;
   host: string;
-  dbPath: string;
+  databaseUrl: string;
   sessionTtlHours: number;
   manifestPrivateKeyPath: string;
   dashboardUrl: string;
@@ -205,59 +204,59 @@ export interface ClerkAuthService {
 }
 
 export interface DatabaseApi {
-  database: DatabaseSync;
+  close(): Promise<void>;
   createUser(input: {
     email: string;
     clerkUserId: string | null;
     displayName: string;
-  }): UserRecord;
+  }): Promise<UserRecord>;
   updateUserIdentity(input: {
     userId: string;
     email: string;
     displayName: string;
     clerkUserId: string;
-  }): UserRecord;
-  findUserByEmail(email: string): UserRecord | null;
-  findUserByClerkUserId(clerkUserId: string): UserRecord | null;
-  findUserById(userId: string): UserRecord | null;
+  }): Promise<UserRecord>;
+  findUserByEmail(email: string): Promise<UserRecord | null>;
+  findUserByClerkUserId(clerkUserId: string): Promise<UserRecord | null>;
+  findUserById(userId: string): Promise<UserRecord | null>;
   createClient(input: {
     slug: string;
     name: string;
     preferredCurrency: string;
     allowedOrigins: string[];
     allowedPaths: string[];
-  }): ClientRecord;
-  findClientById(clientId: string): ClientRecord | null;
-  findClientBySlug(slug: string): ClientRecord | null;
-  listClientsForUser(userId: string): ClientWithRole[];
+  }): Promise<ClientRecord>;
+  findClientById(clientId: string): Promise<ClientRecord | null>;
+  findClientBySlug(slug: string): Promise<ClientRecord | null>;
+  listClientsForUser(userId: string): Promise<ClientWithRole[]>;
   addClientMember(input: {
     clientId: string;
     userId: string;
     role: MembershipRole;
-  }): void;
+  }): Promise<void>;
   findClientMembership(input: {
     clientId: string;
     userId: string;
-  }): ClientMembershipRecord | null;
+  }): Promise<ClientMembershipRecord | null>;
   createSession(input: {
     userId: string;
     clerkSessionId: string | null;
     csrfToken: string;
     expiresAt: number;
-  }): SessionRecord;
-  findSession(sessionId: string): SessionRecord | null;
-  deleteSession(sessionId: string): void;
-  deleteExpiredSessions(): void;
-  getLatestSettingsVersion(clientId: string): SettingsVersionRecord | null;
+  }): Promise<SessionRecord>;
+  findSession(sessionId: string): Promise<SessionRecord | null>;
+  deleteSession(sessionId: string): Promise<void>;
+  deleteExpiredSessions(): Promise<void>;
+  getLatestSettingsVersion(clientId: string): Promise<SettingsVersionRecord | null>;
   createSettingsVersion(input: {
     clientId: string;
     settings: UiSettings;
     createdByUserId: string | null;
-  }): SettingsVersionRecord;
+  }): Promise<SettingsVersionRecord>;
   getLatestPluginArtifact(input: {
     clientId: string;
     kind: PluginKind;
-  }): PluginArtifactRecord | null;
+  }): Promise<PluginArtifactRecord | null>;
   createPluginArtifact(input: {
     clientId: string;
     kind: PluginKind;
@@ -265,21 +264,21 @@ export interface DatabaseApi {
     integrity: string;
     createdByUserId: string | null;
     status?: PluginArtifactStatus;
-  }): PluginArtifactRecord;
+  }): Promise<PluginArtifactRecord>;
   createManifestVersion(input: {
     clientId: string;
     manifest: RuntimeManifest;
     signature: string;
     keyId: string;
-  }): ManifestVersionRecord;
+  }): Promise<ManifestVersionRecord>;
   createAuditEvent(input: {
     clientId?: string | null;
     userId?: string | null;
     eventType: string;
     payload?: Record<string, unknown> | null;
-  }): AuditEventRecord;
-  seedDemoData(): ClientRecord;
-  runTransaction<T>(callback: () => T): T;
+  }): Promise<AuditEventRecord>;
+  seedDemoData(): Promise<ClientRecord>;
+  runTransaction<T>(callback: (tx: DatabaseApi) => Promise<T>): Promise<T>;
 }
 
 export interface AuthService {
@@ -291,31 +290,31 @@ export interface AuthService {
     session: SessionRecord;
     created: boolean;
   }>;
-  createSessionForUser(userId: string, clerkSessionId: string | null): SessionRecord;
-  validateSession(sessionId: string | null): SessionValidationResult | null;
-  logoutSession(sessionId: string): void;
-  getUserClients(userId: string): ClientWithRole[];
+  createSessionForUser(userId: string, clerkSessionId: string | null): Promise<SessionRecord>;
+  validateSession(sessionId: string | null): Promise<SessionValidationResult | null>;
+  logoutSession(sessionId: string): Promise<void>;
+  getUserClients(userId: string): Promise<ClientWithRole[]>;
   getClientAccess(input: {
     userId: string;
     clientId: string;
-  }): ClientAccessRecord | null;
+  }): Promise<ClientAccessRecord | null>;
 }
 
 export interface RuntimeService {
-  getSignedManifestForClient(clientId: string): SignedManifestResult | null;
-  getRuntimeSettings(clientId: string): RuntimeSettingsResult | null;
+  getSignedManifestForClient(clientId: string): Promise<SignedManifestResult | null>;
+  getRuntimeSettings(clientId: string): Promise<RuntimeSettingsResult | null>;
   updateClientSettings(input: {
     clientId: string;
     settings: UiSettingsInput;
     userId: string;
-  }): RuntimeSettingsResult;
+  }): Promise<RuntimeSettingsResult>;
   publishPluginArtifact(input: {
     clientId: string;
     kind: PluginKind;
     artifactUrl: string;
     integrity: string;
     userId: string;
-  }): PluginArtifactRecord;
+  }): Promise<PluginArtifactRecord>;
   getInstallSnippet(input: {
     clientId: string;
   }): string;

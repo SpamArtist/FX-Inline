@@ -1,4 +1,3 @@
-import path from "node:path";
 import type { EnvConfig, NodeEnv } from "../types.js";
 
 function asString(value: unknown, fallback = ""): string {
@@ -67,10 +66,17 @@ export function loadEnv(overrides: Record<string, string | undefined> = {}): Env
     throw new Error("CONTROL_PLANE_HOST is required");
   }
 
-  const dbPath = asString(
-    source.CONTROL_PLANE_DB_PATH,
-    path.resolve(process.cwd(), "apps/control-plane-api/.data/control-plane.db"),
+  const databaseUrl = asString(
+    source.CONTROL_PLANE_DATABASE_URL,
+    "postgres://postgres:postgres@127.0.0.1:5432/fx_inline_control_plane",
   );
+  if (
+    !databaseUrl.startsWith("postgres://") &&
+    !databaseUrl.startsWith("postgresql://") &&
+    !databaseUrl.startsWith("pglite://")
+  ) {
+    throw new Error("CONTROL_PLANE_DATABASE_URL must start with postgres://, postgresql://, or pglite://");
+  }
 
   const sessionTtlHours = asInteger(source.CONTROL_PLANE_SESSION_TTL_HOURS, 24);
   if (!Number.isFinite(sessionTtlHours) || sessionTtlHours < 1 || sessionTtlHours > 168) {
@@ -128,7 +134,7 @@ export function loadEnv(overrides: Record<string, string | undefined> = {}): Env
     nodeEnv,
     port,
     host,
-    dbPath,
+    databaseUrl,
     sessionTtlHours,
     manifestPrivateKeyPath: asString(source.CONTROL_PLANE_MANIFEST_PRIVATE_KEY_PATH, ""),
     dashboardUrl,

@@ -4,25 +4,39 @@ import path from "node:path";
 import { Readable } from "node:stream";
 import { createServerInstance } from "../dist/server.js";
 
-function createTestDatabasePath() {
+const activeInstances = [];
+
+function createTestDatabaseUrl() {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), "cp-api-test-"));
-  return path.join(directory, "control-plane-test.db");
+  return `pglite://${path.join(directory, "control-plane-test.pgdata")}`;
 }
 
-function createTestInstance() {
-  const dbPath = createTestDatabasePath();
+async function createTestInstance() {
+  const databaseUrl = createTestDatabaseUrl();
 
-  return createServerInstance({
+  const instance = await createServerInstance({
     NODE_ENV: "test",
     CONTROL_PLANE_HOST: "127.0.0.1",
     CONTROL_PLANE_PORT: "8787",
-    CONTROL_PLANE_DB_PATH: dbPath,
+    CONTROL_PLANE_DATABASE_URL: databaseUrl,
     CONTROL_PLANE_DASHBOARD_URL: "http://127.0.0.1:5174",
     CONTROL_PLANE_PUBLIC_ORIGIN: "http://127.0.0.1:8787",
     CONTROL_PLANE_ENABLE_MOCK_CLERK: "true",
     CONTROL_PLANE_MANIFEST_PRIVATE_KEY_PATH: "",
   });
+
+  activeInstances.push(instance);
+  return instance;
 }
+
+afterEach(async () => {
+  while (activeInstances.length) {
+    const instance = activeInstances.pop();
+    if (instance?.database?.close) {
+      await instance.database.close();
+    }
+  }
+});
 
 function makeMockClerkToken(payload) {
   const encoded = Buffer.from(JSON.stringify(payload), "utf8").toString("base64url");
@@ -78,7 +92,7 @@ function parseSetCookie(headers) {
 }
 
 test("health and readiness endpoints return success", async () => {
-  const instance = createTestInstance();
+  const instance = await createTestInstance();
 
   const health = await invoke(instance.app, {
     url: "/health",
@@ -96,7 +110,7 @@ test("health and readiness endpoints return success", async () => {
 });
 
 test("mock Clerk login, csrf, settings update, and runtime manifest flow", async () => {
-  const instance = createTestInstance();
+  const instance = await createTestInstance();
 
   const login = await invoke(instance.app, {
     method: "POST",
@@ -186,7 +200,7 @@ test("mock Clerk login, csrf, settings update, and runtime manifest flow", async
 });
 
 test("mock Clerk login creates session when enabled", async () => {
-  const instance = createTestInstance();
+  const instance = await createTestInstance();
 
   const response = await invoke(instance.app, {
     url: "/api/v1/auth/clerk/config",
@@ -197,7 +211,7 @@ test("mock Clerk login creates session when enabled", async () => {
 });
 
 test("login returns 400 when Clerk token is missing", async () => {
-  const instance = createTestInstance();
+  const instance = await createTestInstance();
 
   const response = await invoke(instance.app, {
     method: "POST",
