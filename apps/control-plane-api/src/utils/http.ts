@@ -1,13 +1,6 @@
 import type { ServerResponse } from "node:http";
 import type { ApiError } from "../types.js";
-
-interface CookieOptions {
-  path?: string;
-  httpOnly?: boolean;
-  sameSite?: "Lax" | "Strict" | "None";
-  secure?: boolean;
-  maxAgeSeconds?: number;
-}
+import type { CookieOptions } from "./http.types.js";
 
 export function parseCookies(cookieHeader: string): Record<string, string> {
   if (!cookieHeader.length) {

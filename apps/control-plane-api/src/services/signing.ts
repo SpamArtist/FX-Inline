@@ -3,14 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { canonicalizeJson } from "../utils/json.js";
 import type { RuntimeManifest, SigningService } from "../types.js";
-
-interface ActiveKey {
-  privateKeyPem: string;
-  publicKeyPem: string;
-  keyId: string;
-  privateKeyPath: string;
-  publicKeyPath: string | null;
-}
+import type { ActiveKey, CreateSigningServiceInput } from "./signing.types.js";
 
 function readPrivateKeyFromPath(privateKeyPath: string): string | null {
   if (!privateKeyPath) {
@@ -86,10 +79,7 @@ function derivePublicKeyPem(privateKeyPem: string): string {
 export function createSigningService({
   privateKeyPath,
   fallbackDirectory,
-}: {
-  privateKeyPath: string;
-  fallbackDirectory: string;
-}): SigningService {
+}: CreateSigningServiceInput): SigningService {
   const configuredPrivateKey = readPrivateKeyFromPath(privateKeyPath);
 
   const activeKey: ActiveKey = configuredPrivateKey

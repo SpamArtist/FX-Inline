@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import type { MigrationExecutor } from "./migrate.types.js";
 
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 const distMigrationsDirectory = path.join(currentDirectory, "migrations");
@@ -12,15 +13,6 @@ function resolveMigrationsDirectory(): string {
   }
 
   return sourceMigrationsDirectory;
-}
-
-export interface MigrationExecutor {
-  query(
-    sqlText: string,
-    params?: unknown[],
-  ): Promise<Record<string, unknown>[]>;
-  execute(sqlText: string): Promise<void>;
-  withTransaction<T>(callback: (tx: MigrationExecutor) => Promise<T>): Promise<T>;
 }
 
 export async function applyMigrations(executor: MigrationExecutor): Promise<void> {

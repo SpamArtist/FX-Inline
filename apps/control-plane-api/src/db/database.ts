@@ -2,10 +2,12 @@ import fs from "node:fs";
 import path from "node:path";
 import { PGlite } from "@electric-sql/pglite";
 import { and, asc, desc, eq, lte, sql } from "drizzle-orm";
-import { drizzle as drizzleNodePg, type NodePgDatabase } from "drizzle-orm/node-postgres";
-import { drizzle as drizzlePglite, type PgliteDatabase } from "drizzle-orm/pglite";
+import { drizzle as drizzleNodePg } from "drizzle-orm/node-postgres";
+import { drizzle as drizzlePglite } from "drizzle-orm/pglite";
 import { type PoolClient, type QueryResultRow, Pool } from "pg";
-import { applyMigrations, type MigrationExecutor } from "./migrate.js";
+import { applyMigrations } from "./migrate.js";
+import type { DrizzleDb } from "./database.types.js";
+import type { MigrationExecutor } from "./migrate.types.js";
 import {
   auditEventsTable,
   clientMembersTable,
@@ -37,8 +39,6 @@ import type {
   UiSettings,
   UserRecord,
 } from "../types.js";
-
-type DrizzleDb = NodePgDatabase<typeof controlPlaneSchema> | PgliteDatabase<typeof controlPlaneSchema>;
 
 function ensureParentDirectory(filePath: string): void {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });

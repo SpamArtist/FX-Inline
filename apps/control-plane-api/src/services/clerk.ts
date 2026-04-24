@@ -4,52 +4,14 @@ import type {
   ClerkVerifiedIdentity,
   EnvConfig,
 } from "../types.js";
-
-interface JwtHeader {
-  alg?: string;
-  kid?: string;
-  typ?: string;
-}
-
-interface JwtPayload {
-  sub?: string;
-  sid?: string;
-  azp?: string;
-  exp?: number;
-  nbf?: number;
-  iat?: number;
-  iss?: string;
-  [key: string]: unknown;
-}
-
-interface ClerkJwk extends crypto.JsonWebKey {
-  kid?: string;
-}
-
-interface ClerkJwksResponse {
-  keys: ClerkJwk[];
-}
-
-interface ClerkUserEmail {
-  id: string;
-  email_address: string;
-}
-
-interface ClerkUserResponse {
-  id: string;
-  username: string | null;
-  first_name: string | null;
-  last_name: string | null;
-  primary_email_address_id: string | null;
-  email_addresses: ClerkUserEmail[];
-}
-
-interface MockClerkPayload {
-  clerkUserId?: string;
-  clerkSessionId?: string;
-  email?: string;
-  displayName?: string;
-}
+import type {
+  ClerkJwksResponse,
+  ClerkUserResponse,
+  JwtHeader,
+  JwtPayload,
+  MockClerkPayload,
+  ParsedJwt,
+} from "./clerk.types.js";
 
 function base64UrlToBuffer(input: string): Buffer {
   const normalized = input.replace(/-/gu, "+").replace(/_/gu, "/");
@@ -61,7 +23,7 @@ function base64UrlToJson<T>(input: string): T {
   return JSON.parse(base64UrlToBuffer(input).toString("utf8")) as T;
 }
 
-function parseJwt(token: string): { header: JwtHeader; payload: JwtPayload; signingInput: string; signature: Buffer } {
+function parseJwt(token: string): ParsedJwt {
   const parts = token.split(".");
   if (parts.length !== 3) {
     throw new Error("Clerk session token must be a JWT");
