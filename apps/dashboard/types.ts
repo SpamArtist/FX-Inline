@@ -66,3 +66,8 @@ export interface PublishPluginResponse {
 }
 
 export type DashboardRoute = "/login" | "/settings" | "/install" | "/plugins";
+
+export interface ClerkConfigResponse {
+  publishableKey: string;
+  authorizedParties: string[];
+}

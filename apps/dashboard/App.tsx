@@ -9,6 +9,7 @@ import {
 import type {
   ApiErrorPayload,
   AuthMeResponse,
+  ClerkConfigResponse,
   CsrfTokenResponse,
   DashboardRoute,
   DashboardState,
@@ -72,7 +73,11 @@ function getHashRoute(): DashboardRoute {
   const rawHash = window.location.hash.replace(/^#/u, "") || "/login";
   const normalized = rawHash.startsWith("/") ? rawHash : `/${rawHash}`;
 
-  if (normalized === "/install" || normalized === "/plugins" || normalized === "/settings") {
+  if (
+    normalized === "/install" ||
+    normalized === "/plugins" ||
+    normalized === "/settings"
+  ) {
     return normalized;
   }
 
@@ -121,6 +126,15 @@ async function requestJson<T>({
   return payload as T;
 }
 
+function loadingPanel(label: string): ReactElement {
+  return (
+    <section className="surface-panel loading-panel">
+      <div className="loading-shimmer" />
+      <p>{label}</p>
+    </section>
+  );
+}
+
 export function App(): ReactElement {
   const [dashboardState, setDashboardState] = useState<DashboardState>({
     apiOrigin: localStorage.getItem(STORAGE_KEYS.apiOrigin) || DEFAULT_API_ORIGIN,
@@ -141,6 +155,9 @@ export function App(): ReactElement {
   const [installSnippet, setInstallSnippet] = useState("");
   const [isInitializing, setIsInitializing] = useState(true);
   const [isRouteLoading, setIsRouteLoading] = useState(false);
+  const [isSavingApiOrigin, setIsSavingApiOrigin] = useState(false);
+  const [isSubmittingLogin, setIsSubmittingLogin] = useState(false);
+  const [clerkConfig, setClerkConfig] = useState<ClerkConfigResponse | null>(null);
 
   const setNotice = useCallback((message = "") => {
     setDashboardState((previousState) => ({
@@ -186,6 +203,24 @@ export function App(): ReactElement {
         options,
       }),
     [dashboardState.apiOrigin, dashboardState.csrfToken],
+  );
+
+  const loadClerkConfig = useCallback(
+    async (apiOriginOverride?: string): Promise<void> => {
+      const currentApiOrigin = apiOriginOverride ?? dashboardState.apiOrigin;
+
+      try {
+        const payload = await apiRequest<ClerkConfigResponse>(
+          "/api/v1/auth/clerk/config",
+          {},
+          { apiOrigin: currentApiOrigin, csrfToken: null },
+        );
+        setClerkConfig(payload);
+      } catch {
+        setClerkConfig(null);
+      }
+    },
+    [apiRequest, dashboardState.apiOrigin],
   );
 
   const loadSession = useCallback(
@@ -261,6 +296,7 @@ export function App(): ReactElement {
     let cancelled = false;
 
     (async () => {
+      await loadClerkConfig();
       const hasSession = await loadSession();
       if (cancelled) return;
 
@@ -293,7 +329,7 @@ export function App(): ReactElement {
     return () => {
       cancelled = true;
     };
-  }, [ensureCsrfToken, loadSession, setError]);
+  }, [ensureCsrfToken, loadClerkConfig, loadSession, setError]);
 
   useEffect(() => {
     if (!isInitializing && !dashboardState.user && route !== "/login") {
@@ -321,6 +357,7 @@ export function App(): ReactElement {
     }
 
     if (route === "/plugins") {
+      setIsRouteLoading(false);
       return;
     }
 
@@ -388,6 +425,13 @@ export function App(): ReactElement {
     async (event: FormEvent<HTMLFormElement>): Promise<void> => {
       event.preventDefault();
 
+      if (!clerkSessionTokenInput.trim().length) {
+        setError("Clerk session token is required");
+        return;
+      }
+
+      setIsSubmittingLogin(true);
+
       try {
         await apiRequest("/api/v1/auth/login", {
           method: "POST",
@@ -405,6 +449,8 @@ export function App(): ReactElement {
         setHashRoute("/settings");
       } catch (error) {
         setError(getErrorMessage(error));
+      } finally {
+        setIsSubmittingLogin(false);
       }
     },
     [
@@ -424,6 +470,7 @@ export function App(): ReactElement {
       return;
     }
 
+    setIsSavingApiOrigin(true);
     localStorage.setItem(STORAGE_KEYS.apiOrigin, nextApiOrigin);
 
     setDashboardState((previousState) => ({
@@ -432,13 +479,28 @@ export function App(): ReactElement {
       csrfToken: null,
     }));
 
-    const hasSession = await loadSession(nextApiOrigin);
-    if (hasSession) {
-      await ensureCsrfToken(nextApiOrigin);
-    }
+    try {
+      await loadClerkConfig(nextApiOrigin);
 
-    setNotice(`API origin updated to ${nextApiOrigin}`);
-  }, [apiOriginInput, ensureCsrfToken, loadSession, setNotice]);
+      const hasSession = await loadSession(nextApiOrigin);
+      if (hasSession) {
+        await ensureCsrfToken(nextApiOrigin);
+      }
+
+      setNotice(`API origin updated to ${nextApiOrigin}`);
+    } catch (error) {
+      setError(getErrorMessage(error));
+    } finally {
+      setIsSavingApiOrigin(false);
+    }
+  }, [
+    apiOriginInput,
+    ensureCsrfToken,
+    loadClerkConfig,
+    loadSession,
+    setError,
+    setNotice,
+  ]);
 
   const onLogout = useCallback(async (): Promise<void> => {
     try {
@@ -532,87 +594,46 @@ export function App(): ReactElement {
       return;
     }
 
-    await navigator.clipboard.writeText(installSnippet);
-    setNotice("Snippet copied to clipboard.");
-  }, [installSnippet, setNotice]);
+    try {
+      await navigator.clipboard.writeText(installSnippet);
+      setNotice("Snippet copied to clipboard.");
+    } catch {
+      setError("Clipboard access failed. Copy manually from the snippet block.");
+    }
+  }, [installSnippet, setError, setNotice]);
 
   const isLoggedIn = Boolean(dashboardState.user);
 
   const renderRouteContent = (): ReactElement => {
-    if (!isLoggedIn) {
-      return (
-        <section className="grid">
-          <article className="panel">
-            <h2>Login With Clerk Session</h2>
-            <form onSubmit={onLoginSubmit}>
-              <label htmlFor="clerk-session-token">Clerk session token</label>
-              <textarea
-                id="clerk-session-token"
-                name="clerkSessionToken"
-                rows={5}
-                placeholder="Paste Clerk __session JWT or mock-clerk token"
-                value={clerkSessionTokenInput}
-                onChange={(event) => {
-                  setClerkSessionTokenInput(event.target.value);
-                }}
-                required
-              />
-              <label htmlFor="clerk-user-id">Clerk user ID (optional)</label>
-              <input
-                id="clerk-user-id"
-                name="clerkUserId"
-                placeholder="user_..."
-                value={clerkUserIdInput}
-                onChange={(event) => {
-                  setClerkUserIdInput(event.target.value);
-                }}
-              />
-              <button className="primary" type="submit">
-                Login
-              </button>
-            </form>
-            <p className="notice">
-              Use Clerk to obtain a valid session token, then exchange it with
-              the control-plane API.
-            </p>
-          </article>
-          <article className="panel">
-            <h2>Local Mock Token (Dev/Test)</h2>
-            <p className="notice">
-              If mock Clerk mode is enabled in the API, you can log in with
-              token value <code>mock-clerk</code>.
-            </p>
-            <button
-              onClick={() => {
-                setClerkSessionTokenInput("mock-clerk");
-              }}
-            >
-              Use mock-clerk token
-            </button>
-          </article>
-        </section>
-      );
-    }
-
     if (route === "/install") {
+      if (isRouteLoading) {
+        return loadingPanel("Preparing your install snippet...");
+      }
+
       return (
-        <section className="panel">
-          <h2>Install Runtime Script</h2>
-          <p className="notice">
-            Copy this client-scoped script tag into the pricing or store page
-            template.
-          </p>
-          <div className="code">{installSnippet}</div>
-          <div className="row" style={{ marginTop: "0.7rem" }}>
-            <button id="copy-snippet" className="primary" onClick={onCopySnippet}>
+        <section className="surface-panel route-install motion-rise">
+          <header className="panel-header">
+            <p className="eyebrow">Client Runtime</p>
+            <h2>Install Loader Script</h2>
+            <p>
+              Embed this client-scoped snippet in pricing, checkout, or catalog
+              templates.
+            </p>
+          </header>
+
+          <div className="snippet-box">{installSnippet}</div>
+
+          <div className="panel-actions">
+            <button type="button" className="btn-primary" onClick={onCopySnippet}>
               Copy Snippet
             </button>
             <a
               href="http://127.0.0.1:5173/b2b-demo.html"
               target="_blank"
               rel="noreferrer"
+              className="btn-secondary"
             >
-              Open B2B Demo Page
+              Open Demo Page
             </a>
           </div>
         </section>
@@ -621,18 +642,23 @@ export function App(): ReactElement {
 
     if (route === "/plugins") {
       return (
-        <section className="panel">
-          <h2>Publish Plugin Artifact</h2>
-          <p className="notice">
-            Use this after your deterministic plugin build pipeline emits
-            artifact URL + integrity.
-          </p>
-          <form onSubmit={onPublishPlugin}>
-            <label htmlFor="plugin-kind">Kind</label>
-            <select id="plugin-kind" name="kind" defaultValue="pre">
+        <section className="surface-panel route-plugins motion-rise">
+          <header className="panel-header">
+            <p className="eyebrow">Artifact Registry</p>
+            <h2>Publish Plugin Artifact</h2>
+            <p>
+              Register immutable plugin build artifacts for deterministic runtime
+              loading.
+            </p>
+          </header>
+
+          <form className="form-grid" onSubmit={onPublishPlugin}>
+            <label htmlFor="plugin-kind">Plugin Kind</label>
+            <select id="plugin-kind" name="kind" defaultValue="pre" required>
               <option value="pre">Pre plugin</option>
               <option value="post">Post plugin</option>
             </select>
+
             <label htmlFor="artifact-url">Artifact URL</label>
             <input
               id="artifact-url"
@@ -640,177 +666,310 @@ export function App(): ReactElement {
               required
               placeholder="/b2b/clients/acme/pre.v2.js"
             />
-            <label htmlFor="artifact-integrity">Integrity</label>
+
+            <label htmlFor="artifact-integrity">Integrity Hash</label>
             <input
               id="artifact-integrity"
               name="integrity"
               required
               placeholder="sha256-..."
             />
-            <button className="primary" type="submit">
-              Publish
-            </button>
+
+            <div className="panel-actions compact">
+              <button className="btn-primary" type="submit">
+                Publish Artifact
+              </button>
+            </div>
           </form>
         </section>
       );
     }
 
+    if (isRouteLoading) {
+      return loadingPanel("Loading client settings...");
+    }
+
     return (
-      <section className="panel">
-        <h2>Client Runtime Settings</h2>
-        <p className="notice">
-          Settings are versioned. A page reload should pick up the latest
-          version.
-        </p>
+      <section className="surface-panel route-settings motion-rise">
+        <header className="panel-header">
+          <p className="eyebrow">Presentation Controls</p>
+          <h2>Converted Currency Appearance</h2>
+          <p>
+            Versioned typography and spacing controls for post-plugin conversion
+            rendering.
+          </p>
+        </header>
+
         <form
+          className="settings-grid"
           key={dashboardState.settingsSnapshot?.version || 0}
           onSubmit={onSaveSettings}
         >
-          <label htmlFor="font-scale-pct">Font scale percent</label>
-          <input
-            id="font-scale-pct"
-            name="fontScalePct"
-            type="number"
-            min="60"
-            max="200"
-            defaultValue={activeSettings.fontScalePct}
-            required
-          />
+          <div className="field-group">
+            <label htmlFor="font-scale-pct">Font scale percent</label>
+            <input
+              id="font-scale-pct"
+              name="fontScalePct"
+              type="number"
+              min="60"
+              max="200"
+              defaultValue={activeSettings.fontScalePct}
+              required
+            />
+          </div>
 
-          <label htmlFor="font-weight">Font weight</label>
-          <input
-            id="font-weight"
-            name="fontWeight"
-            type="number"
-            min="300"
-            max="800"
-            defaultValue={activeSettings.fontWeight}
-            required
-          />
+          <div className="field-group">
+            <label htmlFor="font-weight">Font weight</label>
+            <input
+              id="font-weight"
+              name="fontWeight"
+              type="number"
+              min="300"
+              max="800"
+              defaultValue={activeSettings.fontWeight}
+              required
+            />
+          </div>
 
-          <label htmlFor="font-family">Font family</label>
-          <select
-            id="font-family"
-            name="fontFamily"
-            defaultValue={activeSettings.fontFamily}
-          >
-            {SETTINGS_FONT_FAMILIES.map((fontFamily) => (
-              <option key={fontFamily} value={fontFamily}>
-                {fontFamily}
-              </option>
-            ))}
-          </select>
+          <div className="field-group field-span-2">
+            <label htmlFor="font-family">Font family</label>
+            <select
+              id="font-family"
+              name="fontFamily"
+              defaultValue={activeSettings.fontFamily}
+            >
+              {SETTINGS_FONT_FAMILIES.map((fontFamily) => (
+                <option key={fontFamily} value={fontFamily}>
+                  {fontFamily}
+                </option>
+              ))}
+            </select>
+          </div>
 
-          <label htmlFor="font-color">Font color</label>
-          <input
-            id="font-color"
-            name="fontColor"
-            defaultValue={activeSettings.fontColor}
-            required
-          />
+          <div className="field-group">
+            <label htmlFor="font-color">Font color</label>
+            <input
+              id="font-color"
+              name="fontColor"
+              defaultValue={activeSettings.fontColor}
+              required
+            />
+          </div>
 
-          <label htmlFor="spacing-em">Spacing (em)</label>
-          <input
-            id="spacing-em"
-            name="spacingEm"
-            type="number"
-            step="0.01"
-            min="0"
-            max="0.5"
-            defaultValue={activeSettings.spacingEm}
-            required
-          />
+          <div className="field-group">
+            <label htmlFor="spacing-em">Spacing (em)</label>
+            <input
+              id="spacing-em"
+              name="spacingEm"
+              type="number"
+              step="0.01"
+              min="0"
+              max="0.5"
+              defaultValue={activeSettings.spacingEm}
+              required
+            />
+          </div>
 
-          <button className="primary" type="submit">
-            Save Settings
-          </button>
+          <div className="panel-actions field-span-2 compact">
+            <button className="btn-primary" type="submit">
+              Save Settings
+            </button>
+            <p className="meta-inline">
+              Current version: {dashboardState.settingsSnapshot?.version ?? "unknown"}
+            </p>
+          </div>
         </form>
-        <p className="notice">
-          Current version: {dashboardState.settingsSnapshot?.version ?? "unknown"}
-        </p>
       </section>
     );
   };
 
-  return (
-    <div className="layout">
-      <header>
-        <h1>FX Inline Control Plane Dashboard</h1>
-        {isLoggedIn ? (
-          <>
-            <p>Signed-manifest runtime operations for client pricing pages.</p>
-            <div className="nav">
-              <button
-                data-route="/settings"
-                onClick={() => {
-                  setHashRoute("/settings");
-                }}
-              >
-                Settings
+  if (!isLoggedIn) {
+    return (
+      <div className="dashboard-app auth-shell">
+        <div className="ambient-orb ambient-orb-a" aria-hidden="true" />
+        <div className="ambient-orb ambient-orb-b" aria-hidden="true" />
+
+        <section className="auth-showcase motion-stagger">
+          <div>
+            <p className="brand-chip">FX Inline Control Plane</p>
+            <h1>Secure Currency Runtime Operations</h1>
+            <p className="lede">
+              Configure client-specific conversion behavior, publish deterministic
+              plugin artifacts, and deliver signed runtime manifests.
+            </p>
+          </div>
+
+          <div className="showcase-metrics">
+            <article>
+              <h3>Signed Manifests</h3>
+              <p>Cryptographically verifiable runtime payload delivery.</p>
+            </article>
+            <article>
+              <h3>Versioned Settings</h3>
+              <p>Deterministic UI controls with reload-safe propagation.</p>
+            </article>
+            <article>
+              <h3>Scoped Plugins</h3>
+              <p>Client-specific pre/post plugin artifact orchestration.</p>
+            </article>
+          </div>
+
+          {clerkConfig ? (
+            <div className="showcase-footnote">
+              <span>Clerk configured</span>
+              <code>{clerkConfig.publishableKey || "publishable key unavailable"}</code>
+            </div>
+          ) : null}
+        </section>
+
+        <section className="auth-panel motion-rise">
+          <header>
+            <p className="eyebrow">Authentication</p>
+            <h2>Sign In To Dashboard</h2>
+            <p>
+              Exchange a valid Clerk session token with the control-plane API to
+              start a secure dashboard session.
+            </p>
+          </header>
+
+          <form className="auth-form" onSubmit={onLoginSubmit}>
+            <label htmlFor="clerk-session-token">Clerk session token</label>
+            <textarea
+              id="clerk-session-token"
+              name="clerkSessionToken"
+              rows={5}
+              placeholder="Paste Clerk __session JWT or mock-clerk token"
+              value={clerkSessionTokenInput}
+              onChange={(event) => {
+                setClerkSessionTokenInput(event.target.value);
+              }}
+              required
+            />
+
+            <label htmlFor="clerk-user-id">Clerk user ID (optional)</label>
+            <input
+              id="clerk-user-id"
+              name="clerkUserId"
+              placeholder="user_..."
+              value={clerkUserIdInput}
+              onChange={(event) => {
+                setClerkUserIdInput(event.target.value);
+              }}
+            />
+
+            <div className="auth-actions">
+              <button className="btn-primary" type="submit" disabled={isSubmittingLogin}>
+                {isSubmittingLogin ? "Signing In..." : "Sign In"}
               </button>
               <button
-                data-route="/install"
+                type="button"
+                className="btn-ghost"
                 onClick={() => {
-                  setHashRoute("/install");
+                  setClerkSessionTokenInput("mock-clerk");
                 }}
               >
-                Install
-              </button>
-              <button
-                data-route="/plugins"
-                onClick={() => {
-                  setHashRoute("/plugins");
-                }}
-              >
-                Plugins
-              </button>
-              <button
-                data-action="logout"
-                className="ghost"
-                onClick={() => {
-                  void onLogout();
-                }}
-              >
-                Logout
+                Use Mock Token
               </button>
             </div>
-          </>
-        ) : (
-          <p>
-            Manage runtime settings and install snippets for each client
-            workspace.
-          </p>
-        )}
+          </form>
+
+          <div className="auth-note">
+            <p>
+              This dashboard accepts Clerk token exchange only. Password and
+              OAuth fallback paths are intentionally disabled.
+            </p>
+          </div>
+        </section>
+
+        {dashboardState.error ? <p className="feedback error">{dashboardState.error}</p> : null}
+        {dashboardState.notice ? <p className="feedback notice">{dashboardState.notice}</p> : null}
+      </div>
+    );
+  }
+
+  return (
+    <div className="dashboard-app workspace-shell">
+      <div className="ambient-orb ambient-orb-a" aria-hidden="true" />
+      <div className="ambient-orb ambient-orb-b" aria-hidden="true" />
+
+      <header className="workspace-header motion-rise">
+        <div className="brand-block">
+          <p className="brand-chip">FX Inline</p>
+          <h1>Control Plane Dashboard</h1>
+          <p>Signed-manifest runtime operations for client pricing surfaces.</p>
+        </div>
+
+        <nav className="top-nav" aria-label="Dashboard sections">
+          <button
+            className={route === "/settings" ? "active" : ""}
+            onClick={() => {
+              setHashRoute("/settings");
+            }}
+            type="button"
+          >
+            Settings
+          </button>
+          <button
+            className={route === "/install" ? "active" : ""}
+            onClick={() => {
+              setHashRoute("/install");
+            }}
+            type="button"
+          >
+            Install
+          </button>
+          <button
+            className={route === "/plugins" ? "active" : ""}
+            onClick={() => {
+              setHashRoute("/plugins");
+            }}
+            type="button"
+          >
+            Plugins
+          </button>
+        </nav>
+
+        <div className="session-actions">
+          <span className="identity-pill">{userBadgeLabel}</span>
+          <button className="btn-ghost" onClick={() => void onLogout()} type="button">
+            Logout
+          </button>
+        </div>
       </header>
 
-      {isLoggedIn ? (
-        <>
-          <section className="panel">
-            <div className="row">
-              <label htmlFor="api-origin" style={{ margin: 0 }}>
-                API origin
-              </label>
-              <input
-                id="api-origin"
-                value={apiOriginInput}
-                style={{ maxWidth: "320px", margin: 0 }}
-                onChange={(event) => {
-                  setApiOriginInput(event.target.value);
-                }}
-              />
-              <button
-                data-action="save-api-origin"
-                onClick={() => {
-                  void onSaveApiOrigin();
-                }}
-              >
-                Save
-              </button>
-              <span className="badge">{userBadgeLabel}</span>
-            </div>
+      <main className="workspace-main motion-stagger">
+        <aside className="control-rail">
+          <section className="rail-panel">
+            <h3>Environment</h3>
+            <label htmlFor="api-origin">API origin</label>
+            <input
+              id="api-origin"
+              value={apiOriginInput}
+              onChange={(event) => {
+                setApiOriginInput(event.target.value);
+              }}
+            />
+            <button
+              className="btn-secondary"
+              onClick={() => {
+                void onSaveApiOrigin();
+              }}
+              type="button"
+              disabled={isSavingApiOrigin}
+            >
+              {isSavingApiOrigin ? "Saving..." : "Save API Origin"}
+            </button>
+
+            {clerkConfig ? (
+              <p className="meta-block">
+                <strong>Clerk Key</strong>
+                <span>{clerkConfig.publishableKey || "Unavailable"}</span>
+              </p>
+            ) : null}
           </section>
 
-          <section className="panel">
+          <section className="rail-panel">
+            <h3>Client Scope</h3>
             <label htmlFor="active-client">Active client</label>
             <select
               id="active-client"
@@ -836,22 +995,18 @@ export function App(): ReactElement {
                 <option value="">No clients</option>
               )}
             </select>
+            <p className="meta-block">
+              <strong>Total clients</strong>
+              <span>{dashboardState.clients.length}</span>
+            </p>
           </section>
-        </>
-      ) : null}
+        </aside>
 
-      {isInitializing || isRouteLoading ? (
-        <section className="panel">
-          <p className="notice">Loading...</p>
-        </section>
-      ) : (
-        renderRouteContent()
-      )}
+        <section className="workspace-content">{isInitializing ? loadingPanel("Initializing dashboard...") : renderRouteContent()}</section>
+      </main>
 
-      {dashboardState.error ? <p className="error">{dashboardState.error}</p> : null}
-      {dashboardState.notice ? (
-        <p className="notice">{dashboardState.notice}</p>
-      ) : null}
+      {dashboardState.error ? <p className="feedback error">{dashboardState.error}</p> : null}
+      {dashboardState.notice ? <p className="feedback notice">{dashboardState.notice}</p> : null}
     </div>
   );
 }
