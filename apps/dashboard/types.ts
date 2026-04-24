@@ -64,3 +64,5 @@ export interface PublishPluginResponse {
   kind: string;
   version: number;
 }
+
+export type DashboardRoute = "/login" | "/settings" | "/install" | "/plugins";
