@@ -209,10 +209,21 @@ export function createAuthService({
     clerkSessionToken: string;
     clerkUserId?: string | null;
   }) {
-    const verifiedIdentity = await clerkAuthService.verifySessionToken({
-      clerkSessionToken,
-      clerkUserId,
-    });
+    let verifiedIdentity: ClerkVerifiedIdentity;
+    try {
+      verifiedIdentity = await clerkAuthService.verifySessionToken({
+        clerkSessionToken,
+        clerkUserId,
+      });
+    } catch (error) {
+      const reason = error instanceof Error ? error.message : "Session token verification failed";
+      throw createApiError(
+        "AUTH_CLERK_TOKEN_INVALID",
+        "Clerk session token is invalid or expired.",
+        env.nodeEnv === "production" ? null : { reason },
+        401,
+      );
+    }
 
     const normalizedEmail = normalizeEmail(verifiedIdentity.email);
     const emailDomain = extractDomainFromEmail(normalizedEmail);

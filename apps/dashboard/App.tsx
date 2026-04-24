@@ -3,6 +3,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type FormEvent,
   type ReactElement,
@@ -179,6 +180,7 @@ export function App(): ReactElement {
   const [clerkClient, setClerkClient] = useState<Clerk | null>(null);
   const [allowedDomains, setAllowedDomains] = useState<AllowedDomain[]>([]);
   const [allowedDomainInput, setAllowedDomainInput] = useState("");
+  const hasInitializedRef = useRef(false);
 
   const setNotice = useCallback((message = "") => {
     setDashboardState((previousState) => ({
@@ -354,6 +356,11 @@ export function App(): ReactElement {
   );
 
   useEffect(() => {
+    if (hasInitializedRef.current) {
+      return;
+    }
+    hasInitializedRef.current = true;
+
     let cancelled = false;
 
     (async () => {
