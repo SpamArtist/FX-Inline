@@ -1,46 +1,19 @@
+import type {
+  ApiErrorPayload,
+  AuthMeResponse,
+  CsrfTokenResponse,
+  DashboardState,
+  DashboardUser,
+  InstallSnippetResponse,
+  PublishPluginResponse,
+  SettingsSnapshot,
+} from "./types";
+
 const DEFAULT_API_ORIGIN = "http://127.0.0.1:8787";
 const STORAGE_KEYS = {
   apiOrigin: "fxi:cp:api-origin",
   activeClientId: "fxi:cp:active-client-id",
 } as const;
-
-interface DashboardUser {
-  id: string;
-  email: string;
-  displayName: string;
-  clerkUserId: string | null;
-}
-
-interface DashboardClient {
-  id: string;
-  slug: string;
-  name: string;
-  preferredCurrency: string;
-  allowedOrigins: string[];
-  allowedPaths: string[];
-  createdAt: number;
-  role: string;
-}
-
-interface UiSettings {
-  fontScalePct: number;
-  fontWeight: number;
-  fontFamily: string;
-  fontColor: string;
-  spacingEm: number;
-}
-
-interface SettingsSnapshot {
-  version: number;
-  settings: UiSettings;
-  updatedAt: number;
-}
-
-interface ApiErrorPayload {
-  error?: {
-    message?: string;
-  };
-}
 
 class ApiRequestError extends Error {
   status: number;
@@ -58,16 +31,7 @@ if (!(appRoot instanceof HTMLElement)) {
   throw new Error("Dashboard root element #app not found");
 }
 
-const state: {
-  apiOrigin: string;
-  user: DashboardUser | null;
-  clients: DashboardClient[];
-  activeClientId: string | null;
-  csrfToken: string | null;
-  settingsSnapshot: SettingsSnapshot | null;
-  error: string;
-  notice: string;
-} = {
+const state: DashboardState = {
   apiOrigin: localStorage.getItem(STORAGE_KEYS.apiOrigin) || DEFAULT_API_ORIGIN,
   user: null,
   clients: [],
@@ -143,7 +107,7 @@ async function apiRequest<T>(path: string, options: RequestInit = {}): Promise<T
 
 async function loadSession(): Promise<boolean> {
   try {
-    const payload = await apiRequest<{ user: DashboardUser; clients: DashboardClient[] }>("/api/v1/auth/me");
+    const payload = await apiRequest<AuthMeResponse>("/api/v1/auth/me");
     state.user = payload.user;
     state.clients = payload.clients || [];
 
@@ -171,7 +135,7 @@ async function ensureCsrfToken(): Promise<void> {
     return;
   }
 
-  const payload = await apiRequest<{ csrfToken: string }>("/api/v1/auth/csrf");
+  const payload = await apiRequest<CsrfTokenResponse>("/api/v1/auth/csrf");
   state.csrfToken = payload.csrfToken;
 }
 
@@ -392,7 +356,7 @@ function escapeHtml(input: string): string {
 }
 
 async function renderInstallPage(): Promise<void> {
-  const payload = await apiRequest<{ snippet: string }>(`/api/v1/clients/${state.activeClientId}/install-snippet`);
+  const payload = await apiRequest<InstallSnippetResponse>(`/api/v1/clients/${state.activeClientId}/install-snippet`);
 
   appRoot.innerHTML = appLayout(`
     <section class="panel">
@@ -443,7 +407,7 @@ function renderPluginsPage(): void {
     const formData = new FormData(eventForm(event));
 
     try {
-      const payload = await apiRequest<{ kind: string; version: number }>(`/api/v1/clients/${state.activeClientId}/plugins/publish`, {
+      const payload = await apiRequest<PublishPluginResponse>(`/api/v1/clients/${state.activeClientId}/plugins/publish`, {
         method: "POST",
         body: JSON.stringify({
           kind: String(formData.get("kind")),
