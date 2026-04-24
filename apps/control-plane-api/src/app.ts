@@ -147,6 +147,51 @@ function asApiError(error: unknown): ApiError {
   );
 }
 
+function parseOrigin(value: string): URL | null {
+  try {
+    return new URL(value);
+  } catch {
+    return null;
+  }
+}
+
+function isLoopbackHost(hostname: string): boolean {
+  return hostname === "localhost" || hostname === "127.0.0.1";
+}
+
+function isAllowedDashboardOrigin({
+  requestOrigin,
+  dashboardOrigin,
+  authorizedOrigins,
+}: {
+  requestOrigin: string;
+  dashboardOrigin: string;
+  authorizedOrigins: string[];
+}): boolean {
+  const requestUrl = parseOrigin(requestOrigin);
+  if (!requestUrl) return false;
+
+  const allowed = [dashboardOrigin, ...authorizedOrigins];
+  for (const candidateOrigin of allowed) {
+    const candidateUrl = parseOrigin(candidateOrigin);
+    if (!candidateUrl) continue;
+
+    if (requestUrl.origin === candidateUrl.origin) {
+      return true;
+    }
+
+    const sameScheme = requestUrl.protocol === candidateUrl.protocol;
+    const samePort = requestUrl.port === candidateUrl.port;
+    const loopbackPair = isLoopbackHost(requestUrl.hostname) && isLoopbackHost(candidateUrl.hostname);
+
+    if (sameScheme && samePort && loopbackPair) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 export function createControlPlaneApp({
   env,
   authService,
@@ -585,6 +630,17 @@ export function createControlPlaneApp({
   async function handle(request: IncomingMessage, response: ServerResponse): Promise<void> {
     const requestId = createRequestId();
     const requestUrl = new URL(request.url || "/", env.publicOrigin);
+    const requestOriginHeader =
+      typeof request.headers.origin === "string" ? request.headers.origin : "";
+    const resolvedDashboardCorsOrigin =
+      requestOriginHeader &&
+        isAllowedDashboardOrigin({
+          requestOrigin: requestOriginHeader,
+          dashboardOrigin: env.dashboardUrl,
+          authorizedOrigins: env.clerkAuthorizedParties,
+        })
+        ? requestOriginHeader
+        : env.dashboardUrl;
     const isRuntimePublicRoute = requestUrl.pathname.startsWith("/api/v1/runtime/");
     const corsHeaders: Record<string, string | string[]> = isRuntimePublicRoute
       ? {
@@ -594,10 +650,11 @@ export function createControlPlaneApp({
         "x-request-id": requestId,
       }
       : {
-        "access-control-allow-origin": env.dashboardUrl,
+        "access-control-allow-origin": resolvedDashboardCorsOrigin,
         "access-control-allow-credentials": "true",
         "access-control-allow-methods": "GET,POST,PUT,DELETE,OPTIONS",
         "access-control-allow-headers": "content-type,x-csrf-token",
+        vary: "origin",
         "x-request-id": requestId,
       };
 

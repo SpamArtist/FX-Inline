@@ -58,7 +58,7 @@ function makeMockClerkToken(payload) {
   return `mock-clerk:${encoded}`;
 }
 
-async function invoke(app, { method = "GET", url, body, cookie, csrf }) {
+async function invoke(app, { method = "GET", url, body, cookie, csrf, origin }) {
   const requestBody = body === undefined ? "" : JSON.stringify(body);
 
   const request = Readable.from(requestBody ? [requestBody] : []);
@@ -68,6 +68,7 @@ async function invoke(app, { method = "GET", url, body, cookie, csrf }) {
     ...(requestBody ? { "content-type": "application/json" } : {}),
     ...(cookie ? { cookie } : {}),
     ...(csrf ? { "x-csrf-token": csrf } : {}),
+    ...(origin ? { origin } : {}),
   };
 
   let statusCode = 0;
@@ -142,6 +143,18 @@ test("health and readiness endpoints return success", async () => {
 
   expect(ready.status).toBe(200);
   expect(ready.payload.status).toBe("ready");
+});
+
+test("cors allows localhost origin when dashboard URL is configured as 127.0.0.1", async () => {
+  const instance = await createTestInstance();
+
+  const response = await invoke(instance.app, {
+    url: "/api/v1/auth/clerk/config",
+    origin: "http://localhost:5174",
+  });
+
+  expect(response.status).toBe(200);
+  expect(response.headers["access-control-allow-origin"]).toBe("http://localhost:5174");
 });
 
 test("mock Clerk login, csrf, settings update, and runtime manifest flow", async () => {
