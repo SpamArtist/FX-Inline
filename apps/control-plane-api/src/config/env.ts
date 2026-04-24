@@ -1,4 +1,10 @@
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import type { EnvConfig, NodeEnv } from "../types.js";
+
+const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
+const repositoryRoot = path.resolve(currentDirectory, "../../../..");
 
 function asString(value: unknown, fallback = ""): string {
   if (typeof value !== "string") {
@@ -48,8 +54,76 @@ function originFromUrl(urlValue: string): string {
   }
 }
 
+function parseDotenv(content: string): Record<string, string> {
+  const values: Record<string, string> = {};
+
+  const lines = content.split(/\r?\n/gu);
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed.length || trimmed.startsWith("#")) {
+      continue;
+    }
+
+    const equalsIndex = trimmed.indexOf("=");
+    if (equalsIndex <= 0) {
+      continue;
+    }
+
+    const key = trimmed.slice(0, equalsIndex).trim();
+    let rawValue = trimmed.slice(equalsIndex + 1).trim();
+
+    if (
+      (rawValue.startsWith("\"") && rawValue.endsWith("\"")) ||
+      (rawValue.startsWith("'") && rawValue.endsWith("'"))
+    ) {
+      rawValue = rawValue.slice(1, -1);
+    }
+
+    values[key] = rawValue.replace(/\\n/gu, "\n");
+  }
+
+  return values;
+}
+
+function readDotenvFile(filePath: string): Record<string, string> {
+  if (!fs.existsSync(filePath)) {
+    return {};
+  }
+
+  const content = fs.readFileSync(filePath, "utf8");
+  return parseDotenv(content);
+}
+
+function loadDotenvValues(cwd: string): Record<string, string> {
+  const candidatePaths = [
+    path.resolve(repositoryRoot, ".env"),
+    path.resolve(repositoryRoot, ".env.local"),
+    path.resolve(repositoryRoot, "apps/control-plane-api/.env"),
+    path.resolve(repositoryRoot, "apps/control-plane-api/.env.local"),
+    path.resolve(cwd, ".env"),
+    path.resolve(cwd, ".env.local"),
+  ];
+
+  const dotenvValues: Record<string, string> = {};
+  const visited = new Set<string>();
+
+  for (const candidatePath of candidatePaths) {
+    if (visited.has(candidatePath)) {
+      continue;
+    }
+
+    visited.add(candidatePath);
+    const values = readDotenvFile(candidatePath);
+    Object.assign(dotenvValues, values);
+  }
+
+  return dotenvValues;
+}
+
 export function loadEnv(overrides: Record<string, string | undefined> = {}): EnvConfig {
+  const dotenvValues = loadDotenvValues(process.cwd());
   const source: Record<string, string | undefined> = {
+    ...dotenvValues,
     ...(process.env as Record<string, string | undefined>),
     ...overrides,
   };
