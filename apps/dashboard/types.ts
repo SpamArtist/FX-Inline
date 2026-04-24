@@ -3,6 +3,7 @@ export interface DashboardUser {
   email: string;
   displayName: string;
   clerkUserId: string | null;
+  isPlatformAdmin: boolean;
 }
 
 export interface DashboardClient {
@@ -52,6 +53,25 @@ export interface AuthMeResponse {
   clients: DashboardClient[];
 }
 
+export interface AllowedDomain {
+  domain: string;
+  createdByUserId: string | null;
+  createdAt: number;
+}
+
+export interface AllowedDomainsResponse {
+  domains: AllowedDomain[];
+}
+
+export interface AddAllowedDomainResponse {
+  domain: AllowedDomain;
+}
+
+export interface RemoveAllowedDomainResponse {
+  removed: boolean;
+  domain: string;
+}
+
 export interface CsrfTokenResponse {
   csrfToken: string;
 }
@@ -65,9 +85,10 @@ export interface PublishPluginResponse {
   version: number;
 }
 
-export type DashboardRoute = "/login" | "/settings" | "/install" | "/plugins";
+export type DashboardRoute = "/login" | "/settings" | "/install" | "/plugins" | "/admin";
 
 export interface ClerkConfigResponse {
   publishableKey: string;
   authorizedParties: string[];
+  mockEnabled: boolean;
 }

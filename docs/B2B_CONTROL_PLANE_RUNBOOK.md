@@ -32,14 +32,55 @@ npm run dev:dashboard
 - Website: `http://127.0.0.1:5173`
 - Dashboard: `http://127.0.0.1:5174`
 
+## Admin bootstrap (required once)
+
+First platform admin identities are bootstrapped directly in the database.
+
+```sql
+INSERT INTO platform_admin_identities (
+  email,
+  clerk_user_id,
+  created_by_user_id,
+  created_at,
+  updated_at
+) VALUES (
+  'admin@yourcompany.com',
+  NULL,
+  NULL,
+  EXTRACT(EPOCH FROM NOW())::bigint * 1000,
+  EXTRACT(EPOCH FROM NOW())::bigint * 1000
+)
+ON CONFLICT (email) DO NOTHING;
+```
+
+Notes:
+- `email` MUST match the Clerk account email.
+- `clerk_user_id` is optional during bootstrap. It auto-binds on first successful admin login.
+
+## Login and allowlist policy
+
+- Dashboard login uses Clerk hosted auth only (Google SSO and email/password).
+- Backend verifies Clerk session tokens through `POST /api/v1/auth/login`.
+- Admin users (from `platform_admin_identities`) bypass domain restrictions.
+- Non-admin users are allowed only when their email domain exactly matches an entry in `allowed_email_domains`.
+- If `allowed_email_domains` is empty, all non-admin logins are denied.
+
+## Domain allowlist operations
+
+1. Sign in as a platform admin.
+2. Open Dashboard `#/admin`.
+3. Add or remove allowed domains (exact values like `acme.com`).
+4. Changes are effective for the next non-admin login attempt.
+
 ## End-to-end workflow validation
 
-1. Open dashboard and create account or use mock Google login.
-2. Select active client workspace.
-3. Save settings (for example `fontColor = #ea7118`).
-4. Open Install page and copy snippet.
-5. Add snippet to pricing page template or test page.
-6. Reload page and verify converted values + latest styling.
+1. Admin logs in and adds `acme.com` in `#/admin`.
+2. A non-admin `user@acme.com` logs in.
+3. Select active client workspace.
+4. Save settings (for example `fontColor = #ea7118`).
+5. Open Install page and copy snippet.
+6. Add snippet to pricing page template or test page.
+7. Reload page and verify converted values + latest styling.
 
 ## Settings propagation behavior
 

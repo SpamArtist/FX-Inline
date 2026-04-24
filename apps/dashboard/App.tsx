@@ -1,3 +1,4 @@
+import { Clerk } from "@clerk/clerk-js";
 import {
   useCallback,
   useEffect,
@@ -7,6 +8,9 @@ import {
   type ReactElement,
 } from "react";
 import type {
+  AddAllowedDomainResponse,
+  AllowedDomain,
+  AllowedDomainsResponse,
   ApiErrorPayload,
   AuthMeResponse,
   ClerkConfigResponse,
@@ -15,6 +19,7 @@ import type {
   DashboardState,
   InstallSnippetResponse,
   PublishPluginResponse,
+  RemoveAllowedDomainResponse,
   SettingsSnapshot,
   UiSettings,
 } from "./types";
@@ -76,7 +81,8 @@ function getHashRoute(): DashboardRoute {
   if (
     normalized === "/install" ||
     normalized === "/plugins" ||
-    normalized === "/settings"
+    normalized === "/settings" ||
+    normalized === "/admin"
   ) {
     return normalized;
   }
@@ -135,6 +141,19 @@ function loadingPanel(label: string): ReactElement {
   );
 }
 
+function sortAllowedDomains(domains: AllowedDomain[]): AllowedDomain[] {
+  return [...domains].sort((left, right) => left.domain.localeCompare(right.domain));
+}
+
+function uniqueAllowedDomains(domains: AllowedDomain[]): AllowedDomain[] {
+  const uniqueMap = new Map<string, AllowedDomain>();
+  for (const domain of domains) {
+    uniqueMap.set(domain.domain, domain);
+  }
+
+  return sortAllowedDomains(Array.from(uniqueMap.values()));
+}
+
 export function App(): ReactElement {
   const [dashboardState, setDashboardState] = useState<DashboardState>({
     apiOrigin: localStorage.getItem(STORAGE_KEYS.apiOrigin) || DEFAULT_API_ORIGIN,
@@ -150,14 +169,16 @@ export function App(): ReactElement {
   const [apiOriginInput, setApiOriginInput] = useState<string>(
     localStorage.getItem(STORAGE_KEYS.apiOrigin) || DEFAULT_API_ORIGIN,
   );
-  const [clerkSessionTokenInput, setClerkSessionTokenInput] = useState("");
-  const [clerkUserIdInput, setClerkUserIdInput] = useState("");
   const [installSnippet, setInstallSnippet] = useState("");
   const [isInitializing, setIsInitializing] = useState(true);
   const [isRouteLoading, setIsRouteLoading] = useState(false);
   const [isSavingApiOrigin, setIsSavingApiOrigin] = useState(false);
   const [isSubmittingLogin, setIsSubmittingLogin] = useState(false);
+  const [isAdminMutating, setIsAdminMutating] = useState(false);
   const [clerkConfig, setClerkConfig] = useState<ClerkConfigResponse | null>(null);
+  const [clerkClient, setClerkClient] = useState<Clerk | null>(null);
+  const [allowedDomains, setAllowedDomains] = useState<AllowedDomain[]>([]);
+  const [allowedDomainInput, setAllowedDomainInput] = useState("");
 
   const setNotice = useCallback((message = "") => {
     setDashboardState((previousState) => ({
@@ -206,7 +227,7 @@ export function App(): ReactElement {
   );
 
   const loadClerkConfig = useCallback(
-    async (apiOriginOverride?: string): Promise<void> => {
+    async (apiOriginOverride?: string): Promise<ClerkConfigResponse | null> => {
       const currentApiOrigin = apiOriginOverride ?? dashboardState.apiOrigin;
 
       try {
@@ -216,15 +237,33 @@ export function App(): ReactElement {
           { apiOrigin: currentApiOrigin, csrfToken: null },
         );
         setClerkConfig(payload);
+        return payload;
       } catch {
         setClerkConfig(null);
+        setClerkClient(null);
+        return null;
       }
     },
     [apiRequest, dashboardState.apiOrigin],
   );
 
+  const initializeClerkClient = useCallback(
+    async (config: ClerkConfigResponse | null): Promise<Clerk | null> => {
+      if (!config?.publishableKey.length) {
+        setClerkClient(null);
+        return null;
+      }
+
+      const client = new Clerk(config.publishableKey);
+      await client.load();
+      setClerkClient(client);
+      return client;
+    },
+    [],
+  );
+
   const loadSession = useCallback(
-    async (apiOriginOverride?: string): Promise<boolean> => {
+    async (apiOriginOverride?: string): Promise<AuthMeResponse | null> => {
       const currentApiOrigin = apiOriginOverride ?? dashboardState.apiOrigin;
 
       try {
@@ -251,7 +290,7 @@ export function App(): ReactElement {
           };
         });
 
-        return true;
+        return payload;
       } catch (error) {
         if (!(error instanceof ApiRequestError) || error.status !== 401) {
           setError(getErrorMessage(error));
@@ -266,7 +305,7 @@ export function App(): ReactElement {
           csrfToken: null,
         }));
 
-        return false;
+        return null;
       }
     },
     [apiRequest, dashboardState.apiOrigin, setError],
@@ -292,15 +331,58 @@ export function App(): ReactElement {
     [apiRequest, dashboardState.apiOrigin],
   );
 
+  const exchangeClerkSession = useCallback(
+    async (client: Clerk): Promise<void> => {
+      const clerkSessionToken = await client.session?.getToken();
+      if (!clerkSessionToken || !clerkSessionToken.length) {
+        throw new Error("No active Clerk session found. Start sign-in from the buttons below.");
+      }
+
+      await apiRequest(
+        "/api/v1/auth/login",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            clerkSessionToken,
+            clerkUserId: client.user?.id ?? null,
+          }),
+        },
+        { csrfToken: null },
+      );
+    },
+    [apiRequest],
+  );
+
   useEffect(() => {
     let cancelled = false;
 
     (async () => {
-      await loadClerkConfig();
-      const hasSession = await loadSession();
+      const config = await loadClerkConfig();
+
+      let initializedClerkClient: Clerk | null = null;
+      if (config?.publishableKey.length) {
+        try {
+          initializedClerkClient = await initializeClerkClient(config);
+        } catch {
+          initializedClerkClient = null;
+          setClerkClient(null);
+        }
+      }
+
+      let sessionPayload = await loadSession();
+
+      if (!sessionPayload && initializedClerkClient?.session) {
+        try {
+          await exchangeClerkSession(initializedClerkClient);
+          sessionPayload = await loadSession();
+        } catch {
+          // Ignore silent exchange failures so the hosted auth buttons remain usable.
+        }
+      }
+
       if (cancelled) return;
 
-      if (hasSession) {
+      if (sessionPayload) {
         try {
           await ensureCsrfToken();
           if (cancelled) return;
@@ -312,7 +394,11 @@ export function App(): ReactElement {
       }
 
       if (!window.location.hash) {
-        setHashRoute(hasSession ? "/settings" : "/login");
+        if (sessionPayload?.user.isPlatformAdmin) {
+          setHashRoute("/admin");
+        } else {
+          setHashRoute(sessionPayload ? "/settings" : "/login");
+        }
       }
 
       if (!cancelled) {
@@ -329,7 +415,14 @@ export function App(): ReactElement {
     return () => {
       cancelled = true;
     };
-  }, [ensureCsrfToken, loadClerkConfig, loadSession, setError]);
+  }, [
+    ensureCsrfToken,
+    exchangeClerkSession,
+    initializeClerkClient,
+    loadClerkConfig,
+    loadSession,
+    setError,
+  ]);
 
   useEffect(() => {
     if (!isInitializing && !dashboardState.user && route !== "/login") {
@@ -338,7 +431,20 @@ export function App(): ReactElement {
   }, [dashboardState.user, isInitializing, route]);
 
   useEffect(() => {
-    if (!dashboardState.user || isInitializing) {
+    if (
+      !isInitializing &&
+      route === "/admin" &&
+      dashboardState.user &&
+      !dashboardState.user.isPlatformAdmin
+    ) {
+      setHashRoute("/settings");
+    }
+  }, [dashboardState.user, isInitializing, route]);
+
+  useEffect(() => {
+    const currentUser = dashboardState.user;
+
+    if (!currentUser || isInitializing) {
       return;
     }
 
@@ -352,7 +458,7 @@ export function App(): ReactElement {
       return;
     }
 
-    if (!dashboardState.activeClientId) {
+    if (route !== "/admin" && !dashboardState.activeClientId) {
       return;
     }
 
@@ -374,17 +480,30 @@ export function App(): ReactElement {
           if (!cancelled) {
             setInstallSnippet(payload.snippet);
           }
-        } else {
-          const payload = await apiRequest<SettingsSnapshot>(
-            `/api/v1/clients/${dashboardState.activeClientId}/settings/current`,
-          );
+          return;
+        }
 
-          if (!cancelled) {
-            setDashboardState((previousState) => ({
-              ...previousState,
-              settingsSnapshot: payload,
-            }));
+        if (route === "/admin") {
+          if (!currentUser.isPlatformAdmin) {
+            return;
           }
+
+          const payload = await apiRequest<AllowedDomainsResponse>("/api/v1/admin/allowed-domains");
+          if (!cancelled) {
+            setAllowedDomains(sortAllowedDomains(payload.domains || []));
+          }
+          return;
+        }
+
+        const payload = await apiRequest<SettingsSnapshot>(
+          `/api/v1/clients/${dashboardState.activeClientId}/settings/current`,
+        );
+
+        if (!cancelled) {
+          setDashboardState((previousState) => ({
+            ...previousState,
+            settingsSnapshot: payload,
+          }));
         }
       } catch (error) {
         if (!cancelled) {
@@ -421,48 +540,71 @@ export function App(): ReactElement {
     [dashboardState.user?.email],
   );
 
-  const onLoginSubmit = useCallback(
-    async (event: FormEvent<HTMLFormElement>): Promise<void> => {
-      event.preventDefault();
+  const hostedSignInRedirect = useCallback(async (): Promise<void> => {
+    if (!clerkClient) {
+      setError("Clerk hosted login is not configured. Check publishable key and API origin.");
+      return;
+    }
 
-      if (!clerkSessionTokenInput.trim().length) {
-        setError("Clerk session token is required");
-        return;
-      }
+    setIsSubmittingLogin(true);
 
-      setIsSubmittingLogin(true);
+    try {
+      await clerkClient.redirectToSignIn({
+        redirectUrl: window.location.href,
+        signInFallbackRedirectUrl: window.location.href,
+      });
+    } catch (error) {
+      setError(getErrorMessage(error));
+      setIsSubmittingLogin(false);
+    }
+  }, [clerkClient, setError]);
 
-      try {
-        await apiRequest("/api/v1/auth/login", {
+  const hostedSignUpRedirect = useCallback(async (): Promise<void> => {
+    if (!clerkClient) {
+      setError("Clerk hosted signup is not configured. Check publishable key and API origin.");
+      return;
+    }
+
+    setIsSubmittingLogin(true);
+
+    try {
+      await clerkClient.redirectToSignUp({
+        redirectUrl: window.location.href,
+        signUpFallbackRedirectUrl: window.location.href,
+      });
+    } catch (error) {
+      setError(getErrorMessage(error));
+      setIsSubmittingLogin(false);
+    }
+  }, [clerkClient, setError]);
+
+  const onMockLogin = useCallback(async (): Promise<void> => {
+    setIsSubmittingLogin(true);
+
+    try {
+      await apiRequest(
+        "/api/v1/auth/login",
+        {
           method: "POST",
           body: JSON.stringify({
-            clerkSessionToken: clerkSessionTokenInput.trim(),
-            clerkUserId: clerkUserIdInput.trim(),
+            clerkSessionToken: "mock-clerk",
           }),
-        });
+        },
+        { csrfToken: null },
+      );
 
-        const hasSession = await loadSession();
-        if (hasSession) {
-          await ensureCsrfToken();
-        }
-        setNotice("Logged in successfully via Clerk.");
-        setHashRoute("/settings");
-      } catch (error) {
-        setError(getErrorMessage(error));
-      } finally {
-        setIsSubmittingLogin(false);
+      const sessionPayload = await loadSession();
+      if (sessionPayload) {
+        await ensureCsrfToken();
+        setHashRoute(sessionPayload.user.isPlatformAdmin ? "/admin" : "/settings");
       }
-    },
-    [
-      apiRequest,
-      clerkSessionTokenInput,
-      clerkUserIdInput,
-      ensureCsrfToken,
-      loadSession,
-      setError,
-      setNotice,
-    ],
-  );
+      setNotice("Logged in successfully via mock Clerk.");
+    } catch (error) {
+      setError(getErrorMessage(error));
+    } finally {
+      setIsSubmittingLogin(false);
+    }
+  }, [apiRequest, ensureCsrfToken, loadSession, setError, setNotice]);
 
   const onSaveApiOrigin = useCallback(async (): Promise<void> => {
     const nextApiOrigin = apiOriginInput.trim();
@@ -480,10 +622,11 @@ export function App(): ReactElement {
     }));
 
     try {
-      await loadClerkConfig(nextApiOrigin);
+      const config = await loadClerkConfig(nextApiOrigin);
+      await initializeClerkClient(config);
 
-      const hasSession = await loadSession(nextApiOrigin);
-      if (hasSession) {
+      const sessionPayload = await loadSession(nextApiOrigin);
+      if (sessionPayload) {
         await ensureCsrfToken(nextApiOrigin);
       }
 
@@ -496,6 +639,7 @@ export function App(): ReactElement {
   }, [
     apiOriginInput,
     ensureCsrfToken,
+    initializeClerkClient,
     loadClerkConfig,
     loadSession,
     setError,
@@ -503,21 +647,40 @@ export function App(): ReactElement {
   ]);
 
   const onLogout = useCallback(async (): Promise<void> => {
+    let logoutError: string | null = null;
+
     try {
       await apiRequest("/api/v1/auth/logout", { method: "POST" });
-      setDashboardState((previousState) => ({
-        ...previousState,
-        user: null,
-        clients: [],
-        activeClientId: null,
-        csrfToken: null,
-      }));
-      setNotice("Logged out.");
-      setHashRoute("/login");
     } catch (error) {
-      setError(getErrorMessage(error));
+      logoutError = getErrorMessage(error);
     }
-  }, [apiRequest, setError, setNotice]);
+
+    try {
+      if (clerkClient) {
+        await clerkClient.signOut();
+      }
+    } catch {
+      // Dashboard logout still completes even if upstream Clerk sign-out fails.
+    }
+
+    setDashboardState((previousState) => ({
+      ...previousState,
+      user: null,
+      clients: [],
+      activeClientId: null,
+      csrfToken: null,
+      settingsSnapshot: null,
+    }));
+    setAllowedDomains([]);
+
+    if (logoutError) {
+      setError(logoutError);
+    } else {
+      setNotice("Logged out.");
+    }
+
+    setHashRoute("/login");
+  }, [apiRequest, clerkClient, setError, setNotice]);
 
   const onSaveSettings = useCallback(
     async (event: FormEvent<HTMLFormElement>): Promise<void> => {
@@ -602,6 +765,74 @@ export function App(): ReactElement {
     }
   }, [installSnippet, setError, setNotice]);
 
+  const onAddAllowedDomain = useCallback(
+    async (event: FormEvent<HTMLFormElement>): Promise<void> => {
+      event.preventDefault();
+
+      if (!allowedDomainInput.trim().length) {
+        setError("Domain is required");
+        return;
+      }
+
+      setIsAdminMutating(true);
+
+      try {
+        const payload = await apiRequest<AddAllowedDomainResponse>(
+          "/api/v1/admin/allowed-domains",
+          {
+            method: "POST",
+            body: JSON.stringify({
+              domain: allowedDomainInput,
+            }),
+          },
+        );
+
+        setAllowedDomains((previousDomains) =>
+          uniqueAllowedDomains([...previousDomains, payload.domain]),
+        );
+        setAllowedDomainInput("");
+        setNotice(`Allowed domain added: ${payload.domain.domain}`);
+      } catch (error) {
+        setError(getErrorMessage(error));
+      } finally {
+        setIsAdminMutating(false);
+      }
+    },
+    [allowedDomainInput, apiRequest, setError, setNotice],
+  );
+
+  const onRemoveAllowedDomain = useCallback(
+    async (domain: string): Promise<void> => {
+      setIsAdminMutating(true);
+
+      try {
+        const payload = await apiRequest<RemoveAllowedDomainResponse>(
+          `/api/v1/admin/allowed-domains/${encodeURIComponent(domain)}`,
+          {
+            method: "DELETE",
+          },
+        );
+
+        if (payload.removed) {
+          setAllowedDomains((previousDomains) =>
+            previousDomains.filter((entry) => entry.domain !== payload.domain),
+          );
+        }
+
+        setNotice(
+          payload.removed
+            ? `Removed allowed domain: ${payload.domain}`
+            : `Domain not found: ${payload.domain}`,
+        );
+      } catch (error) {
+        setError(getErrorMessage(error));
+      } finally {
+        setIsAdminMutating(false);
+      }
+    },
+    [apiRequest, setError, setNotice],
+  );
+
   const isLoggedIn = Boolean(dashboardState.user);
 
   const renderRouteContent = (): ReactElement => {
@@ -681,6 +912,81 @@ export function App(): ReactElement {
               </button>
             </div>
           </form>
+        </section>
+      );
+    }
+
+    if (route === "/admin") {
+      if (isRouteLoading) {
+        return loadingPanel("Loading allowed domains...");
+      }
+
+      if (!dashboardState.user?.isPlatformAdmin) {
+        return (
+          <section className="surface-panel motion-rise">
+            <header className="panel-header">
+              <p className="eyebrow">Admin Access</p>
+              <h2>Access Denied</h2>
+              <p>This route is available only to platform admins.</p>
+            </header>
+          </section>
+        );
+      }
+
+      return (
+        <section className="surface-panel route-admin motion-rise">
+          <header className="panel-header">
+            <p className="eyebrow">Platform Access Policy</p>
+            <h2>Allowed Email Domains</h2>
+            <p>
+              Non-admin users can sign in only when their email domain exactly
+              matches one of these entries.
+            </p>
+          </header>
+
+          <form className="admin-domain-form" onSubmit={onAddAllowedDomain}>
+            <label htmlFor="allowed-domain-input">Add domain</label>
+            <div className="admin-domain-row">
+              <input
+                id="allowed-domain-input"
+                placeholder="example.com"
+                value={allowedDomainInput}
+                onChange={(event) => {
+                  setAllowedDomainInput(event.target.value);
+                }}
+              />
+              <button className="btn-primary" type="submit" disabled={isAdminMutating}>
+                {isAdminMutating ? "Saving..." : "Add Domain"}
+              </button>
+            </div>
+          </form>
+
+          <div className="domain-list">
+            {allowedDomains.length ? (
+              allowedDomains.map((entry) => (
+                <article key={entry.domain} className="domain-item">
+                  <div>
+                    <h3>{entry.domain}</h3>
+                    <p>Added at {new Date(entry.createdAt).toLocaleString()}</p>
+                  </div>
+                  <button
+                    type="button"
+                    className="btn-ghost"
+                    disabled={isAdminMutating}
+                    onClick={() => {
+                      void onRemoveAllowedDomain(entry.domain);
+                    }}
+                  >
+                    Remove
+                  </button>
+                </article>
+              ))
+            ) : (
+              <p className="meta-inline">
+                No allowed domains configured. Non-admin users will be denied login.
+              </p>
+            )}
+          </div>
         </section>
       );
     }
@@ -784,6 +1090,8 @@ export function App(): ReactElement {
   };
 
   if (!isLoggedIn) {
+    const hostedClerkConfigured = Boolean(clerkConfig?.publishableKey.length && clerkClient);
+
     return (
       <div className="dashboard-app auth-shell">
         <div className="ambient-orb ambient-orb-a" aria-hidden="true" />
@@ -827,58 +1135,68 @@ export function App(): ReactElement {
             <p className="eyebrow">Authentication</p>
             <h2>Sign In To Dashboard</h2>
             <p>
-              Exchange a valid Clerk session token with the control-plane API to
-              start a secure dashboard session.
+              Use Clerk hosted authentication for Google SSO or email/password,
+              then the dashboard automatically exchanges your session for
+              `cp_session`.
             </p>
           </header>
 
-          <form className="auth-form" onSubmit={onLoginSubmit}>
-            <label htmlFor="clerk-session-token">Clerk session token</label>
-            <textarea
-              id="clerk-session-token"
-              name="clerkSessionToken"
-              rows={5}
-              placeholder="Paste Clerk __session JWT or mock-clerk token"
-              value={clerkSessionTokenInput}
-              onChange={(event) => {
-                setClerkSessionTokenInput(event.target.value);
+          <div className="auth-actions auth-actions-vertical">
+            <button
+              className="btn-primary"
+              type="button"
+              onClick={() => {
+                void hostedSignInRedirect();
               }}
-              required
-            />
+              disabled={!hostedClerkConfigured || isSubmittingLogin}
+            >
+              {isSubmittingLogin ? "Redirecting..." : "Continue with Google SSO"}
+            </button>
 
-            <label htmlFor="clerk-user-id">Clerk user ID (optional)</label>
-            <input
-              id="clerk-user-id"
-              name="clerkUserId"
-              placeholder="user_..."
-              value={clerkUserIdInput}
-              onChange={(event) => {
-                setClerkUserIdInput(event.target.value);
+            <button
+              className="btn-secondary"
+              type="button"
+              onClick={() => {
+                void hostedSignInRedirect();
               }}
-            />
+              disabled={!hostedClerkConfigured || isSubmittingLogin}
+            >
+              Continue with Email + Password
+            </button>
 
-            <div className="auth-actions">
-              <button className="btn-primary" type="submit" disabled={isSubmittingLogin}>
-                {isSubmittingLogin ? "Signing In..." : "Sign In"}
-              </button>
+            <button
+              className="btn-ghost"
+              type="button"
+              onClick={() => {
+                void hostedSignUpRedirect();
+              }}
+              disabled={!hostedClerkConfigured || isSubmittingLogin}
+            >
+              Create Account
+            </button>
+
+            {clerkConfig?.mockEnabled ? (
               <button
-                type="button"
                 className="btn-ghost"
+                type="button"
                 onClick={() => {
-                  setClerkSessionTokenInput("mock-clerk");
+                  void onMockLogin();
                 }}
+                disabled={isSubmittingLogin}
               >
-                Use Mock Token
+                Developer Mock Login
               </button>
-            </div>
-          </form>
-
-          <div className="auth-note">
-            <p>
-              This dashboard accepts Clerk token exchange only. Password and
-              OAuth fallback paths are intentionally disabled.
-            </p>
+            ) : null}
           </div>
+
+          {!hostedClerkConfigured && !clerkConfig?.mockEnabled ? (
+            <div className="auth-note">
+              <p>
+                Clerk publishable key is not available for this API origin. Update
+                API origin and verify Clerk environment configuration.
+              </p>
+            </div>
+          ) : null}
         </section>
 
         {dashboardState.error ? <p className="feedback error">{dashboardState.error}</p> : null}
@@ -927,10 +1245,24 @@ export function App(): ReactElement {
           >
             Plugins
           </button>
+          {dashboardState.user?.isPlatformAdmin ? (
+            <button
+              className={route === "/admin" ? "active" : ""}
+              onClick={() => {
+                setHashRoute("/admin");
+              }}
+              type="button"
+            >
+              Admin
+            </button>
+          ) : null}
         </nav>
 
         <div className="session-actions">
-          <span className="identity-pill">{userBadgeLabel}</span>
+          <span className="identity-pill">
+            {userBadgeLabel}
+            {dashboardState.user?.isPlatformAdmin ? " (admin)" : ""}
+          </span>
           <button className="btn-ghost" onClick={() => void onLogout()} type="button">
             Logout
           </button>

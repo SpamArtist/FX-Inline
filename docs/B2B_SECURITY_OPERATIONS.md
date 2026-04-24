@@ -76,6 +76,8 @@ Control plane records:
 - `auth.login`
 - `settings.update`
 - `plugin.publish`
+- `admin.allowed_domain.add`
+- `admin.allowed_domain.remove`
 
 Recommended follow-up:
 - Stream audit events to external immutable log storage.

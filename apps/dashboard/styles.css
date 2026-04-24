@@ -323,6 +323,11 @@ a:focus-visible {
   flex-wrap: wrap;
 }
 
+.auth-actions-vertical {
+  display: grid;
+  gap: 0.7rem;
+}
+
 .auth-note {
   border-top: 1px solid var(--line);
   padding-top: 0.9rem;
@@ -503,6 +508,46 @@ a:focus-visible {
   max-width: 640px;
 }
 
+.admin-domain-form {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.52rem;
+}
+
+.admin-domain-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.62rem;
+  align-items: center;
+}
+
+.domain-list {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.domain-item {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0.72rem 0.82rem;
+  background: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.domain-item h3 {
+  font-size: 0.98rem;
+}
+
+.domain-item p {
+  margin-top: 0.2rem;
+  color: var(--text-soft);
+  font-size: 0.84rem;
+}
+
 .panel-actions {
   margin-top: 1rem;
   display: flex;
@@ -664,5 +709,9 @@ a:focus-visible {
 
   .identity-pill {
     max-width: 180px;
+  }
+
+  .admin-domain-row {
+    grid-template-columns: 1fr;
   }
 }
