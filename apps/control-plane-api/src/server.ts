@@ -40,8 +40,6 @@ export async function createServerInstance(envOverrides: Record<string, string |
     databaseUrl: resolveDatabaseUrl(env.databaseUrl),
   });
 
-  await database.seedDemoData();
-
   const signingService = createSigningService({
     privateKeyPath: env.manifestPrivateKeyPath,
     fallbackDirectory: path.resolve(repositoryRoot, "apps/control-plane-api/.data"),

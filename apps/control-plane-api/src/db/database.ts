@@ -612,51 +612,6 @@ function createDatabaseApi({
     return record;
   }
 
-  async function seedDemoData(): Promise<ClientRecord> {
-    const existingClient = await findClientBySlug("acme");
-    if (existingClient) return existingClient;
-
-    const client = await createClient({
-      slug: "acme",
-      name: "ACME Inc",
-      preferredCurrency: "USD",
-      allowedOrigins: ["http://127.0.0.1:5173", "http://localhost:5173"],
-      allowedPaths: ["^/b2b-demo(?:/|$)", "^/pricing(?:/|$)", "^/store(?:/|$)"],
-    });
-
-    await createSettingsVersion({
-      clientId: client.id,
-      settings: {
-        fontScalePct: 90,
-        fontWeight: 600,
-        fontFamily: "inherit",
-        fontColor: "#355aa8",
-        spacingEm: 0.1,
-      },
-      createdByUserId: null,
-    });
-
-    await createPluginArtifact({
-      clientId: client.id,
-      kind: "pre",
-      artifactUrl: "/b2b/clients/acme/pre.v1.js",
-      integrity: "sha256-lu7Y8YbmNXtJXmVFJbtzZgMRjTukAv/Adu+yXIB/qgw=",
-      createdByUserId: null,
-      status: "approved",
-    });
-
-    await createPluginArtifact({
-      clientId: client.id,
-      kind: "post",
-      artifactUrl: "/b2b/clients/acme/post.v1.js",
-      integrity: "sha256-xYRtIxxmKh/DhPVMKEMgwzr4p65nSJvO1V8NPcabXAA=",
-      createdByUserId: null,
-      status: "approved",
-    });
-
-    return client;
-  }
-
   async function runTransaction<T>(callback: (tx: DatabaseApi) => Promise<T>): Promise<T> {
     return runInTransaction(async (txDb) => {
       const txApi = createDatabaseApi({
@@ -692,7 +647,6 @@ function createDatabaseApi({
     createPluginArtifact,
     createManifestVersion,
     createAuditEvent,
-    seedDemoData,
     runTransaction,
   };
 }

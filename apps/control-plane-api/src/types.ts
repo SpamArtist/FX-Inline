@@ -277,7 +277,6 @@ export interface DatabaseApi {
     eventType: string;
     payload?: Record<string, unknown> | null;
   }): Promise<AuditEventRecord>;
-  seedDemoData(): Promise<ClientRecord>;
   runTransaction<T>(callback: (tx: DatabaseApi) => Promise<T>): Promise<T>;
 }
 
