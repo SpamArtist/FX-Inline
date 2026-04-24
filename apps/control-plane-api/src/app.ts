@@ -158,6 +158,19 @@ export function createControlPlaneApp({
 }): ControlPlaneApp {
   const router = createRouter();
 
+  async function assertPlatformAdmin(ctx: RouteContext): Promise<UserRecord> {
+    if (!ctx.user) {
+      throw createApiError("AUTH_REQUIRED", "Authentication required", null, 401);
+    }
+
+    const isPlatformAdmin = await authService.isPlatformAdminForUser(ctx.user);
+    if (!isPlatformAdmin) {
+      throw createApiError("AUTH_ADMIN_FORBIDDEN", "Platform admin access required", null, 403);
+    }
+
+    return ctx.user;
+  }
+
   router.register("GET", "/health", () => {
     return {
       statusCode: 200,
@@ -206,6 +219,7 @@ export function createControlPlaneApp({
         user: {
           ...userPayload(login.user),
           clerkUserId: login.user.clerkUserId,
+          isPlatformAdmin: login.isPlatformAdmin,
         },
         created: login.created,
       },
@@ -248,6 +262,7 @@ export function createControlPlaneApp({
     }
 
     const clients = await authService.getUserClients(ctx.user.id);
+    const isPlatformAdmin = await authService.isPlatformAdminForUser(ctx.user);
 
     return {
       statusCode: 200,
@@ -255,6 +270,7 @@ export function createControlPlaneApp({
         user: {
           ...userPayload(ctx.user),
           clerkUserId: ctx.user.clerkUserId,
+          isPlatformAdmin,
         },
         clients,
       },
@@ -287,6 +303,75 @@ export function createControlPlaneApp({
       },
     };
   });
+
+  router.register(
+    "GET",
+    "/api/v1/admin/allowed-domains",
+    { requiresAuth: true },
+    async (ctx) => {
+      await assertPlatformAdmin(ctx);
+
+      const domains = await authService.listAllowedEmailDomains();
+      return {
+        statusCode: 200,
+        payload: {
+          domains,
+        },
+      };
+    },
+  );
+
+  router.register(
+    "POST",
+    "/api/v1/admin/allowed-domains",
+    { requiresAuth: true, requiresCsrf: true },
+    async (ctx) => {
+      const adminUser = await assertPlatformAdmin(ctx);
+      const payload = await readJsonBody(ctx.request);
+      const domain = toStringValue(payload.domain);
+
+      if (!domain.length) {
+        throw createApiError(
+          "ADMIN_DOMAIN_MISSING",
+          "domain is required",
+          { field: "domain" },
+          400,
+        );
+      }
+
+      const record = await authService.addAllowedEmailDomain({
+        domain,
+        actorUserId: adminUser.id,
+      });
+
+      return {
+        statusCode: 201,
+        payload: {
+          domain: record,
+        },
+      };
+    },
+  );
+
+  router.register(
+    "DELETE",
+    "/api/v1/admin/allowed-domains/:domain",
+    { requiresAuth: true, requiresCsrf: true },
+    async (ctx) => {
+      const adminUser = await assertPlatformAdmin(ctx);
+      const result = await authService.removeAllowedEmailDomain({
+        domain: ctx.params.domain,
+        actorUserId: adminUser.id,
+      });
+
+      return {
+        statusCode: 200,
+        payload: {
+          ...result,
+        },
+      };
+    },
+  );
 
   router.register("GET", "/api/v1/clients", { requiresAuth: true }, async (ctx) => {
     if (!ctx.user) {

@@ -9,12 +9,14 @@ import { applyMigrations } from "./migrate.js";
 import type { DrizzleDb } from "./database.types.js";
 import type { MigrationExecutor } from "./migrate.types.js";
 import {
+  allowedEmailDomainsTable,
   auditEventsTable,
   clientMembersTable,
   clientsTable,
   clientSettingsVersionsTable,
   controlPlaneSchema,
   manifestVersionsTable,
+  platformAdminIdentitiesTable,
   pluginArtifactsTable,
   sessionsTable,
   usersTable,
@@ -23,6 +25,7 @@ import { createId } from "../utils/ids.js";
 import { parseJsonSafe } from "../utils/json.js";
 import { nowMs } from "../utils/time.js";
 import type {
+  AllowedEmailDomainRecord,
   AuditEventRecord,
   ClientMembershipRecord,
   ClientRecord,
@@ -30,6 +33,7 @@ import type {
   DatabaseApi,
   ManifestVersionRecord,
   MembershipRole,
+  PlatformAdminIdentityRecord,
   PluginArtifactRecord,
   PluginArtifactStatus,
   PluginKind,
@@ -56,6 +60,32 @@ function toUserRecord(row: typeof usersTable.$inferSelect | null | undefined): U
     email: row.email,
     clerkUserId: row.clerkUserId,
     displayName: row.displayName ?? "",
+    createdAt: row.createdAt,
+  };
+}
+
+function toPlatformAdminIdentityRecord(
+  row: typeof platformAdminIdentitiesTable.$inferSelect | null | undefined,
+): PlatformAdminIdentityRecord | null {
+  if (!row) return null;
+
+  return {
+    email: row.email,
+    clerkUserId: row.clerkUserId,
+    createdByUserId: row.createdByUserId,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  };
+}
+
+function toAllowedEmailDomainRecord(
+  row: typeof allowedEmailDomainsTable.$inferSelect | null | undefined,
+): AllowedEmailDomainRecord | null {
+  if (!row) return null;
+
+  return {
+    domain: row.domain,
+    createdByUserId: row.createdByUserId,
     createdAt: row.createdAt,
   };
 }
@@ -255,6 +285,167 @@ function createDatabaseApi({
       .limit(1);
 
     return toUserRecord(rows[0]);
+  }
+
+  async function upsertPlatformAdminIdentity({
+    email,
+    clerkUserId,
+    createdByUserId,
+  }: {
+    email: string;
+    clerkUserId: string | null;
+    createdByUserId: string | null;
+  }): Promise<PlatformAdminIdentityRecord> {
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedClerkUserId =
+      typeof clerkUserId === "string" && clerkUserId.trim().length ? clerkUserId.trim() : null;
+    const timestamp = nowMs();
+
+    const existingRows = await db
+      .select()
+      .from(platformAdminIdentitiesTable)
+      .where(sql`lower(${platformAdminIdentitiesTable.email}) = lower(${normalizedEmail})`)
+      .limit(1);
+
+    const existing = existingRows[0];
+    if (!existing) {
+      const record: PlatformAdminIdentityRecord = {
+        email: normalizedEmail,
+        clerkUserId: normalizedClerkUserId,
+        createdByUserId,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      };
+
+      await db.insert(platformAdminIdentitiesTable).values({
+        email: record.email,
+        clerkUserId: record.clerkUserId,
+        createdByUserId: record.createdByUserId,
+        createdAt: record.createdAt,
+        updatedAt: record.updatedAt,
+      });
+
+      return record;
+    }
+
+    const nextClerkUserId = normalizedClerkUserId ?? existing.clerkUserId ?? null;
+    const nextCreatedByUserId = createdByUserId ?? existing.createdByUserId ?? null;
+
+    await db
+      .update(platformAdminIdentitiesTable)
+      .set({
+        clerkUserId: nextClerkUserId,
+        createdByUserId: nextCreatedByUserId,
+        updatedAt: timestamp,
+      })
+      .where(eq(platformAdminIdentitiesTable.email, existing.email));
+
+    return {
+      email: existing.email,
+      clerkUserId: nextClerkUserId,
+      createdByUserId: nextCreatedByUserId,
+      createdAt: existing.createdAt,
+      updatedAt: timestamp,
+    };
+  }
+
+  async function isPlatformAdminByIdentity({
+    email,
+    clerkUserId,
+  }: {
+    email: string;
+    clerkUserId?: string | null;
+  }): Promise<boolean> {
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedClerkUserId =
+      typeof clerkUserId === "string" && clerkUserId.trim().length ? clerkUserId.trim() : null;
+
+    const rows = await db
+      .select()
+      .from(platformAdminIdentitiesTable)
+      .where(sql`lower(${platformAdminIdentitiesTable.email}) = lower(${normalizedEmail})`)
+      .limit(1);
+
+    const matched = toPlatformAdminIdentityRecord(rows[0]);
+    if (!matched) {
+      return false;
+    }
+
+    if (
+      matched.clerkUserId &&
+      normalizedClerkUserId &&
+      matched.clerkUserId !== normalizedClerkUserId
+    ) {
+      return false;
+    }
+
+    if (!matched.clerkUserId && normalizedClerkUserId) {
+      await db
+        .update(platformAdminIdentitiesTable)
+        .set({
+          clerkUserId: normalizedClerkUserId,
+          updatedAt: nowMs(),
+        })
+        .where(eq(platformAdminIdentitiesTable.email, matched.email));
+    }
+
+    return true;
+  }
+
+  async function listAllowedEmailDomains(): Promise<AllowedEmailDomainRecord[]> {
+    const rows = await db
+      .select()
+      .from(allowedEmailDomainsTable)
+      .orderBy(asc(allowedEmailDomainsTable.domain));
+
+    return rows
+      .map((row) => toAllowedEmailDomainRecord(row))
+      .filter((row): row is AllowedEmailDomainRecord => Boolean(row));
+  }
+
+  async function addAllowedEmailDomain({
+    domain,
+    createdByUserId,
+  }: {
+    domain: string;
+    createdByUserId: string | null;
+  }): Promise<AllowedEmailDomainRecord> {
+    const normalizedDomain = domain.trim().toLowerCase();
+
+    const existingRows = await db
+      .select()
+      .from(allowedEmailDomainsTable)
+      .where(eq(allowedEmailDomainsTable.domain, normalizedDomain))
+      .limit(1);
+
+    const existing = toAllowedEmailDomainRecord(existingRows[0]);
+    if (existing) {
+      return existing;
+    }
+
+    const record: AllowedEmailDomainRecord = {
+      domain: normalizedDomain,
+      createdByUserId,
+      createdAt: nowMs(),
+    };
+
+    await db.insert(allowedEmailDomainsTable).values({
+      domain: record.domain,
+      createdByUserId: record.createdByUserId,
+      createdAt: record.createdAt,
+    });
+
+    return record;
+  }
+
+  async function removeAllowedEmailDomain(domain: string): Promise<boolean> {
+    const normalizedDomain = domain.trim().toLowerCase();
+    const deletedRows = await db
+      .delete(allowedEmailDomainsTable)
+      .where(eq(allowedEmailDomainsTable.domain, normalizedDomain))
+      .returning();
+
+    return deletedRows.length > 0;
   }
 
   async function createClient({
@@ -631,6 +822,11 @@ function createDatabaseApi({
     findUserByEmail,
     findUserByClerkUserId,
     findUserById,
+    upsertPlatformAdminIdentity,
+    isPlatformAdminByIdentity,
+    listAllowedEmailDomains,
+    addAllowedEmailDomain,
+    removeAllowedEmailDomain,
     createClient,
     findClientById,
     findClientBySlug,

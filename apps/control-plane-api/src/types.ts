@@ -43,6 +43,20 @@ export interface UserRecord {
   createdAt: number;
 }
 
+export interface AllowedEmailDomainRecord {
+  domain: string;
+  createdByUserId: string | null;
+  createdAt: number;
+}
+
+export interface PlatformAdminIdentityRecord {
+  email: string;
+  clerkUserId: string | null;
+  createdByUserId: string | null;
+  createdAt: number;
+  updatedAt: number;
+}
+
 export interface ClientRecord {
   id: string;
   slug: string;
@@ -219,6 +233,21 @@ export interface DatabaseApi {
   findUserByEmail(email: string): Promise<UserRecord | null>;
   findUserByClerkUserId(clerkUserId: string): Promise<UserRecord | null>;
   findUserById(userId: string): Promise<UserRecord | null>;
+  upsertPlatformAdminIdentity(input: {
+    email: string;
+    clerkUserId: string | null;
+    createdByUserId: string | null;
+  }): Promise<PlatformAdminIdentityRecord>;
+  isPlatformAdminByIdentity(input: {
+    email: string;
+    clerkUserId?: string | null;
+  }): Promise<boolean>;
+  listAllowedEmailDomains(): Promise<AllowedEmailDomainRecord[]>;
+  addAllowedEmailDomain(input: {
+    domain: string;
+    createdByUserId: string | null;
+  }): Promise<AllowedEmailDomainRecord>;
+  removeAllowedEmailDomain(domain: string): Promise<boolean>;
   createClient(input: {
     slug: string;
     name: string;
@@ -288,6 +317,20 @@ export interface AuthService {
     user: UserRecord;
     session: SessionRecord;
     created: boolean;
+    isPlatformAdmin: boolean;
+  }>;
+  isPlatformAdminForUser(user: UserRecord): Promise<boolean>;
+  listAllowedEmailDomains(): Promise<AllowedEmailDomainRecord[]>;
+  addAllowedEmailDomain(input: {
+    domain: string;
+    actorUserId: string;
+  }): Promise<AllowedEmailDomainRecord>;
+  removeAllowedEmailDomain(input: {
+    domain: string;
+    actorUserId: string;
+  }): Promise<{
+    removed: boolean;
+    domain: string;
   }>;
   createSessionForUser(userId: string, clerkSessionId: string | null): Promise<SessionRecord>;
   validateSession(sessionId: string | null): Promise<SessionValidationResult | null>;

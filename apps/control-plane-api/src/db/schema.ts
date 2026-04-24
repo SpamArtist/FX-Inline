@@ -13,6 +13,20 @@ export const usersTable = pgTable("users", {
   createdAt: bigint("created_at", { mode: "number" }).notNull(),
 });
 
+export const platformAdminIdentitiesTable = pgTable("platform_admin_identities", {
+  email: text("email").primaryKey(),
+  clerkUserId: text("clerk_user_id"),
+  createdByUserId: text("created_by_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+  createdAt: bigint("created_at", { mode: "number" }).notNull(),
+  updatedAt: bigint("updated_at", { mode: "number" }).notNull(),
+});
+
+export const allowedEmailDomainsTable = pgTable("allowed_email_domains", {
+  domain: text("domain").primaryKey(),
+  createdByUserId: text("created_by_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+  createdAt: bigint("created_at", { mode: "number" }).notNull(),
+});
+
 export const clientsTable = pgTable("clients", {
   id: text("id").primaryKey(),
   slug: text("slug").notNull().unique(),
@@ -106,6 +120,8 @@ export const auditEventsTable = pgTable("audit_events", {
 export const controlPlaneSchema = {
   schemaMigrationsTable,
   usersTable,
+  platformAdminIdentitiesTable,
+  allowedEmailDomainsTable,
   clientsTable,
   clientMembersTable,
   clientSettingsVersionsTable,

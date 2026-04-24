@@ -15,6 +15,26 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_users_clerk_user_id
   ON users(clerk_user_id)
   WHERE clerk_user_id IS NOT NULL;
 
+CREATE TABLE IF NOT EXISTS platform_admin_identities (
+  email TEXT PRIMARY KEY,
+  clerk_user_id TEXT,
+  created_by_user_id TEXT,
+  created_at BIGINT NOT NULL,
+  updated_at BIGINT NOT NULL,
+  FOREIGN KEY(created_by_user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_platform_admin_identities_clerk_user_id
+  ON platform_admin_identities(clerk_user_id)
+  WHERE clerk_user_id IS NOT NULL;
+
+CREATE TABLE IF NOT EXISTS allowed_email_domains (
+  domain TEXT PRIMARY KEY,
+  created_by_user_id TEXT,
+  created_at BIGINT NOT NULL,
+  FOREIGN KEY(created_by_user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
 CREATE TABLE IF NOT EXISTS clients (
   id TEXT PRIMARY KEY,
   slug TEXT NOT NULL UNIQUE,

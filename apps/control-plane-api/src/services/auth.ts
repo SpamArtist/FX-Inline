@@ -1,7 +1,9 @@
 import crypto from "node:crypto";
 import { createId } from "../utils/ids.js";
 import { hoursFromNow, nowMs } from "../utils/time.js";
+import { createApiError } from "../utils/http.js";
 import type {
+  AllowedEmailDomainRecord,
   AuthService,
   ClientRecord,
   ClerkAuthService,
@@ -14,6 +16,23 @@ import type {
 
 function normalizeEmail(value: string): string {
   return value.trim().toLowerCase();
+}
+
+function normalizeDomain(value: string): string {
+  return value.trim().toLowerCase();
+}
+
+function extractDomainFromEmail(email: string): string | null {
+  const atIndex = email.lastIndexOf("@");
+  if (atIndex <= 0 || atIndex >= email.length - 1) {
+    return null;
+  }
+
+  return normalizeDomain(email.slice(atIndex + 1));
+}
+
+function isValidDomainSyntax(domain: string): boolean {
+  return /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/u.test(domain);
 }
 
 function slugify(value: string): string {
@@ -195,7 +214,45 @@ export function createAuthService({
       clerkUserId,
     });
 
+    const normalizedEmail = normalizeEmail(verifiedIdentity.email);
+    const emailDomain = extractDomainFromEmail(normalizedEmail);
+    if (!emailDomain) {
+      throw createApiError(
+        "AUTH_EMAIL_INVALID",
+        "Verified identity does not include a valid email domain",
+        null,
+        400,
+      );
+    }
+
     return database.runTransaction(async (tx) => {
+      const isPlatformAdmin = await tx.isPlatformAdminByIdentity({
+        email: normalizedEmail,
+        clerkUserId: verifiedIdentity.clerkUserId,
+      });
+
+      if (!isPlatformAdmin) {
+        const allowedDomains = await tx.listAllowedEmailDomains();
+        if (!allowedDomains.length) {
+          throw createApiError(
+            "AUTH_DOMAIN_ALLOWLIST_EMPTY",
+            "No client domains are allowed yet. Contact platform admin.",
+            null,
+            403,
+          );
+        }
+
+        const isAllowed = allowedDomains.some((entry) => entry.domain === emailDomain);
+        if (!isAllowed) {
+          throw createApiError(
+            "AUTH_DOMAIN_NOT_ALLOWED",
+            "Your email domain is not allowed for this dashboard.",
+            { domain: emailDomain },
+            403,
+          );
+        }
+      }
+
       const resolvedUser = await resolveUserFromClerkIdentity(tx, verifiedIdentity);
       const session = await createSessionForDatabase(
         tx,
@@ -210,6 +267,8 @@ export function createAuthService({
           method: "clerk",
           clerkUserId: verifiedIdentity.clerkUserId,
           clerkSessionId: verifiedIdentity.clerkSessionId,
+          emailDomain,
+          isPlatformAdmin,
         },
       });
 
@@ -217,6 +276,7 @@ export function createAuthService({
         user: resolvedUser.user,
         session,
         created: resolvedUser.created,
+        isPlatformAdmin,
       };
     });
   }
@@ -254,6 +314,88 @@ export function createAuthService({
     return database.listClientsForUser(userId);
   }
 
+  async function isPlatformAdminForUser(user: UserRecord): Promise<boolean> {
+    return database.isPlatformAdminByIdentity({
+      email: user.email,
+      clerkUserId: user.clerkUserId,
+    });
+  }
+
+  async function listAllowedEmailDomains(): Promise<AllowedEmailDomainRecord[]> {
+    return database.listAllowedEmailDomains();
+  }
+
+  async function addAllowedEmailDomain({
+    domain,
+    actorUserId,
+  }: {
+    domain: string;
+    actorUserId: string;
+  }): Promise<AllowedEmailDomainRecord> {
+    const normalizedDomain = normalizeDomain(domain);
+    if (!isValidDomainSyntax(normalizedDomain)) {
+      throw createApiError(
+        "ADMIN_DOMAIN_INVALID",
+        "Domain must be a valid hostname like example.com",
+        { domain },
+        400,
+      );
+    }
+
+    return database.runTransaction(async (tx) => {
+      const record = await tx.addAllowedEmailDomain({
+        domain: normalizedDomain,
+        createdByUserId: actorUserId,
+      });
+
+      await tx.createAuditEvent({
+        userId: actorUserId,
+        eventType: "admin.allowed_domain.add",
+        payload: {
+          domain: record.domain,
+        },
+      });
+
+      return record;
+    });
+  }
+
+  async function removeAllowedEmailDomain({
+    domain,
+    actorUserId,
+  }: {
+    domain: string;
+    actorUserId: string;
+  }): Promise<{ removed: boolean; domain: string }> {
+    const normalizedDomain = normalizeDomain(domain);
+    if (!isValidDomainSyntax(normalizedDomain)) {
+      throw createApiError(
+        "ADMIN_DOMAIN_INVALID",
+        "Domain must be a valid hostname like example.com",
+        { domain },
+        400,
+      );
+    }
+
+    return database.runTransaction(async (tx) => {
+      const removed = await tx.removeAllowedEmailDomain(normalizedDomain);
+
+      await tx.createAuditEvent({
+        userId: actorUserId,
+        eventType: "admin.allowed_domain.remove",
+        payload: {
+          domain: normalizedDomain,
+          removed,
+        },
+      });
+
+      return {
+        removed,
+        domain: normalizedDomain,
+      };
+    });
+  }
+
   async function getClientAccess({ userId, clientId }: { userId: string; clientId: string }) {
     const membership = await database.findClientMembership({ userId, clientId });
     if (!membership) {
@@ -278,6 +420,10 @@ export function createAuthService({
     validateSession,
     logoutSession,
     getUserClients,
+    isPlatformAdminForUser,
+    listAllowedEmailDomains,
+    addAllowedEmailDomain,
+    removeAllowedEmailDomain,
     getClientAccess,
   };
 }
