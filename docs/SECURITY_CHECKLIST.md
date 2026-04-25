@@ -1,6 +1,6 @@
 # Security Checklist
 
-_Last updated: 2026-04-20_
+_Last updated: 2026-04-25_
 
 ## 1. Manifest surface and CSP
 
@@ -39,7 +39,7 @@ _Last updated: 2026-04-20_
 
 - [ ] Firefox manifest gecko id remains fixed (`fx-inline@xbotpc`).
 - [ ] Gecko `data_collection_permissions.required = ["none"]` is present.
-- [ ] Build post-processing patch for fragile Firefox `innerHTML` assignments remains active.
+- [ ] Firefox build post-processing keeps generated manifest `version` and `version_name` aligned with the release tag.
 
 ## 6. Privacy and telemetry boundaries
 

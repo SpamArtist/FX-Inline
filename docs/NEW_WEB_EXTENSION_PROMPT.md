@@ -69,7 +69,7 @@ Implement equivalent manifest behavior via WXT config:
 - `browser_specific_settings.gecko.id = "fx-inline@xbotpc"`
 - include `data_collection_permissions.required = ["none"]`.
 7. Build hardening behavior:
-- include post-bundle patching to replace fragile Firefox `innerHTML` patterns with safer equivalents.
+- include post-bundle patching for Firefox manifest version fields so generated artifacts match the release tag metadata.
 
 ## 4) Required Extension Pages and Entrypoints
 
@@ -130,7 +130,23 @@ Implement these extension entrypoints and behaviors exactly.
 7. Options HTML metadata:
 - include `<meta name="manifest.open_in_tab" content="true" />`.
 
-### C) Content Script (all URLs)
+### C) Welcome Page (`welcome.html`, open in tab on fresh install)
+
+1. Title: `Welcome to FX Inline`.
+2. Open only when the extension is freshly installed.
+3. Page shell:
+- brand text `FX Inline`
+- onboarding copy that explains the converter and points users to Settings
+- primary button text `Open Settings`
+4. On click:
+- first call `browser.runtime.openOptionsPage()`
+- fallback: `browser.tabs.create({ url: browser.runtime.getURL("/options.html") })`
+5. Implementation notes:
+- render the page with direct DOM APIs
+- keep the page idempotent and avoid raw HTML injection
+- include `<meta name="manifest.open_in_tab" content="true" />`.
+
+### D) Content Script (all URLs)
 
 1. Match pattern: `<all_urls>`.
 2. `cssInjectionMode: "manual"`.
@@ -147,7 +163,7 @@ Implement these extension entrypoints and behaviors exactly.
 - `characterData: true`
 5. Ignore self-triggered mutations while conversion suppression is active.
 
-### D) Selection Popup in Webpages
+### E) Selection Popup in Webpages
 
 1. On `mouseup`:
 - read selected text
@@ -173,13 +189,14 @@ Implement these extension entrypoints and behaviors exactly.
 - remove popup when clicking outside and selection is cleared
 - `removePopup()` and `destroy()` must be idempotent
 
-### E) Background Script
+### F) Background Script
 
 1. Alarm name: `ccx-refresh-rates`.
 2. Interval: every 30 minutes.
 3. On install:
 - schedule alarm
 - refresh rates with force refresh
+- open the welcome page only when the install reason is `install`
 4. On startup:
 - schedule alarm
 - refresh rates

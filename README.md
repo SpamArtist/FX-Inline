@@ -44,10 +44,10 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 - `https://api.exchangerate-api.com/v4/latest/USD`
 
 ### Test Inventory
-- Total test files: `18`
+- Total test files: `19`
 - content: `6`
 - release: `1`
-- unit: `11`
+- unit: `12`
 
 ### Scripts
 | Script | Command |
@@ -84,18 +84,20 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run currency-detection:test` | `npm run jest -- packages/currency-detection/test` |
 | `npm run currency-detection:bench` | `node packages/currency-detection/scripts/run-benchmarks.mjs` |
 | `npm run currency-detection:bench:compare` | `node packages/currency-detection/scripts/compare-benchmarks.mjs` |
+| `npm run inline-runtime:build` | `vite build --config packages/inline-runtime/vite.config.mjs` |
+| `npm run inline-runtime:test` | `npm run jest -- packages/inline-runtime/test` |
 | `npm run postinstall` | `wxt prepare` |
 | `npm run readme:sync` | `node scripts/readme-sync.mjs` |
 | `npm run readme:sync:check` | `node scripts/readme-sync.mjs --check` |
 
 ### Recent Changes (first-parent, excluding README automation commits)
+- 2026-04-25 `3b18be5` update
+- 2026-04-23 `a3e4b1e` Merge branch 'main' of https://github.com/SpamArtist/currency-conversion-extension-tool
+- 2026-04-23 `8717671` update
+- 2026-04-21 `c87eb22` Codex/welcome page install (#25)
+- 2026-04-21 `150c49f` feat: add post-install welcome page (#24)
+- 2026-04-21 `846850d` docs: align release docs with tag-driven workflow
 - 2026-04-20 `fe83acc` missing
 - 2026-04-20 `4f5c47d` REMOVED
-- 2026-04-20 `e20a3ce` Merge branch 'main' of https://github.com/SpamArtist/currency-conversion-extension-tool
-- 2026-04-19 `2952f84` build: add tag-driven release plumbing
-- 2026-04-19 `9ce0b9f` ci: add tag-driven release workflow
-- 2026-04-19 `833939e` test: add release versioning coverage
-- 2026-04-19 `df53eba` docs: add revenue review for 2026-04-19
-- 2026-04-19 `7d970d3` docs: add revenue review for 2026-04-19
 
 <!-- AUTO-GENERATED:END -->

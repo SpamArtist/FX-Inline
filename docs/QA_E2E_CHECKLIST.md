@@ -1,6 +1,6 @@
 # E2E Extension Checklist
 
-_Last updated: 2026-04-17_
+_Last updated: 2026-04-25_
 
 ## Preconditions
 
@@ -9,7 +9,18 @@ _Last updated: 2026-04-17_
 - Use a page with visible prices and dynamic updates (SPA/news feed/e-commerce).
 - Test at least once on Chromium and once on Firefox.
 
-## 1. Popup converter and settings actions
+## 1. Fresh install welcome page
+
+1. Install the extension in a clean browser profile.
+2. Confirm a `Welcome to FX Inline` tab opens only for the fresh install flow.
+3. Click `Open Settings` and confirm the options page opens.
+4. Close the welcome page and verify it does not reopen on extension startup or update.
+
+Expected:
+- Fresh installs open the onboarding page once.
+- The welcome page can open Settings with the runtime fallback path.
+
+## 2. Popup converter and settings actions
 
 1. Open extension popup from toolbar.
 2. Verify two rows render with editable amount displays and currency dropdowns.
@@ -24,7 +35,7 @@ Expected:
 - Local toggle is disabled when active tab origin is unavailable.
 - Global/local toggle states persist after reopening popup.
 
-## 2. Options page preferred currency persistence
+## 3. Options page preferred currency persistence
 
 1. Open options page.
 2. Change preferred currency to another code.
@@ -34,7 +45,7 @@ Expected:
 Expected:
 - Preferred currency persists across popup/content runtime.
 
-## 3. Selection popup on arbitrary pages
+## 4. Selection popup on arbitrary pages
 
 1. Select values in formats:
 - `100`
@@ -50,7 +61,7 @@ Expected:
 Expected:
 - Popup lifecycle remains stable; no duplicate roots or stuck overlays.
 
-## 4. Inline conversion in text nodes
+## 5. Inline conversion in text nodes
 
 1. Load a page with plain text prices (mixed formats and currencies).
 2. Confirm each converted instance renders as `original (converted)`.
@@ -61,7 +72,7 @@ Expected:
 - Wrapper class: `ccx-inline-conversion`.
 - Converted amount node: `.ccx-converted-amount`.
 
-## 5. Structured price conversion coverage
+## 6. Structured price conversion coverage
 
 1. Test Amazon-like split prices (`symbol + whole + decimal + fraction` fragments).
 2. Test sibling symbol/amount layouts, including `yen/month` style text near numeric amount.
@@ -71,7 +82,7 @@ Expected:
 - Add-on wrappers are appended to structured roots/amount nodes and refresh in place.
 - Existing add-ons are removed if source snippet becomes invalid.
 
-## 6. False-positive safety checks
+## 7. False-positive safety checks
 
 1. Visit content containing usernames/handles (for example `@kes11av`, `kes11buddy`).
 2. Include valid prices nearby (for example `USD350/week`, `KES 11`).
@@ -81,7 +92,7 @@ Expected:
 Expected:
 - No handle/prose false-positive wrappers.
 
-## 7. Rate fetch and refresh behavior
+## 8. Rate fetch and refresh behavior
 
 1. Trigger a conversion with normal network access.
 2. Confirm rate snapshot is cached and reused within market-day policy.
@@ -92,7 +103,7 @@ Expected:
 - Alarm `ccx-refresh-rates` refreshes rates every 30 minutes.
 - If fetch fails and cache is valid, conversions still work from cache.
 
-## 8. Runtime stability on dynamic pages
+## 9. Runtime stability on dynamic pages
 
 1. On a high-mutation SPA page, trigger repeated content updates.
 2. Verify conversions continue appearing on newly inserted content.
