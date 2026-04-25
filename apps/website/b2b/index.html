@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FX Inline | B2B Routes</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        background: #0a1420;
+        color: #e7f3ff;
+      }
+
+      body {
+        margin: 0;
+      }
+
+      main {
+        width: min(820px, calc(100% - 2rem));
+        margin: 1.2rem auto;
+        border: 1px solid rgba(135, 189, 235, 0.32);
+        border-radius: 16px;
+        padding: 1.1rem;
+        background: rgba(14, 29, 45, 0.92);
+      }
+
+      h1,
+      h2,
+      p {
+        margin: 0;
+      }
+
+      h2 {
+        margin-top: 1rem;
+        font-size: 1.05rem;
+      }
+
+      p {
+        margin-top: 0.55rem;
+        color: #b9cee4;
+      }
+
+      ul {
+        margin: 0.75rem 0 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 0.55rem;
+      }
+
+      li {
+        border: 1px solid rgba(135, 189, 235, 0.24);
+        border-radius: 10px;
+        background: rgba(15, 35, 54, 0.84);
+        padding: 0.65rem 0.75rem;
+      }
+
+      a {
+        color: #84dbff;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      a:hover {
+        color: #b8ecff;
+      }
+
+      code {
+        color: #c8ddf3;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>B2B Loader Routes</h1>
+      <p>
+        Routes under <code>/b2b</code> used by the client script-tag loader flow.
+      </p>
+
+      <h2>Pages</h2>
+      <ul>
+        <li><a href="/b2b-demo.html">/b2b-demo.html</a></li>
+      </ul>
+
+      <h2>Loader and artifacts</h2>
+      <ul>
+        <li><a href="/b2b/loader.v1.js">/b2b/loader.v1.js</a></li>
+        <li><a href="/b2b/manifests/acme.signed.json">/b2b/manifests/acme.signed.json</a></li>
+        <li><a href="/b2b/settings/acme.json">/b2b/settings/acme.json</a></li>
+        <li><a href="/b2b/clients/acme/pre.v1.js">/b2b/clients/acme/pre.v1.js</a></li>
+        <li><a href="/b2b/clients/acme/post.v1.js">/b2b/clients/acme/post.v1.js</a></li>
+      </ul>
+
+      <h2>Runtime modules</h2>
+      <ul>
+        <li><a href="/b2b-runtime/">/b2b-runtime/</a></li>
+      </ul>
+    </main>
+  </body>
+</html>

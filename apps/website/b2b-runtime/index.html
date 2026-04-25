@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FX Inline | B2B Runtime Modules</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        background: #0a1420;
+        color: #e7f3ff;
+      }
+
+      body {
+        margin: 0;
+      }
+
+      main {
+        width: min(820px, calc(100% - 2rem));
+        margin: 1.2rem auto;
+        border: 1px solid rgba(135, 189, 235, 0.32);
+        border-radius: 16px;
+        padding: 1.1rem;
+        background: rgba(14, 29, 45, 0.92);
+      }
+
+      h1,
+      h2,
+      p {
+        margin: 0;
+      }
+
+      h2 {
+        margin-top: 1rem;
+        font-size: 1.05rem;
+      }
+
+      p {
+        margin-top: 0.55rem;
+        color: #b9cee4;
+      }
+
+      ul {
+        margin: 0.75rem 0 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 0.55rem;
+      }
+
+      li {
+        border: 1px solid rgba(135, 189, 235, 0.24);
+        border-radius: 10px;
+        background: rgba(15, 35, 54, 0.84);
+        padding: 0.65rem 0.75rem;
+      }
+
+      a {
+        color: #84dbff;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      a:hover {
+        color: #b8ecff;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>B2B Runtime Module Routes</h1>
+      <p>
+        ES modules used by <code>/b2b/loader.v1.js</code> to execute signed manifests.
+      </p>
+
+      <h2>Entrypoints</h2>
+      <ul>
+        <li><a href="/b2b-runtime/index.js">/b2b-runtime/index.js</a></li>
+        <li><a href="/b2b-runtime/loader.js">/b2b-runtime/loader.js</a></li>
+      </ul>
+
+      <h2>Core runtime modules</h2>
+      <ul>
+        <li><a href="/b2b-runtime/engine.js">/b2b-runtime/engine.js</a></li>
+        <li><a href="/b2b-runtime/manifest.js">/b2b-runtime/manifest.js</a></li>
+        <li><a href="/b2b-runtime/settings.js">/b2b-runtime/settings.js</a></li>
+        <li><a href="/b2b-runtime/rates.js">/b2b-runtime/rates.js</a></li>
+        <li><a href="/b2b-runtime/conversion.js">/b2b-runtime/conversion.js</a></li>
+        <li><a href="/b2b-runtime/canonicalize.js">/b2b-runtime/canonicalize.js</a></li>
+        <li><a href="/b2b-runtime/crypto.js">/b2b-runtime/crypto.js</a></li>
+      </ul>
+
+      <h2>Related pages</h2>
+      <ul>
+        <li><a href="/b2b/">/b2b/</a></li>
+        <li><a href="/public-b2b/">/public-b2b/</a></li>
+      </ul>
+    </main>
+  </body>
+</html>

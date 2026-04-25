@@ -26,6 +26,9 @@ export default defineConfig({
         index: path.resolve(currentDirectory, "index.html"),
         playground: path.resolve(currentDirectory, "playground.html"),
         b2bDemo: path.resolve(currentDirectory, "b2b-demo.html"),
+        "b2b/index": path.resolve(currentDirectory, "b2b/index.html"),
+        "b2b-runtime/index": path.resolve(currentDirectory, "b2b-runtime/index.html"),
+        "public-b2b/index": path.resolve(currentDirectory, "public-b2b/index.html"),
         b2bLoaderV1: path.resolve(currentDirectory, "b2b/loader.v1.js"),
       },
       output: {
