@@ -69,6 +69,7 @@ Example:
 
 ## Ignore rules:
 - Ignore the `LikeC4/` folder completely unless the user explicitly asks otherwise.
+- Ignore the `NEW_WEB_EXTENSION_PROMPT.md` file completely unless the user explicitly asks otherwise.
 - Ignore any `graphify/`, `Graphify/`, graph-generation folders, graph-export folders, architecture-diagram output folders, and related generated graph artifacts unless the user explicitly asks otherwise.
 - Ignore graph-related generated files and derivatives, including generated diagrams, generated graph JSON, generated topology snapshots, rendered architecture exports, and similar graphification artifacts.
 - Ignore previously generated narrative reports under `docs/revenue-reviews/reports/` when analyzing the product, codebase, or market position.
