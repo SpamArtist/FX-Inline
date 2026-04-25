@@ -1100,51 +1100,17 @@ export function App(): ReactElement {
     const hostedClerkConfigured = Boolean(clerkConfig?.publishableKey.length && clerkClient);
 
     return (
-      <div className="dashboard-app auth-shell">
+      <div className="dashboard-app auth-shell auth-shell-simple">
         <div className="ambient-orb ambient-orb-a" aria-hidden="true" />
         <div className="ambient-orb ambient-orb-b" aria-hidden="true" />
-
-        <section className="auth-showcase motion-stagger">
-          <div>
-            <p className="brand-chip">FX Inline Control Plane</p>
-            <h1>Secure Currency Runtime Operations</h1>
-            <p className="lede">
-              Configure client-specific conversion behavior, publish deterministic
-              plugin artifacts, and deliver signed runtime manifests.
-            </p>
-          </div>
-
-          <div className="showcase-metrics">
-            <article>
-              <h3>Signed Manifests</h3>
-              <p>Cryptographically verifiable runtime payload delivery.</p>
-            </article>
-            <article>
-              <h3>Versioned Settings</h3>
-              <p>Deterministic UI controls with reload-safe propagation.</p>
-            </article>
-            <article>
-              <h3>Scoped Plugins</h3>
-              <p>Client-specific pre/post plugin artifact orchestration.</p>
-            </article>
-          </div>
-
-          {clerkConfig ? (
-            <div className="showcase-footnote">
-              <span>Clerk configured</span>
-              <code>{clerkConfig.publishableKey || "publishable key unavailable"}</code>
-            </div>
-          ) : null}
-        </section>
 
         <section className="auth-panel motion-rise">
           <header>
             <p className="eyebrow">Authentication</p>
-            <h2>Sign In To Dashboard</h2>
+            <h2>Sign In With Clerk</h2>
             <p>
-              Use Clerk hosted authentication for Google SSO or email/password,
-              then the dashboard automatically exchanges your session for
-              `cp_session`.
+              Use Clerk hosted sign-in or sign-up. After authentication, the
+              dashboard exchanges your Clerk session for `cp_session`.
             </p>
           </header>
 
@@ -1157,29 +1123,18 @@ export function App(): ReactElement {
               }}
               disabled={!hostedClerkConfigured || isSubmittingLogin}
             >
-              {isSubmittingLogin ? "Redirecting..." : "Continue with Google SSO"}
+              {isSubmittingLogin ? "Redirecting..." : "Open Clerk Sign In"}
             </button>
 
             <button
               className="btn-secondary"
               type="button"
               onClick={() => {
-                void hostedSignInRedirect();
-              }}
-              disabled={!hostedClerkConfigured || isSubmittingLogin}
-            >
-              Continue with Email + Password
-            </button>
-
-            <button
-              className="btn-ghost"
-              type="button"
-              onClick={() => {
                 void hostedSignUpRedirect();
               }}
               disabled={!hostedClerkConfigured || isSubmittingLogin}
             >
-              Create Account
+              Open Clerk Sign Up
             </button>
 
             {clerkConfig?.mockEnabled ? (
