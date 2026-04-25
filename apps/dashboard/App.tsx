@@ -1109,8 +1109,9 @@ export function App(): ReactElement {
             <p className="eyebrow">Authentication</p>
             <h2>Sign In With Clerk</h2>
             <p>
-              Use Clerk hosted sign-in or sign-up. After authentication, the
-              dashboard exchanges your Clerk session for `cp_session`.
+              Use Clerk hosted sign-in/sign-up pages (Google SSO and email/password).
+              After authentication, the dashboard exchanges your Clerk session for
+              `cp_session`.
             </p>
           </header>
 
@@ -1123,7 +1124,7 @@ export function App(): ReactElement {
               }}
               disabled={!hostedClerkConfigured || isSubmittingLogin}
             >
-              {isSubmittingLogin ? "Redirecting..." : "Open Clerk Sign In"}
+              {isSubmittingLogin ? "Redirecting..." : "Continue to Clerk Sign In"}
             </button>
 
             <button
@@ -1134,7 +1135,7 @@ export function App(): ReactElement {
               }}
               disabled={!hostedClerkConfigured || isSubmittingLogin}
             >
-              Open Clerk Sign Up
+              Continue to Clerk Sign Up
             </button>
 
             {clerkConfig?.mockEnabled ? (
@@ -1159,6 +1160,21 @@ export function App(): ReactElement {
               </p>
             </div>
           ) : null}
+
+          <div className="auth-note">
+            <p>
+              Implementation follows Clerk hosted-auth flow guidance for React:
+              {" "}
+              <a
+                href="https://clerk.com/docs/react/getting-started/quickstart"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Clerk React quickstart
+              </a>
+              .
+            </p>
+          </div>
         </section>
 
         {dashboardState.error ? <p className="feedback error">{dashboardState.error}</p> : null}

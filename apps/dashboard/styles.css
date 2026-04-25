@@ -358,6 +358,15 @@ a:focus-visible {
   font-size: 0.9rem;
 }
 
+.auth-note a {
+  color: var(--accent-strong);
+  text-decoration: none;
+}
+
+.auth-note a:hover {
+  text-decoration: underline;
+}
+
 .workspace-shell {
   min-height: min(900px, calc(100svh - 2rem));
 }
