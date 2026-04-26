@@ -3,180 +3,299 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FX Inline | Instant Currency Conversion While You Browse</title>
+    <title>FX Inline | Local-Currency Hints for SaaS Pricing Pages</title>
     <meta
       name="description"
-      content="FX Inline helps you compare prices globally by converting currency values instantly while you browse online stores and listings."
+      content="FX Inline adds local-currency price hints to existing SaaS pricing pages without rebuilding checkout or replacing your pricing page."
     />
-    <meta name="theme-color" content="#0d1520" />
+    <meta
+      name="robots"
+      content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1"
+    />
+    <meta name="theme-color" content="#f7f7f2" />
+    <link rel="canonical" href="https://REPLACE_WITH_FX_INLINE_DOMAIN.example/" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="FX Inline" />
+    <meta property="og:site_name" content="FX Inline" />
+    <meta property="og:title" content="FX Inline | Local-Currency Hints for SaaS Pricing Pages" />
     <meta
       property="og:description"
-      content="Convert prices in place while you browse and compare products across markets with confidence."
+      content="Run a fixed-fee pilot that adds familiar local-currency estimates beside your existing USD prices."
     />
-    <meta property="og:image" content="/assets/fx-inline-site-mark.svg" />
+    <meta property="og:url" content="https://REPLACE_WITH_FX_INLINE_DOMAIN.example/" />
+    <meta
+      property="og:image"
+      content="https://REPLACE_WITH_FX_INLINE_DOMAIN.example/assets/fx-inline-site-mark.svg"
+    />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="FX Inline" />
+    <meta name="twitter:title" content="FX Inline | Local-Currency Hints for SaaS Pricing Pages" />
     <meta
       name="twitter:description"
-      content="Instant currency conversion where you already shop and research."
+      content="A lightweight B2B pilot for SaaS teams that want international visitors to understand pricing faster."
+    />
+    <meta
+      name="twitter:image"
+      content="https://REPLACE_WITH_FX_INLINE_DOMAIN.example/assets/fx-inline-site-mark.svg"
     />
     <link rel="icon" type="image/svg+xml" href="/assets/fx-inline-site-mark.svg" />
     <link rel="stylesheet" href="./styles.css" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "SoftwareApplication",
+            "@id": "https://REPLACE_WITH_FX_INLINE_DOMAIN.example/#software",
+            "name": "FX Inline",
+            "applicationCategory": "BrowserApplication",
+            "operatingSystem": "Chrome, Firefox, Edge",
+            "description": "FX Inline detects currency amounts and adds in-page conversion context for web pricing surfaces.",
+            "url": "https://REPLACE_WITH_FX_INLINE_DOMAIN.example/",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD",
+              "availability": "https://schema.org/InStock"
+            }
+          },
+          {
+            "@type": "Service",
+            "@id": "https://REPLACE_WITH_FX_INLINE_DOMAIN.example/#pilot",
+            "name": "FX Inline pricing-page localization pilot",
+            "provider": {
+              "@type": "Organization",
+              "name": "FX Inline",
+              "url": "https://REPLACE_WITH_FX_INLINE_DOMAIN.example/"
+            },
+            "serviceType": "B2B pricing-page local-currency hints",
+            "audience": {
+              "@type": "BusinessAudience",
+              "audienceType": "B2B SaaS companies"
+            },
+            "description": "A fixed-fee pilot that adds local-currency price hints to one existing SaaS pricing page while keeping original prices visible.",
+            "areaServed": "Worldwide",
+            "url": "https://REPLACE_WITH_FX_INLINE_DOMAIN.example/"
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
 
     <header class="site-header">
-      <div class="brand-wrap">
-        <img src="./assets/fx-inline-site-mark.svg" alt="FX Inline" width="44" height="44" />
+      <a class="brand-wrap" href="/" aria-label="FX Inline home">
+        <img src="/assets/fx-inline-site-mark.svg" alt="" width="40" height="40" />
         <span>FX Inline</span>
-      </div>
-      <nav aria-label="Primary">
-        <a href="#features">Features</a>
-        <a href="#how-it-works">How It Works</a>
-        <a href="#faq">FAQ</a>
+      </a>
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a href="#pilot">Pilot</a>
+        <a href="#proof">Proof</a>
+        <a href="#scope">Scope</a>
+        <a href="#trust">Trust</a>
         <a href="./playground.html">Playground</a>
       </nav>
+      <a class="header-cta" href="mailto:REPLACE_WITH_DEMO_EMAIL?subject=FX%20Inline%20pilot%20demo&body=Hi%20FX%20Inline%2C%0A%0AWe%20want%20to%20see%20a%20pilot%20demo%20for%20our%20pricing%20page.%0A%0ACompany%3A%20%0AWebsite%3A%20%0ATarget%20currencies%3A%20%0A%0AThanks.">Request demo</a>
     </header>
 
     <main id="main-content">
-      <section class="hero" aria-labelledby="hero-title">
-        <p class="eyebrow">Currency Conversion Extension</p>
-        <h1 id="hero-title">Convert global prices instantly while you browse.</h1>
-        <p class="hero-copy">
-          FX Inline detects prices on web pages and converts them into your preferred
-          currency so you can compare products faster and make better buying decisions.
-        </p>
-        <div class="hero-actions">
-          <a class="btn btn-primary" href="#how-it-works">See How It Works</a>
-          <a class="btn btn-secondary" href="#features">Explore Features</a>
+      <section id="pilot" class="hero section-band" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">B2B pilot for SaaS pricing pages</p>
+          <h1 id="hero-title">FX Inline adds local-currency hints to your pricing page.</h1>
+          <p class="hero-lede">
+            Show international visitors familiar price estimates without rebuilding checkout
+            or replacing your existing pricing page.
+          </p>
+          <div class="hero-actions" aria-label="Pilot actions">
+            <a class="btn btn-primary" href="mailto:REPLACE_WITH_DEMO_EMAIL?subject=FX%20Inline%20pilot%20demo&body=Hi%20FX%20Inline%2C%0A%0AWe%20want%20to%20see%20a%20pilot%20demo%20for%20our%20pricing%20page.%0A%0ACompany%3A%20%0AWebsite%3A%20%0ATarget%20currencies%3A%20%0A%0AThanks.">Request a pilot demo</a>
+            <a class="btn btn-secondary" href="#proof">See before and after</a>
+          </div>
+          <p class="hero-note">
+            Fixed-fee pilot. One pricing page. Original prices stay visible.
+          </p>
         </div>
-        <div class="store-actions" aria-label="Install FX Inline">
-          <a
-            class="store-btn store-btn-chrome"
-            href="https://chromewebstore.google.com/detail/cicoldboionelecmpjpkkdhicjbpfefj?utm_source=item-share-cb/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Get it on Chrome Web Store
-          </a>
-          <a
-            class="store-btn store-btn-firefox"
-            href="https://addons.mozilla.org/en-GB/firefox/addon/fx-inline"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Get it on Firefox Add-ons
-          </a>
-        </div>
-        <p class="store-note">
-          Update these links to your exact extension listings once published.
-        </p>
-      </section>
 
-      <section class="stats" aria-label="Highlights">
-        <article>
-          <h2>150+</h2>
-          <p>Currencies supported</p>
-        </article>
-        <article>
-          <h2>Fast</h2>
-          <p>In-context conversion feedback</p>
-        </article>
-        <article>
-          <h2>Private</h2>
-          <p>Preference stored locally</p>
-        </article>
-      </section>
-
-      <section id="features" class="section" aria-labelledby="features-title">
-        <div class="section-head">
-          <p class="eyebrow">Features</p>
-          <h2 id="features-title">Purpose-built for confident price comparison</h2>
-        </div>
-        <div class="grid">
-          <article class="card">
-            <h3>Inline conversion</h3>
-            <p>Detects and converts price values directly where you already browse.</p>
-          </article>
-          <article class="card">
-            <h3>Stay in flow</h3>
-            <p>No more tab switching or manual copy/paste into conversion tools.</p>
-          </article>
-          <article class="card">
-            <h3>Custom defaults</h3>
-            <p>Set one preferred destination currency and keep comparisons consistent.</p>
-          </article>
-          <article class="card">
-            <h3>Performance-first</h3>
-            <p>Designed to remain responsive while scanning complex product pages.</p>
-          </article>
+        <div class="hero-visual" role="img" aria-label="Pricing page preview with local-currency hints">
+          <div class="browser-shell" aria-hidden="true">
+            <div class="browser-top">
+              <span></span>
+              <span></span>
+              <span></span>
+              <p>pricing.example.com</p>
+            </div>
+            <div class="pricing-surface">
+              <div class="pricing-plan">
+                <p class="plan-name">Growth</p>
+                <p class="price">$49<span>/mo</span></p>
+                <p class="hint">approx EUR 46</p>
+                <ul>
+                  <li>Team usage</li>
+                  <li>Priority support</li>
+                </ul>
+              </div>
+              <div class="pricing-plan pricing-plan-featured">
+                <p class="plan-name">Scale</p>
+                <p class="price">$149<span>/mo</span></p>
+                <p class="hint">approx GBP 119</p>
+                <ul>
+                  <li>Advanced controls</li>
+                  <li>Shared workflows</li>
+                </ul>
+              </div>
+              <div class="pricing-plan">
+                <p class="plan-name">Business</p>
+                <p class="price">$399<span>/mo</span></p>
+                <p class="hint">approx INR 33,200</p>
+                <ul>
+                  <li>Custom terms</li>
+                  <li>Managed rollout</li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      <section id="how-it-works" class="section" aria-labelledby="how-title">
-        <div class="section-head">
-          <p class="eyebrow">How It Works</p>
-          <h2 id="how-title">Three steps to get started</h2>
+      <section id="proof" class="section-band proof-band" aria-labelledby="proof-title">
+        <div class="section-copy">
+          <p class="eyebrow">Before and after</p>
+          <h2 id="proof-title">Keep the USD price. Add the local context.</h2>
+          <p>
+            The pilot does not replace your commercial source of truth. It adds a readable
+            estimate beside existing prices so visitors understand the number faster.
+          </p>
         </div>
-        <ol class="steps">
+        <div class="comparison" aria-label="Before and after pricing comparison">
+          <article class="comparison-pane">
+            <p class="pane-label">Before</p>
+            <div class="mini-price-row">
+              <span>Starter</span>
+              <strong>$29/mo</strong>
+            </div>
+            <div class="mini-price-row">
+              <span>Pro</span>
+              <strong>$99/mo</strong>
+            </div>
+            <div class="mini-price-row">
+              <span>Business</span>
+              <strong>$249/mo</strong>
+            </div>
+          </article>
+          <article class="comparison-pane comparison-pane-after">
+            <p class="pane-label">After FX Inline pilot</p>
+            <div class="mini-price-row">
+              <span>Starter</span>
+              <strong>$29/mo <em>approx EUR 27</em></strong>
+            </div>
+            <div class="mini-price-row">
+              <span>Pro</span>
+              <strong>$99/mo <em>approx EUR 92</em></strong>
+            </div>
+            <div class="mini-price-row">
+              <span>Business</span>
+              <strong>$249/mo <em>approx EUR 232</em></strong>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-band steps-band" aria-labelledby="steps-title">
+        <div class="section-copy">
+          <p class="eyebrow">How it works</p>
+          <h2 id="steps-title">A small pilot that creates real buyer learning.</h2>
+        </div>
+        <ol class="steps-list">
           <li>
-            <h3>Install FX Inline</h3>
-            <p>Add the extension to your browser from the extension marketplace.</p>
+            <span>01</span>
+            <h3>Detect prices</h3>
+            <p>Use FX Inline's browser-proven parser to identify visible price amounts.</p>
           </li>
           <li>
-            <h3>Choose your currency</h3>
-            <p>Set your preferred target currency once in extension settings.</p>
+            <span>02</span>
+            <h3>Add local hints</h3>
+            <p>Render secondary estimates next to original prices in selected currencies.</p>
           </li>
           <li>
-            <h3>Browse and compare</h3>
-            <p>Read converted prices in place as you explore products globally.</p>
+            <span>03</span>
+            <h3>Measure interest</h3>
+            <p>Use the pilot to learn whether visitors and buyers ask for localized pricing.</p>
           </li>
         </ol>
       </section>
 
-      <section id="faq" class="section" aria-labelledby="faq-title">
-        <div class="section-head">
-          <p class="eyebrow">FAQ</p>
-          <h2 id="faq-title">Common questions</h2>
+      <section id="scope" class="section-band scope-band" aria-labelledby="scope-title">
+        <div class="section-copy">
+          <p class="eyebrow">Pilot scope</p>
+          <h2 id="scope-title">Narrow enough to ship. Specific enough to learn.</h2>
         </div>
-        <div class="faq-list">
-          <details>
-            <summary>Do I need an account to use FX Inline?</summary>
-            <p>No. You can use FX Inline without creating an account.</p>
-          </details>
-          <details>
-            <summary>Where are my settings stored?</summary>
-            <p>Your preferences are stored locally in your browser profile.</p>
-          </details>
-          <details>
-            <summary>Can I use this website without the extension installed?</summary>
-            <p>
-              Yes, this website is public. The conversion functionality itself requires
-              installing the extension.
-            </p>
-          </details>
+        <div class="scope-grid">
+          <p><strong>One pricing page</strong><span>Start where purchase intent is already visible.</span></p>
+          <p><strong>3-5 target currencies</strong><span>Focus on markets that matter to your team.</span></p>
+          <p><strong>Reversible install</strong><span>Additive display that can be removed cleanly.</span></p>
+          <p><strong>Fixed-fee pilot</strong><span>A contained test before SaaS productization.</span></p>
         </div>
+      </section>
+
+      <section id="trust" class="section-band trust-band" aria-labelledby="trust-title">
+        <div class="section-copy">
+          <p class="eyebrow">Trust posture</p>
+          <h2 id="trust-title">Built to avoid heavy rebuilds and risky promises.</h2>
+          <p>
+            FX Inline starts from a working extension and shared parser package, then uses
+            the pilot to validate a business outcome before adding platform complexity.
+          </p>
+        </div>
+        <dl class="trust-list">
+          <div>
+            <dt>Original prices stay visible</dt>
+            <dd>Local estimates are secondary hints, not replacement pricing.</dd>
+          </div>
+          <div>
+            <dt>Browser-proven parser</dt>
+            <dd>The current extension already handles messy real-world price patterns.</dd>
+          </div>
+          <div>
+            <dt>No full rebuild</dt>
+            <dd>The pilot is scoped to your existing public pricing page.</dd>
+          </div>
+          <div>
+            <dt>Privacy-light implementation</dt>
+            <dd>Designed around minimal page data and clear user-facing behavior.</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="section-band extension-band" aria-labelledby="extension-title">
+        <div class="section-copy">
+          <p class="eyebrow">Product proof</p>
+          <h2 id="extension-title">The extension is the proof, not the sales bottleneck.</h2>
+          <p>
+            Try the browser extension or inspect the parser playground. The B2B pilot turns
+            the same page-layer capability into a focused pricing-page test.
+          </p>
+        </div>
+        <div class="proof-links" aria-label="FX Inline proof links">
+          <a href="https://chromewebstore.google.com/detail/cicoldboionelecmpjpkkdhicjbpfefj?utm_source=item-share-cb" target="_blank" rel="noopener noreferrer">Chrome Web Store</a>
+          <a href="https://addons.mozilla.org/en-GB/firefox/addon/fx-inline" target="_blank" rel="noopener noreferrer">Firefox Add-ons</a>
+          <a href="./playground.html">Parser playground</a>
+        </div>
+      </section>
+
+      <section class="final-cta section-band" aria-labelledby="final-title">
+        <p class="eyebrow">Start small</p>
+        <h2 id="final-title">See your pricing page with local-currency hints.</h2>
+        <p>
+          Send the pricing page URL and target currencies. The first step is a short,
+          visual before-and-after demo.
+        </p>
+        <a class="btn btn-primary" href="mailto:REPLACE_WITH_DEMO_EMAIL?subject=FX%20Inline%20pilot%20demo&body=Hi%20FX%20Inline%2C%0A%0AWe%20want%20to%20see%20a%20pilot%20demo%20for%20our%20pricing%20page.%0A%0ACompany%3A%20%0AWebsite%3A%20%0ATarget%20currencies%3A%20%0A%0AThanks.">Request a pilot demo</a>
       </section>
     </main>
 
     <footer class="site-footer">
-      <p>© <span id="year"></span> FX Inline</p>
-      <p>Built for clear, low-friction global price comparison.</p>
-      <div class="footer-store-links" aria-label="Install links">
-        <a href="https://chromewebstore.google.com/detail/cicoldboionelecmpjpkkdhicjbpfefj?utm_source=item-share-cb" target="_blank" rel="noopener noreferrer">
-          Chrome Web Store
-        </a>
-        <a
-          href="https://addons.mozilla.org/en-GB/firefox/addon/fx-inline"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Firefox Add-ons
-        </a>
-      </div>
+      <p>© <span id="year">2026</span> FX Inline</p>
+      <a href="./playground.html">Playground</a>
+      <a href="mailto:REPLACE_WITH_DEMO_EMAIL?subject=FX%20Inline%20pilot%20demo">Contact</a>
     </footer>
 
     <script type="module" src="./main.js"></script>
