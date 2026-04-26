@@ -26,7 +26,14 @@ import type { InlineRuntimeOptions } from "@fx-inline/inline-runtime";
 export type { ContentConversionRuntime } from "./content.types";
 
 const LITTLE_HOTELIER_PRICING_HOSTNAME = "www.littlehotelier.com";
-const LITTLE_HOTELIER_PRICING_PATH = "/pricing";
+const LITTLE_HOTELIER_PRICING_PATHS = new Set([
+  "/pricing",
+  "/de/preise",
+  "/es/precios",
+  "/it/prezzi",
+  "/th/pricing",
+  "/id/pricing",
+]);
 
 type ContentRuntimeSitePluginOptions = Pick<
   InlineRuntimeOptions,
@@ -40,7 +47,7 @@ function isExtensionContextInvalidatedError(error: unknown): boolean {
   );
 }
 
-export function isLittleHotelierEnglishPricingPage(url: string): boolean {
+export function isLittleHotelierPricingPage(url: string): boolean {
   try {
     const parsedUrl = new URL(url);
     const normalizedPath = parsedUrl.pathname.replace(/\/+$/u, "");
@@ -48,7 +55,7 @@ export function isLittleHotelierEnglishPricingPage(url: string): boolean {
     return (
       parsedUrl.protocol === "https:" &&
       parsedUrl.hostname === LITTLE_HOTELIER_PRICING_HOSTNAME &&
-      normalizedPath === LITTLE_HOTELIER_PRICING_PATH
+      LITTLE_HOTELIER_PRICING_PATHS.has(normalizedPath)
     );
   } catch {
     return false;
@@ -58,7 +65,7 @@ export function isLittleHotelierEnglishPricingPage(url: string): boolean {
 export function getContentRuntimeSitePluginOptions(
   pageUrl: string,
 ): ContentRuntimeSitePluginOptions {
-  if (!isLittleHotelierEnglishPricingPage(pageUrl)) {
+  if (!isLittleHotelierPricingPage(pageUrl)) {
     return {};
   }
 

@@ -146,14 +146,14 @@ test("initialize hydrates settings/rates, applies runtime state, and starts cont
   expect(controllerStartMock).toHaveBeenCalledTimes(1);
 });
 
-test("content runtime selects little hotelier plugins only for english pricing page", async () => {
+test("content runtime selects little hotelier plugins only for pricing pages", async () => {
   const {
     getContentRuntimeSitePluginOptions,
-    isLittleHotelierEnglishPricingPage,
+    isLittleHotelierPricingPage,
   } = await importRuntimeModuleWithMocks();
 
   expect(
-    isLittleHotelierEnglishPricingPage(
+    isLittleHotelierPricingPage(
       "https://www.littlehotelier.com/pricing/",
     ),
   ).toBe(true);
@@ -170,7 +170,10 @@ test("content runtime selects little hotelier plugins only for english pricing p
     getContentRuntimeSitePluginOptions(
       "https://www.littlehotelier.com/id/pricing/",
     ),
-  ).toEqual({});
+  ).toEqual({
+    prePlugins: [littleHotelierPricingDetectorPrePluginMock],
+    postPlugins: [littleHotelierPricingRendererPostPluginMock],
+  });
   expect(
     getContentRuntimeSitePluginOptions(
       "https://littlehotelier.com/pricing/",
@@ -181,6 +184,28 @@ test("content runtime selects little hotelier plugins only for english pricing p
       "https://www.littlehotelier.com/pricing-extra/",
     ),
   ).toEqual({});
+});
+
+test("content runtime selects little hotelier plugins for current locale pricing pages", async () => {
+  const { getContentRuntimeSitePluginOptions, isLittleHotelierPricingPage } =
+    await importRuntimeModuleWithMocks();
+
+  const pricingUrls = [
+    "https://www.littlehotelier.com/pricing/",
+    "https://www.littlehotelier.com/de/preise/",
+    "https://www.littlehotelier.com/es/precios/",
+    "https://www.littlehotelier.com/it/prezzi/",
+    "https://www.littlehotelier.com/th/pricing/",
+    "https://www.littlehotelier.com/id/pricing/",
+  ];
+
+  for (const pricingUrl of pricingUrls) {
+    expect(isLittleHotelierPricingPage(pricingUrl)).toBe(true);
+    expect(getContentRuntimeSitePluginOptions(pricingUrl)).toEqual({
+      prePlugins: [littleHotelierPricingDetectorPrePluginMock],
+      postPlugins: [littleHotelierPricingRendererPostPluginMock],
+    });
+  }
 });
 
 test("settings updates debounce a fresh settings/rates hydration", async () => {
