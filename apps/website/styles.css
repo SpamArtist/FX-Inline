@@ -638,7 +638,7 @@ h1 {
   min-height: 82px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 18px;
   padding: 18px;
   border-bottom: 1px solid var(--line);
@@ -678,6 +678,12 @@ select {
   flex-wrap: wrap;
   gap: 10px;
   justify-content: flex-end;
+}
+
+.input-actions {
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--line);
+  background: #fff;
 }
 
 .playground-panel {
