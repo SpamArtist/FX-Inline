@@ -274,9 +274,9 @@ Use extension local storage with these keys and semantics:
 - hidden/assistive-only contexts
 - already converted nodes
 3. Wrapper/styling contract:
-- wrapper class: `fx-inline-inline-conversion`
+- wrapper class: `fx-inline-conversion`
 - converted amount child class: `fx-inline-converted-amount`
-- style tag id: `fx-inline-inline-conversion-style`
+- style tag id: `fx-inline-conversion-style`
 4. Render output format as `original (converted)` for text-node replacements.
 5. Avoid nested duplicate wrappers.
 6. On reruns:

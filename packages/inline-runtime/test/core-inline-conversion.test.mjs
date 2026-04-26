@@ -9,7 +9,7 @@ import {
   suppressInlineConversions,
 } from "../src/index.js";
 
-const INLINE_CONVERSION_CLASS = "fx-inline-inline-conversion";
+const INLINE_CONVERSION_CLASS = "fx-inline-conversion";
 
 function createRateSnapshot(overrides = {}) {
   const baseSnapshot = {
@@ -91,7 +91,7 @@ function getLittleHotelierAddons() {
 beforeEach(() => {
   document.documentElement.lang = "en-US";
   document.body.innerHTML = "";
-  const styleTag = document.getElementById("fx-inline-inline-conversion-style");
+  const styleTag = document.getElementById("fx-inline-conversion-style");
   styleTag?.remove();
 });
 
@@ -119,7 +119,7 @@ test("injects style tag with converted amount line-height and width contract", (
     clearExisting: false,
   });
 
-  const styleTag = document.getElementById("fx-inline-inline-conversion-style");
+  const styleTag = document.getElementById("fx-inline-conversion-style");
   expect(styleTag).not.toBeNull();
   expect(styleTag.textContent).toContain("line-height: inherit !important;");
   expect(styleTag.textContent).toContain("width: fit-content !important;");
@@ -207,13 +207,13 @@ test("adds structured add-on conversions for amazon-style and sibling-symbol pri
   expect(applied).toBeGreaterThanOrEqual(2);
 
   const amazonAddon = document.querySelector(
-    '#amazon-root span.fx-inline-inline-conversion[data-fx-inline-mode="addon"]',
+    '#amazon-root span.fx-inline-conversion[data-fx-inline-mode="addon"]',
   );
   expect(amazonAddon).not.toBeNull();
   expect(amazonAddon.getAttribute("data-original")).toBe("$199.99");
 
   const siblingAddon = document.querySelector(
-    '#sibling-value span.fx-inline-inline-conversion[data-fx-inline-mode="addon"]',
+    '#sibling-value span.fx-inline-conversion[data-fx-inline-mode="addon"]',
   );
   expect(siblingAddon).not.toBeNull();
   expect(siblingAddon.getAttribute("data-original")).toBe("$2500");
@@ -236,7 +236,7 @@ test("allows disabling default post plugins so amazon-specific logic can be deta
 
   expect(applied).toBe(0);
   expect(
-    document.querySelector('#amazon-root span.fx-inline-inline-conversion[data-fx-inline-mode="addon"]'),
+    document.querySelector('#amazon-root span.fx-inline-conversion[data-fx-inline-mode="addon"]'),
   ).toBeNull();
 });
 
@@ -259,7 +259,7 @@ test("supports amazon decorator as explicit post plugin", () => {
 
   expect(applied).toBe(1);
   expect(
-    document.querySelector('#amazon-root span.fx-inline-inline-conversion[data-fx-inline-mode="addon"]'),
+    document.querySelector('#amazon-root span.fx-inline-conversion[data-fx-inline-mode="addon"]'),
   ).not.toBeNull();
 });
 
@@ -285,7 +285,7 @@ test("amazon addon does not duplicate original amount by default", () => {
 
   expect(applied).toBe(1);
   const addon = document.querySelector(
-    '#amazon-hidden-root span.fx-inline-inline-conversion[data-fx-inline-mode="addon"]',
+    '#amazon-hidden-root span.fx-inline-conversion[data-fx-inline-mode="addon"]',
   );
   expect(addon).not.toBeNull();
   expect(addon.textContent).not.toContain("¥4,680");
@@ -440,7 +440,7 @@ test("amazon renderer applies client render preferences", () => {
 
   expect(applied).toBe(1);
   const addon = document.querySelector(
-    '#amazon-root span.fx-inline-inline-conversion[data-fx-inline-mode="addon"]',
+    '#amazon-root span.fx-inline-conversion[data-fx-inline-mode="addon"]',
   );
   expect(addon).not.toBeNull();
   expect(addon.classList.contains("client-wrapper")).toBe(true);
@@ -484,7 +484,7 @@ test("amazon renderer ignores stale candidates from pre detection", () => {
 
   expect(applied).toBe(0);
   expect(
-    document.querySelector('#amazon-root span.fx-inline-inline-conversion[data-fx-inline-mode="addon"]'),
+    document.querySelector('#amazon-root span.fx-inline-conversion[data-fx-inline-mode="addon"]'),
   ).toBeNull();
 });
 

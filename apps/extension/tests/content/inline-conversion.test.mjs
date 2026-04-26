@@ -29,7 +29,7 @@ function createRateSnapshot(overrides = {}) {
 beforeEach(() => {
   document.documentElement.lang = "en-US";
   document.body.innerHTML = "";
-  const styleTag = document.getElementById("fx-inline-inline-conversion-style");
+  const styleTag = document.getElementById("fx-inline-conversion-style");
   styleTag?.remove();
 });
 
@@ -60,7 +60,7 @@ test("injects converted amount line-height and width styles", () => {
     clearExisting: false,
   });
 
-  const styleTag = document.getElementById("fx-inline-inline-conversion-style");
+  const styleTag = document.getElementById("fx-inline-conversion-style");
   expect(styleTag).not.toBeNull();
   expect(styleTag.textContent).toMatch(/\.fx-inline-converted-amount\s*\{/);
   expect(styleTag.textContent).toContain("line-height: inherit !important;");
@@ -72,7 +72,7 @@ test("converts unicode yen symbols in mixed listing text", () => {
     '<h5 id="listing">',
     '  <a href="/en/property/1545984">',
     "    ￥39,000",
-    '    <span>Management fee：<span class="fx-inline-inline-conversion" data-original="¥6,500">¥6,500 (<span class="fx-inline-converted-amount">₹3,806.20</span>)</span></span>',
+    '    <span>Management fee：<span class="fx-inline-conversion" data-original="¥6,500">¥6,500 (<span class="fx-inline-converted-amount">₹3,806.20</span>)</span></span>',
     "  </a>",
     "</h5>",
   ].join("\n");
@@ -94,13 +94,13 @@ test("converts unicode yen symbols in mixed listing text", () => {
   expect(listingWrappers).toHaveLength(2);
 
   const convertedMainPrice = document.querySelector(
-    '#listing span.fx-inline-inline-conversion[data-original="￥39,000"]',
+    '#listing span.fx-inline-conversion[data-original="￥39,000"]',
   );
   expect(convertedMainPrice).not.toBeNull();
   expect(convertedMainPrice.textContent).toMatch(/^￥39,000\s+\(.+\)$/);
 
   const existingFeeWrapper = document.querySelector(
-    '#listing span.fx-inline-inline-conversion[data-original="¥6,500"]',
+    '#listing span.fx-inline-conversion[data-original="¥6,500"]',
   );
   expect(existingFeeWrapper).not.toBeNull();
   expect(existingFeeWrapper.querySelector(".fx-inline-converted-amount").textContent).toBe(
@@ -193,7 +193,7 @@ test("skips editable, non-visible, and already-converted wrapper contexts", () =
   document.body.innerHTML = [
     '<div id="editable" contenteditable="true">$100</div>',
     '<div id="hidden" class="visually-hidden">$200</div>',
-    '<div id="existing"><span class="fx-inline-inline-conversion" data-original="$300"><span class="fx-inline-converted-amount">€270.00</span></span></div>',
+    '<div id="existing"><span class="fx-inline-conversion" data-original="$300"><span class="fx-inline-converted-amount">€270.00</span></span></div>',
     '<p id="plain">$400</p>',
   ].join("");
 
@@ -241,7 +241,7 @@ test("adds structured add-on conversions for Amazon-style and sibling-symbol pri
   expect(applied).toBeGreaterThanOrEqual(2);
 
   const amazonAddon = document.querySelector(
-    '#amazon-root span.fx-inline-inline-conversion[data-fx-inline-mode="addon"]',
+    '#amazon-root span.fx-inline-conversion[data-fx-inline-mode="addon"]',
   );
   expect(amazonAddon).not.toBeNull();
   expect(amazonAddon.getAttribute("data-original")).toBe("$199.99");
@@ -250,7 +250,7 @@ test("adds structured add-on conversions for Amazon-style and sibling-symbol pri
   );
 
   const siblingAddon = document.querySelector(
-    '#sibling-value span.fx-inline-inline-conversion[data-fx-inline-mode="addon"]',
+    '#sibling-value span.fx-inline-conversion[data-fx-inline-mode="addon"]',
   );
   expect(siblingAddon).not.toBeNull();
   expect(siblingAddon.getAttribute("data-original")).toBe("$2500");
@@ -259,7 +259,7 @@ test("adds structured add-on conversions for Amazon-style and sibling-symbol pri
   );
 
   const siblingWordAddon = document.querySelector(
-    '#sibling-value-word span.fx-inline-inline-conversion[data-fx-inline-mode="addon"]',
+    '#sibling-value-word span.fx-inline-conversion[data-fx-inline-mode="addon"]',
   );
   expect(siblingWordAddon).not.toBeNull();
   expect(siblingWordAddon.getAttribute("data-original")).toBe("990,000 yen");
@@ -290,7 +290,7 @@ test("does not duplicate amazon original amount text in addon by default", () =>
 
   expect(applied).toBe(1);
   const addon = document.querySelector(
-    '#amazon-hidden-root span.fx-inline-inline-conversion[data-fx-inline-mode="addon"]',
+    '#amazon-hidden-root span.fx-inline-conversion[data-fx-inline-mode="addon"]',
   );
   expect(addon).not.toBeNull();
   expect(addon.textContent).not.toContain("¥4,680");
@@ -320,7 +320,7 @@ test("adds conversion when amount and yen/month token are split across sibling n
   expect(applied).toBeGreaterThanOrEqual(1);
 
   const addon = document.querySelector(
-    '#split-yen .bold span.fx-inline-inline-conversion[data-fx-inline-mode="addon"]',
+    '#split-yen .bold span.fx-inline-conversion[data-fx-inline-mode="addon"]',
   );
   expect(addon).not.toBeNull();
   expect(addon.getAttribute("data-original")).toBe("990,000 yen");

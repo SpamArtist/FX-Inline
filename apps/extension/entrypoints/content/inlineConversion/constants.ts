@@ -1,5 +1,5 @@
-export const INLINE_CONVERSION_CLASS = "fx-inline-inline-conversion";
-export const INLINE_CONVERSION_STYLE_ID = "fx-inline-inline-conversion-style";
+export const INLINE_CONVERSION_CLASS = "fx-inline-conversion";
+export const INLINE_CONVERSION_STYLE_ID = "fx-inline-conversion-style";
 export const INLINE_COMPACT_THRESHOLD = 100_000;
 export const INLINE_CONVERSION_ADDON_MODE = "addon";
 

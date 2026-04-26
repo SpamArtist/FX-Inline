@@ -69,7 +69,7 @@ Expected:
 4. Confirm no nested duplicate wrappers after repeated reruns/navigation.
 
 Expected:
-- Wrapper class: `fx-inline-inline-conversion`.
+- Wrapper class: `fx-inline-conversion`.
 - Converted amount node: `.fx-inline-converted-amount`.
 
 ## 6. Structured price conversion coverage
