@@ -185,3 +185,19 @@ export const amazonStructuredAddonPlugin: {
   phase: "post";
   apply: (context: InlineConversionPluginContext) => number;
 };
+
+export const LITTLE_HOTELIER_PRICING_DETECTOR_PRE_PLUGIN_NAME: "littlehotelier-pricing-detector";
+
+export const littleHotelierPricingDetectorPrePlugin: {
+  name: "littlehotelier-pricing-detector";
+  phase: "pre";
+  apply: (context: InlineConversionPluginContext) => number;
+};
+
+export const LITTLE_HOTELIER_PRICING_RENDERER_POST_PLUGIN_NAME: "littlehotelier-pricing-renderer";
+
+export const littleHotelierPricingRendererPostPlugin: {
+  name: "littlehotelier-pricing-renderer";
+  phase: "post";
+  apply: (context: InlineConversionPluginContext) => number;
+};

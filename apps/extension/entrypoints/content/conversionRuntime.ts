@@ -16,15 +16,56 @@ import {
 } from "./conversionRuntime/hydration";
 import { createRuntimePerfContext } from "./conversionRuntime/logging";
 import { clearTimer } from "./conversionRuntime/timers";
-import { createInlineRuntime } from "@fx-inline/inline-runtime";
+import {
+  createInlineRuntime,
+  littleHotelierPricingDetectorPrePlugin,
+  littleHotelierPricingRendererPostPlugin,
+} from "@fx-inline/inline-runtime";
+import type { InlineRuntimeOptions } from "@fx-inline/inline-runtime";
 
 export type { ContentConversionRuntime } from "./content.types";
+
+const LITTLE_HOTELIER_PRICING_HOSTNAME = "www.littlehotelier.com";
+const LITTLE_HOTELIER_PRICING_PATH = "/lh-pricing-plans";
+
+type ContentRuntimeSitePluginOptions = Pick<
+  InlineRuntimeOptions,
+  "prePlugins" | "postPlugins"
+>;
 
 function isExtensionContextInvalidatedError(error: unknown): boolean {
   return (
     error instanceof Error &&
     /extension context invalidated/i.test(error.message)
   );
+}
+
+export function isLittleHotelierEnglishPricingPage(url: string): boolean {
+  try {
+    const parsedUrl = new URL(url);
+    const normalizedPath = parsedUrl.pathname.replace(/\/+$/u, "");
+
+    return (
+      parsedUrl.protocol === "https:" &&
+      parsedUrl.hostname === LITTLE_HOTELIER_PRICING_HOSTNAME &&
+      normalizedPath === LITTLE_HOTELIER_PRICING_PATH
+    );
+  } catch {
+    return false;
+  }
+}
+
+export function getContentRuntimeSitePluginOptions(
+  pageUrl: string,
+): ContentRuntimeSitePluginOptions {
+  if (!isLittleHotelierEnglishPricingPage(pageUrl)) {
+    return {};
+  }
+
+  return {
+    prePlugins: [littleHotelierPricingDetectorPrePlugin],
+    postPlugins: [littleHotelierPricingRendererPostPlugin],
+  };
 }
 
 export function createContentConversionRuntime(): ContentConversionRuntime {
@@ -43,12 +84,16 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
   let settingsRefreshTimer: number | null = null;
   let isHydratingRates = false;
   let isCleanedUp = false;
+  const sitePluginOptions = getContentRuntimeSitePluginOptions(
+    window.location.href,
+  );
 
   const inlineRuntime = createInlineRuntime({
     root: document.body,
     observeMutations: false,
     enabled: false,
     autoFetchRates: false,
+    ...sitePluginOptions,
     onPerfSample: perfLoggingEnabled
       ? (sample) => {
         logPerf("inlineConversion.full", {

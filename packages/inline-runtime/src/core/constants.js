@@ -2,6 +2,8 @@ export const INLINE_CONVERSION_CLASS = "ccx-inline-conversion";
 export const INLINE_CONVERSION_STYLE_ID = "ccx-inline-conversion-style";
 export const INLINE_COMPACT_THRESHOLD = 100_000;
 export const INLINE_CONVERSION_ADDON_MODE = "addon";
+export const INLINE_CONVERSION_SKIP_SELECTOR =
+  '[data-ccx-skip-inline-conversion="true"]';
 
 export const ARIA_HIDDEN_SELECTOR = '[aria-hidden="true"]';
 
@@ -56,6 +58,7 @@ export const EDITABLE_CONTEXT_SELECTOR = [
 
 export const NON_VISIBLE_TEXT_CONTEXT_SELECTOR = [
   "[hidden]",
+  INLINE_CONVERSION_SKIP_SELECTOR,
   ".a-offscreen",
   ".sr-only",
   ".sr_only",

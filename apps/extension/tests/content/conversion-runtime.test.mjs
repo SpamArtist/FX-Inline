@@ -4,6 +4,14 @@ const getUserSettingsMock = jest.fn();
 const getRatesMock = jest.fn();
 
 const createInlineRuntimeMock = jest.fn();
+const littleHotelierPricingDetectorPrePluginMock = {
+  name: "littlehotelier-pricing-detector",
+  phase: "pre",
+};
+const littleHotelierPricingRendererPostPluginMock = {
+  name: "littlehotelier-pricing-renderer",
+  phase: "post",
+};
 const controllerStartMock = jest.fn();
 const controllerDestroyMock = jest.fn();
 const controllerSetPreferredCurrencyMock = jest.fn();
@@ -73,6 +81,10 @@ async function importRuntimeModuleWithMocks() {
 
   await jest.unstable_mockModule("@fx-inline/inline-runtime", () => ({
     createInlineRuntime: createInlineRuntimeMock,
+    littleHotelierPricingDetectorPrePlugin:
+      littleHotelierPricingDetectorPrePluginMock,
+    littleHotelierPricingRendererPostPlugin:
+      littleHotelierPricingRendererPostPluginMock,
   }));
 
   return import("../../test-dist/entrypoints/content/conversionRuntime.js");
@@ -132,6 +144,43 @@ test("initialize hydrates settings/rates, applies runtime state, and starts cont
   );
   expect(controllerSetEnabledMock).toHaveBeenCalledWith(true);
   expect(controllerStartMock).toHaveBeenCalledTimes(1);
+});
+
+test("content runtime selects little hotelier plugins only for english pricing page", async () => {
+  const {
+    getContentRuntimeSitePluginOptions,
+    isLittleHotelierEnglishPricingPage,
+  } = await importRuntimeModuleWithMocks();
+
+  expect(
+    isLittleHotelierEnglishPricingPage(
+      "https://www.littlehotelier.com/lh-pricing-plans/",
+    ),
+  ).toBe(true);
+  expect(
+    getContentRuntimeSitePluginOptions(
+      "https://www.littlehotelier.com/lh-pricing-plans?currency=USD",
+    ),
+  ).toEqual({
+    prePlugins: [littleHotelierPricingDetectorPrePluginMock],
+    postPlugins: [littleHotelierPricingRendererPostPluginMock],
+  });
+
+  expect(
+    getContentRuntimeSitePluginOptions(
+      "https://www.littlehotelier.com/id/pricing/",
+    ),
+  ).toEqual({});
+  expect(
+    getContentRuntimeSitePluginOptions(
+      "https://littlehotelier.com/lh-pricing-plans/",
+    ),
+  ).toEqual({});
+  expect(
+    getContentRuntimeSitePluginOptions(
+      "https://www.littlehotelier.com/lh-pricing-plans-extra/",
+    ),
+  ).toEqual({});
 });
 
 test("settings updates debounce a fresh settings/rates hydration", async () => {
