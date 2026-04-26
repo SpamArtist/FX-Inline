@@ -147,14 +147,15 @@ test("initialize hydrates settings/rates, applies runtime state, and starts cont
 });
 
 test("content runtime selects little hotelier plugins only for pricing pages", async () => {
+  await importRuntimeModuleWithMocks();
   const {
     getContentRuntimeSitePluginOptions,
     isLittleHotelierPricingPage,
-  } = await importRuntimeModuleWithMocks();
+  } = await import("../../test-dist/entrypoints/content/sitePlugins.js");
 
   expect(
     isLittleHotelierPricingPage(
-      "https://www.littlehotelier.com/pricing/",
+      new URL("https://www.littlehotelier.com/pricing/"),
     ),
   ).toBe(true);
   expect(
@@ -187,8 +188,9 @@ test("content runtime selects little hotelier plugins only for pricing pages", a
 });
 
 test("content runtime selects little hotelier plugins for current locale pricing pages", async () => {
+  await importRuntimeModuleWithMocks();
   const { getContentRuntimeSitePluginOptions, isLittleHotelierPricingPage } =
-    await importRuntimeModuleWithMocks();
+    await import("../../test-dist/entrypoints/content/sitePlugins.js");
 
   const pricingUrls = [
     "https://www.littlehotelier.com/pricing/",
@@ -200,7 +202,7 @@ test("content runtime selects little hotelier plugins for current locale pricing
   ];
 
   for (const pricingUrl of pricingUrls) {
-    expect(isLittleHotelierPricingPage(pricingUrl)).toBe(true);
+    expect(isLittleHotelierPricingPage(new URL(pricingUrl))).toBe(true);
     expect(getContentRuntimeSitePluginOptions(pricingUrl)).toEqual({
       prePlugins: [littleHotelierPricingDetectorPrePluginMock],
       postPlugins: [littleHotelierPricingRendererPostPluginMock],

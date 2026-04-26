@@ -16,63 +16,16 @@ import {
 } from "./conversionRuntime/hydration";
 import { createRuntimePerfContext } from "./conversionRuntime/logging";
 import { clearTimer } from "./conversionRuntime/timers";
-import {
-  createInlineRuntime,
-  littleHotelierPricingDetectorPrePlugin,
-  littleHotelierPricingRendererPostPlugin,
-} from "@fx-inline/inline-runtime";
-import type { InlineRuntimeOptions } from "@fx-inline/inline-runtime";
+import { getContentRuntimeSitePluginOptions } from "./sitePlugins";
+import { createInlineRuntime } from "@fx-inline/inline-runtime";
 
 export type { ContentConversionRuntime } from "./content.types";
-
-const LITTLE_HOTELIER_PRICING_HOSTNAME = "www.littlehotelier.com";
-const LITTLE_HOTELIER_PRICING_PATHS = new Set([
-  "/pricing",
-  "/de/preise",
-  "/es/precios",
-  "/it/prezzi",
-  "/th/pricing",
-  "/id/pricing",
-]);
-
-type ContentRuntimeSitePluginOptions = Pick<
-  InlineRuntimeOptions,
-  "prePlugins" | "postPlugins"
->;
 
 function isExtensionContextInvalidatedError(error: unknown): boolean {
   return (
     error instanceof Error &&
     /extension context invalidated/i.test(error.message)
   );
-}
-
-export function isLittleHotelierPricingPage(url: string): boolean {
-  try {
-    const parsedUrl = new URL(url);
-    const normalizedPath = parsedUrl.pathname.replace(/\/+$/u, "");
-
-    return (
-      parsedUrl.protocol === "https:" &&
-      parsedUrl.hostname === LITTLE_HOTELIER_PRICING_HOSTNAME &&
-      LITTLE_HOTELIER_PRICING_PATHS.has(normalizedPath)
-    );
-  } catch {
-    return false;
-  }
-}
-
-export function getContentRuntimeSitePluginOptions(
-  pageUrl: string,
-): ContentRuntimeSitePluginOptions {
-  if (!isLittleHotelierPricingPage(pageUrl)) {
-    return {};
-  }
-
-  return {
-    prePlugins: [littleHotelierPricingDetectorPrePlugin],
-    postPlugins: [littleHotelierPricingRendererPostPlugin],
-  };
 }
 
 export function createContentConversionRuntime(): ContentConversionRuntime {
