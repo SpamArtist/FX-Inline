@@ -4,6 +4,8 @@ import {
   amazonStructuredAddonPlugin,
   amazonStructuredRendererPostPlugin,
   convertVisiblePrices,
+  littleHotelierPricingDetectorPrePlugin,
+  littleHotelierPricingRendererPostPlugin,
   suppressInlineConversions,
 } from "../src/index.js";
 
@@ -30,6 +32,60 @@ function createRateSnapshot(overrides = {}) {
       ...(overrides.rates || {}),
     },
   };
+}
+
+function convertLittleHotelierPricing(preferredCurrency, rateSnapshot) {
+  return convertVisiblePrices(preferredCurrency, rateSnapshot, document.body, {
+    clearExisting: false,
+    refreshExisting: true,
+    includeDefaultPrePlugins: false,
+    includeDefaultPostPlugins: false,
+    prePlugins: [littleHotelierPricingDetectorPrePlugin],
+    postPlugins: [littleHotelierPricingRendererPostPlugin],
+  });
+}
+
+function setLittleHotelierPricingTable() {
+  document.body.innerHTML = [
+    '<section class="section d-none d-md-block pricing-table revised-pricing-lhb">',
+    '  <div class="container">',
+    '    <table class="table table-borderless mb-0 text-center">',
+    "      <tbody>",
+    "        <tr>",
+    '          <td class="p-0 border-top-0">',
+    '            <table class="mb-0 table-pricing table-breakdown-heading w-70 mx-auto">',
+    "              <tbody>",
+    '                <tr class="pb-0">',
+    '                  <th class="border border-bottom-0 border-top-0 pb-0 px-4 pt-0" id="littleHotelierPro" data-field="product">',
+    "                    <p>",
+    '                      <span class="medium lh-pro" id="term">From&nbsp;</span><strong class="h1"><span class="output lh-pro pb-0" id="output-lhbm">$179</span></strong>',
+    '                      <span class="code">USD</span><span class="price-suffix">&nbsp;/ month*</span>',
+    "                    </p>",
+    "                  </th>",
+    '                  <th class="border border-bottom-0 border-top-0 pb-0 px-4 pt-0" id="littleHotelierRevenueOptimiser" data-field="product">',
+    "                    <p>",
+    '                      <span class="medium lh-pro" id="term">From&nbsp;</span><strong class="h1"><span class="output lh-pro pb-0" id="output-lhbm">$179</span></strong>',
+    '                      <span class="lh-pro" id="term"><span class="code">USD</span><span class="price-suffix">&nbsp;/ month*</span></span>',
+    "                    </p>",
+    "                  </th>",
+    "                </tr>",
+    "              </tbody>",
+    "            </table>",
+    "          </td>",
+    "        </tr>",
+    "      </tbody>",
+    "    </table>",
+    "  </div>",
+    "</section>",
+  ].join("\n");
+}
+
+function getLittleHotelierAddons() {
+  return Array.from(
+    document.querySelectorAll(
+      'span.ccx-inline-conversion[data-ccx-site="littlehotelier-pricing"]',
+    ),
+  );
 }
 
 beforeEach(() => {
@@ -430,6 +486,106 @@ test("amazon renderer ignores stale candidates from pre detection", () => {
   expect(
     document.querySelector('#amazon-root span.fx-inline-inline-conversion[data-fx-inline-mode="addon"]'),
   ).toBeNull();
+});
+
+test("little hotelier pricing renderer places conversions below original prices", () => {
+  setLittleHotelierPricingTable();
+
+  const applied = convertLittleHotelierPricing("EUR", createRateSnapshot());
+
+  expect(applied).toBe(2);
+
+  const addons = getLittleHotelierAddons();
+  expect(addons).toHaveLength(2);
+
+  const proOutput = document.querySelector("#littleHotelierPro .output.lh-pro");
+  expect(proOutput.textContent).toBe("$179");
+  expect(proOutput.querySelector(".ccx-inline-conversion")).toBeNull();
+
+  const proParagraph = document.querySelector("#littleHotelierPro p");
+  const proAddon = proParagraph.lastElementChild;
+  expect(proAddon).toBe(addons[0]);
+  expect(proAddon.getAttribute("data-original")).toBe("$179 USD");
+  expect(proAddon.textContent).toMatch(/^≈ \(.+\)$/u);
+  expect(proAddon.textContent).not.toContain("$179");
+  expect(proAddon.style.display).toBe("block");
+  expect(proAddon.style.position).toBe("static");
+  expect(proAddon.style.float).toBe("none");
+  expect(proAddon.style.marginTop).toBe("0.35rem");
+  expect(proAddon.style.padding).toBe("0.2rem 0px 0px");
+});
+
+test("little hotelier pricing renderer refreshes addon nodes in place", () => {
+  setLittleHotelierPricingTable();
+
+  convertLittleHotelierPricing("EUR", createRateSnapshot());
+
+  const initialAddon = getLittleHotelierAddons()[0];
+  const initialConvertedNode = initialAddon.querySelector(".ccx-converted-amount");
+  const initialConvertedText = initialConvertedNode.textContent;
+
+  convertLittleHotelierPricing(
+    "EUR",
+    createRateSnapshot({
+      rates: {
+        EUR: 0.75,
+      },
+    }),
+  );
+
+  const refreshedAddon = getLittleHotelierAddons()[0];
+  const refreshedConvertedNode = refreshedAddon.querySelector(
+    ".ccx-converted-amount",
+  );
+
+  expect(getLittleHotelierAddons()).toHaveLength(2);
+  expect(refreshedAddon).toBe(initialAddon);
+  expect(refreshedConvertedNode).toBe(initialConvertedNode);
+  expect(refreshedConvertedNode.textContent).not.toBe(initialConvertedText);
+});
+
+test("little hotelier pricing renderer removes addons when conversion is unavailable", () => {
+  setLittleHotelierPricingTable();
+
+  convertLittleHotelierPricing("EUR", createRateSnapshot());
+  expect(getLittleHotelierAddons()).toHaveLength(2);
+
+  convertLittleHotelierPricing("USD", createRateSnapshot());
+
+  expect(getLittleHotelierAddons()).toHaveLength(0);
+});
+
+test("little hotelier pricing renderer removes stale addons outside pricing table", () => {
+  setLittleHotelierPricingTable();
+
+  convertLittleHotelierPricing("EUR", createRateSnapshot());
+  expect(getLittleHotelierAddons()).toHaveLength(2);
+
+  const pricingSection = document.querySelector(
+    "section.pricing-table.revised-pricing-lhb",
+  );
+  pricingSection.className = "section";
+
+  convertLittleHotelierPricing("EUR", createRateSnapshot());
+
+  expect(getLittleHotelierAddons()).toHaveLength(0);
+});
+
+test("little hotelier pricing renderer ignores non-pricing DOM", () => {
+  document.body.innerHTML = [
+    '<section class="section">',
+    '  <th id="notPricing" data-field="product">',
+    "    <p>",
+    '      <strong class="h1"><span class="output lh-pro pb-0">$179</span></strong>',
+    '      <span class="code">USD</span><span class="price-suffix">&nbsp;/ month*</span>',
+    "    </p>",
+    "  </th>",
+    "</section>",
+  ].join("\n");
+
+  convertLittleHotelierPricing("EUR", createRateSnapshot());
+
+  expect(getLittleHotelierAddons()).toHaveLength(0);
 });
 
 test("reports perf sample shape with reached node limit", () => {

@@ -16,6 +16,7 @@ import {
 } from "./conversionRuntime/hydration";
 import { createRuntimePerfContext } from "./conversionRuntime/logging";
 import { clearTimer } from "./conversionRuntime/timers";
+import { getContentRuntimeSitePluginOptions } from "./sitePlugins";
 import { createInlineRuntime } from "@fx-inline/inline-runtime";
 
 export type { ContentConversionRuntime } from "./content.types";
@@ -43,12 +44,16 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
   let settingsRefreshTimer: number | null = null;
   let isHydratingRates = false;
   let isCleanedUp = false;
+  const sitePluginOptions = getContentRuntimeSitePluginOptions(
+    window.location.href,
+  );
 
   const inlineRuntime = createInlineRuntime({
     root: document.body,
     observeMutations: false,
     enabled: false,
     autoFetchRates: false,
+    ...sitePluginOptions,
     onPerfSample: perfLoggingEnabled
       ? (sample) => {
         logPerf("inlineConversion.full", {
