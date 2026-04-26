@@ -23,8 +23,8 @@ import {
 export const AMAZON_STRUCTURED_ADDON_PLUGIN_NAME = "amazon-structured-addon";
 
 const AMAZON_SITE_RENDER_KEY = "amazon";
-const WRAPPER_CLASS_PREF_ATTR = "data-ccx-pref-wrapper-classes";
-const CONVERTED_CLASS_PREF_ATTR = "data-ccx-pref-converted-classes";
+const WRAPPER_CLASS_PREF_ATTR = "data-fx-inline-pref-wrapper-classes";
+const CONVERTED_CLASS_PREF_ATTR = "data-fx-inline-pref-converted-classes";
 
 function parseClassNames(classNameText) {
   if (typeof classNameText !== "string") return [];
@@ -79,7 +79,7 @@ function applyRenderPreferences(
 
   const prefixNode = wrapper.firstChild;
   const suffixNode = wrapper.childNodes.item(2);
-  const convertedNode = wrapper.querySelector(".ccx-converted-amount");
+  const convertedNode = wrapper.querySelector(".fx-inline-converted-amount");
 
   if (prefixNode instanceof Text) {
     const convertedPrefix = preferences.convertedPrefix ?? "";
@@ -181,14 +181,14 @@ export const amazonStructuredRendererPostPlugin = {
 
       const previousOriginal = existingAddon?.getAttribute("data-original") ?? null;
       const previousConverted =
-        existingAddon?.querySelector(".ccx-converted-amount")?.textContent ?? null;
+        existingAddon?.querySelector(".fx-inline-converted-amount")?.textContent ?? null;
 
       const wrapper = existingAddon ?? document.createElement("span");
       wrapper.className = INLINE_CONVERSION_CLASS;
-      wrapper.setAttribute("data-ccx-mode", INLINE_CONVERSION_ADDON_MODE);
+      wrapper.setAttribute("data-fx-inline-mode", INLINE_CONVERSION_ADDON_MODE);
       wrapper.setAttribute("data-original", rawPrice);
       if (renderPreferences.colorStrategy === "inherit") {
-        wrapper.style.setProperty("--ccx-converted-color", "currentColor");
+        wrapper.style.setProperty("--fx-inline-converted-color", "currentColor");
       } else {
         applyConvertedAmountColor(
           wrapper,

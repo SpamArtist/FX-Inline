@@ -2,7 +2,7 @@ import { getRates } from "@/utils/rates/index";
 import { shouldOpenWelcomePage } from "@/utils/installLifecycle";
 import { browser } from "wxt/browser";
 
-const RATE_REFRESH_ALARM = "ccx-refresh-rates";
+const RATE_REFRESH_ALARM = "fx-inline-refresh-rates";
 const RATE_REFRESH_INTERVAL_MINUTES = 30;
 const WELCOME_PAGE_PATH = "/welcome.html";
 
@@ -22,7 +22,7 @@ async function initializeRateRefresh(forceRefresh = false) {
 }
 
 function logRateRefreshError(context: string, error: unknown) {
-  console.warn(`[ccx] Failed to refresh rates during ${context}`, error);
+  console.warn(`[fx-inline] Failed to refresh rates during ${context}`, error);
 }
 
 async function openWelcomePage() {
@@ -32,7 +32,7 @@ async function openWelcomePage() {
 }
 
 function logWelcomePageError(error: unknown) {
-  console.warn("[ccx] Failed to open welcome page after install", error);
+  console.warn("[fx-inline] Failed to open welcome page after install", error);
 }
 
 export default defineBackground(() => {

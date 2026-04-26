@@ -6,18 +6,18 @@ import {
 } from "../../test-dist/entrypoints/content/perfLogger.js";
 
 beforeEach(() => {
-  window.localStorage.removeItem("ccx:perf");
+  window.localStorage.removeItem("fx-inline:perf");
   jest.restoreAllMocks();
 });
 
 afterEach(() => {
-  window.localStorage.removeItem("ccx:perf");
+  window.localStorage.removeItem("fx-inline:perf");
   jest.restoreAllMocks();
 });
 
 test("createPerfLogger stays disabled unless debug key is enabled", () => {
   const infoSpy = jest.spyOn(console, "info").mockImplementation(() => {});
-  const logger = createPerfLogger("ccx-test");
+  const logger = createPerfLogger("fx-inline-test");
 
   expect(logger.enabled).toBe(false);
   logger.log("inlineConversion.full", { conversions: 1 });
@@ -26,9 +26,9 @@ test("createPerfLogger stays disabled unless debug key is enabled", () => {
 });
 
 test("createPerfLogger logs with incrementing sequence when enabled", () => {
-  window.localStorage.setItem("ccx:perf", "1");
+  window.localStorage.setItem("fx-inline:perf", "1");
   const infoSpy = jest.spyOn(console, "info").mockImplementation(() => {});
-  const logger = createPerfLogger("ccx-test");
+  const logger = createPerfLogger("fx-inline-test");
 
   expect(logger.enabled).toBe(true);
 
@@ -36,8 +36,8 @@ test("createPerfLogger logs with incrementing sequence when enabled", () => {
   logger.log("inlineConversion.partial", { conversions: 3 });
 
   expect(infoSpy).toHaveBeenCalledTimes(2);
-  expect(infoSpy.mock.calls[0][0]).toContain("[ccx-test][perf][1] inlineConversion.full");
-  expect(infoSpy.mock.calls[1][0]).toContain("[ccx-test][perf][2] inlineConversion.partial");
+  expect(infoSpy.mock.calls[0][0]).toContain("[fx-inline-test][perf][1] inlineConversion.full");
+  expect(infoSpy.mock.calls[1][0]).toContain("[fx-inline-test][perf][2] inlineConversion.partial");
   expect(infoSpy.mock.calls[0][1]).toEqual({ conversions: 2 });
   expect(infoSpy.mock.calls[1][1]).toEqual({ conversions: 3 });
 });

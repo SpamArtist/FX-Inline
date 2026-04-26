@@ -5,7 +5,7 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
     <input
       type={type}
       data-slot="input"
-      className={`ccx-ui-input${className ? ` ${className}` : ""}`}
+      className={`fx-inline-ui-input${className ? ` ${className}` : ""}`}
       {...props}
     />
   )

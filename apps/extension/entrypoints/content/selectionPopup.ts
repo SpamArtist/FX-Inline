@@ -45,35 +45,35 @@ function resolveLocale(localeHint?: string | null): string {
 
 function createAmountRowView(): AmountRowView {
   const rowRoot = document.createElement("section");
-  rowRoot.className = "ccx-currency-box ccx-currency-box--selection";
+  rowRoot.className = "fx-inline-currency-box fx-inline-currency-box--selection";
 
   const top = document.createElement("div");
-  top.className = "ccx-currency-box__top";
+  top.className = "fx-inline-currency-box__top";
 
   const nameLabel = document.createElement("p");
-  nameLabel.className = "ccx-currency-box__name";
+  nameLabel.className = "fx-inline-currency-box__name";
   top.appendChild(nameLabel);
 
   const currencyChip = document.createElement("button");
   currencyChip.type = "button";
-  currencyChip.className = "ccx-dropdown-trigger";
+  currencyChip.className = "fx-inline-dropdown-trigger";
   currencyChip.disabled = true;
 
   const currencyIcon = document.createElement("span");
-  currencyIcon.className = "ccx-dropdown-trigger__icon";
+  currencyIcon.className = "fx-inline-dropdown-trigger__icon";
   currencyIcon.setAttribute("aria-hidden", "true");
 
   const currencyLabel = document.createElement("span");
-  currencyLabel.className = "ccx-dropdown-trigger__label";
+  currencyLabel.className = "fx-inline-dropdown-trigger__label";
 
   currencyChip.append(currencyIcon, currencyLabel);
   top.appendChild(currencyChip);
 
   const amountArea = document.createElement("div");
-  amountArea.className = "ccx-currency-box__amount-area";
+  amountArea.className = "fx-inline-currency-box__amount-area";
 
   const meta = document.createElement("p");
-  meta.className = "ccx-currency-box__amount-meta";
+  meta.className = "fx-inline-currency-box__amount-meta";
   meta.textContent = SELECTION_META_TEXT;
 
   rowRoot.append(top, amountArea, meta);
@@ -95,25 +95,25 @@ function createSelectionPopupView(
   currency: CurrencyCode,
 ): PopupView {
   const root = document.createElement("section");
-  root.className = "ccx-theme ccx-shell ccx-shell--selection";
+  root.className = "fx-inline-theme fx-inline-shell fx-inline-shell--selection";
 
   const shellInner = document.createElement("div");
-  shellInner.className = "ccx-shell__inner";
+  shellInner.className = "fx-inline-shell__inner";
 
   const header = document.createElement("header");
-  header.className = "ccx-shell__header";
+  header.className = "fx-inline-shell__header";
 
   const title = document.createElement("h2");
-  title.className = "ccx-shell__title";
+  title.className = "fx-inline-shell__title";
   title.textContent = "FX INLINE";
   header.appendChild(title);
 
   const layout = document.createElement("div");
-  layout.className = "ccx-converter-layout ccx-converter-layout--selection";
+  layout.className = "fx-inline-converter-layout fx-inline-converter-layout--selection";
 
   const sourceRow = createAmountRowView();
   const divider = document.createElement("div");
-  divider.className = "ccx-converter-divider";
+  divider.className = "fx-inline-converter-divider";
   divider.setAttribute("aria-hidden", "true");
   const targetRow = createAmountRowView();
 
@@ -145,7 +145,7 @@ function createSelectionPopupView(
 
     if (row.isEditing) {
       const input = document.createElement("input");
-      input.className = "ccx-currency-box__amount-input";
+      input.className = "fx-inline-currency-box__amount-input";
       input.type = "text";
       input.inputMode = "decimal";
       input.value = row.draftAmount;
@@ -208,7 +208,7 @@ function createSelectionPopupView(
 
     const amountButton = document.createElement("button");
     amountButton.type = "button";
-    amountButton.className = "ccx-currency-box__amount-display";
+    amountButton.className = "fx-inline-currency-box__amount-display";
     amountButton.textContent = formatCurrencyHeadlineAmount(
       currencyState.amount,
       currencyState.code,
@@ -302,7 +302,7 @@ export function createSelectionPopupController(
 
     const popupContainer = document.createElement("div");
     popupContainer.id = "popup-react-container";
-    popupContainer.className = "ccx-selection-popup-host";
+    popupContainer.className = "fx-inline-selection-popup-host";
     shadowRoot.appendChild(popupContainer);
 
     document.body.appendChild(popupRoot);

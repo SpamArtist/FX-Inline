@@ -16,7 +16,7 @@ export type RuntimePerfContext = {
   ) => void;
 };
 
-export function createRuntimePerfContext(namespace = "ccx"): RuntimePerfContext {
+export function createRuntimePerfContext(namespace = "fx-inline"): RuntimePerfContext {
   const perfLogger = createPerfLogger(namespace);
   const perfLoggingEnabled = perfLogger.enabled;
   const logPerf = perfLogger.log;

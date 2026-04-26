@@ -176,7 +176,7 @@ Implement these extension entrypoints and behaviors exactly.
 - attached open Shadow DOM
 - very high z-index (`9999999`)
 - inject combined inline CSS (`converter-theme.css` + `content.css`) via a `<style id="content-styles">`
-- mount UI inside container id `popup-react-container` (container class `ccx-selection-popup-host`)
+- mount UI inside container id `popup-react-container` (container class `fx-inline-selection-popup-host`)
 3. Popup UI behavior:
 - same shell design language as popup, with `FX INLINE` header
 - two rows only
@@ -184,14 +184,14 @@ Implement these extension entrypoints and behaviors exactly.
 - amounts are click-to-edit with commit/cancel key behavior
 4. Event isolation:
 - capture and swallow `pointerdown`, `mousedown`, `click`, `contextmenu`
-- isolate events from popup root and dropdown portal class `ccx-dropdown-menu-content`
+- isolate events from popup root and dropdown portal class `fx-inline-dropdown-menu-content`
 5. Removal behavior:
 - remove popup when clicking outside and selection is cleared
 - `removePopup()` and `destroy()` must be idempotent
 
 ### F) Background Script
 
-1. Alarm name: `ccx-refresh-rates`.
+1. Alarm name: `fx-inline-refresh-rates`.
 2. Interval: every 30 minutes.
 3. On install:
 - schedule alarm
@@ -274,9 +274,9 @@ Use extension local storage with these keys and semantics:
 - hidden/assistive-only contexts
 - already converted nodes
 3. Wrapper/styling contract:
-- wrapper class: `ccx-inline-conversion`
-- converted amount child class: `ccx-converted-amount`
-- style tag id: `ccx-inline-conversion-style`
+- wrapper class: `fx-inline-inline-conversion`
+- converted amount child class: `fx-inline-converted-amount`
+- style tag id: `fx-inline-inline-conversion-style`
 4. Render output format as `original (converted)` for text-node replacements.
 5. Avoid nested duplicate wrappers.
 6. On reruns:
@@ -301,7 +301,7 @@ Use extension local storage with these keys and semantics:
 - support structured Amazon-style fragments and sibling symbol/amount node patterns
 - include sibling currency-word combinations such as `yen/month`
 12. Converted amount style contract:
-- `.ccx-converted-amount` must include inherited line-height and `width: fit-content`
+- `.fx-inline-converted-amount` must include inherited line-height and `width: fit-content`
 
 ### E) Mutation-Aware Conversion Runtime
 
@@ -328,7 +328,7 @@ Implement the same runtime behavior pattern:
 - retry conversion hydration after failure (around `3000ms`)
 8. Perf logging:
 - enabled by default in development
-- in production, opt-in via localStorage key `ccx:perf` set to `"1"`
+- in production, opt-in via localStorage key `fx-inline:perf` set to `"1"`
 - log phase timings and counters for initialize/full/partial/settings flows
 9. Auto-conversion disabled behavior:
 - suppress/hide existing inline wrappers instead of applying new conversions

@@ -9,10 +9,10 @@
   box-sizing: border-box;
 }
 
-.ccx-selection-popup-host {
+.fx-inline-selection-popup-host {
   width: min(31rem, calc(100vw - 1.5rem));
 }
 
-.ccx-selection-popup-host .ccx-shell {
+.fx-inline-selection-popup-host .fx-inline-shell {
   margin: 0;
 }

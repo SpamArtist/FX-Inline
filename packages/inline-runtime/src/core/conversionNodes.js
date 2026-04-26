@@ -16,7 +16,7 @@ export function replaceWithOriginalText(node, fallbackText) {
 }
 
 export function isInlineConversionAddon(node) {
-  return node.getAttribute("data-ccx-mode") === INLINE_CONVERSION_ADDON_MODE;
+  return node.getAttribute("data-fx-inline-mode") === INLINE_CONVERSION_ADDON_MODE;
 }
 
 function ensureInlineConversionNodeRefs(wrapper) {
@@ -28,7 +28,7 @@ function ensureInlineConversionNodeRefs(wrapper) {
     wrapper.childNodes.length === 3 &&
     firstChild instanceof Text &&
     secondChild instanceof HTMLSpanElement &&
-    secondChild.classList.contains("ccx-converted-amount") &&
+    secondChild.classList.contains("fx-inline-converted-amount") &&
     thirdChild instanceof Text;
 
   if (hasExpectedShape) {
@@ -43,7 +43,7 @@ function ensureInlineConversionNodeRefs(wrapper) {
 
   const prefixNode = document.createTextNode("");
   const convertedValueNode = document.createElement("span");
-  convertedValueNode.className = "ccx-converted-amount";
+  convertedValueNode.className = "fx-inline-converted-amount";
   const suffixNode = document.createTextNode("");
 
   wrapper.append(prefixNode, convertedValueNode, suffixNode);
@@ -65,7 +65,7 @@ export function setInlineConversionContent(
   const prefixText =
     options?.originalText === undefined ? " " : `${options.originalText} `;
 
-  wrapper.removeAttribute("data-ccx-suppressed");
+  wrapper.removeAttribute("data-fx-inline-suppressed");
   wrapper.style.removeProperty("display");
   convertedValueNode.style.removeProperty("display");
   prefixNode.nodeValue = prefixText;
@@ -78,7 +78,7 @@ export function applyConvertedAmountColor(
   useLightColor,
 ) {
   wrapper.style.setProperty(
-    "--ccx-converted-color",
+    "--fx-inline-converted-color",
     useLightColor ? "#93c5fd" : "#355aa8",
   );
 }
@@ -110,7 +110,7 @@ export function suppressInlineConversions(root = document.body) {
   for (const node of convertedNodes) {
     if (!(node instanceof HTMLSpanElement)) continue;
 
-    node.setAttribute("data-ccx-suppressed", "true");
+    node.setAttribute("data-fx-inline-suppressed", "true");
 
     if (isInlineConversionAddon(node)) {
       node.style.setProperty("display", "none");
@@ -195,7 +195,7 @@ export function getInlineAddonNode(root) {
     if (
       child instanceof HTMLSpanElement &&
       child.classList.contains(INLINE_CONVERSION_CLASS) &&
-      child.getAttribute("data-ccx-mode") === INLINE_CONVERSION_ADDON_MODE
+      child.getAttribute("data-fx-inline-mode") === INLINE_CONVERSION_ADDON_MODE
     ) {
       return child;
     }

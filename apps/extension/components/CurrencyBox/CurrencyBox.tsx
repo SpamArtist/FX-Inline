@@ -118,9 +118,9 @@ function CurrencyBox({
   }
 
   return (
-    <section className={`ccx-currency-box ccx-currency-box--${variant}`}>
-      <div className="ccx-currency-box__top">
-        <p className="ccx-currency-box__name">{currencyName}</p>
+    <section className={`fx-inline-currency-box fx-inline-currency-box--${variant}`}>
+      <div className="fx-inline-currency-box__top">
+        <p className="fx-inline-currency-box__name">{currencyName}</p>
         <CurrencyDropdown
           isDisabled={!isCurrencySelectable}
           selectedCurrency={data.code}
@@ -129,11 +129,11 @@ function CurrencyBox({
         />
       </div>
 
-      <div className="ccx-currency-box__amount-area">
+      <div className="fx-inline-currency-box__amount-area">
         {shouldDisplayInput ? (
           <input
             ref={inputRef}
-            className="ccx-currency-box__amount-input"
+            className="fx-inline-currency-box__amount-input"
             type="text"
             inputMode="decimal"
             value={draftAmount}
@@ -145,7 +145,7 @@ function CurrencyBox({
         ) : (
           <button
             type="button"
-            className="ccx-currency-box__amount-display"
+            className="fx-inline-currency-box__amount-display"
             onClick={beginAmountEdit}
             aria-label={`Edit ${currencyName} amount`}
           >
@@ -154,7 +154,7 @@ function CurrencyBox({
         )}
       </div>
 
-      <p className="ccx-currency-box__amount-meta">
+      <p className="fx-inline-currency-box__amount-meta">
         {amountPresentationMode === "displayThenEdit"
           ? "Click amount to edit"
           : "Amount updates instantly"}

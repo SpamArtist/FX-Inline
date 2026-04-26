@@ -11,7 +11,7 @@ function isPerfLoggingEnabled(): boolean {
   }
 }
 
-export function createPerfLogger(namespace = "ccx"): PerfLogger {
+export function createPerfLogger(namespace = "fx-inline"): PerfLogger {
   const enabled = isPerfLoggingEnabled();
   let sequence = 0;
 

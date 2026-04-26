@@ -4,45 +4,45 @@ import "./style.css";
 const root = document.getElementById("root");
 
 if (!root) {
-  throw new Error("[ccx] Missing #root element in welcome page");
+  throw new Error("[fx-inline] Missing #root element in welcome page");
 }
 
 const page = document.createElement("main");
-page.className = "ccx-theme ccx-welcome-page";
+page.className = "fx-inline-theme fx-inline-welcome-page";
 
 const shell = document.createElement("section");
-shell.className = "ccx-shell ccx-welcome-shell";
+shell.className = "fx-inline-shell fx-inline-welcome-shell";
 
 const shellInner = document.createElement("div");
-shellInner.className = "ccx-shell__inner ccx-welcome-shell-inner";
+shellInner.className = "fx-inline-shell__inner fx-inline-welcome-shell-inner";
 
 const header = document.createElement("header");
-header.className = "ccx-welcome-header";
+header.className = "fx-inline-welcome-header";
 
 const brand = document.createElement("p");
-brand.className = "ccx-shell__title ccx-welcome-brand";
+brand.className = "fx-inline-shell__title fx-inline-welcome-brand";
 brand.textContent = "FX Inline";
 
 const heading = document.createElement("h1");
-heading.className = "ccx-welcome-heading";
+heading.className = "fx-inline-welcome-heading";
 heading.textContent = "Welcome to FX Inline";
 
 const copy = document.createElement("p");
-copy.className = "ccx-welcome-copy";
+copy.className = "fx-inline-welcome-copy";
 copy.textContent =
   "Thank you for installing FX Inline. We convert prices directly on the pages you visit so you can evaluate costs quickly and confidently in your preferred currency.";
 
 header.append(brand, heading, copy);
 
 const guide = document.createElement("section");
-guide.className = "ccx-welcome-guide";
+guide.className = "fx-inline-welcome-guide";
 
 const guideTitle = document.createElement("h2");
-guideTitle.className = "ccx-welcome-guide-title";
+guideTitle.className = "fx-inline-welcome-guide-title";
 guideTitle.textContent = "Get started in under a minute";
 
 const guideList = document.createElement("ul");
-guideList.className = "ccx-welcome-guide-list";
+guideList.className = "fx-inline-welcome-guide-list";
 
 const firstGuideItem = document.createElement("li");
 firstGuideItem.textContent = "Choose your preferred currency in Settings.";
@@ -55,21 +55,21 @@ guideList.append(firstGuideItem, secondGuideItem, thirdGuideItem);
 guide.append(guideTitle, guideList);
 
 const actions = document.createElement("div");
-actions.className = "ccx-welcome-actions";
+actions.className = "fx-inline-welcome-actions";
 
 const settingsButton = document.createElement("button");
-settingsButton.className = "ccx-welcome-primary-button";
-settingsButton.id = "ccx-welcome-open-settings";
+settingsButton.className = "fx-inline-welcome-primary-button";
+settingsButton.id = "fx-inline-welcome-open-settings";
 settingsButton.type = "button";
 settingsButton.textContent = "Open Settings";
 
 const note = document.createElement("p");
-note.className = "ccx-welcome-note";
+note.className = "fx-inline-welcome-note";
 note.textContent = "You can revisit this page anytime from the extension files.";
 
 const statusText = document.createElement("p");
-statusText.className = "ccx-welcome-status";
-statusText.id = "ccx-welcome-status";
+statusText.className = "fx-inline-welcome-status";
+statusText.id = "fx-inline-welcome-status";
 statusText.setAttribute("role", "status");
 statusText.setAttribute("aria-live", "polite");
 statusText.hidden = true;
@@ -102,7 +102,7 @@ async function openSettingsPage() {
 
     setStatus("Settings opened in a new tab.");
   } catch (error) {
-    console.warn("[ccx] Failed to open options page from welcome page", error);
+    console.warn("[fx-inline] Failed to open options page from welcome page", error);
     setStatus(
       "Could not open settings automatically. Open FX Inline Settings from the extension menu.",
     );

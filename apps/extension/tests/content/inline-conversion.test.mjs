@@ -29,7 +29,7 @@ function createRateSnapshot(overrides = {}) {
 beforeEach(() => {
   document.documentElement.lang = "en-US";
   document.body.innerHTML = "";
-  const styleTag = document.getElementById("ccx-inline-conversion-style");
+  const styleTag = document.getElementById("fx-inline-inline-conversion-style");
   styleTag?.remove();
 });
 
@@ -48,7 +48,7 @@ test("converts text-node prices with the expected inline wrapper shape", () => {
   expect(wrapper.textContent).toMatch(/^\$100\s+\(/);
   expect(wrapper.textContent.endsWith(")")).toBe(true);
 
-  const convertedAmount = wrapper.querySelector(".ccx-converted-amount");
+  const convertedAmount = wrapper.querySelector(".fx-inline-converted-amount");
   expect(convertedAmount).not.toBeNull();
   expect(convertedAmount.textContent).toMatch(/^\(.+\)$/);
 });
@@ -60,9 +60,9 @@ test("injects converted amount line-height and width styles", () => {
     clearExisting: false,
   });
 
-  const styleTag = document.getElementById("ccx-inline-conversion-style");
+  const styleTag = document.getElementById("fx-inline-inline-conversion-style");
   expect(styleTag).not.toBeNull();
-  expect(styleTag.textContent).toMatch(/\.ccx-converted-amount\s*\{/);
+  expect(styleTag.textContent).toMatch(/\.fx-inline-converted-amount\s*\{/);
   expect(styleTag.textContent).toContain("line-height: inherit !important;");
   expect(styleTag.textContent).toContain("width: fit-content !important;");
 });
@@ -72,7 +72,7 @@ test("converts unicode yen symbols in mixed listing text", () => {
     '<h5 id="listing">',
     '  <a href="/en/property/1545984">',
     "    ￥39,000",
-    '    <span>Management fee：<span class="ccx-inline-conversion" data-original="¥6,500">¥6,500 (<span class="ccx-converted-amount">₹3,806.20</span>)</span></span>',
+    '    <span>Management fee：<span class="fx-inline-inline-conversion" data-original="¥6,500">¥6,500 (<span class="fx-inline-converted-amount">₹3,806.20</span>)</span></span>',
     "  </a>",
     "</h5>",
   ].join("\n");
@@ -94,16 +94,16 @@ test("converts unicode yen symbols in mixed listing text", () => {
   expect(listingWrappers).toHaveLength(2);
 
   const convertedMainPrice = document.querySelector(
-    '#listing span.ccx-inline-conversion[data-original="￥39,000"]',
+    '#listing span.fx-inline-inline-conversion[data-original="￥39,000"]',
   );
   expect(convertedMainPrice).not.toBeNull();
   expect(convertedMainPrice.textContent).toMatch(/^￥39,000\s+\(.+\)$/);
 
   const existingFeeWrapper = document.querySelector(
-    '#listing span.ccx-inline-conversion[data-original="¥6,500"]',
+    '#listing span.fx-inline-inline-conversion[data-original="¥6,500"]',
   );
   expect(existingFeeWrapper).not.toBeNull();
-  expect(existingFeeWrapper.querySelector(".ccx-converted-amount").textContent).toBe(
+  expect(existingFeeWrapper.querySelector(".fx-inline-converted-amount").textContent).toBe(
     "₹3,806.20",
   );
 });
@@ -120,10 +120,10 @@ test("refreshes existing wrappers in place and clears wrappers when requested", 
   expect(initialWrapper).not.toBeNull();
 
   const initialConvertedText = initialWrapper
-    .querySelector(".ccx-converted-amount")
+    .querySelector(".fx-inline-converted-amount")
     .textContent;
   expect(initialConvertedText).toMatch(/^\(.+\)$/);
-  const initialConvertedNode = initialWrapper.querySelector(".ccx-converted-amount");
+  const initialConvertedNode = initialWrapper.querySelector(".fx-inline-converted-amount");
 
   const refreshedApplied = convertVisiblePrices(
     "EUR",
@@ -139,12 +139,12 @@ test("refreshes existing wrappers in place and clears wrappers when requested", 
 
   const refreshedWrapper = document.querySelector(`#price span.${INLINE_CONVERSION_CLASS}`);
   expect(refreshedWrapper).toBe(initialWrapper);
-  expect(refreshedWrapper.querySelector(".ccx-converted-amount")).toBe(
+  expect(refreshedWrapper.querySelector(".fx-inline-converted-amount")).toBe(
     initialConvertedNode,
   );
 
   const refreshedConvertedText = refreshedWrapper
-    .querySelector(".ccx-converted-amount")
+    .querySelector(".fx-inline-converted-amount")
     .textContent;
   expect(refreshedConvertedText).not.toBe(initialConvertedText);
   expect(refreshedConvertedText).toMatch(/^\(.+\)$/);
@@ -164,12 +164,12 @@ test("suppresses and restores wrappers without replacing converted-amount node",
   expect(initialApplied).toBe(1);
 
   const wrapper = document.querySelector(`#price span.${INLINE_CONVERSION_CLASS}`);
-  const convertedNode = wrapper.querySelector(".ccx-converted-amount");
+  const convertedNode = wrapper.querySelector(".fx-inline-converted-amount");
   expect(convertedNode).not.toBeNull();
 
   const suppressedCount = suppressInlineConversions(document.body);
   expect(suppressedCount).toBe(1);
-  expect(wrapper.querySelector(".ccx-converted-amount")).toBe(convertedNode);
+  expect(wrapper.querySelector(".fx-inline-converted-amount")).toBe(convertedNode);
   expect(wrapper.firstChild.nodeValue).toBe("$100");
   expect(wrapper.lastChild.nodeValue).toBe("");
   expect(convertedNode.style.display).toBe("none");
@@ -184,7 +184,7 @@ test("suppresses and restores wrappers without replacing converted-amount node",
     },
   );
 
-  expect(wrapper.querySelector(".ccx-converted-amount")).toBe(convertedNode);
+  expect(wrapper.querySelector(".fx-inline-converted-amount")).toBe(convertedNode);
   expect(convertedNode.style.display).toBe("");
   expect(wrapper.textContent).toMatch(/^\$100\s+\(.+\)$/);
 });
@@ -193,7 +193,7 @@ test("skips editable, non-visible, and already-converted wrapper contexts", () =
   document.body.innerHTML = [
     '<div id="editable" contenteditable="true">$100</div>',
     '<div id="hidden" class="visually-hidden">$200</div>',
-    '<div id="existing"><span class="ccx-inline-conversion" data-original="$300"><span class="ccx-converted-amount">€270.00</span></span></div>',
+    '<div id="existing"><span class="fx-inline-inline-conversion" data-original="$300"><span class="fx-inline-converted-amount">€270.00</span></span></div>',
     '<p id="plain">$400</p>',
   ].join("");
 
@@ -241,30 +241,30 @@ test("adds structured add-on conversions for Amazon-style and sibling-symbol pri
   expect(applied).toBeGreaterThanOrEqual(2);
 
   const amazonAddon = document.querySelector(
-    '#amazon-root span.ccx-inline-conversion[data-ccx-mode="addon"]',
+    '#amazon-root span.fx-inline-inline-conversion[data-fx-inline-mode="addon"]',
   );
   expect(amazonAddon).not.toBeNull();
   expect(amazonAddon.getAttribute("data-original")).toBe("$199.99");
-  expect(amazonAddon.querySelector(".ccx-converted-amount").textContent).toMatch(
+  expect(amazonAddon.querySelector(".fx-inline-converted-amount").textContent).toMatch(
     /^\(.+\)$/,
   );
 
   const siblingAddon = document.querySelector(
-    '#sibling-value span.ccx-inline-conversion[data-ccx-mode="addon"]',
+    '#sibling-value span.fx-inline-inline-conversion[data-fx-inline-mode="addon"]',
   );
   expect(siblingAddon).not.toBeNull();
   expect(siblingAddon.getAttribute("data-original")).toBe("$2500");
-  expect(siblingAddon.querySelector(".ccx-converted-amount").textContent).toMatch(
+  expect(siblingAddon.querySelector(".fx-inline-converted-amount").textContent).toMatch(
     /^\(.+\)$/,
   );
 
   const siblingWordAddon = document.querySelector(
-    '#sibling-value-word span.ccx-inline-conversion[data-ccx-mode="addon"]',
+    '#sibling-value-word span.fx-inline-inline-conversion[data-fx-inline-mode="addon"]',
   );
   expect(siblingWordAddon).not.toBeNull();
   expect(siblingWordAddon.getAttribute("data-original")).toBe("990,000 yen");
   expect(
-    siblingWordAddon.querySelector(".ccx-converted-amount").textContent,
+    siblingWordAddon.querySelector(".fx-inline-converted-amount").textContent,
   ).toMatch(/^\(.+\)$/);
 });
 
@@ -290,11 +290,11 @@ test("does not duplicate amazon original amount text in addon by default", () =>
 
   expect(applied).toBe(1);
   const addon = document.querySelector(
-    '#amazon-hidden-root span.ccx-inline-conversion[data-ccx-mode="addon"]',
+    '#amazon-hidden-root span.fx-inline-inline-conversion[data-fx-inline-mode="addon"]',
   );
   expect(addon).not.toBeNull();
   expect(addon.textContent).not.toContain("¥4,680");
-  expect(addon.querySelector(".ccx-converted-amount").textContent).toMatch(
+  expect(addon.querySelector(".fx-inline-converted-amount").textContent).toMatch(
     /^\(.+\)$/u,
   );
 });
@@ -320,11 +320,11 @@ test("adds conversion when amount and yen/month token are split across sibling n
   expect(applied).toBeGreaterThanOrEqual(1);
 
   const addon = document.querySelector(
-    '#split-yen .bold span.ccx-inline-conversion[data-ccx-mode="addon"]',
+    '#split-yen .bold span.fx-inline-inline-conversion[data-fx-inline-mode="addon"]',
   );
   expect(addon).not.toBeNull();
   expect(addon.getAttribute("data-original")).toBe("990,000 yen");
-  expect(addon.querySelector(".ccx-converted-amount").textContent).toMatch(
+  expect(addon.querySelector(".fx-inline-converted-amount").textContent).toMatch(
     /^\(.+\)$/,
   );
 });

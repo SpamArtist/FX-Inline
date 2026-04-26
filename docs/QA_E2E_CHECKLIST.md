@@ -69,8 +69,8 @@ Expected:
 4. Confirm no nested duplicate wrappers after repeated reruns/navigation.
 
 Expected:
-- Wrapper class: `ccx-inline-conversion`.
-- Converted amount node: `.ccx-converted-amount`.
+- Wrapper class: `fx-inline-inline-conversion`.
+- Converted amount node: `.fx-inline-converted-amount`.
 
 ## 6. Structured price conversion coverage
 
@@ -100,7 +100,7 @@ Expected:
 4. Wait for/force alarm cycle path and confirm rates still hydrate without errors.
 
 Expected:
-- Alarm `ccx-refresh-rates` refreshes rates every 30 minutes.
+- Alarm `fx-inline-refresh-rates` refreshes rates every 30 minutes.
 - If fetch fails and cache is valid, conversions still work from cache.
 
 ## 9. Runtime stability on dynamic pages

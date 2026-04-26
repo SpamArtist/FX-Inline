@@ -33,7 +33,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
     logPerf,
     roundMs,
     logSettingsStorageUpdate,
-  } = createRuntimePerfContext("ccx");
+  } = createRuntimePerfContext("fx-inline");
   const currentPageOrigin = getOriginFromUrl(window.location.href);
 
   let settings: UserSettings | null = null;
@@ -64,7 +64,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
       : undefined,
     onError: (error) => {
       if (isExtensionContextInvalidatedError(error)) return;
-      console.warn("[ccx] Inline runtime error", error);
+      console.warn("[fx-inline] Inline runtime error", error);
     },
   });
 
@@ -132,7 +132,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
       if (isCleanedUp) return;
       void initialize().catch((error) => {
         if (isExtensionContextInvalidatedError(error)) return;
-        console.warn("[ccx] Failed to retry inline runtime hydration", error);
+        console.warn("[fx-inline] Failed to retry inline runtime hydration", error);
       });
     }, HYDRATION_RETRY_MS);
   }
@@ -155,7 +155,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
         })
         .catch((error) => {
           if (!isExtensionContextInvalidatedError(error)) {
-            console.warn("[ccx] Failed to refresh settings/rates after settings update", error);
+            console.warn("[fx-inline] Failed to refresh settings/rates after settings update", error);
           }
           scheduleHydrationRetry();
         });
@@ -169,7 +169,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
       await hydrateRuntimeSettingsAndRates();
     } catch (error) {
       if (!isExtensionContextInvalidatedError(error)) {
-        console.warn("[ccx] Failed to hydrate settings/rates for inline runtime", error);
+        console.warn("[fx-inline] Failed to hydrate settings/rates for inline runtime", error);
       }
       scheduleHydrationRetry();
       return;

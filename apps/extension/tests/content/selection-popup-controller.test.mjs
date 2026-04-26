@@ -78,9 +78,9 @@ function getShadowRoot(controller) {
 async function waitForPopupContent(controller) {
   await waitForCondition(() => {
     const shadowRoot = getShadowRoot(controller);
-    const host = shadowRoot.querySelector(".ccx-selection-popup-host");
-    const shell = shadowRoot.querySelector(".ccx-shell");
-    const amountDisplay = shadowRoot.querySelector(".ccx-currency-box__amount-display");
+    const host = shadowRoot.querySelector(".fx-inline-selection-popup-host");
+    const shell = shadowRoot.querySelector(".fx-inline-shell");
+    const amountDisplay = shadowRoot.querySelector(".fx-inline-currency-box__amount-display");
 
     expect(host).not.toBeNull();
     expect(shell).not.toBeNull();
@@ -119,10 +119,10 @@ test("showPopup renders popup shell, styles, and placement", async () => {
   const styleTag = shadowRoot.querySelector("#content-styles");
   expect(styleTag?.textContent).toContain(".mock-style");
 
-  const host = shadowRoot.querySelector(".ccx-selection-popup-host");
+  const host = shadowRoot.querySelector(".fx-inline-selection-popup-host");
   expect(host).not.toBeNull();
-  expect(host?.querySelector(".ccx-shell")).not.toBeNull();
-  expect(host?.querySelectorAll(".ccx-currency-box")).toHaveLength(2);
+  expect(host?.querySelector(".fx-inline-shell")).not.toBeNull();
+  expect(host?.querySelectorAll(".fx-inline-currency-box")).toHaveLength(2);
 });
 
 test("removePopup and destroy are idempotent and clean up the DOM", async () => {
@@ -161,7 +161,7 @@ test("containsTarget and repeated showPopup replace the popup root", async () =>
   expect(firstPopupRoot && controller.containsTarget(firstPopupRoot)).toBe(true);
 
   const firstShadowRoot = getShadowRoot(controller);
-  const firstAmountButton = firstShadowRoot.querySelector(".ccx-currency-box__amount-display");
+  const firstAmountButton = firstShadowRoot.querySelector(".fx-inline-currency-box__amount-display");
   expect(firstAmountButton).not.toBeNull();
   if (!firstAmountButton) {
     throw new Error("Expected amount display button");
@@ -186,13 +186,13 @@ test("amount edit interactions commit on blur and Enter, and revert on Escape", 
   await waitForPopupContent(controller);
 
   const shadowRoot = getShadowRoot(controller);
-  const sourceRow = shadowRoot.querySelectorAll(".ccx-currency-box")[0];
+  const sourceRow = shadowRoot.querySelectorAll(".fx-inline-currency-box")[0];
   expect(sourceRow).not.toBeUndefined();
   if (!sourceRow) {
     throw new Error("Expected source currency row");
   }
 
-  const sourceAmountDisplay = sourceRow.querySelector(".ccx-currency-box__amount-display");
+  const sourceAmountDisplay = sourceRow.querySelector(".fx-inline-currency-box__amount-display");
   expect(sourceAmountDisplay).not.toBeNull();
   if (!sourceAmountDisplay) {
     throw new Error("Expected source amount display button");
@@ -201,7 +201,7 @@ test("amount edit interactions commit on blur and Enter, and revert on Escape", 
   sourceAmountDisplay.dispatchEvent(new MouseEvent("click", { bubbles: true }));
   await flushMicrotasks();
 
-  const sourceAmountInput = sourceRow.querySelector(".ccx-currency-box__amount-input");
+  const sourceAmountInput = sourceRow.querySelector(".fx-inline-currency-box__amount-input");
   expect(sourceAmountInput).not.toBeNull();
   if (!(sourceAmountInput instanceof HTMLInputElement)) {
     throw new Error("Expected source amount input");
@@ -212,13 +212,13 @@ test("amount edit interactions commit on blur and Enter, and revert on Escape", 
   sourceAmountInput.dispatchEvent(new FocusEvent("blur", { bubbles: true }));
   await flushMicrotasks();
 
-  const displayAfterBlur = sourceRow.querySelector(".ccx-currency-box__amount-display");
+  const displayAfterBlur = sourceRow.querySelector(".fx-inline-currency-box__amount-display");
   expect(displayAfterBlur?.textContent).not.toBe(sourceAmountDisplay.textContent);
 
   displayAfterBlur?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
   await flushMicrotasks();
 
-  const inputAfterBlur = sourceRow.querySelector(".ccx-currency-box__amount-input");
+  const inputAfterBlur = sourceRow.querySelector(".fx-inline-currency-box__amount-input");
   if (!(inputAfterBlur instanceof HTMLInputElement)) {
     throw new Error("Expected source amount input after blur edit");
   }
@@ -231,18 +231,18 @@ test("amount edit interactions commit on blur and Enter, and revert on Escape", 
 
   let stableDisplayText = "";
   await waitForCondition(() => {
-    const displayAfterEnter = sourceRow.querySelector(".ccx-currency-box__amount-display");
+    const displayAfterEnter = sourceRow.querySelector(".fx-inline-currency-box__amount-display");
     expect(displayAfterEnter).not.toBeNull();
     stableDisplayText = displayAfterEnter?.textContent || "";
     expect(stableDisplayText.length).toBeGreaterThan(0);
   });
 
   sourceRow
-    .querySelector(".ccx-currency-box__amount-display")
+    .querySelector(".fx-inline-currency-box__amount-display")
     ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
   await flushMicrotasks();
 
-  const inputAfterEnter = sourceRow.querySelector(".ccx-currency-box__amount-input");
+  const inputAfterEnter = sourceRow.querySelector(".fx-inline-currency-box__amount-input");
   if (!(inputAfterEnter instanceof HTMLInputElement)) {
     throw new Error("Expected source amount input after enter edit");
   }
@@ -251,7 +251,7 @@ test("amount edit interactions commit on blur and Enter, and revert on Escape", 
   inputAfterEnter.dispatchEvent(new Event("input", { bubbles: true }));
   inputAfterEnter.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
   await waitForCondition(() => {
-    const displayAfterEscape = sourceRow.querySelector(".ccx-currency-box__amount-display");
+    const displayAfterEscape = sourceRow.querySelector(".fx-inline-currency-box__amount-display");
     expect(displayAfterEscape).not.toBeNull();
     expect(displayAfterEscape?.textContent).toBe(stableDisplayText);
   });
@@ -277,7 +277,7 @@ test("hydration updates preferred currency row after popup mount", async () => {
   await waitForCondition(() => {
     const shadowRoot = getShadowRoot(controller);
     const labels = Array.from(
-      shadowRoot.querySelectorAll(".ccx-dropdown-trigger__label"),
+      shadowRoot.querySelectorAll(".fx-inline-dropdown-trigger__label"),
     ).map((node) => node.textContent?.trim());
 
     expect(labels).toContain("INR");

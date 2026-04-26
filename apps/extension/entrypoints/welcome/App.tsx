@@ -20,7 +20,7 @@ function App() {
 
       setStatusMessage("Settings opened in a new tab.");
     } catch (error) {
-      console.warn("[ccx] Failed to open options page from welcome page", error);
+      console.warn("[fx-inline] Failed to open options page from welcome page", error);
       setStatusMessage(
         "Could not open settings automatically. Open FX Inline Settings from the extension menu.",
       );
@@ -30,31 +30,31 @@ function App() {
   }
 
   return (
-    <main className="ccx-theme ccx-welcome-page">
-      <section className="ccx-shell ccx-welcome-shell">
-        <div className="ccx-shell__inner ccx-welcome-shell-inner">
-          <header className="ccx-welcome-header">
-            <p className="ccx-shell__title ccx-welcome-brand">FX Inline</p>
-            <h1 className="ccx-welcome-heading">Welcome to FX Inline</h1>
-            <p className="ccx-welcome-copy">
+    <main className="fx-inline-theme fx-inline-welcome-page">
+      <section className="fx-inline-shell fx-inline-welcome-shell">
+        <div className="fx-inline-shell__inner fx-inline-welcome-shell-inner">
+          <header className="fx-inline-welcome-header">
+            <p className="fx-inline-shell__title fx-inline-welcome-brand">FX Inline</p>
+            <h1 className="fx-inline-welcome-heading">Welcome to FX Inline</h1>
+            <p className="fx-inline-welcome-copy">
               Thank you for installing FX Inline. We convert prices directly on
               the pages you visit so you can evaluate costs quickly and
               confidently in your preferred currency.
             </p>
           </header>
 
-          <section className="ccx-welcome-guide">
-            <h2 className="ccx-welcome-guide-title">Get started in under a minute</h2>
-            <ul className="ccx-welcome-guide-list">
+          <section className="fx-inline-welcome-guide">
+            <h2 className="fx-inline-welcome-guide-title">Get started in under a minute</h2>
+            <ul className="fx-inline-welcome-guide-list">
               <li>Choose your preferred currency in Settings.</li>
               <li>Open any shopping, travel, or marketplace page with prices.</li>
               <li>Use the FX Inline icon anytime to open the converter popup.</li>
             </ul>
           </section>
 
-          <div className="ccx-welcome-actions">
+          <div className="fx-inline-welcome-actions">
             <button
-              className="ccx-welcome-primary-button"
+              className="fx-inline-welcome-primary-button"
               type="button"
               onClick={() => {
                 void openSettingsPage();
@@ -63,11 +63,11 @@ function App() {
             >
               {isOpeningSettings ? "Opening Settings..." : "Open Settings"}
             </button>
-            <p className="ccx-welcome-note">
+            <p className="fx-inline-welcome-note">
               You can revisit this page anytime from the extension files.
             </p>
             {statusMessage ? (
-              <p className="ccx-welcome-status" role="status" aria-live="polite">
+              <p className="fx-inline-welcome-status" role="status" aria-live="polite">
                 {statusMessage}
               </p>
             ) : null}

@@ -63,18 +63,18 @@ function App() {
   }
 
   return (
-    <main className="ccx-theme ccx-options-page">
-      <section className="ccx-options-card">
-        <div className="ccx-options-brand">
-          <span className="ccx-shell__title">FX INLINE</span>
+    <main className="fx-inline-theme fx-inline-options-page">
+      <section className="fx-inline-options-card">
+        <div className="fx-inline-options-brand">
+          <span className="fx-inline-shell__title">FX INLINE</span>
         </div>
 
-        <div className="ccx-options-field">
-          <label className="ccx-options-label" htmlFor="preferred-currency">
+        <div className="fx-inline-options-field">
+          <label className="fx-inline-options-label" htmlFor="preferred-currency">
             Preferred Currency
           </label>
           <select
-            className="ccx-options-select"
+            className="fx-inline-options-select"
             id="preferred-currency"
             value={settings.preferredCurrency}
             onChange={handlePreferredCurrencyInputChange}
@@ -85,7 +85,7 @@ function App() {
               </option>
             ))}
           </select>
-          {statusMessage && <p className="ccx-options-status">{statusMessage}</p>}
+          {statusMessage && <p className="fx-inline-options-status">{statusMessage}</p>}
         </div>
       </section>
     </main>

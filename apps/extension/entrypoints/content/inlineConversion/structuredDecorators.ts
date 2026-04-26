@@ -230,11 +230,11 @@ export function decorateStructuredAmazonPrices(
 
     const previousOriginal = existingAddon?.getAttribute("data-original") ?? null;
     const previousConverted =
-      existingAddon?.querySelector(".ccx-converted-amount")?.textContent ?? null;
+      existingAddon?.querySelector(".fx-inline-converted-amount")?.textContent ?? null;
 
     const wrapper = existingAddon ?? document.createElement("span");
     wrapper.className = INLINE_CONVERSION_CLASS;
-    wrapper.setAttribute("data-ccx-mode", INLINE_CONVERSION_ADDON_MODE);
+    wrapper.setAttribute("data-fx-inline-mode", INLINE_CONVERSION_ADDON_MODE);
     wrapper.setAttribute("data-original", rawPrice);
     applyConvertedAmountColor(
       wrapper,
@@ -312,11 +312,11 @@ export function decorateStructuredSiblingSymbolPrices(
 
     const previousOriginal = existingAddon?.getAttribute("data-original") ?? null;
     const previousConverted =
-      existingAddon?.querySelector(".ccx-converted-amount")?.textContent ?? null;
+      existingAddon?.querySelector(".fx-inline-converted-amount")?.textContent ?? null;
 
     const wrapper = existingAddon ?? document.createElement("span");
     wrapper.className = INLINE_CONVERSION_CLASS;
-    wrapper.setAttribute("data-ccx-mode", INLINE_CONVERSION_ADDON_MODE);
+    wrapper.setAttribute("data-fx-inline-mode", INLINE_CONVERSION_ADDON_MODE);
     wrapper.setAttribute("data-original", rawPrice);
     applyConvertedAmountColor(
       wrapper,

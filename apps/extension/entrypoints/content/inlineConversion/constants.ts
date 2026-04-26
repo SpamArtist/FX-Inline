@@ -1,5 +1,5 @@
-export const INLINE_CONVERSION_CLASS = "ccx-inline-conversion";
-export const INLINE_CONVERSION_STYLE_ID = "ccx-inline-conversion-style";
+export const INLINE_CONVERSION_CLASS = "fx-inline-inline-conversion";
+export const INLINE_CONVERSION_STYLE_ID = "fx-inline-inline-conversion-style";
 export const INLINE_COMPACT_THRESHOLD = 100_000;
 export const INLINE_CONVERSION_ADDON_MODE = "addon";
 
@@ -19,9 +19,9 @@ export const INLINE_CONVERSION_CSS = `
     white-space: normal !important;
   }
 
-  :where(.${INLINE_CONVERSION_CLASS}) .ccx-converted-amount {
+  :where(.${INLINE_CONVERSION_CLASS}) .fx-inline-converted-amount {
     font-weight: 600 !important;
-    color: var(--ccx-converted-color, currentColor) !important;
+    color: var(--fx-inline-converted-color, currentColor) !important;
     background-color: transparent !important;
     box-shadow: none !important;
     border-radius: 0 !important;

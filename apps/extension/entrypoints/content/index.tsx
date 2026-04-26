@@ -7,7 +7,7 @@ import { createContentConversionRuntime } from "./conversionRuntime";
 import { createLazySelectionPopupControllerLoader } from "./selectionPopupLoader";
 
 const USER_SETTINGS_STORAGE_KEY = SETTINGS_KEY;
-const PORTAL_DROPDOWN_CLASS = "ccx-dropdown-menu-content";
+const PORTAL_DROPDOWN_CLASS = "fx-inline-dropdown-menu-content";
 const UI_CAPTURE_EVENT_TYPES = [
   "pointerdown",
   "mousedown",
@@ -109,7 +109,7 @@ export default defineContentScript({
           settingsUnwatch();
         } catch (error) {
           if (!isExtensionContextInvalidatedError(error)) {
-            console.warn("[ccx] Failed to unwatch settings during cleanup", error);
+            console.warn("[fx-inline] Failed to unwatch settings during cleanup", error);
           }
         } finally {
           settingsUnwatch = null;
@@ -196,7 +196,7 @@ export default defineContentScript({
     const onMouseUp = (event: MouseEvent) => {
       void handleMouseUp(event).catch((error) => {
         if (ctx.isInvalid || isExtensionContextInvalidatedError(error)) return;
-        console.warn("[ccx] Failed to show selection popup", error);
+        console.warn("[fx-inline] Failed to show selection popup", error);
       });
     };
 

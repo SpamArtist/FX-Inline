@@ -7,7 +7,7 @@ import {
   suppressInlineConversions,
 } from "../src/index.js";
 
-const INLINE_CONVERSION_CLASS = "ccx-inline-conversion";
+const INLINE_CONVERSION_CLASS = "fx-inline-inline-conversion";
 
 function createRateSnapshot(overrides = {}) {
   const baseSnapshot = {
@@ -35,7 +35,7 @@ function createRateSnapshot(overrides = {}) {
 beforeEach(() => {
   document.documentElement.lang = "en-US";
   document.body.innerHTML = "";
-  const styleTag = document.getElementById("ccx-inline-conversion-style");
+  const styleTag = document.getElementById("fx-inline-inline-conversion-style");
   styleTag?.remove();
 });
 
@@ -52,7 +52,7 @@ test("converts text-node prices with expected wrapper shape", () => {
   expect(wrapper).not.toBeNull();
   expect(wrapper.getAttribute("data-original")?.trim()).toBe("$100");
   expect(wrapper.textContent).toMatch(/^\$100\s+\(.+\)$/);
-  const convertedAmount = wrapper.querySelector(".ccx-converted-amount");
+  const convertedAmount = wrapper.querySelector(".fx-inline-converted-amount");
   expect(convertedAmount.textContent).toMatch(/^\(.+\)$/);
 });
 
@@ -63,7 +63,7 @@ test("injects style tag with converted amount line-height and width contract", (
     clearExisting: false,
   });
 
-  const styleTag = document.getElementById("ccx-inline-conversion-style");
+  const styleTag = document.getElementById("fx-inline-inline-conversion-style");
   expect(styleTag).not.toBeNull();
   expect(styleTag.textContent).toContain("line-height: inherit !important;");
   expect(styleTag.textContent).toContain("width: fit-content !important;");
@@ -78,7 +78,7 @@ test("refreshes existing wrappers in place and clears when target currency match
   expect(initialApplied).toBe(1);
 
   const initialWrapper = document.querySelector(`#price span.${INLINE_CONVERSION_CLASS}`);
-  const initialConvertedNode = initialWrapper.querySelector(".ccx-converted-amount");
+  const initialConvertedNode = initialWrapper.querySelector(".fx-inline-converted-amount");
 
   const refreshedApplied = convertVisiblePrices(
     "EUR",
@@ -94,7 +94,7 @@ test("refreshes existing wrappers in place and clears when target currency match
 
   const refreshedWrapper = document.querySelector(`#price span.${INLINE_CONVERSION_CLASS}`);
   expect(refreshedWrapper).toBe(initialWrapper);
-  expect(refreshedWrapper.querySelector(".ccx-converted-amount")).toBe(initialConvertedNode);
+  expect(refreshedWrapper.querySelector(".fx-inline-converted-amount")).toBe(initialConvertedNode);
 
   const clearedApplied = convertVisiblePrices("USD", createRateSnapshot(), document.body);
   expect(clearedApplied).toBe(0);
@@ -109,11 +109,11 @@ test("suppresses and restores wrappers without replacing converted node", () => 
   });
 
   const wrapper = document.querySelector(`#price span.${INLINE_CONVERSION_CLASS}`);
-  const convertedNode = wrapper.querySelector(".ccx-converted-amount");
+  const convertedNode = wrapper.querySelector(".fx-inline-converted-amount");
 
   const suppressedCount = suppressInlineConversions(document.body);
   expect(suppressedCount).toBe(1);
-  expect(wrapper.querySelector(".ccx-converted-amount")).toBe(convertedNode);
+  expect(wrapper.querySelector(".fx-inline-converted-amount")).toBe(convertedNode);
   expect(convertedNode.style.display).toBe("none");
 
   convertVisiblePrices(
@@ -126,7 +126,7 @@ test("suppresses and restores wrappers without replacing converted node", () => 
     },
   );
 
-  expect(wrapper.querySelector(".ccx-converted-amount")).toBe(convertedNode);
+  expect(wrapper.querySelector(".fx-inline-converted-amount")).toBe(convertedNode);
   expect(convertedNode.style.display).toBe("");
 });
 
@@ -151,13 +151,13 @@ test("adds structured add-on conversions for amazon-style and sibling-symbol pri
   expect(applied).toBeGreaterThanOrEqual(2);
 
   const amazonAddon = document.querySelector(
-    '#amazon-root span.ccx-inline-conversion[data-ccx-mode="addon"]',
+    '#amazon-root span.fx-inline-inline-conversion[data-fx-inline-mode="addon"]',
   );
   expect(amazonAddon).not.toBeNull();
   expect(amazonAddon.getAttribute("data-original")).toBe("$199.99");
 
   const siblingAddon = document.querySelector(
-    '#sibling-value span.ccx-inline-conversion[data-ccx-mode="addon"]',
+    '#sibling-value span.fx-inline-inline-conversion[data-fx-inline-mode="addon"]',
   );
   expect(siblingAddon).not.toBeNull();
   expect(siblingAddon.getAttribute("data-original")).toBe("$2500");
@@ -180,7 +180,7 @@ test("allows disabling default post plugins so amazon-specific logic can be deta
 
   expect(applied).toBe(0);
   expect(
-    document.querySelector('#amazon-root span.ccx-inline-conversion[data-ccx-mode="addon"]'),
+    document.querySelector('#amazon-root span.fx-inline-inline-conversion[data-fx-inline-mode="addon"]'),
   ).toBeNull();
 });
 
@@ -203,7 +203,7 @@ test("supports amazon decorator as explicit post plugin", () => {
 
   expect(applied).toBe(1);
   expect(
-    document.querySelector('#amazon-root span.ccx-inline-conversion[data-ccx-mode="addon"]'),
+    document.querySelector('#amazon-root span.fx-inline-inline-conversion[data-fx-inline-mode="addon"]'),
   ).not.toBeNull();
 });
 
@@ -229,11 +229,11 @@ test("amazon addon does not duplicate original amount by default", () => {
 
   expect(applied).toBe(1);
   const addon = document.querySelector(
-    '#amazon-hidden-root span.ccx-inline-conversion[data-ccx-mode="addon"]',
+    '#amazon-hidden-root span.fx-inline-inline-conversion[data-fx-inline-mode="addon"]',
   );
   expect(addon).not.toBeNull();
   expect(addon.textContent).not.toContain("¥4,680");
-  expect(addon.querySelector(".ccx-converted-amount").textContent).toMatch(
+  expect(addon.querySelector(".fx-inline-converted-amount").textContent).toMatch(
     /^\(.+\)$/u,
   );
 });
@@ -384,15 +384,15 @@ test("amazon renderer applies client render preferences", () => {
 
   expect(applied).toBe(1);
   const addon = document.querySelector(
-    '#amazon-root span.ccx-inline-conversion[data-ccx-mode="addon"]',
+    '#amazon-root span.fx-inline-inline-conversion[data-fx-inline-mode="addon"]',
   );
   expect(addon).not.toBeNull();
   expect(addon.classList.contains("client-wrapper")).toBe(true);
-  expect(addon.style.getPropertyValue("--ccx-converted-color")).toBe("currentColor");
+  expect(addon.style.getPropertyValue("--fx-inline-converted-color")).toBe("currentColor");
   expect(addon.textContent).toContain("≈ ");
   expect(addon.textContent).toContain(" incl");
   expect(addon.textContent).not.toContain("$199.99");
-  expect(addon.querySelector(".ccx-converted-amount").classList.contains("client-amount")).toBe(
+  expect(addon.querySelector(".fx-inline-converted-amount").classList.contains("client-amount")).toBe(
     true,
   );
 });
@@ -428,7 +428,7 @@ test("amazon renderer ignores stale candidates from pre detection", () => {
 
   expect(applied).toBe(0);
   expect(
-    document.querySelector('#amazon-root span.ccx-inline-conversion[data-ccx-mode="addon"]'),
+    document.querySelector('#amazon-root span.fx-inline-inline-conversion[data-fx-inline-mode="addon"]'),
   ).toBeNull();
 });
 

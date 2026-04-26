@@ -106,7 +106,7 @@ beforeEach(() => {
   });
 
   document.body.innerHTML = "<div id=\"root\"></div>";
-  window.localStorage.removeItem("ccx:perf");
+  window.localStorage.removeItem("fx-inline:perf");
 });
 
 afterEach(() => {
@@ -114,7 +114,7 @@ afterEach(() => {
   jest.useRealTimers();
   jest.restoreAllMocks();
   document.body.innerHTML = "";
-  window.localStorage.removeItem("ccx:perf");
+  window.localStorage.removeItem("fx-inline:perf");
 });
 
 test("initialize hydrates settings/rates, applies runtime state, and starts controller", async () => {

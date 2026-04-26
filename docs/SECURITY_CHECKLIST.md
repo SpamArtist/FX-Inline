@@ -45,7 +45,7 @@ _Last updated: 2026-04-25_
 
 - [ ] No user-auth/account data is collected by extension runtime.
 - [ ] No browsing history payloads are transmitted; only provider rate endpoints are contacted.
-- [ ] Debug/perf logging is development-default; production logging requires explicit `localStorage` opt-in (`ccx:perf=1`).
+- [ ] Debug/perf logging is development-default; production logging requires explicit `localStorage` opt-in (`fx-inline:perf=1`).
 
 ## 7. Pre-Ship Checks
 

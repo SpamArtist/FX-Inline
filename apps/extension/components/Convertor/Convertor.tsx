@@ -10,12 +10,12 @@ export const ConvertorHOD = ({
   children,
 }: ConvertorHodProps) => {
   return (
-    <section className={`ccx-theme ccx-shell ccx-shell--${variant}`}>
-      <div className="ccx-shell__inner">
-        <header className="ccx-shell__header">
-          <h2 className="ccx-shell__title">{title}</h2>
+    <section className={`fx-inline-theme fx-inline-shell fx-inline-shell--${variant}`}>
+      <div className="fx-inline-shell__inner">
+        <header className="fx-inline-shell__header">
+          <h2 className="fx-inline-shell__title">{title}</h2>
           {headerActions && (
-            <div className="ccx-shell__header-actions">{headerActions}</div>
+            <div className="fx-inline-shell__header-actions">{headerActions}</div>
           )}
         </header>
         {children}

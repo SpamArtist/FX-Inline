@@ -173,14 +173,14 @@ function App() {
   }
 
   return (
-    <main className="ccx-popup-page">
+    <main className="fx-inline-popup-page">
       <ConvertorHOD
         variant="popup"
         headerActions={(
           <>
             <button
               type="button"
-              className={`ccx-settings-button ccx-toggle-button ${
+              className={`fx-inline-settings-button fx-inline-toggle-button ${
                 localAutoConversionEnabled ? "is-on" : "is-off"
               }`}
               onClick={onToggleLocalAutoConversion}
@@ -199,7 +199,7 @@ function App() {
 
             <button
               type="button"
-              className={`ccx-settings-button ccx-toggle-button ${
+              className={`fx-inline-settings-button fx-inline-toggle-button ${
                 globalAutoConversionEnabled ? "is-on" : "is-off"
               }`}
               onClick={onToggleGlobalAutoConversion}
@@ -212,7 +212,7 @@ function App() {
 
             <button
               type="button"
-              className="ccx-settings-button"
+              className="fx-inline-settings-button"
               onClick={onOpenSettings}
               aria-label="Open extension options"
               title="Open extension options"
@@ -223,10 +223,10 @@ function App() {
         )}
       >
         {sourceCurrency && targetCurrency ? (
-          <div className="ccx-converter-layout ccx-popup-layout">
+          <div className="fx-inline-converter-layout fx-inline-popup-layout">
             <button
               type="button"
-              className="ccx-converter-swap"
+              className="fx-inline-converter-swap"
               onClick={onSwapCurrencies}
               aria-label="Swap currencies"
               title="Swap currencies"
@@ -245,7 +245,7 @@ function App() {
               }
             />
 
-            <div className="ccx-converter-divider" aria-hidden />
+            <div className="fx-inline-converter-divider" aria-hidden />
 
             <CurrencyBox
               variant="popup"
@@ -259,17 +259,17 @@ function App() {
             />
           </div>
         ) : null}
-        <div className="ccx-popup-footer">
+        <div className="fx-inline-popup-footer">
           <button
             type="button"
-            className="ccx-popup-feedback-button"
+            className="fx-inline-popup-feedback-button"
             onClick={onOpenFeedback}
             aria-label="Share feedback (opens in a new tab)"
             title="Share feedback (opens in a new tab)"
           >
             Feedback ↗
           </button>
-          <p className="ccx-popup-meta">© {currentYear} FX Inline</p>
+          <p className="fx-inline-popup-meta">© {currentYear} FX Inline</p>
         </div>
       </ConvertorHOD>
     </main>
