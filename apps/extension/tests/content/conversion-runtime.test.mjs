@@ -154,12 +154,12 @@ test("content runtime selects little hotelier plugins only for english pricing p
 
   expect(
     isLittleHotelierEnglishPricingPage(
-      "https://www.littlehotelier.com/lh-pricing-plans/",
+      "https://www.littlehotelier.com/pricing/",
     ),
   ).toBe(true);
   expect(
     getContentRuntimeSitePluginOptions(
-      "https://www.littlehotelier.com/lh-pricing-plans?currency=USD",
+      "https://www.littlehotelier.com/pricing?currency=USD",
     ),
   ).toEqual({
     prePlugins: [littleHotelierPricingDetectorPrePluginMock],
@@ -173,12 +173,12 @@ test("content runtime selects little hotelier plugins only for english pricing p
   ).toEqual({});
   expect(
     getContentRuntimeSitePluginOptions(
-      "https://littlehotelier.com/lh-pricing-plans/",
+      "https://littlehotelier.com/pricing/",
     ),
   ).toEqual({});
   expect(
     getContentRuntimeSitePluginOptions(
-      "https://www.littlehotelier.com/lh-pricing-plans-extra/",
+      "https://www.littlehotelier.com/pricing-extra/",
     ),
   ).toEqual({});
 });

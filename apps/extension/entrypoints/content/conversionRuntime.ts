@@ -26,7 +26,7 @@ import type { InlineRuntimeOptions } from "@fx-inline/inline-runtime";
 export type { ContentConversionRuntime } from "./content.types";
 
 const LITTLE_HOTELIER_PRICING_HOSTNAME = "www.littlehotelier.com";
-const LITTLE_HOTELIER_PRICING_PATH = "/lh-pricing-plans";
+const LITTLE_HOTELIER_PRICING_PATH = "/pricing";
 
 type ContentRuntimeSitePluginOptions = Pick<
   InlineRuntimeOptions,
