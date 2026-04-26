@@ -9,6 +9,12 @@ import {
   amazonStructuredRendererPostPlugin,
   amazonStructuredAddonPlugin,
 } from "./plugins/amazon/structuredAddonPlugin.js";
+import {
+  LITTLE_HOTELIER_PRICING_DETECTOR_PRE_PLUGIN_NAME,
+  LITTLE_HOTELIER_PRICING_RENDERER_POST_PLUGIN_NAME,
+  littleHotelierPricingDetectorPrePlugin,
+  littleHotelierPricingRendererPostPlugin,
+} from "./plugins/littlehotelier/pricingPlugin.js";
 
 export {
   createInlineRuntime,
@@ -21,4 +27,8 @@ export {
   amazonStructuredDetectorPrePlugin,
   amazonStructuredRendererPostPlugin,
   amazonStructuredAddonPlugin,
+  LITTLE_HOTELIER_PRICING_DETECTOR_PRE_PLUGIN_NAME,
+  LITTLE_HOTELIER_PRICING_RENDERER_POST_PLUGIN_NAME,
+  littleHotelierPricingDetectorPrePlugin,
+  littleHotelierPricingRendererPostPlugin,
 };

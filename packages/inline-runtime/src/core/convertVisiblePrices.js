@@ -60,10 +60,6 @@ export function convertVisiblePrices(
       }
     }
 
-    const scanStartedAt = capturePerf ? performance.now() : 0;
-    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-
-    const textNodes = [];
     const maxNodesPerPass = options?.maxNodesPerPass ?? 15000;
     const lightTextCache = new WeakMap();
     const pluginContext = {
@@ -77,17 +73,6 @@ export function convertVisiblePrices(
       clientRenderPreferences: options?.clientRenderPreferences ?? null,
       onPluginError: options?.onPluginError,
     };
-
-    while (walker.nextNode() && textNodes.length < maxNodesPerPass) {
-      const textNode = walker.currentNode;
-      if (shouldSkipTextNode(textNode)) continue;
-      textNodes.push(textNode);
-    }
-    const scanTextNodesMs = capturePerf ? performance.now() - scanStartedAt : 0;
-
-    if (textNodes.length >= maxNodesPerPass && options?.onNodeLimitReached) {
-      options.onNodeLimitReached(maxNodesPerPass);
-    }
 
     const includeDefaultPrePlugins = options?.includeDefaultPrePlugins !== false;
     const prePlugins = includeDefaultPrePlugins
@@ -103,6 +88,22 @@ export function convertVisiblePrices(
       INLINE_PLUGIN_PHASE_PRE,
     );
     totalConversions += prePluginConversions;
+
+    const scanStartedAt = capturePerf ? performance.now() : 0;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+
+    const textNodes = [];
+
+    while (walker.nextNode() && textNodes.length < maxNodesPerPass) {
+      const textNode = walker.currentNode;
+      if (shouldSkipTextNode(textNode)) continue;
+      textNodes.push(textNode);
+    }
+    const scanTextNodesMs = capturePerf ? performance.now() - scanStartedAt : 0;
+
+    if (textNodes.length >= maxNodesPerPass && options?.onNodeLimitReached) {
+      options.onNodeLimitReached(maxNodesPerPass);
+    }
 
     let textNodeConversions = 0;
     for (const node of textNodes) {

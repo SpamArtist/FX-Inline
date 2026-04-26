@@ -4,6 +4,14 @@ const getUserSettingsMock = jest.fn();
 const getRatesMock = jest.fn();
 
 const createInlineRuntimeMock = jest.fn();
+const littleHotelierPricingDetectorPrePluginMock = {
+  name: "littlehotelier-pricing-detector",
+  phase: "pre",
+};
+const littleHotelierPricingRendererPostPluginMock = {
+  name: "littlehotelier-pricing-renderer",
+  phase: "post",
+};
 const controllerStartMock = jest.fn();
 const controllerDestroyMock = jest.fn();
 const controllerSetPreferredCurrencyMock = jest.fn();
@@ -73,6 +81,10 @@ async function importRuntimeModuleWithMocks() {
 
   await jest.unstable_mockModule("@fx-inline/inline-runtime", () => ({
     createInlineRuntime: createInlineRuntimeMock,
+    littleHotelierPricingDetectorPrePlugin:
+      littleHotelierPricingDetectorPrePluginMock,
+    littleHotelierPricingRendererPostPlugin:
+      littleHotelierPricingRendererPostPluginMock,
   }));
 
   return import("../../test-dist/entrypoints/content/conversionRuntime.js");
@@ -132,6 +144,70 @@ test("initialize hydrates settings/rates, applies runtime state, and starts cont
   );
   expect(controllerSetEnabledMock).toHaveBeenCalledWith(true);
   expect(controllerStartMock).toHaveBeenCalledTimes(1);
+});
+
+test("content runtime selects little hotelier plugins only for pricing pages", async () => {
+  await importRuntimeModuleWithMocks();
+  const {
+    getContentRuntimeSitePluginOptions,
+    isLittleHotelierPricingPage,
+  } = await import("../../test-dist/entrypoints/content/sitePlugins.js");
+
+  expect(
+    isLittleHotelierPricingPage(
+      new URL("https://www.littlehotelier.com/pricing/"),
+    ),
+  ).toBe(true);
+  expect(
+    getContentRuntimeSitePluginOptions(
+      "https://www.littlehotelier.com/pricing?currency=USD",
+    ),
+  ).toEqual({
+    prePlugins: [littleHotelierPricingDetectorPrePluginMock],
+    postPlugins: [littleHotelierPricingRendererPostPluginMock],
+  });
+
+  expect(
+    getContentRuntimeSitePluginOptions(
+      "https://www.littlehotelier.com/id/pricing/",
+    ),
+  ).toEqual({
+    prePlugins: [littleHotelierPricingDetectorPrePluginMock],
+    postPlugins: [littleHotelierPricingRendererPostPluginMock],
+  });
+  expect(
+    getContentRuntimeSitePluginOptions(
+      "https://littlehotelier.com/pricing/",
+    ),
+  ).toEqual({});
+  expect(
+    getContentRuntimeSitePluginOptions(
+      "https://www.littlehotelier.com/pricing-extra/",
+    ),
+  ).toEqual({});
+});
+
+test("content runtime selects little hotelier plugins for current locale pricing pages", async () => {
+  await importRuntimeModuleWithMocks();
+  const { getContentRuntimeSitePluginOptions, isLittleHotelierPricingPage } =
+    await import("../../test-dist/entrypoints/content/sitePlugins.js");
+
+  const pricingUrls = [
+    "https://www.littlehotelier.com/pricing/",
+    "https://www.littlehotelier.com/de/preise/",
+    "https://www.littlehotelier.com/es/precios/",
+    "https://www.littlehotelier.com/it/prezzi/",
+    "https://www.littlehotelier.com/th/pricing/",
+    "https://www.littlehotelier.com/id/pricing/",
+  ];
+
+  for (const pricingUrl of pricingUrls) {
+    expect(isLittleHotelierPricingPage(new URL(pricingUrl))).toBe(true);
+    expect(getContentRuntimeSitePluginOptions(pricingUrl)).toEqual({
+      prePlugins: [littleHotelierPricingDetectorPrePluginMock],
+      postPlugins: [littleHotelierPricingRendererPostPluginMock],
+    });
+  }
 });
 
 test("settings updates debounce a fresh settings/rates hydration", async () => {
