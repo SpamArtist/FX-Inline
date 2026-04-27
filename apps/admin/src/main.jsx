@@ -305,6 +305,44 @@ function SettingsForm({
   );
 }
 
+function PageOverrideAccordion({
+  pageUrl,
+  settings,
+  onChange,
+  onDelete,
+}) {
+  return (
+    <details className="page-accordion">
+      <summary className="page-accordion-summary">
+        <span className="page-accordion-title">{pageUrl}</span>
+        <span className="page-accordion-meta">
+          <span className={settings.enabled ? "page-accordion-state on" : "page-accordion-state"}>
+            {settings.enabled ? "On" : "Off"}
+          </span>
+          <button
+            type="button"
+            className="danger-icon-button"
+            aria-label={`Delete page override ${pageUrl}`}
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              onDelete();
+            }}
+          >
+            <Trash2 size={15} />
+          </button>
+        </span>
+      </summary>
+      <SettingsForm
+        title="Page settings"
+        settings={settings}
+        onChange={onChange}
+        lockDomainFields
+      />
+    </details>
+  );
+}
+
 function App() {
   const [manifest, setManifest] = useState(DEFAULT_MANIFEST);
   const [draftManifest, setDraftManifest] = useState(DEFAULT_MANIFEST);
@@ -649,22 +687,12 @@ function App() {
 
             {getDomainPages(draftManifest, activeDomain).length ? (
               getDomainPages(draftManifest, activeDomain).map(([pageUrl, settings]) => (
-                <SettingsForm
+                <PageOverrideAccordion
                   key={pageUrl}
-                  title={pageUrl}
+                  pageUrl={pageUrl}
                   settings={settings}
                   onChange={(nextSettings) => updatePageDraft(pageUrl, nextSettings)}
-                  lockDomainFields
-                  actions={(
-                    <button
-                      type="button"
-                      className="danger-icon-button"
-                      aria-label={`Delete page override ${pageUrl}`}
-                      onClick={() => deletePageOverride(pageUrl)}
-                    >
-                      <Trash2 size={15} />
-                    </button>
-                  )}
+                  onDelete={() => deletePageOverride(pageUrl)}
                 />
               ))
             ) : (

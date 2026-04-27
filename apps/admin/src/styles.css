@@ -529,6 +529,79 @@ button:disabled {
   background: #fbfcf8;
 }
 
+.page-accordion {
+  margin-top: 14px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fbfcf8;
+}
+
+.page-accordion-summary {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 12px 14px 12px 38px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.page-accordion-summary::-webkit-details-marker {
+  display: none;
+}
+
+.page-accordion-summary::before {
+  content: "";
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  transform: translateY(-50%) rotate(-45deg);
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transition: transform 140ms ease;
+}
+
+.page-accordion[open] .page-accordion-summary {
+  border-bottom: 1px solid var(--line);
+}
+
+.page-accordion[open] .page-accordion-summary::before {
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.page-accordion-title {
+  overflow-wrap: anywhere;
+  font-size: 1rem;
+  font-weight: 820;
+}
+
+.page-accordion-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.page-accordion-state {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.page-accordion-state.on {
+  color: var(--accent-dark);
+}
+
+.page-accordion .settings-panel {
+  margin-top: 0;
+  border: 0;
+  border-radius: 0;
+}
+
 .empty-state {
   margin-top: 14px;
   padding: 18px;
@@ -647,5 +720,13 @@ button:disabled {
 
   .form-grid {
     grid-template-columns: 1fr;
+  }
+
+  .page-accordion-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .page-accordion-meta {
+    justify-content: space-between;
   }
 }
