@@ -211,9 +211,17 @@ function App() {
   const [manifest, setManifest] = useState(DEFAULT_MANIFEST);
   const [draftManifest, setDraftManifest] = useState(DEFAULT_MANIFEST);
   const [activeScope, setActiveScope] = useState({ type: "all_urls", id: "all_urls" });
-  const [status, setStatus] = useState("Loading settings");
+  const [toast, setToast] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isBuilding, setIsBuilding] = useState(false);
+
+  function showMessage(message, tone = "info") {
+    setToast({
+      id: `${Date.now()}-${message}`,
+      message,
+      tone,
+    });
+  }
 
   useEffect(() => {
     let canceled = false;
@@ -227,17 +235,29 @@ function App() {
         if (canceled) return;
         setManifest(settings);
         setDraftManifest(clone(settings));
-        setStatus("Settings loaded");
+        showMessage("Settings loaded.");
       })
       .catch((error) => {
         if (canceled) return;
-        setStatus(`${error.message}. Using local defaults.`);
+        showMessage(`${error.message}. Using local defaults.`, "error");
       });
 
     return () => {
       canceled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (!toast) return undefined;
+
+    const timeoutId = window.setTimeout(() => {
+      setToast(null);
+    }, 15000);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [toast]);
 
   const domainTabs = Object.keys(draftManifest.scopes.domains).sort((left, right) =>
     left.localeCompare(right),
@@ -288,7 +308,7 @@ function App() {
     if (!raw) return;
     const domain = normalizeDomain(raw);
     if (!domain) {
-      setStatus("Enter a valid domain.");
+      showMessage("Enter a valid domain.", "error");
       return;
     }
 
@@ -302,7 +322,7 @@ function App() {
       return next;
     });
     setActiveScope({ type: "domain", id: domain });
-    setStatus(`Domain draft created for ${domain}.`);
+    showMessage(`Domain draft created for ${domain}.`);
   }
 
   function addPageOverride() {
@@ -311,7 +331,7 @@ function App() {
     if (!raw) return;
     const pageUrl = normalizePageUrl(raw);
     if (!pageUrl || getPageDomain(pageUrl) !== activeScope.id) {
-      setStatus(`Enter a valid page URL on ${activeScope.id}.`);
+      showMessage(`Enter a valid page URL on ${activeScope.id}.`, "error");
       return;
     }
 
@@ -324,7 +344,7 @@ function App() {
       };
       return next;
     });
-    setStatus(`Page override draft created for ${pageUrl}.`);
+    showMessage(`Page override draft created for ${pageUrl}.`);
   }
 
   function deleteDomain(domain) {
@@ -345,7 +365,7 @@ function App() {
       setActiveScope({ type: "all_urls", id: "all_urls" });
     }
 
-    setStatus(`Deleted ${domain} from draft settings.`);
+    showMessage(`Deleted ${domain} from draft settings.`);
   }
 
   function deletePageOverride(pageUrl) {
@@ -354,7 +374,7 @@ function App() {
       delete next.scopes.pages[pageUrl];
       return next;
     });
-    setStatus(`Deleted page override for ${pageUrl}.`);
+    showMessage(`Deleted page override for ${pageUrl}.`);
   }
 
   function cancelActiveScope() {
@@ -383,7 +403,7 @@ function App() {
 
       return next;
     });
-    setStatus(`Reverted ${activeKey}.`);
+    showMessage(`Reverted ${activeKey}.`);
   }
 
   async function saveAllSettings() {
@@ -400,9 +420,9 @@ function App() {
       const saved = payload.manifest;
       setManifest(saved);
       setDraftManifest(clone(saved));
-      setStatus("Saved all settings and exported settings.");
+      showMessage("Saved all settings and exported settings.");
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Save failed.");
+      showMessage(error instanceof Error ? error.message : "Save failed.", "error");
     } finally {
       setIsSaving(false);
     }
@@ -413,9 +433,9 @@ function App() {
     try {
       const response = await fetch("/api/build-extension", { method: "POST" });
       if (!response.ok) throw new Error("Build failed");
-      setStatus("Built web extension.");
+      showMessage("Built web extension.");
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Build failed.");
+      showMessage(error instanceof Error ? error.message : "Build failed.", "error");
     } finally {
       setIsBuilding(false);
     }
@@ -498,7 +518,16 @@ function App() {
           </div>
         </header>
 
-        <p className="status-line">{status}</p>
+        {toast ? (
+          <div
+            key={toast.id}
+            className={toast.tone === "error" ? "toast error" : "toast"}
+            role="status"
+          >
+            <span>{toast.message}</span>
+            <span className="toast-countdown" />
+          </div>
+        ) : null}
 
         <SettingsForm
           title={activeScope.type === "all_urls" ? "Shared settings" : "Domain settings"}

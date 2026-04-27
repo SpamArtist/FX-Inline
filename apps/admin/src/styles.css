@@ -144,7 +144,6 @@ button:disabled {
 
 .workspace-header p,
 .section-bar p,
-.status-line,
 .empty-state {
   margin: 0;
   color: var(--muted);
@@ -173,12 +172,6 @@ button:disabled {
   border-color: var(--accent);
   background: var(--accent);
   color: #fff;
-}
-
-.status-line {
-  min-height: 28px;
-  padding: 12px 0 0;
-  font-size: 0.9rem;
 }
 
 .settings-panel,
@@ -390,6 +383,54 @@ button:disabled {
   padding: 18px;
   border: 1px dashed var(--line-strong);
   border-radius: var(--radius);
+}
+
+.toast {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 30;
+  width: min(360px, calc(100vw - 36px));
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--accent) 34%, var(--line-strong));
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: 0 16px 40px rgba(23, 34, 27, 0.16);
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 720;
+}
+
+.toast > span:first-child {
+  display: block;
+  padding: 12px 14px 13px;
+}
+
+.toast.error {
+  border-color: color-mix(in srgb, var(--danger) 45%, var(--line-strong));
+}
+
+.toast-countdown {
+  display: block;
+  height: 3px;
+  width: 100%;
+  transform-origin: left center;
+  animation: toast-countdown 15s linear forwards;
+  background: var(--accent);
+}
+
+.toast.error .toast-countdown {
+  background: var(--danger);
+}
+
+@keyframes toast-countdown {
+  from {
+    transform: scaleX(1);
+  }
+
+  to {
+    transform: scaleX(0);
+  }
 }
 
 @media (max-width: 860px) {
