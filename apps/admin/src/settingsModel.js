@@ -37,7 +37,7 @@ export function getPageDomain(pageUrl) {
 }
 
 export function getScopeKey(scope) {
-  return scope.type === "all_urls" ? "all_urls" : scope.id;
+  return scope.type === "all_urls" ? "All Pages" : scope.id;
 }
 
 export function getDomainPages(manifest, domain) {
