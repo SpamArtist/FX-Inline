@@ -158,9 +158,10 @@ button:disabled {
 
 .workspace {
   flex: 1 1 auto;
-  width: min(1180px, calc(100% - 44px));
+  width: 100%;
+  max-width: 1224px;
   margin: 0 auto;
-  padding: 28px 0 56px;
+  padding: 28px 22px 56px;
 }
 
 .workspace-header {
@@ -718,7 +719,8 @@ button:disabled {
   }
 
   .workspace {
-    width: min(100% - 28px, 1180px);
+    max-width: none;
+    padding: 22px 14px 44px;
   }
 
   .workspace-header,
