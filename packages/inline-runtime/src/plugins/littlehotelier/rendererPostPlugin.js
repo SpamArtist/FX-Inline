@@ -79,9 +79,10 @@ function applyLittleHotelierAddonLayout(wrapper) {
   wrapper.style.setProperty("line-height", "1.3");
 }
 
-function setLittleHotelierAddonContent(wrapper, convertedAmount) {
+function setLittleHotelierAddonContent(wrapper, convertedAmount, renderPreferences) {
   setInlineConversionContent(wrapper, convertedAmount, {
     originalText: "",
+    renderPreferences,
   });
 
   const prefixNode = wrapper.firstChild;
@@ -112,6 +113,8 @@ export const littleHotelierPricingRendererPostPlugin = {
     rateSnapshot,
     localeHint,
     lightTextCache,
+    baseCurrency,
+    clientRenderPreferences,
     passContext,
   }) {
     const candidates = getCandidateRoots({
@@ -164,6 +167,7 @@ export const littleHotelierPricingRendererPostPlugin = {
         preferredCurrency,
         rateSnapshot,
         localeHint,
+        baseCurrency,
       );
       if (!convertedAmount) {
         existingAddon?.remove();
@@ -184,7 +188,11 @@ export const littleHotelierPricingRendererPostPlugin = {
         wrapper,
         usesLightTextColorForElement(hostNode, lightTextCache),
       );
-      setLittleHotelierAddonContent(wrapper, convertedAmount);
+      setLittleHotelierAddonContent(
+        wrapper,
+        convertedAmount,
+        clientRenderPreferences?.default ?? null,
+      );
       applyLittleHotelierAddonLayout(wrapper);
 
       if (!existingAddon) {
@@ -195,7 +203,7 @@ export const littleHotelierPricingRendererPostPlugin = {
 
       if (
         previousOriginal !== rawPrice ||
-        previousConverted !== `(${convertedAmount})`
+        !previousConverted?.includes(convertedAmount)
       ) {
         conversionsApplied += 1;
       }

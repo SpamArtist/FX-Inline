@@ -28,6 +28,7 @@ function isTruthyNode(value) {
 
 export function createInlineRuntime(options = {}) {
   let root = options.root ?? document.body;
+  let baseCurrency = options.baseCurrency ?? null;
   let preferredCurrency = options.preferredCurrency ?? null;
   let rateSnapshot = options.rateSnapshot ?? null;
   let clientRenderPreferences = options.clientRenderPreferences ?? null;
@@ -105,6 +106,7 @@ export function createInlineRuntime(options = {}) {
         postPlugins: options.postPlugins,
         includeDefaultPostPlugins: options.includeDefaultPostPlugins,
         clientRenderPreferences,
+        baseCurrency,
         onPluginError: options.onPluginError,
       });
     } finally {
@@ -168,6 +170,7 @@ export function createInlineRuntime(options = {}) {
             postPlugins: options.postPlugins,
             includeDefaultPostPlugins: options.includeDefaultPostPlugins,
             clientRenderPreferences,
+            baseCurrency,
             onPluginError: options.onPluginError,
           },
         );
@@ -262,6 +265,13 @@ export function createInlineRuntime(options = {}) {
     }
   }
 
+  function setBaseCurrency(nextCurrency) {
+    baseCurrency = nextCurrency;
+    if (isRunning) {
+      void scheduleFullConversion();
+    }
+  }
+
   function setRateSnapshot(snapshot) {
     rateSnapshot = snapshot;
     if (isRunning) {
@@ -335,6 +345,7 @@ export function createInlineRuntime(options = {}) {
     start,
     stop,
     refresh,
+    setBaseCurrency,
     setPreferredCurrency,
     setRateSnapshot,
     setEnabled,

@@ -24,6 +24,27 @@ function createRateSnapshot(overrides = {}) {
   };
 }
 
+function createUserSettings(targetCurrency) {
+  return {
+    schemaVersion: 1,
+    generatedAt: "2026-01-01T00:00:00.000Z",
+    scopes: {
+      allUrls: {
+        enabled: true,
+        domain: "",
+        pageUrl: "",
+        baseCurrency: "USD",
+        targetCurrencies: [targetCurrency],
+        convertedCurrencyPosition: "right",
+        displayStyle: "brackets",
+        extraSettings: {},
+      },
+      domains: {},
+      pages: {},
+    },
+  };
+}
+
 async function waitForCondition(assertion, timeoutMs = 250) {
   const startedAt = Date.now();
 
@@ -105,7 +126,7 @@ test("hydration applies preferred currency and rate snapshot conversion", async 
     amount: "5",
     sourceCurrency: CurrencyCode.EURO,
     hydrationDeps: {
-      readUserSettings: async () => ({ preferredCurrency: CurrencyCode.INDIA }),
+      readUserSettings: async () => createUserSettings(CurrencyCode.INDIA),
       readRates: async () => createRateSnapshot(),
     },
   });

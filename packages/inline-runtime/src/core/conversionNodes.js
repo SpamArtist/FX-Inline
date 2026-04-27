@@ -5,6 +5,25 @@ import {
 } from "./constants.js";
 import { getConvertedAmountText } from "./amountFormatting.js";
 
+const DEFAULT_CONVERTED_CURRENCY_POSITION = "right";
+const DEFAULT_DISPLAY_STYLE = "brackets";
+
+function getRenderPreferences(preferences) {
+  return {
+    convertedCurrencyPosition:
+      preferences?.convertedCurrencyPosition ?? DEFAULT_CONVERTED_CURRENCY_POSITION,
+    displayStyle: preferences?.displayStyle ?? DEFAULT_DISPLAY_STYLE,
+  };
+}
+
+function getConvertedAmountPresentation(convertedAmount, preferences) {
+  const { convertedCurrencyPosition, displayStyle } =
+    getRenderPreferences(preferences);
+
+  if (convertedCurrencyPosition === "tooltip") return convertedAmount;
+  return displayStyle === "brackets" ? `(${convertedAmount})` : convertedAmount;
+}
+
 export function getOriginalText(node) {
   return node.getAttribute("data-original") || node.textContent || "";
 }
@@ -62,14 +81,44 @@ export function setInlineConversionContent(
 ) {
   const { prefixNode, convertedValueNode, suffixNode } =
     ensureInlineConversionNodeRefs(wrapper);
-  const prefixText =
-    options?.originalText === undefined ? " " : `${options.originalText} `;
+  const renderPreferences = getRenderPreferences(options?.renderPreferences);
+  const position = renderPreferences.convertedCurrencyPosition;
+  const originalText = options?.originalText;
+  const hasOriginalText = typeof originalText === "string" && originalText.length > 0;
+  const convertedText = getConvertedAmountPresentation(
+    convertedAmount,
+    renderPreferences,
+  );
 
   wrapper.removeAttribute("data-fx-inline-suppressed");
   wrapper.style.removeProperty("display");
   convertedValueNode.style.removeProperty("display");
-  prefixNode.nodeValue = prefixText;
-  convertedValueNode.textContent = `(${convertedAmount})`;
+  convertedValueNode.style.removeProperty("margin-left");
+  wrapper.setAttribute("data-fx-inline-position", position);
+  wrapper.removeAttribute("data-fx-inline-tooltip");
+  wrapper.removeAttribute("title");
+
+  if (position === "tooltip") {
+    wrapper.removeAttribute("data-fx-inline-display-style");
+    wrapper.setAttribute("data-fx-inline-tooltip", convertedAmount);
+    wrapper.setAttribute("title", convertedAmount);
+    prefixNode.nodeValue = hasOriginalText ? originalText : " ⓘ";
+    convertedValueNode.textContent = convertedAmount;
+    convertedValueNode.style.setProperty("display", "none");
+    suffixNode.nodeValue = "";
+    return;
+  }
+
+  wrapper.setAttribute("data-fx-inline-display-style", renderPreferences.displayStyle);
+  convertedValueNode.textContent = convertedText;
+
+  if (position === "left" || position === "top") {
+    prefixNode.nodeValue = hasOriginalText ? "" : " ";
+    suffixNode.nodeValue = hasOriginalText ? ` ${originalText}` : "";
+    return;
+  }
+
+  prefixNode.nodeValue = hasOriginalText ? `${originalText} ` : " ";
   suffixNode.nodeValue = "";
 }
 
@@ -133,6 +182,7 @@ export function refreshExistingInlineConversions(
   rateSnapshot,
   root,
   localeHint,
+  options = {},
 ) {
   const convertedNodes = root.querySelectorAll(`span.${INLINE_CONVERSION_CLASS}`);
   if (!convertedNodes.length) return 0;
@@ -168,6 +218,7 @@ export function refreshExistingInlineConversions(
       preferredCurrency,
       rateSnapshot,
       localeHint,
+      options.baseCurrency,
     );
 
     if (!convertedAmount) {
@@ -183,6 +234,7 @@ export function refreshExistingInlineConversions(
 
     setInlineConversionContent(node, convertedAmount, {
       originalText: isAddon ? undefined : originalText,
+      renderPreferences: options.renderPreferences,
     });
     refreshedConversions += 1;
   }

@@ -2,8 +2,12 @@ import currencies from "@/assets/currency.json";
 import {
   DEFAULT_USER_SETTINGS,
   getUserSettings,
-  updateUserSettings,
+  setUserSettings,
 } from "@/utils/appStorage";
+import {
+  cloneInlineRuntimeSettings,
+  getPrimaryTargetCurrency,
+} from "@/utils/inlineRuntimeSettings";
 import { CurrencyCode } from "@/utils/enums";
 import { type ChangeEvent, useEffect, useMemo, useState } from "react";
 import type { UserSettings } from "@/utils/appStorage.types";
@@ -50,8 +54,17 @@ function App() {
   }, []);
 
   async function onPreferredCurrencyChange(nextCurrency: CurrencyCode) {
-    if (settings.preferredCurrency === nextCurrency) return;
-    const updated = await updateUserSettings({ preferredCurrency: nextCurrency });
+    if (getPrimaryTargetCurrency(settings.scopes.allUrls) === nextCurrency) return;
+    const updated = await setUserSettings({
+      ...settings,
+      scopes: {
+        ...settings.scopes,
+        allUrls: {
+          ...cloneInlineRuntimeSettings(settings.scopes.allUrls),
+          targetCurrencies: [nextCurrency],
+        },
+      },
+    });
     setSettings(updated);
     setStatusMessage(`Preferred currency updated to ${nextCurrency}.`);
   }
@@ -76,7 +89,7 @@ function App() {
           <select
             className="fx-inline-options-select"
             id="preferred-currency"
-            value={settings.preferredCurrency}
+            value={getPrimaryTargetCurrency(settings.scopes.allUrls)}
             onChange={handlePreferredCurrencyInputChange}
           >
             {currencyOptions.map((option) => (

@@ -5,9 +5,13 @@ import {
   DEFAULT_USER_SETTINGS,
   getOriginFromUrl,
   getUserSettings,
-  isLocalAutoConversionEnabledForOrigin,
-  updateUserSettings,
+  setUserSettings,
 } from "@/utils/appStorage";
+import {
+  cloneInlineRuntimeSettings,
+  normalizeDomainScope,
+  resolveInlineRuntimeSettingsForUrl,
+} from "@/utils/inlineRuntimeSettings";
 import { DEFAULT_STARTING_CURRENCY } from "@/utils/constants";
 import { ActionType, type CurrencyCode } from "@/utils/enums";
 import SwitchIcon from "@/assets/switch.svg";
@@ -26,7 +30,7 @@ function App() {
     currency: DEFAULT_STARTING_CURRENCY,
   });
   const [globalAutoConversionEnabled, setGlobalAutoConversionEnabled] = useState(
-    DEFAULT_USER_SETTINGS.globalAutoConversionEnabled,
+    DEFAULT_USER_SETTINGS.scopes.allUrls.enabled,
   );
   const [localAutoConversionEnabled, setLocalAutoConversionEnabled] = useState(true);
   const [currentTabOrigin, setCurrentTabOrigin] = useState<string | null>(null);
@@ -66,10 +70,10 @@ function App() {
 
       setCurrentTabOrigin(activeTabOrigin);
       setGlobalAutoConversionEnabled(
-        persisted.globalAutoConversionEnabled !== false,
+        persisted.scopes.allUrls.enabled !== false,
       );
       setLocalAutoConversionEnabled(
-        isLocalAutoConversionEnabledForOrigin(persisted, activeTabOrigin),
+        resolveInlineRuntimeSettingsForUrl(persisted, activeTabOrigin).settings.enabled,
       );
     };
 
@@ -88,16 +92,24 @@ function App() {
     setIsGlobalTogglePending(true);
 
     try {
-      const persisted = await updateUserSettings({
-        globalAutoConversionEnabled: nextGlobalAutoConversionEnabled,
+      const currentSettings = await getUserSettings();
+      const persisted = await setUserSettings({
+        ...currentSettings,
+        scopes: {
+          ...currentSettings.scopes,
+          allUrls: {
+            ...currentSettings.scopes.allUrls,
+            enabled: nextGlobalAutoConversionEnabled,
+          },
+        },
       });
       setGlobalAutoConversionEnabled(
-        persisted.globalAutoConversionEnabled !== false,
+        persisted.scopes.allUrls.enabled !== false,
       );
     } catch {
       const fallback = await getUserSettings();
       setGlobalAutoConversionEnabled(
-        fallback.globalAutoConversionEnabled !== false,
+        fallback.scopes.allUrls.enabled !== false,
       );
     } finally {
       setIsGlobalTogglePending(false);
@@ -113,25 +125,36 @@ function App() {
 
     try {
       const currentSettings = await getUserSettings();
-      const nextLocalSettingsByOrigin = {
-        ...currentSettings.localAutoConversionByOrigin,
-        [currentTabOrigin]: nextLocalAutoConversionEnabled,
+      const domain = normalizeDomainScope(currentTabOrigin);
+      if (!domain) return;
+
+      const existingDomainSettings = currentSettings.scopes.domains[domain];
+      const nextDomainSettings = {
+        ...cloneInlineRuntimeSettings(
+          existingDomainSettings ?? currentSettings.scopes.allUrls,
+        ),
+        domain,
+        pageUrl: "",
+        enabled: nextLocalAutoConversionEnabled,
       };
 
-      if (nextLocalAutoConversionEnabled) {
-        delete nextLocalSettingsByOrigin[currentTabOrigin];
-      }
-
-      const persisted = await updateUserSettings({
-        localAutoConversionByOrigin: nextLocalSettingsByOrigin,
+      const persisted = await setUserSettings({
+        ...currentSettings,
+        scopes: {
+          ...currentSettings.scopes,
+          domains: {
+            ...currentSettings.scopes.domains,
+            [domain]: nextDomainSettings,
+          },
+        },
       });
       setLocalAutoConversionEnabled(
-        isLocalAutoConversionEnabledForOrigin(persisted, currentTabOrigin),
+        resolveInlineRuntimeSettingsForUrl(persisted, currentTabOrigin).settings.enabled,
       );
     } catch {
       const fallback = await getUserSettings();
       setLocalAutoConversionEnabled(
-        isLocalAutoConversionEnabledForOrigin(fallback, currentTabOrigin),
+        resolveInlineRuntimeSettingsForUrl(fallback, currentTabOrigin).settings.enabled,
       );
     } finally {
       setIsLocalTogglePending(false);

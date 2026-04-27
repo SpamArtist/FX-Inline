@@ -2,7 +2,24 @@ import { jest } from "@jest/globals";
 import { loadCurrencyReducerHydration } from "../../test-dist/hooks/useCurrencyReducer.hydration.js";
 
 test("loadCurrencyReducerHydration returns preferred currency and rates on success", async () => {
-  const readUserSettings = jest.fn().mockResolvedValue({ preferredCurrency: "INR" });
+  const readUserSettings = jest.fn().mockResolvedValue({
+    schemaVersion: 1,
+    generatedAt: "2026-01-01T00:00:00.000Z",
+    scopes: {
+      allUrls: {
+        enabled: true,
+        domain: "",
+        pageUrl: "",
+        baseCurrency: "USD",
+        targetCurrencies: ["INR"],
+        convertedCurrencyPosition: "right",
+        displayStyle: "brackets",
+        extraSettings: {},
+      },
+      domains: {},
+      pages: {},
+    },
+  });
   const readRates = jest.fn().mockResolvedValue({
     base: "USD",
     fetchedAt: 123,

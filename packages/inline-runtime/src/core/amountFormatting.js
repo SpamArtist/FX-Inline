@@ -8,16 +8,19 @@ export function getConvertedAmountText(
   preferredCurrency,
   rateSnapshot,
   localeHint,
+  baseCurrency = null,
 ) {
   const isZeroValue =
     match.value === 0 &&
     (match.rangeEndValue === undefined || match.rangeEndValue === 0);
   if (isZeroValue) return null;
-  if (match.currency === preferredCurrency) return null;
+  const sourceCurrency = match.currency ?? baseCurrency;
+  if (!sourceCurrency) return null;
+  if (sourceCurrency === preferredCurrency) return null;
 
   const converted = convertAmountWithSnapshot(
     match.value,
-    match.currency,
+    sourceCurrency,
     preferredCurrency,
     rateSnapshot,
   );
@@ -40,7 +43,7 @@ export function getConvertedAmountText(
   if (match.rangeEndValue !== undefined) {
     const convertedRangeEnd = convertAmountWithSnapshot(
       match.rangeEndValue,
-      match.currency,
+      sourceCurrency,
       preferredCurrency,
       rateSnapshot,
     );

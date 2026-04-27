@@ -17,6 +17,8 @@
     "utils/constants.ts",
     "utils/currencyPresentation.ts",
     "utils/enums.ts",
+    "utils/inlineRuntimeSettings.ts",
+    "utils/inlineRuntimeSettings.types.ts",
     "utils/installLifecycle.ts",
     "utils/mutationRoots.ts",
     "utils/rateMath.ts",

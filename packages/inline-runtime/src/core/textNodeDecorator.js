@@ -106,6 +106,8 @@ function decorateSplitSiblingPriceInTextNode(
   lightTextCache,
   passContext,
   passId,
+  baseCurrency,
+  renderPreferences,
 ) {
   const amountRoot = textNode.parentElement;
   if (!amountRoot || amountRoot.closest(`.${INLINE_CONVERSION_CLASS}`)) return 0;
@@ -130,6 +132,7 @@ function decorateSplitSiblingPriceInTextNode(
     preferredCurrency,
     rateSnapshot,
     localeHint,
+    baseCurrency,
   );
   if (!convertedAmount) {
     existingAddon?.remove();
@@ -148,7 +151,9 @@ function decorateSplitSiblingPriceInTextNode(
     wrapper,
     usesLightTextColor(textNode, lightTextCache),
   );
-  setInlineConversionContent(wrapper, convertedAmount);
+  setInlineConversionContent(wrapper, convertedAmount, {
+    renderPreferences,
+  });
 
   if (!existingAddon) {
     amountRoot.appendChild(wrapper);
@@ -164,7 +169,7 @@ function decorateSplitSiblingPriceInTextNode(
 
   if (
     previousOriginal !== rawPrice ||
-    previousConverted !== `(${convertedAmount})`
+    !previousConverted?.includes(convertedAmount)
   ) {
     pushCoreConversionEvent(passContext, passId, {
       source: "split-sibling",
@@ -188,6 +193,8 @@ export function decoratePricesInTextNode(
   lightTextCache,
   passContext,
   passId,
+  baseCurrency,
+  renderPreferences,
 ) {
   const text = textNode.nodeValue;
   if (!text?.trim()) return 0;
@@ -207,6 +214,8 @@ export function decoratePricesInTextNode(
       lightTextCache,
       passContext,
       passId,
+      baseCurrency,
+      renderPreferences,
     );
   }
 
@@ -226,6 +235,7 @@ export function decoratePricesInTextNode(
       preferredCurrency,
       rateSnapshot,
       localeHint,
+      baseCurrency,
     );
     if (!convertedAmount) {
       fragment.append(match.raw);
@@ -240,6 +250,7 @@ export function decoratePricesInTextNode(
 
     setInlineConversionContent(wrapper, convertedAmount, {
       originalText: match.raw,
+      renderPreferences,
     });
 
     fragment.append(wrapper);

@@ -75,6 +75,7 @@ function applyRenderPreferences(
   const showOriginalPrice = preferences.showOriginalPrice === true;
   setInlineConversionContent(wrapper, convertedAmount, {
     originalText: showOriginalPrice ? rawPrice : "",
+    renderPreferences: preferences,
   });
 
   const prefixNode = wrapper.firstChild;
@@ -128,6 +129,7 @@ export const amazonStructuredRendererPostPlugin = {
     rateSnapshot,
     localeHint,
     lightTextCache,
+    baseCurrency,
     clientRenderPreferences,
     passContext,
   }) {
@@ -173,6 +175,7 @@ export const amazonStructuredRendererPostPlugin = {
         preferredCurrency,
         rateSnapshot,
         localeHint,
+        baseCurrency,
       );
       if (!convertedAmount) {
         existingAddon?.remove();
@@ -205,7 +208,7 @@ export const amazonStructuredRendererPostPlugin = {
 
       if (
         previousOriginal !== rawPrice ||
-        previousConverted !== `(${convertedAmount})`
+        !previousConverted?.includes(convertedAmount)
       ) {
         conversionsApplied += 1;
       }

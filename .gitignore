@@ -5,6 +5,7 @@ node_modules
 .wxt
 backend/data/db.json
 backend/dist
+apps/admin/data
 test-dist
 apps/extension/test-dist
 dist

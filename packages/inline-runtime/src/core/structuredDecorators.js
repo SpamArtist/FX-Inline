@@ -127,6 +127,8 @@ export function decorateStructuredSiblingSymbolPrices(
   lightTextCache,
   passContext,
   passId,
+  baseCurrency,
+  renderPreferences,
 ) {
   const ariaHiddenRoots = getAriaHiddenRoots(root);
   if (!ariaHiddenRoots.length) return 0;
@@ -164,6 +166,7 @@ export function decorateStructuredSiblingSymbolPrices(
       preferredCurrency,
       rateSnapshot,
       localeHint,
+      baseCurrency,
     );
     if (!convertedAmount) {
       existingAddon?.remove();
@@ -182,7 +185,9 @@ export function decorateStructuredSiblingSymbolPrices(
       wrapper,
       usesLightTextColorForElement(ariaHiddenRoot, lightTextCache),
     );
-    setInlineConversionContent(wrapper, convertedAmount);
+    setInlineConversionContent(wrapper, convertedAmount, {
+      renderPreferences,
+    });
 
     if (!existingAddon) {
       ariaHiddenRoot.appendChild(wrapper);
@@ -199,7 +204,7 @@ export function decorateStructuredSiblingSymbolPrices(
 
     if (
       previousOriginal !== rawPrice ||
-      previousConverted !== `(${convertedAmount})`
+      !previousConverted?.includes(convertedAmount)
     ) {
       pushCoreConversionEvent(passContext, passId, {
         source: "structured-sibling",

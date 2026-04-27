@@ -1,10 +1,18 @@
+import { GENERATED_INLINE_RUNTIME_SETTINGS_MANIFEST } from "../generated/inlineRuntimeSettingsManifest";
 import { storage } from "wxt/utils/storage";
-import { DEFAULT_STARTING_CURRENCY } from "./constants";
 import { CurrencyCode } from "./enums";
 import type {
+  LegacyUserSettings,
   LocalAutoConversionByOrigin,
   UserSettings,
 } from "./appStorage.types";
+import {
+  cloneInlineRuntimeSettings,
+  getPrimaryTargetCurrency,
+  normalizeDomainScope,
+  resolveInlineRuntimeSettingsForUrl,
+  sanitizeInlineRuntimeSettingsManifest,
+} from "./inlineRuntimeSettings";
 
 const SETTINGS_KEY = "local:user-settings";
 
@@ -12,26 +20,24 @@ const VALID_CURRENCY_CODES: ReadonlySet<string> = new Set(
   Object.values(CurrencyCode),
 );
 
-const DEFAULT_USER_SETTINGS: UserSettings = {
-  preferredCurrency: DEFAULT_STARTING_CURRENCY,
-  globalAutoConversionEnabled: true,
-  localAutoConversionByOrigin: {},
-};
+const DEFAULT_USER_SETTINGS: UserSettings = sanitizeInlineRuntimeSettingsManifest(
+  GENERATED_INLINE_RUNTIME_SETTINGS_MANIFEST,
+);
 
 const userSettingsItem = storage.defineItem<UserSettings>(SETTINGS_KEY, {
   fallback: DEFAULT_USER_SETTINGS,
 });
 
-function asCurrencyCode(value: string | null | undefined): CurrencyCode {
+function asCurrencyCode(value: unknown): CurrencyCode {
   return typeof value === "string" && VALID_CURRENCY_CODES.has(value)
     ? (value as CurrencyCode)
-    : DEFAULT_USER_SETTINGS.preferredCurrency;
+    : getPrimaryTargetCurrency(DEFAULT_USER_SETTINGS.scopes.allUrls);
 }
 
 function asGlobalAutoConversionEnabled(value: unknown): boolean {
   return typeof value === "boolean"
     ? value
-    : DEFAULT_USER_SETTINGS.globalAutoConversionEnabled;
+    : DEFAULT_USER_SETTINGS.scopes.allUrls.enabled;
 }
 
 export function getOriginFromUrl(url: string | null | undefined): string | null {
@@ -51,7 +57,7 @@ export function getOriginFromUrl(url: string | null | undefined): string | null 
 
 function asLocalAutoConversionByOrigin(value: unknown): LocalAutoConversionByOrigin {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
-    return { ...DEFAULT_USER_SETTINGS.localAutoConversionByOrigin };
+    return {};
   }
 
   const settingsByOrigin: LocalAutoConversionByOrigin = {};
@@ -69,44 +75,73 @@ function asLocalAutoConversionByOrigin(value: unknown): LocalAutoConversionByOri
   return settingsByOrigin;
 }
 
-function hasCanonicalUserSettingsShape(value: UserSettings): boolean {
+function isLegacyUserSettings(value: unknown): value is Partial<LegacyUserSettings> {
   return (
-    Object.keys(value).length === 3 &&
-    Object.prototype.hasOwnProperty.call(value, "preferredCurrency") &&
-    Object.prototype.hasOwnProperty.call(value, "globalAutoConversionEnabled") &&
-    Object.prototype.hasOwnProperty.call(value, "localAutoConversionByOrigin")
+    Boolean(value) &&
+    typeof value === "object" &&
+    !Array.isArray(value) &&
+    (
+      Object.prototype.hasOwnProperty.call(value, "preferredCurrency") ||
+      Object.prototype.hasOwnProperty.call(value, "globalAutoConversionEnabled") ||
+      Object.prototype.hasOwnProperty.call(value, "localAutoConversionByOrigin")
+    )
   );
 }
 
-export function sanitizeUserSettings(value: Partial<UserSettings> | null): UserSettings {
+function migrateLegacyUserSettings(value: Partial<LegacyUserSettings>): UserSettings {
+  const preferredCurrency = asCurrencyCode(value.preferredCurrency);
+  const globalAutoConversionEnabled = asGlobalAutoConversionEnabled(
+    value.globalAutoConversionEnabled,
+  );
+  const localAutoConversionByOrigin = asLocalAutoConversionByOrigin(
+    value.localAutoConversionByOrigin,
+  );
+
+  const allUrls = {
+    ...cloneInlineRuntimeSettings(DEFAULT_USER_SETTINGS.scopes.allUrls),
+    enabled: globalAutoConversionEnabled,
+    targetCurrencies: [preferredCurrency],
+  };
+  const domains: UserSettings["scopes"]["domains"] = {};
+
+  for (const [origin, isEnabled] of Object.entries(localAutoConversionByOrigin)) {
+    const domain = normalizeDomainScope(origin);
+    if (!domain) continue;
+
+    if (isEnabled === allUrls.enabled) continue;
+
+    domains[domain] = {
+      ...cloneInlineRuntimeSettings(allUrls),
+      domain,
+      pageUrl: "",
+      enabled: isEnabled,
+    };
+  }
+
   return {
-    preferredCurrency: asCurrencyCode(value?.preferredCurrency),
-    globalAutoConversionEnabled: asGlobalAutoConversionEnabled(
-      value?.globalAutoConversionEnabled,
-    ),
-    localAutoConversionByOrigin: asLocalAutoConversionByOrigin(
-      value?.localAutoConversionByOrigin,
-    ),
+    schemaVersion: 1,
+    generatedAt: DEFAULT_USER_SETTINGS.generatedAt,
+    scopes: {
+      allUrls,
+      domains,
+      pages: {},
+    },
   };
 }
 
-function hasSameLocalAutoConversionSettings(
-  first: LocalAutoConversionByOrigin,
-  second: LocalAutoConversionByOrigin,
-): boolean {
-  const firstKeys = Object.keys(first);
-  if (firstKeys.length !== Object.keys(second).length) return false;
-
-  for (const key of firstKeys) {
-    if (first[key] !== second[key]) return false;
-  }
-
-  return true;
+function serializeSettings(settings: UserSettings): string {
+  return JSON.stringify(settings);
 }
 
-async function persistSanitizedUserSettings(
-  value: Partial<UserSettings>,
-): Promise<UserSettings> {
+export function sanitizeUserSettings(value: unknown): UserSettings {
+  if (isLegacyUserSettings(value)) {
+    return sanitizeInlineRuntimeSettingsManifest(migrateLegacyUserSettings(value));
+  }
+
+  return sanitizeInlineRuntimeSettingsManifest(value, DEFAULT_USER_SETTINGS);
+}
+
+async function persistSanitizedUserSettings(value: unknown): Promise<UserSettings> {
   const sanitized = sanitizeUserSettings(value);
   await userSettingsItem.setValue(sanitized);
   return sanitized;
@@ -116,15 +151,7 @@ export async function getUserSettings(): Promise<UserSettings> {
   const stored = await userSettingsItem.getValue();
   const sanitized = sanitizeUserSettings(stored);
 
-  if (
-    stored.preferredCurrency !== sanitized.preferredCurrency ||
-    stored.globalAutoConversionEnabled !== sanitized.globalAutoConversionEnabled ||
-    !hasSameLocalAutoConversionSettings(
-      stored.localAutoConversionByOrigin,
-      sanitized.localAutoConversionByOrigin,
-    ) ||
-    !hasCanonicalUserSettingsShape(stored)
-  ) {
+  if (serializeSettings(stored) !== serializeSettings(sanitized)) {
     await userSettingsItem.setValue(sanitized);
   }
 
@@ -148,9 +175,7 @@ export function isAutoConversionEnabledForOrigin(
   settings: UserSettings,
   origin: string | null,
 ): boolean {
-  if (settings.globalAutoConversionEnabled === false) return false;
-  if (!origin) return true;
-  return isLocalAutoConversionEnabledForOrigin(settings, origin);
+  return resolveInlineRuntimeSettingsForUrl(settings, origin).settings.enabled;
 }
 
 export function isLocalAutoConversionEnabledForOrigin(
@@ -158,14 +183,7 @@ export function isLocalAutoConversionEnabledForOrigin(
   origin: string | null,
 ): boolean {
   if (!origin) return false;
-  if (
-    !settings.localAutoConversionByOrigin ||
-    typeof settings.localAutoConversionByOrigin !== "object"
-  ) {
-    return true;
-  }
-
-  return settings.localAutoConversionByOrigin[origin] !== false;
+  return resolveInlineRuntimeSettingsForUrl(settings, origin).settings.enabled;
 }
 
 export { DEFAULT_USER_SETTINGS, SETTINGS_KEY };
