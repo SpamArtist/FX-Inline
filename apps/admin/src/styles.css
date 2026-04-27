@@ -660,7 +660,7 @@ button:disabled {
   height: 3px;
   width: 100%;
   transform-origin: left center;
-  animation: toast-countdown 15s linear forwards;
+  animation: toast-countdown 8s linear forwards;
   background: var(--accent);
 }
 
