@@ -192,12 +192,15 @@ function SettingsForm({
         <div className="panel-actions">
           {actions}
           <label className="switch-row">
-            <span>{settings.enabled ? "On" : "Off"}</span>
             <input
               type="checkbox"
               checked={settings.enabled}
               onChange={(event) => update({ enabled: event.target.checked })}
             />
+            <span className="switch-track" aria-hidden="true">
+              <span className="switch-thumb" />
+            </span>
+            <span>{settings.enabled ? "On" : "Off"}</span>
           </label>
         </div>
       </div>
