@@ -7,7 +7,6 @@ const DEFAULT_SETTINGS = {
   enabled: true,
   domain: "",
   pageUrl: "",
-  baseCurrency: "USD",
   targetCurrencies: ["EUR"],
   convertedCurrencyPosition: "right",
   displayStyle: "brackets",
@@ -133,18 +132,6 @@ function SettingsForm({ settings, onChange, title, lockDomainFields = false }) {
             onChange={(event) => update({ pageUrl: normalizePageUrl(event.target.value) })}
             placeholder="https://example.com/pricing"
           />
-        </label>
-
-        <label>
-          <span>Base currency</span>
-          <select
-            value={settings.baseCurrency}
-            onChange={(event) => update({ baseCurrency: event.target.value })}
-          >
-            {currencyOptions.map((code) => (
-              <option key={code} value={code}>{code}</option>
-            ))}
-          </select>
         </label>
 
         <label>

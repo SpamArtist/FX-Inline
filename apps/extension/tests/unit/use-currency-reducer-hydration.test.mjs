@@ -10,7 +10,6 @@ test("loadCurrencyReducerHydration returns preferred currency and rates on succe
         enabled: true,
         domain: "",
         pageUrl: "",
-        baseCurrency: "USD",
         targetCurrencies: ["INR"],
         convertedCurrencyPosition: "right",
         displayStyle: "brackets",

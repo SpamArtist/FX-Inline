@@ -9,7 +9,6 @@ const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(currentDirectory, "../..");
 const DEFAULT_ADMIN_DB_PATH = path.resolve(repoRoot, "apps/admin/data/settings.sqlite");
 const DEFAULT_GENERATED_AT = "1970-01-01T00:00:00.000Z";
-const DEFAULT_BASE_CURRENCY = "USD";
 const DEFAULT_TARGET_CURRENCY = "EUR";
 const DEFAULT_POSITION = "right";
 const DEFAULT_DISPLAY_STYLE = "brackets";
@@ -25,7 +24,6 @@ const currencyList = JSON.parse(
   fs.readFileSync(path.resolve(repoRoot, "apps/extension/assets/currency.json"), "utf8"),
 );
 const VALID_CURRENCY_CODES = new Set(currencyList.map((entry) => entry.code));
-VALID_CURRENCY_CODES.add(DEFAULT_BASE_CURRENCY);
 VALID_CURRENCY_CODES.add(DEFAULT_TARGET_CURRENCY);
 
 export function resolveAdminDbPath(inputPath = process.env.FX_INLINE_ADMIN_DB_PATH) {
@@ -85,7 +83,6 @@ export function createDefaultInlineRuntimeSettings(overrides = {}) {
     enabled: overrides.enabled ?? true,
     domain: overrides.domain ?? "",
     pageUrl: overrides.pageUrl ?? "",
-    baseCurrency: overrides.baseCurrency ?? DEFAULT_BASE_CURRENCY,
     targetCurrencies: overrides.targetCurrencies
       ? [...overrides.targetCurrencies]
       : [DEFAULT_TARGET_CURRENCY],
@@ -130,7 +127,6 @@ export function sanitizeInlineRuntimeSettings(value, fallback = createDefaultInl
       typeof raw.pageUrl === "string"
         ? normalizePageScope(raw.pageUrl) ?? fallback.pageUrl
         : fallback.pageUrl,
-    baseCurrency: asCurrencyCode(raw.baseCurrency, fallback.baseCurrency),
     targetCurrencies: asTargetCurrencies(raw.targetCurrencies, fallbackTargets),
     convertedCurrencyPosition:
       typeof raw.convertedCurrencyPosition === "string" &&

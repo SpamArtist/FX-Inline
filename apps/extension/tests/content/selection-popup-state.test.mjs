@@ -33,7 +33,6 @@ function createUserSettings(targetCurrency) {
         enabled: true,
         domain: "",
         pageUrl: "",
-        baseCurrency: "USD",
         targetCurrencies: [targetCurrency],
         convertedCurrencyPosition: "right",
         displayStyle: "brackets",

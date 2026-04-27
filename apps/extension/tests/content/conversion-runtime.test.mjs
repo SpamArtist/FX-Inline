@@ -14,7 +14,6 @@ const littleHotelierPricingRendererPostPluginMock = {
 };
 const controllerStartMock = jest.fn();
 const controllerDestroyMock = jest.fn();
-const controllerSetBaseCurrencyMock = jest.fn();
 const controllerSetPreferredCurrencyMock = jest.fn();
 const controllerSetRateSnapshotMock = jest.fn();
 const controllerSetEnabledMock = jest.fn();
@@ -49,7 +48,6 @@ function createUserSettings(overrides = {}) {
     enabled: true,
     domain: "",
     pageUrl: "",
-    baseCurrency: "USD",
     targetCurrencies: ["EUR"],
     convertedCurrencyPosition: "right",
     displayStyle: "brackets",
@@ -71,7 +69,6 @@ function createUserSettings(overrides = {}) {
 function resetControllerMocks() {
   controllerStartMock.mockReset();
   controllerDestroyMock.mockReset();
-  controllerSetBaseCurrencyMock.mockReset();
   controllerSetPreferredCurrencyMock.mockReset();
   controllerSetRateSnapshotMock.mockReset();
   controllerSetEnabledMock.mockReset();
@@ -118,7 +115,6 @@ beforeEach(() => {
     start: controllerStartMock,
     stop: jest.fn(),
     refresh: controllerRefreshMock,
-    setBaseCurrency: controllerSetBaseCurrencyMock,
     setPreferredCurrency: controllerSetPreferredCurrencyMock,
     setRateSnapshot: controllerSetRateSnapshotMock,
     setEnabled: controllerSetEnabledMock,
@@ -151,7 +147,6 @@ test("initialize hydrates settings/rates, applies runtime state, and starts cont
   expect(getUserSettingsMock).toHaveBeenCalledTimes(1);
   expect(getRatesMock).toHaveBeenCalledWith({ forceRefresh: false });
 
-  expect(controllerSetBaseCurrencyMock).toHaveBeenCalledWith("USD");
   expect(controllerSetPreferredCurrencyMock).toHaveBeenCalledWith("EUR");
   expect(controllerSetClientRenderPreferencesMock).toHaveBeenCalledWith({
     default: {

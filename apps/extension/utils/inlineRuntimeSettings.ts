@@ -14,7 +14,6 @@ export const INLINE_RUNTIME_SETTINGS_SCHEMA_VERSION = 1;
 export const INLINE_RUNTIME_ALL_URLS_SCOPE_ID = "all_urls";
 
 const DEFAULT_GENERATED_AT = "1970-01-01T00:00:00.000Z";
-const DEFAULT_BASE_CURRENCY = CurrencyCode["UNITED STATES DOLLAR"];
 const DEFAULT_TARGET_CURRENCY = CurrencyCode.EURO;
 const DEFAULT_CONVERTED_CURRENCY_POSITION: InlineConvertedCurrencyPosition = "right";
 const DEFAULT_DISPLAY_STYLE: InlineConvertedCurrencyDisplayStyle = "brackets";
@@ -37,11 +36,13 @@ const KNOWN_SETTING_KEYS: ReadonlySet<string> = new Set([
   "enabled",
   "domain",
   "pageUrl",
-  "baseCurrency",
   "targetCurrencies",
   "convertedCurrencyPosition",
   "displayStyle",
   "extraSettings",
+]);
+const LEGACY_IGNORED_SETTING_KEYS: ReadonlySet<string> = new Set([
+  "baseCurrency",
 ]);
 
 export const INLINE_RUNTIME_SETTING_REGISTRY: Record<
@@ -61,11 +62,6 @@ export const INLINE_RUNTIME_SETTING_REGISTRY: Record<
   pageUrl: {
     key: "pageUrl",
     label: "Page URL",
-    runtimeSupported: true,
-  },
-  baseCurrency: {
-    key: "baseCurrency",
-    label: "Base currency",
     runtimeSupported: true,
   },
   targetCurrencies: {
@@ -187,7 +183,6 @@ export function createDefaultInlineRuntimeSettings(
     enabled: overrides.enabled ?? true,
     domain: overrides.domain ?? "",
     pageUrl: overrides.pageUrl ?? "",
-    baseCurrency: overrides.baseCurrency ?? DEFAULT_BASE_CURRENCY,
     targetCurrencies: overrides.targetCurrencies
       ? [...overrides.targetCurrencies]
       : [DEFAULT_TARGET_CURRENCY],
@@ -227,6 +222,7 @@ function collectExtraSettings(value: unknown): Record<string, JsonValue> {
 
   for (const [key, extraValue] of Object.entries(value)) {
     if (KNOWN_SETTING_KEYS.has(key)) continue;
+    if (LEGACY_IGNORED_SETTING_KEYS.has(key)) continue;
     if (isJsonValue(extraValue)) {
       extras[key] = extraValue;
     }
@@ -257,7 +253,6 @@ export function sanitizeInlineRuntimeSettings(
       typeof raw.pageUrl === "string"
         ? normalizePageScope(raw.pageUrl) ?? fallback.pageUrl
         : fallback.pageUrl,
-    baseCurrency: asCurrencyCode(raw.baseCurrency, fallback.baseCurrency),
     targetCurrencies: asTargetCurrencies(raw.targetCurrencies, fallbackTargets),
     convertedCurrencyPosition: asPosition(
       raw.convertedCurrencyPosition,

@@ -20,7 +20,6 @@ export type InlineRuntimeSettings = {
   enabled: boolean;
   domain: string;
   pageUrl: string;
-  baseCurrency: CurrencyCode;
   targetCurrencies: CurrencyCode[];
   convertedCurrencyPosition: InlineConvertedCurrencyPosition;
   displayStyle: InlineConvertedCurrencyDisplayStyle;
@@ -41,7 +40,6 @@ export type InlineRuntimeSettingKey =
   | "enabled"
   | "domain"
   | "pageUrl"
-  | "baseCurrency"
   | "targetCurrencies"
   | "convertedCurrencyPosition"
   | "displayStyle";

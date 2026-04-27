@@ -101,7 +101,6 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
     logUnsupportedRuntimeSettings(resolvedSettings);
 
     const pageSettings = resolvedSettings.settings;
-    inlineRuntime.setBaseCurrency(pageSettings.baseCurrency);
     inlineRuntime.setPreferredCurrency(getPrimaryTargetCurrency(pageSettings));
     inlineRuntime.setClientRenderPreferences({
       default: {
