@@ -445,6 +445,18 @@ button:disabled {
   padding: 18px;
 }
 
+.page-overrides .section-bar {
+  align-items: flex-start;
+}
+
+.page-overrides .section-bar > div {
+  min-width: 0;
+}
+
+.page-overrides .section-bar button {
+  flex: 0 0 auto;
+}
+
 .currency-select-trigger {
   width: 100%;
   justify-content: space-between;
@@ -590,6 +602,15 @@ button:disabled {
 
   .header-actions .primary {
     grid-column: 1 / -1;
+  }
+
+  .page-overrides .section-bar {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .page-overrides .section-bar button {
+    width: 100%;
   }
 }
 
