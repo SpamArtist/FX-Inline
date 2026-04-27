@@ -91,13 +91,13 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run readme:sync:check` | `node scripts/readme-sync.mjs --check` |
 
 ### Recent Changes (first-parent, excluding README automation commits)
+- 2026-04-26 `62ccee8` no duplicate inline
+- 2026-04-26 `191bb50` Merge branch 'main' of https://github.com/SpamArtist/currency-conversion-extension-tool
+- 2026-04-26 `aa92014` renaming ccx to fx-inline
+- 2026-04-25 `9af33cd` docs: align docs with current extension behavior
 - 2026-04-25 `3b18be5` update
 - 2026-04-23 `a3e4b1e` Merge branch 'main' of https://github.com/SpamArtist/currency-conversion-extension-tool
 - 2026-04-23 `8717671` update
 - 2026-04-21 `c87eb22` Codex/welcome page install (#25)
-- 2026-04-21 `150c49f` feat: add post-install welcome page (#24)
-- 2026-04-21 `846850d` docs: align release docs with tag-driven workflow
-- 2026-04-20 `fe83acc` missing
-- 2026-04-20 `4f5c47d` REMOVED
 
 <!-- AUTO-GENERATED:END -->
