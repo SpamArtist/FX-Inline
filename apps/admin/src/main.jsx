@@ -136,7 +136,7 @@ function SettingsForm({ settings, onChange, title, lockDomainFields = false }) {
           />
         </label>
 
-        <label>
+        <label className="position-field">
           <span>Converted currency position</span>
           <select
             value={settings.convertedCurrencyPosition}

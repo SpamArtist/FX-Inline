@@ -207,6 +207,7 @@ button:disabled {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
+  align-items: start;
 }
 
 .form-grid label {
@@ -231,6 +232,14 @@ button:disabled {
   background: #fff;
   color: var(--ink);
   padding: 0 10px;
+}
+
+.position-field {
+  align-self: start;
+}
+
+.position-field select {
+  height: 40px;
 }
 
 .form-grid input:disabled,
