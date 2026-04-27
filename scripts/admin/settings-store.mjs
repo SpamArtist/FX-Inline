@@ -309,3 +309,19 @@ export function writeGeneratedManifestFile(
   fs.writeFileSync(outputPath, content, "utf8");
   return outputPath;
 }
+
+export function saveAndExportInlineRuntimeSettingsManifest(
+  manifestInput,
+  {
+    dbPath = resolveAdminDbPath(),
+    outputPath,
+  } = {},
+) {
+  const manifest = writeInlineRuntimeSettingsManifestToDb(manifestInput, dbPath);
+  const generatedManifestPath = writeGeneratedManifestFile(manifest, outputPath);
+
+  return {
+    manifest,
+    outputPath: generatedManifestPath,
+  };
+}

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Check, Download, Globe2, Plus, RotateCcw, Save } from "lucide-react";
+import { Check, Globe2, Hammer, Plus, RotateCcw, Save } from "lucide-react";
 import currencies from "../../extension/assets/currency.json";
 
 const DEFAULT_SETTINGS = {
@@ -204,6 +204,7 @@ function App() {
   const [activeScope, setActiveScope] = useState({ type: "all_urls", id: "all_urls" });
   const [status, setStatus] = useState("Loading settings");
   const [isSaving, setIsSaving] = useState(false);
+  const [isBuilding, setIsBuilding] = useState(false);
 
   useEffect(() => {
     let canceled = false;
@@ -369,10 +370,11 @@ function App() {
       });
 
       if (!response.ok) throw new Error("Save failed");
-      const saved = await response.json();
+      const payload = await response.json();
+      const saved = payload.manifest;
       setManifest(saved);
       setDraftManifest(clone(saved));
-      setStatus(`Saved ${activeKey}.`);
+      setStatus(`Saved ${activeKey} and exported settings.`);
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Save failed.");
     } finally {
@@ -380,17 +382,16 @@ function App() {
     }
   }
 
-  async function exportSettings() {
-    setIsSaving(true);
+  async function buildExtension() {
+    setIsBuilding(true);
     try {
-      const response = await fetch("/api/export", { method: "POST" });
-      if (!response.ok) throw new Error("Export failed");
-      const payload = await response.json();
-      setStatus(`Exported to ${payload.outputPath}.`);
+      const response = await fetch("/api/build-extension", { method: "POST" });
+      if (!response.ok) throw new Error("Build failed");
+      setStatus("Built web extension.");
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Export failed.");
+      setStatus(error instanceof Error ? error.message : "Build failed.");
     } finally {
-      setIsSaving(false);
+      setIsBuilding(false);
     }
   }
 
@@ -439,17 +440,22 @@ function App() {
             <h1>{activeKey}</h1>
           </div>
           <div className="header-actions">
-            <button type="button" onClick={cancelActiveScope} disabled={isSaving}>
+            <button type="button" onClick={cancelActiveScope} disabled={isSaving || isBuilding}>
               <RotateCcw size={16} />
               Cancel
             </button>
-            <button type="button" onClick={saveActiveScope} disabled={isSaving}>
+            <button type="button" onClick={saveActiveScope} disabled={isSaving || isBuilding}>
               <Save size={16} />
               Save
             </button>
-            <button type="button" className="primary" onClick={exportSettings} disabled={isSaving}>
-              <Download size={16} />
-              Export
+            <button
+              type="button"
+              className="primary"
+              onClick={buildExtension}
+              disabled={isSaving || isBuilding}
+            >
+              <Hammer size={16} />
+              {isBuilding ? "Building" : "Build extension"}
             </button>
           </div>
         </header>
