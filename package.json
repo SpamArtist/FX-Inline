@@ -9,7 +9,7 @@
     "dev:firefox": "wxt -b firefox",
     "dev:website": "vite --config apps/website/vite.config.mjs",
     "dev:admin": "vite --config apps/admin/vite.config.mjs",
-    "admin:api": "node scripts/admin/server.mjs",
+    "admin:api": "npm run build:backend && node dist/backend/main.js",
     "admin:export-settings": "npm run build:backend && node dist/backend/export-settings.js",
     "build:backend": "tsc -p apps/backend/tsconfig.json",
     "build": "npm run admin:export-settings && wxt build",
