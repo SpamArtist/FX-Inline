@@ -365,7 +365,7 @@ button:disabled {
   padding: 0;
 }
 
-.target-currencies {
+.target-currency-field {
   margin-top: 18px;
 }
 
@@ -374,32 +374,76 @@ button:disabled {
   font-size: 0.84rem;
 }
 
-.currency-grid {
-  margin-top: 10px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(74px, 1fr));
-  gap: 8px;
-  max-height: 240px;
-  overflow: auto;
-  padding-right: 4px;
-}
-
-.currency-chip {
-  min-height: 34px;
-  border-color: var(--line);
-  justify-content: center;
-  font-size: 0.82rem;
-}
-
-.currency-chip.selected {
-  border-color: var(--accent);
-  background: #e6f1ed;
-  color: var(--accent-dark);
-  font-weight: 800;
-}
-
 .page-overrides {
   padding: 18px;
+}
+
+.currency-select-trigger {
+  margin-top: 10px;
+  width: min(320px, 100%);
+  justify-content: space-between;
+  border-color: var(--line-strong);
+  background: #fff;
+}
+
+.currency-select-trigger strong {
+  margin-right: auto;
+}
+
+.currency-select-menu {
+  z-index: 40;
+  width: 320px;
+  max-width: calc(100vw - 32px);
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: 0 16px 40px rgba(23, 34, 27, 0.16);
+}
+
+.currency-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--line);
+  padding: 9px 10px;
+}
+
+.currency-search input {
+  min-height: 32px;
+  width: 100%;
+  border: 0;
+  outline: 0;
+  color: var(--ink);
+}
+
+.currency-options {
+  max-height: 280px;
+  overflow: auto;
+  padding: 6px;
+}
+
+.currency-option {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) 18px;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  border-radius: 6px;
+  padding: 0 8px;
+  cursor: pointer;
+  outline: 0;
+}
+
+.currency-option[data-highlighted] {
+  background: #e6f1ed;
+  color: var(--accent-dark);
+}
+
+.currency-option.empty {
+  grid-template-columns: 1fr;
+  color: var(--muted);
+  cursor: default;
 }
 
 .page-overrides .settings-panel {

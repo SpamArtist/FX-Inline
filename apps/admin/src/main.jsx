@@ -1,6 +1,18 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Check, Globe2, Hammer, Plus, RotateCcw, Save, Trash2, X } from "lucide-react";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import {
+  Check,
+  ChevronDown,
+  Globe2,
+  Hammer,
+  Plus,
+  RotateCcw,
+  Save,
+  Search,
+  Trash2,
+  X,
+} from "lucide-react";
 import currencies from "../../extension/assets/currency.json";
 
 const DEFAULT_SETTINGS = {
@@ -80,6 +92,66 @@ function getDomainPages(manifest, domain) {
     .sort(([left], [right]) => left.localeCompare(right));
 }
 
+function CurrencySearchDropdown({ value, options, onChange }) {
+  const [query, setQuery] = useState("");
+  const filteredOptions = useMemo(() => {
+    const normalizedQuery = query.trim().toUpperCase();
+    if (!normalizedQuery) return options;
+
+    return options.filter((currency) =>
+      currency.code.includes(normalizedQuery),
+    );
+  }, [options, query]);
+  const selected = options.find((currency) => currency.code === value);
+
+  return (
+    <DropdownMenu.Root onOpenChange={(open) => {
+      if (open) setQuery("");
+    }}>
+      <DropdownMenu.Trigger className="currency-select-trigger">
+        <span>{selected?.logo}</span>
+        <strong>{value}</strong>
+        <ChevronDown size={15} />
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content
+          className="currency-select-menu"
+          align="start"
+          sideOffset={6}
+        >
+          <div className="currency-search">
+            <Search size={15} />
+            <input
+              autoFocus
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              onKeyDown={(event) => event.stopPropagation()}
+              placeholder="Search currency code"
+            />
+          </div>
+          <div className="currency-options" aria-label="Currency options">
+            {filteredOptions.length ? (
+              filteredOptions.map((currency) => (
+                <DropdownMenu.Item
+                  key={currency.code}
+                  className="currency-option"
+                  onSelect={() => onChange(currency.code)}
+                >
+                  <span>{currency.logo}</span>
+                  <strong>{currency.code}</strong>
+                  {currency.code === value ? <Check size={14} /> : null}
+                </DropdownMenu.Item>
+              ))
+            ) : (
+              <div className="currency-option empty">No matching currency</div>
+            )}
+          </div>
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
+  );
+}
+
 function SettingsForm({
   settings,
   onChange,
@@ -88,7 +160,12 @@ function SettingsForm({
   actions = null,
 }) {
   const currencyOptions = useMemo(
-    () => currencies.map((currency) => currency.code).sort((a, b) => a.localeCompare(b)),
+    () => currencies
+      .map((currency) => ({
+        code: currency.code,
+        logo: currency.logo,
+      }))
+      .sort((a, b) => a.code.localeCompare(b.code)),
     [],
   );
   const activeTargetCurrency = settings.targetCurrencies[0] ?? "EUR";
@@ -210,24 +287,16 @@ function SettingsForm({
         </div>
       </div>
 
-      <div className="target-currencies" aria-label="Target currency">
+      <div className="target-currency-field" aria-label="Target currency">
         <div className="subheading">
           <span>Target currency</span>
           <strong>{activeTargetCurrency} is active</strong>
         </div>
-        <div className="currency-grid">
-          {currencyOptions.map((code) => (
-            <button
-              key={code}
-              type="button"
-              className={code === activeTargetCurrency ? "currency-chip selected" : "currency-chip"}
-              onClick={() => chooseTarget(code)}
-            >
-              {code === activeTargetCurrency ? <Check size={13} /> : null}
-              {code}
-            </button>
-          ))}
-        </div>
+        <CurrencySearchDropdown
+          value={activeTargetCurrency}
+          options={currencyOptions}
+          onChange={chooseTarget}
+        />
       </div>
     </section>
   );
