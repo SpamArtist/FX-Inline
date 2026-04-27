@@ -434,9 +434,9 @@ button:disabled {
 }
 
 .highlight-color-picker {
-  width: 18px;
-  height: 18px;
-  flex: 0 0 18px;
+  width: 2.6875em;
+  height: 1.125em;
+  flex: 0 0 2.6875em;
   min-height: 0;
   border: 1px solid var(--line-strong);
   border-radius: 999px;
