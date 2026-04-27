@@ -1,6 +1,10 @@
 import { useMemo } from "react";
 import currencies from "../../../extension/assets/currency.json";
-import { DISPLAY_STYLE_OPTIONS, POSITION_OPTIONS } from "../settingsConstants";
+import {
+  DISPLAY_STYLE_OPTIONS,
+  POSITION_OPTIONS,
+  getDisplayStylePreview,
+} from "../settingsConstants";
 import { normalizeDomain, normalizePageUrl } from "../settingsModel";
 import CurrencySearchDropdown from "./CurrencySearchDropdown";
 
@@ -125,7 +129,7 @@ export default function SettingsForm({
                         ? { "--preview-highlight-color": settings.highlightColor }
                         : undefined}
                     >
-                      {style.preview}
+                      {getDisplayStylePreview(style.value, activeTargetCurrency)}
                     </span>
                   </button>
                   {style.value === "highlightColor" ? (

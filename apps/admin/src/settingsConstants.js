@@ -22,8 +22,13 @@ export const DEFAULT_MANIFEST = {
 export const POSITION_OPTIONS = ["top", "bottom", "left", "right", "tooltip"];
 
 export const DISPLAY_STYLE_OPTIONS = [
-  { value: "pill", label: "Pill", preview: "EUR 90" },
-  { value: "underline", label: "Underline", preview: "EUR 90" },
-  { value: "highlightColor", label: "Highlight", preview: "EUR 90" },
-  { value: "brackets", label: "Brackets", preview: "(EUR 90)" },
+  { value: "pill", label: "Pill" },
+  { value: "underline", label: "Underline" },
+  { value: "highlightColor", label: "Highlight" },
+  { value: "brackets", label: "Brackets" },
 ];
+
+export function getDisplayStylePreview(displayStyle, targetCurrency) {
+  const preview = `${targetCurrency} 90`;
+  return displayStyle === "brackets" ? `(${preview})` : preview;
+}
