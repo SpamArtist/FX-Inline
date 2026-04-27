@@ -215,7 +215,8 @@ button:disabled {
 }
 
 .form-grid span,
-.subheading span {
+.subheading span,
+.field-label {
   color: var(--muted);
   font-size: 0.82rem;
   font-weight: 740;
@@ -236,6 +237,64 @@ button:disabled {
 .form-grid select:disabled {
   background: var(--surface-soft);
   color: var(--muted);
+}
+
+.display-style-field {
+  display: grid;
+  gap: 6px;
+}
+
+.display-style-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.display-style-tab {
+  min-height: 62px;
+  align-items: flex-start;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.display-style-tab.selected {
+  border-color: var(--accent);
+  background: #e6f1ed;
+  color: var(--accent-dark);
+  font-weight: 800;
+}
+
+.display-style-tab > span:first-child {
+  color: inherit;
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.style-preview {
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-weight: 650;
+  line-height: 1.2;
+}
+
+.style-preview.pill {
+  border: 1px solid color-mix(in srgb, var(--accent) 36%, var(--line-strong));
+  border-radius: 999px;
+  padding: 2px 8px;
+  background: #f8fbf7;
+}
+
+.style-preview.underline {
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 1px;
+}
+
+.style-preview.highlightColor {
+  border-radius: 4px;
+  background: #fff1a8;
+  padding: 2px 5px;
 }
 
 .target-currencies {

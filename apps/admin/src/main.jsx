@@ -24,7 +24,12 @@ const DEFAULT_MANIFEST = {
 };
 
 const POSITION_OPTIONS = ["top", "bottom", "left", "right", "tooltip"];
-const DISPLAY_STYLE_OPTIONS = ["pill", "underline", "highlightColor", "brackets"];
+const DISPLAY_STYLE_OPTIONS = [
+  { value: "pill", label: "Pill", preview: "EUR 90" },
+  { value: "underline", label: "Underline", preview: "EUR 90" },
+  { value: "highlightColor", label: "Highlight color", preview: "EUR 90" },
+  { value: "brackets", label: "Brackets", preview: "(EUR 90)" },
+];
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
@@ -145,18 +150,29 @@ function SettingsForm({ settings, onChange, title, lockDomainFields = false }) {
           </select>
         </label>
 
-        <label>
-          <span>Display style</span>
-          <select
-            value={settings.displayStyle}
-            disabled={isTooltip}
-            onChange={(event) => update({ displayStyle: event.target.value })}
-          >
+        <div className="display-style-field">
+          <span className="field-label">Display style</span>
+          <div className="display-style-tabs" role="tablist" aria-label="Display style">
             {DISPLAY_STYLE_OPTIONS.map((style) => (
-              <option key={style} value={style}>{style}</option>
+              <button
+                key={style.value}
+                type="button"
+                role="tab"
+                aria-selected={settings.displayStyle === style.value}
+                className={
+                  settings.displayStyle === style.value
+                    ? "display-style-tab selected"
+                    : "display-style-tab"
+                }
+                disabled={isTooltip}
+                onClick={() => update({ displayStyle: style.value })}
+              >
+                <span>{style.label}</span>
+                <span className={`style-preview ${style.value}`}>{style.preview}</span>
+              </button>
             ))}
-          </select>
-        </label>
+          </div>
+        </div>
       </div>
 
       <div className="target-currencies" aria-label="Target currency">
