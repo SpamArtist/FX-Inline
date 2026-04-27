@@ -99,14 +99,14 @@ button:disabled {
 }
 
 .scope-tab-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 34px;
-  gap: 6px;
+  position: relative;
+  display: block;
   margin-bottom: 8px;
 }
 
 .scope-tab-row .scope-tab {
   margin-bottom: 0;
+  padding-right: 42px;
 }
 
 .scope-tab-row.active .scope-tab,
@@ -118,8 +118,24 @@ button:disabled {
 }
 
 .scope-delete {
-  min-height: 38px;
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  width: 28px;
+  min-height: 28px;
+  transform: translateY(-50%);
+  border-color: transparent;
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
+  opacity: 0;
   padding: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+.scope-tab-row:hover .scope-delete,
+.scope-tab-row:focus-within .scope-delete {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .add-scope {
