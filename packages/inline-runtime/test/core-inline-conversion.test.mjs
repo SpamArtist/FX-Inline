@@ -34,7 +34,11 @@ function createRateSnapshot(overrides = {}) {
   };
 }
 
-function convertLittleHotelierPricing(preferredCurrency, rateSnapshot) {
+function convertLittleHotelierPricing(
+  preferredCurrency,
+  rateSnapshot,
+  clientRenderPreferences = null,
+) {
   return convertVisiblePrices(preferredCurrency, rateSnapshot, document.body, {
     clearExisting: false,
     refreshExisting: true,
@@ -42,6 +46,7 @@ function convertLittleHotelierPricing(preferredCurrency, rateSnapshot) {
     includeDefaultPostPlugins: false,
     prePlugins: [littleHotelierPricingDetectorPrePlugin],
     postPlugins: [littleHotelierPricingRendererPostPlugin],
+    clientRenderPreferences,
   });
 }
 
@@ -525,7 +530,7 @@ test("amazon renderer ignores stale candidates from pre detection", () => {
   ).toBeNull();
 });
 
-test("little hotelier pricing renderer places conversions below original prices", () => {
+test("little hotelier pricing renderer uses default render preferences", () => {
   setLittleHotelierPricingTable();
 
   const applied = convertLittleHotelierPricing("EUR", createRateSnapshot());
@@ -543,13 +548,33 @@ test("little hotelier pricing renderer places conversions below original prices"
   const proAddon = proParagraph.lastElementChild;
   expect(proAddon).toBe(addons[0]);
   expect(proAddon.getAttribute("data-original")).toBe("$179 USD");
+  expect(proAddon.getAttribute("data-fx-inline-position")).toBe("right");
+  expect(proAddon.getAttribute("data-fx-inline-display-style")).toBe("brackets");
   expect(proAddon.textContent).toMatch(/^≈ \(.+\)$/u);
   expect(proAddon.textContent).not.toContain("$179");
-  expect(proAddon.style.display).toBe("block");
-  expect(proAddon.style.position).toBe("static");
-  expect(proAddon.style.float).toBe("none");
-  expect(proAddon.style.marginTop).toBe("0.35rem");
-  expect(proAddon.style.padding).toBe("0.2rem 0px 0px");
+  expect(proAddon.style.display).toBe("");
+  expect(proAddon.style.position).toBe("");
+  expect(proAddon.style.float).toBe("");
+  expect(proAddon.style.marginTop).toBe("");
+  expect(proAddon.style.padding).toBe("");
+});
+
+test("little hotelier pricing renderer applies admin render preferences", () => {
+  setLittleHotelierPricingTable();
+
+  const applied = convertLittleHotelierPricing("EUR", createRateSnapshot(), {
+    default: {
+      convertedCurrencyPosition: "bottom",
+      displayStyle: "underline",
+    },
+  });
+
+  expect(applied).toBe(2);
+
+  const [proAddon] = getLittleHotelierAddons();
+  expect(proAddon.getAttribute("data-fx-inline-position")).toBe("bottom");
+  expect(proAddon.getAttribute("data-fx-inline-display-style")).toBe("underline");
+  expect(proAddon.textContent).toMatch(/^≈ [^(].+/u);
 });
 
 test("little hotelier pricing renderer refreshes addon nodes in place", () => {
