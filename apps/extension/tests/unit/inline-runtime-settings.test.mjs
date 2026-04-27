@@ -29,10 +29,18 @@ test("sanitizeInlineRuntimeSettingsManifest applies defaults and drops invalid s
   });
 
   expect(manifest.scopes.allUrls.enabled).toBe(true);
-  expect(manifest.scopes.allUrls.targetCurrencies).toEqual(["INR", "EUR"]);
+  expect(manifest.scopes.allUrls.targetCurrencies).toEqual(["INR"]);
   expect(manifest.scopes.allUrls.convertedCurrencyPosition).toBe("right");
   expect(manifest.scopes.allUrls.displayStyle).toBe("pill");
   expect(Object.keys(manifest.scopes.domains)).toEqual(["example.com"]);
+});
+
+test("settings keep only one target currency", () => {
+  const settings = createDefaultInlineRuntimeSettings({
+    targetCurrencies: ["GBP", "EUR"],
+  });
+
+  expect(settings.targetCurrencies).toEqual(["GBP"]);
 });
 
 test("resolveInlineRuntimeSettingsForUrl uses page, domain, then all_urls precedence", () => {

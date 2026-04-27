@@ -46,10 +46,7 @@ test("admin DB export persists scoped domain and page settings", () => {
   const exported = readInlineRuntimeSettingsManifestFromDb(dbPath);
 
   assert.equal(exported.scopes.domains["example.com"].enabled, false);
-  assert.deepEqual(exported.scopes.domains["example.com"].targetCurrencies, [
-    "INR",
-    "EUR",
-  ]);
+  assert.deepEqual(exported.scopes.domains["example.com"].targetCurrencies, ["INR"]);
   assert.equal(
     exported.scopes.pages["https://example.com/pricing"].displayStyle,
     "pill",

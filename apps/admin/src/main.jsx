@@ -79,7 +79,7 @@ function SettingsForm({ settings, onChange, title, lockDomainFields = false }) {
     () => currencies.map((currency) => currency.code).sort((a, b) => a.localeCompare(b)),
     [],
   );
-  const targetSet = new Set(settings.targetCurrencies);
+  const activeTargetCurrency = settings.targetCurrencies[0] ?? "EUR";
   const isTooltip = settings.convertedCurrencyPosition === "tooltip";
 
   function update(patch) {
@@ -92,11 +92,8 @@ function SettingsForm({ settings, onChange, title, lockDomainFields = false }) {
     });
   }
 
-  function toggleTarget(currency) {
-    const nextTargets = targetSet.has(currency)
-      ? settings.targetCurrencies.filter((target) => target !== currency)
-      : [...settings.targetCurrencies, currency];
-    update({ targetCurrencies: nextTargets.length ? nextTargets : [currency] });
+  function chooseTarget(currency) {
+    update({ targetCurrencies: [currency] });
   }
 
   return (
@@ -162,20 +159,20 @@ function SettingsForm({ settings, onChange, title, lockDomainFields = false }) {
         </label>
       </div>
 
-      <div className="target-currencies" aria-label="Target currencies">
+      <div className="target-currencies" aria-label="Target currency">
         <div className="subheading">
-          <span>Target currencies</span>
-          <strong>{settings.targetCurrencies[0]} renders first</strong>
+          <span>Target currency</span>
+          <strong>{activeTargetCurrency} is active</strong>
         </div>
         <div className="currency-grid">
           {currencyOptions.map((code) => (
             <button
               key={code}
               type="button"
-              className={targetSet.has(code) ? "currency-chip selected" : "currency-chip"}
-              onClick={() => toggleTarget(code)}
+              className={code === activeTargetCurrency ? "currency-chip selected" : "currency-chip"}
+              onClick={() => chooseTarget(code)}
             >
-              {targetSet.has(code) ? <Check size={13} /> : null}
+              {code === activeTargetCurrency ? <Check size={13} /> : null}
               {code}
             </button>
           ))}

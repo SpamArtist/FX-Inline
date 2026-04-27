@@ -66,7 +66,7 @@ export const INLINE_RUNTIME_SETTING_REGISTRY: Record<
   },
   targetCurrencies: {
     key: "targetCurrencies",
-    label: "Target currencies",
+    label: "Target currency",
     runtimeSupported: true,
   },
   convertedCurrencyPosition: {
@@ -103,25 +103,19 @@ function isJsonValue(value: unknown): value is JsonValue {
   return Object.values(value).every(isJsonValue);
 }
 
-function asCurrencyCode(value: unknown, fallback: CurrencyCode): CurrencyCode {
-  if (typeof value !== "string") return fallback;
-  const normalized = value.trim().toUpperCase();
-  return VALID_CURRENCY_CODES.has(normalized)
-    ? (normalized as CurrencyCode)
-    : fallback;
-}
-
 function asTargetCurrencies(value: unknown, fallback: CurrencyCode[]): CurrencyCode[] {
-  if (!Array.isArray(value)) return [...fallback];
+  const fallbackTarget = fallback[0] ?? DEFAULT_TARGET_CURRENCY;
+  if (!Array.isArray(value)) return [fallbackTarget];
 
-  const next: CurrencyCode[] = [];
   for (const item of value) {
-    const currency = asCurrencyCode(item, fallback[0] ?? DEFAULT_TARGET_CURRENCY);
-    if (next.includes(currency)) continue;
-    next.push(currency);
+    if (typeof item !== "string") continue;
+    const normalized = item.trim().toUpperCase();
+    if (VALID_CURRENCY_CODES.has(normalized)) {
+      return [normalized as CurrencyCode];
+    }
   }
 
-  return next.length ? next : [...fallback];
+  return [fallbackTarget];
 }
 
 function asPosition(
@@ -183,9 +177,10 @@ export function createDefaultInlineRuntimeSettings(
     enabled: overrides.enabled ?? true,
     domain: overrides.domain ?? "",
     pageUrl: overrides.pageUrl ?? "",
-    targetCurrencies: overrides.targetCurrencies
-      ? [...overrides.targetCurrencies]
-      : [DEFAULT_TARGET_CURRENCY],
+    targetCurrencies: asTargetCurrencies(
+      overrides.targetCurrencies,
+      [DEFAULT_TARGET_CURRENCY],
+    ),
     convertedCurrencyPosition:
       overrides.convertedCurrencyPosition ?? DEFAULT_CONVERTED_CURRENCY_POSITION,
     displayStyle: overrides.displayStyle ?? DEFAULT_DISPLAY_STYLE,

@@ -34,22 +34,19 @@ function isRecord(value) {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
-function asCurrencyCode(value, fallback) {
-  if (typeof value !== "string") return fallback;
-  const normalized = value.trim().toUpperCase();
-  return VALID_CURRENCY_CODES.has(normalized) ? normalized : fallback;
-}
-
 function asTargetCurrencies(value, fallback) {
-  if (!Array.isArray(value)) return [...fallback];
-  const next = [];
+  const fallbackTarget = fallback[0] ?? DEFAULT_TARGET_CURRENCY;
+  if (!Array.isArray(value)) return [fallbackTarget];
 
   for (const item of value) {
-    const currency = asCurrencyCode(item, fallback[0] ?? DEFAULT_TARGET_CURRENCY);
-    if (!next.includes(currency)) next.push(currency);
+    if (typeof item !== "string") continue;
+    const normalized = item.trim().toUpperCase();
+    if (VALID_CURRENCY_CODES.has(normalized)) {
+      return [normalized];
+    }
   }
 
-  return next.length ? next : [...fallback];
+  return [fallbackTarget];
 }
 
 export function normalizeDomainScope(value) {
@@ -83,9 +80,10 @@ export function createDefaultInlineRuntimeSettings(overrides = {}) {
     enabled: overrides.enabled ?? true,
     domain: overrides.domain ?? "",
     pageUrl: overrides.pageUrl ?? "",
-    targetCurrencies: overrides.targetCurrencies
-      ? [...overrides.targetCurrencies]
-      : [DEFAULT_TARGET_CURRENCY],
+    targetCurrencies: asTargetCurrencies(
+      overrides.targetCurrencies,
+      [DEFAULT_TARGET_CURRENCY],
+    ),
     convertedCurrencyPosition: overrides.convertedCurrencyPosition ?? DEFAULT_POSITION,
     displayStyle: overrides.displayStyle ?? DEFAULT_DISPLAY_STYLE,
     extraSettings: {
