@@ -354,15 +354,25 @@ button:disabled {
 
 .highlight-color-picker {
   position: absolute;
-  right: 9px;
-  bottom: 9px;
-  width: 28px;
-  height: 24px;
+  right: 10px;
+  bottom: 10px;
+  width: 18px;
+  height: 18px;
   min-height: 0;
   border: 1px solid var(--line-strong);
-  border-radius: 5px;
+  border-radius: 999px;
   background: transparent;
   padding: 0;
+  cursor: pointer;
+}
+
+.highlight-color-picker::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.highlight-color-picker::-webkit-color-swatch {
+  border: 0;
+  border-radius: 999px;
 }
 
 .target-currency-field {
