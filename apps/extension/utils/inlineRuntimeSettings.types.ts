@@ -24,7 +24,6 @@ export type InlineRuntimeSettings = {
   convertedCurrencyPosition: InlineConvertedCurrencyPosition;
   displayStyle: InlineConvertedCurrencyDisplayStyle;
   highlightColor: string;
-  fontColor: string;
   extraSettings: Record<string, JsonValue>;
 };
 
@@ -45,8 +44,7 @@ export type InlineRuntimeSettingKey =
   | "targetCurrencies"
   | "convertedCurrencyPosition"
   | "displayStyle"
-  | "highlightColor"
-  | "fontColor";
+  | "highlightColor";
 
 export type InlineRuntimeSettingRegistryEntry = {
   key: InlineRuntimeSettingKey;

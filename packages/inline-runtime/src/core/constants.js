@@ -18,7 +18,7 @@ export const INLINE_CONVERSION_CSS = `
 
   :where(.${INLINE_CONVERSION_CLASS}) .fx-inline-converted-amount {
     font-weight: 600 !important;
-    color: var(--fx-inline-font-color, var(--fx-inline-converted-color, currentColor)) !important;
+    color: var(--fx-inline-converted-color, currentColor) !important;
     background-color: transparent !important;
     box-shadow: none !important;
     border-radius: 0 !important;
@@ -46,9 +46,9 @@ export const INLINE_CONVERSION_CSS = `
   }
 
   :where(.${INLINE_CONVERSION_CLASS})[data-fx-inline-display-style="pill"] .fx-inline-converted-amount {
-    border: 1px solid color-mix(in srgb, var(--fx-inline-font-color, var(--fx-inline-converted-color, currentColor)) 38%, transparent) !important;
+    border: 1px solid color-mix(in srgb, var(--fx-inline-converted-color, currentColor) 38%, transparent) !important;
     border-radius: 999px !important;
-    background-color: color-mix(in srgb, var(--fx-inline-font-color, var(--fx-inline-converted-color, currentColor)) 12%, transparent) !important;
+    background-color: color-mix(in srgb, var(--fx-inline-converted-color, currentColor) 12%, transparent) !important;
     padding: 0.05em 0.38em !important;
   }
 
@@ -66,7 +66,7 @@ export const INLINE_CONVERSION_CSS = `
 
   :where(.${INLINE_CONVERSION_CLASS})[data-fx-inline-position="tooltip"] {
     position: relative !important;
-    border-bottom: 1px dotted var(--fx-inline-font-color, var(--fx-inline-converted-color, currentColor)) !important;
+    border-bottom: 1px dotted var(--fx-inline-converted-color, currentColor) !important;
     cursor: help !important;
   }
 

@@ -149,7 +149,6 @@ test("applies configured converted currency position and display style", () => {
           convertedCurrencyPosition: position,
           displayStyle: style,
           highlightColor: "#abcdef",
-          fontColor: "#123456",
         },
       },
     });
@@ -165,7 +164,6 @@ test("applies configured converted currency position and display style", () => {
       expect(wrapper.getAttribute("title")).toBe(wrapper.getAttribute("data-fx-inline-tooltip"));
     } else {
       expect(wrapper.getAttribute("data-fx-inline-display-style")).toBe(style);
-      expect(wrapper.style.getPropertyValue("--fx-inline-font-color")).toBe("#123456");
       if (style === "highlightColor") {
         expect(wrapper.style.getPropertyValue("--fx-inline-highlight-color")).toBe("#abcdef");
       }

@@ -6,7 +6,6 @@ export const DEFAULT_SETTINGS = {
   convertedCurrencyPosition: "right",
   displayStyle: "brackets",
   highlightColor: "#fff1a8",
-  fontColor: "#355aa8",
   extraSettings: {},
 };
 

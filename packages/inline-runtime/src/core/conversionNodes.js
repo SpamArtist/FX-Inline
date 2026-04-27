@@ -9,17 +9,12 @@ const DEFAULT_CONVERTED_CURRENCY_POSITION = "right";
 const DEFAULT_DISPLAY_STYLE = "brackets";
 const DEFAULT_HIGHLIGHT_COLOR = "#fff1a8";
 
-function getOptionalColor(value) {
-  return typeof value === "string" && value.trim() ? value.trim() : null;
-}
-
 function getRenderPreferences(preferences) {
   return {
     convertedCurrencyPosition:
       preferences?.convertedCurrencyPosition ?? DEFAULT_CONVERTED_CURRENCY_POSITION,
     displayStyle: preferences?.displayStyle ?? DEFAULT_DISPLAY_STYLE,
     highlightColor: preferences?.highlightColor ?? DEFAULT_HIGHLIGHT_COLOR,
-    fontColor: getOptionalColor(preferences?.fontColor),
   };
 }
 
@@ -104,11 +99,6 @@ export function setInlineConversionContent(
   wrapper.setAttribute("data-fx-inline-position", position);
   wrapper.removeAttribute("data-fx-inline-tooltip");
   wrapper.removeAttribute("title");
-  if (renderPreferences.fontColor) {
-    wrapper.style.setProperty("--fx-inline-font-color", renderPreferences.fontColor);
-  } else {
-    wrapper.style.removeProperty("--fx-inline-font-color");
-  }
 
   if (position === "tooltip") {
     wrapper.removeAttribute("data-fx-inline-display-style");

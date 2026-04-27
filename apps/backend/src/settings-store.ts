@@ -13,7 +13,6 @@ export interface InlineRuntimeSettings {
   convertedCurrencyPosition: string;
   displayStyle: string;
   highlightColor: string;
-  fontColor: string;
   extraSettings: Record<string, unknown>;
 }
 
@@ -45,7 +44,6 @@ const DEFAULT_TARGET_CURRENCY = "EUR";
 const DEFAULT_POSITION = "right";
 const DEFAULT_DISPLAY_STYLE = "brackets";
 const DEFAULT_HIGHLIGHT_COLOR = "#fff1a8";
-const DEFAULT_FONT_COLOR = "#355aa8";
 const HEX_COLOR_PATTERN = /^#[0-9a-f]{6}$/iu;
 const VALID_POSITIONS = new Set(["top", "bottom", "left", "right", "tooltip"]);
 const VALID_DISPLAY_STYLES = new Set([
@@ -130,7 +128,6 @@ export function createDefaultInlineRuntimeSettings(
     convertedCurrencyPosition: overrides.convertedCurrencyPosition ?? DEFAULT_POSITION,
     displayStyle: overrides.displayStyle ?? DEFAULT_DISPLAY_STYLE,
     highlightColor: asHexColor(overrides.highlightColor, DEFAULT_HIGHLIGHT_COLOR),
-    fontColor: asHexColor(overrides.fontColor, DEFAULT_FONT_COLOR),
     extraSettings: {
       ...(overrides.extraSettings ?? {}),
     },
@@ -184,7 +181,6 @@ export function sanitizeInlineRuntimeSettings(
         ? raw.displayStyle
         : fallback.displayStyle,
     highlightColor: asHexColor(raw.highlightColor, fallback.highlightColor),
-    fontColor: asHexColor(raw.fontColor, fallback.fontColor),
     extraSettings: collectExtraSettings(raw),
   };
 }

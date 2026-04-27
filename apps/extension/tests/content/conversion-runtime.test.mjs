@@ -154,7 +154,6 @@ test("initialize hydrates settings/rates, applies runtime state, and starts cont
         convertedCurrencyPosition: "right",
         displayStyle: "brackets",
         highlightColor: "#fff1a8",
-        fontColor: "#355aa8",
       },
     });
   expect(controllerSetRateSnapshotMock).toHaveBeenCalledWith(
