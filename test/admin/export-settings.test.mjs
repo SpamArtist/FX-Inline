@@ -10,7 +10,7 @@ import {
   saveAndExportInlineRuntimeSettingsManifest,
   writeGeneratedManifestFile,
   writeInlineRuntimeSettingsManifestToDb,
-} from "../../scripts/admin/settings-store.mjs";
+} from "../../dist/backend/settings-store.js";
 
 test("admin DB export returns a default manifest on a fresh database", () => {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "fx-inline-admin-"));
@@ -64,7 +64,7 @@ test("admin exporter writes a TypeScript generated manifest", () => {
 
   assert.equal(writtenPath, outputPath);
   assert.match(generated, /GENERATED_INLINE_RUNTIME_SETTINGS_MANIFEST/);
-  assert.match(generated, /"targetCurrencies": \[\n        "EUR"\n      \]/);
+  assert.match(generated, /"targetCurrencies": \[\n {8}"EUR"\n {6}\]/);
 });
 
 test("admin save persists settings and exports the generated manifest", () => {
@@ -91,6 +91,6 @@ test("admin save persists settings and exports the generated manifest", () => {
   assert.equal(result.manifest.scopes.allUrls.convertedCurrencyPosition, "left");
   assert.equal(result.manifest.scopes.allUrls.highlightColor, "#abcdef");
   assert.equal(persisted.scopes.allUrls.displayStyle, "underline");
-  assert.match(generated, /"targetCurrencies": \[\n        "BMD"\n      \]/);
+  assert.match(generated, /"targetCurrencies": \[\n {8}"BMD"\n {6}\]/);
   assert.match(generated, /"convertedCurrencyPosition": "left"/);
 });
