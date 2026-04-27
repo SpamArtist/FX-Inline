@@ -409,21 +409,21 @@ button:disabled {
 }
 
 .style-preview {
-  color: var(--ink);
+  color: var(--preview-font-color, var(--ink));
   font-size: 0.78rem;
   font-weight: 650;
   line-height: 1.2;
 }
 
 .style-preview.pill {
-  border: 1px solid color-mix(in srgb, var(--accent) 36%, var(--line-strong));
+  border: 1px solid color-mix(in srgb, currentColor 36%, var(--line-strong));
   border-radius: 999px;
   padding: 2px 8px;
-  background: #f8fbf7;
+  background: color-mix(in srgb, currentColor 10%, #fff);
 }
 
 .style-preview.underline {
-  border-bottom: 2px solid var(--accent);
+  border-bottom: 2px solid currentColor;
   padding-bottom: 1px;
 }
 
@@ -433,7 +433,30 @@ button:disabled {
   padding: 2px 5px;
 }
 
-.highlight-color-picker {
+.display-style-color-controls {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.color-picker-control {
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  color: var(--muted);
+}
+
+.color-picker-control svg {
+  width: 0.875em;
+  height: 0.875em;
+  flex: 0 0 auto;
+}
+
+.display-color-picker {
   width: 2.6875em;
   height: 1.125em;
   flex: 0 0 2.6875em;
@@ -445,11 +468,11 @@ button:disabled {
   cursor: pointer;
 }
 
-.highlight-color-picker::-webkit-color-swatch-wrapper {
+.display-color-picker::-webkit-color-swatch-wrapper {
   padding: 0;
 }
 
-.highlight-color-picker::-webkit-color-swatch {
+.display-color-picker::-webkit-color-swatch {
   border: 0;
   border-radius: 999px;
 }

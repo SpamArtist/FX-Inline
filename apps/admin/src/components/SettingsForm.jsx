@@ -1,6 +1,8 @@
 import { useMemo } from "react";
+import { Highlighter, Type } from "lucide-react";
 import currencies from "../../../extension/assets/currency.json";
 import {
+  DEFAULT_SETTINGS,
   DISPLAY_STYLE_OPTIONS,
   POSITION_OPTIONS,
   getDisplayStylePreview,
@@ -24,6 +26,8 @@ export default function SettingsForm({
     [],
   );
   const activeTargetCurrency = settings.targetCurrencies[0] ?? "EUR";
+  const activeHighlightColor = settings.highlightColor ?? DEFAULT_SETTINGS.highlightColor;
+  const activeFontColor = settings.fontColor ?? DEFAULT_SETTINGS.fontColor;
   const isTooltip = settings.convertedCurrencyPosition === "tooltip";
 
   function update(patch) {
@@ -109,6 +113,12 @@ export default function SettingsForm({
           <div className="display-style-tabs" role="tablist" aria-label="Display style">
             {DISPLAY_STYLE_OPTIONS.map((style) => {
               const isSelected = settings.displayStyle === style.value;
+              const previewStyle = {
+                "--preview-font-color": activeFontColor,
+                ...(style.value === "highlightColor"
+                  ? { "--preview-highlight-color": activeHighlightColor }
+                  : {}),
+              };
               return (
                 <div
                   key={style.value}
@@ -125,27 +135,49 @@ export default function SettingsForm({
                     <span>{style.label}</span>
                     <span
                       className={`style-preview ${style.value}`}
-                      style={style.value === "highlightColor"
-                        ? { "--preview-highlight-color": settings.highlightColor }
-                        : undefined}
+                      style={previewStyle}
                     >
                       {getDisplayStylePreview(style.value, activeTargetCurrency)}
                     </span>
                   </button>
                   {style.value === "highlightColor" ? (
-                    <input
-                      className="highlight-color-picker"
-                      type="color"
-                      value={settings.highlightColor}
-                      disabled={isTooltip}
-                      aria-label="Highlight color"
-                      onChange={(event) =>
-                        update({
-                          displayStyle: "highlightColor",
-                          highlightColor: event.target.value,
-                        })
-                      }
-                    />
+                    <div
+                      className="display-style-color-controls"
+                      aria-label="Highlight style colors"
+                    >
+                      <label className="color-picker-control">
+                        <Highlighter aria-hidden="true" size={14} strokeWidth={2.2} />
+                        <input
+                          className="display-color-picker highlight-color-picker"
+                          type="color"
+                          value={activeHighlightColor}
+                          disabled={isTooltip}
+                          aria-label="Highlight color"
+                          onChange={(event) =>
+                            update({
+                              displayStyle: "highlightColor",
+                              highlightColor: event.target.value,
+                            })
+                          }
+                        />
+                      </label>
+                      <label className="color-picker-control">
+                        <Type aria-hidden="true" size={14} strokeWidth={2.2} />
+                        <input
+                          className="display-color-picker font-color-picker"
+                          type="color"
+                          value={activeFontColor}
+                          disabled={isTooltip}
+                          aria-label="Font color"
+                          onChange={(event) =>
+                            update({
+                              displayStyle: "highlightColor",
+                              fontColor: event.target.value,
+                            })
+                          }
+                        />
+                      </label>
+                    </div>
                   ) : null}
                 </div>
               );

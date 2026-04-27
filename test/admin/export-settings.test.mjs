@@ -21,6 +21,7 @@ test("admin DB export returns a default manifest on a fresh database", () => {
   assert.equal(manifest.schemaVersion, 1);
   assert.equal(manifest.scopes.allUrls.enabled, true);
   assert.deepEqual(manifest.scopes.allUrls.targetCurrencies, ["EUR"]);
+  assert.equal(manifest.scopes.allUrls.fontColor, "#355aa8");
 });
 
 test("admin DB export persists scoped domain and page settings", () => {
@@ -78,6 +79,7 @@ test("admin save persists settings and exports the generated manifest", () => {
     convertedCurrencyPosition: "left",
     displayStyle: "underline",
     highlightColor: "#abcdef",
+    fontColor: "#123456",
   });
 
   const result = saveAndExportInlineRuntimeSettingsManifest(manifest, {
@@ -90,7 +92,9 @@ test("admin save persists settings and exports the generated manifest", () => {
   assert.equal(result.outputPath, outputPath);
   assert.equal(result.manifest.scopes.allUrls.convertedCurrencyPosition, "left");
   assert.equal(result.manifest.scopes.allUrls.highlightColor, "#abcdef");
+  assert.equal(result.manifest.scopes.allUrls.fontColor, "#123456");
   assert.equal(persisted.scopes.allUrls.displayStyle, "underline");
   assert.match(generated, /"targetCurrencies": \[\n {8}"BMD"\n {6}\]/);
   assert.match(generated, /"convertedCurrencyPosition": "left"/);
+  assert.match(generated, /"fontColor": "#123456"/);
 });

@@ -18,6 +18,7 @@ const DEFAULT_TARGET_CURRENCY = CurrencyCode.EURO;
 const DEFAULT_CONVERTED_CURRENCY_POSITION: InlineConvertedCurrencyPosition = "right";
 const DEFAULT_DISPLAY_STYLE: InlineConvertedCurrencyDisplayStyle = "brackets";
 const DEFAULT_HIGHLIGHT_COLOR = "#fff1a8";
+const DEFAULT_FONT_COLOR = "#355aa8";
 const HEX_COLOR_PATTERN = /^#[0-9a-f]{6}$/iu;
 
 const VALID_CURRENCY_CODES: ReadonlySet<string> = new Set(Object.values(CurrencyCode));
@@ -42,6 +43,7 @@ const KNOWN_SETTING_KEYS: ReadonlySet<string> = new Set([
   "convertedCurrencyPosition",
   "displayStyle",
   "highlightColor",
+  "fontColor",
   "extraSettings",
 ]);
 const LEGACY_IGNORED_SETTING_KEYS: ReadonlySet<string> = new Set([
@@ -85,6 +87,11 @@ export const INLINE_RUNTIME_SETTING_REGISTRY: Record<
   highlightColor: {
     key: "highlightColor",
     label: "Highlight color",
+    runtimeSupported: true,
+  },
+  fontColor: {
+    key: "fontColor",
+    label: "Font color",
     runtimeSupported: true,
   },
 };
@@ -199,6 +206,7 @@ export function createDefaultInlineRuntimeSettings(
       overrides.convertedCurrencyPosition ?? DEFAULT_CONVERTED_CURRENCY_POSITION,
     displayStyle: overrides.displayStyle ?? DEFAULT_DISPLAY_STYLE,
     highlightColor: asHexColor(overrides.highlightColor, DEFAULT_HIGHLIGHT_COLOR),
+    fontColor: asHexColor(overrides.fontColor, DEFAULT_FONT_COLOR),
     extraSettings: {
       ...(overrides.extraSettings ?? {}),
     },
@@ -270,6 +278,7 @@ export function sanitizeInlineRuntimeSettings(
     ),
     displayStyle: asDisplayStyle(raw.displayStyle, fallback.displayStyle),
     highlightColor: asHexColor(raw.highlightColor, fallback.highlightColor),
+    fontColor: asHexColor(raw.fontColor, fallback.fontColor),
     extraSettings: collectExtraSettings(raw),
   };
 }

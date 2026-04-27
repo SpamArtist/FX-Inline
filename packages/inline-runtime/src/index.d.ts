@@ -42,6 +42,7 @@ export type InlineSiteRenderPreferences = {
   convertedCurrencyPosition?: InlineConvertedCurrencyPosition;
   displayStyle?: InlineConvertedCurrencyDisplayStyle;
   highlightColor?: string;
+  fontColor?: string;
 };
 
 export type InlineRenderPreferences = {
