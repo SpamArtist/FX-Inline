@@ -1,4 +1,6 @@
 import type { CurrencyCode } from "../utils/enums";
+import type { UserSettings } from "../utils/appStorage.types";
+import { getPrimaryTargetCurrency } from "../utils/inlineRuntimeSettings";
 import type { RateSnapshot } from "../utils/rates.types";
 
 export type CurrencyReducerHydrationResult = {
@@ -7,7 +9,7 @@ export type CurrencyReducerHydrationResult = {
 };
 
 export type CurrencyReducerHydrationDeps = {
-  readUserSettings?: () => Promise<{ preferredCurrency: CurrencyCode }>;
+  readUserSettings?: () => Promise<UserSettings>;
   readRates?: () => Promise<RateSnapshot>;
 };
 
@@ -31,7 +33,7 @@ export async function loadCurrencyReducerHydration(
     const rateSnapshot = await readRates();
 
     return {
-      preferredCurrency: settings.preferredCurrency,
+      preferredCurrency: getPrimaryTargetCurrency(settings.scopes.allUrls),
       rateSnapshot,
     };
   } catch {

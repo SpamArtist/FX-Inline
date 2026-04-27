@@ -38,6 +38,8 @@ export function convertVisiblePrices(
 
     ensureInlineConversionStyles();
     const localeHint = document.documentElement?.lang || null;
+    const baseCurrency = options?.baseCurrency ?? null;
+    const renderPreferences = options?.clientRenderPreferences?.default ?? null;
     let clearExistingMs = 0;
     let refreshedConversions = 0;
 
@@ -54,6 +56,10 @@ export function convertVisiblePrices(
         rateSnapshot,
         root,
         localeHint,
+        {
+          baseCurrency,
+          renderPreferences,
+        },
       );
       if (capturePerf) {
         clearExistingMs = performance.now() - refreshStartedAt;
@@ -66,6 +72,7 @@ export function convertVisiblePrices(
       root,
       preferredCurrency,
       rateSnapshot,
+      baseCurrency,
       localeHint,
       lightTextCache,
       passId,
@@ -115,6 +122,8 @@ export function convertVisiblePrices(
         lightTextCache,
         passContext,
         passId,
+        baseCurrency,
+        renderPreferences,
       );
     }
     totalConversions += textNodeConversions;
@@ -127,6 +136,8 @@ export function convertVisiblePrices(
       lightTextCache,
       passContext,
       passId,
+      baseCurrency,
+      renderPreferences,
     );
     totalConversions += structuredConversions;
 

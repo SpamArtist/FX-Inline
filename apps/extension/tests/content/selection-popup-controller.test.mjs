@@ -24,6 +24,27 @@ function createRateSnapshot(overrides = {}) {
   };
 }
 
+function createUserSettings(targetCurrency) {
+  return {
+    schemaVersion: 1,
+    generatedAt: "2026-01-01T00:00:00.000Z",
+    scopes: {
+      allUrls: {
+        enabled: true,
+        domain: "",
+        pageUrl: "",
+        targetCurrencies: [targetCurrency],
+        convertedCurrencyPosition: "right",
+        displayStyle: "brackets",
+        highlightColor: "#fff1a8",
+        extraSettings: {},
+      },
+      domains: {},
+      pages: {},
+    },
+  };
+}
+
 async function importSelectionPopupModuleWithMocks() {
   jest.resetModules();
 
@@ -91,7 +112,7 @@ async function waitForPopupContent(controller) {
 beforeEach(() => {
   jest.clearAllMocks();
 
-  getUserSettingsMock.mockResolvedValue({ preferredCurrency: "EUR" });
+  getUserSettingsMock.mockResolvedValue(createUserSettings("EUR"));
   getRatesMock.mockResolvedValue(createRateSnapshot());
 
   document.body.innerHTML = "";
@@ -258,7 +279,7 @@ test("amount edit interactions commit on blur and Enter, and revert on Escape", 
 });
 
 test("hydration updates preferred currency row after popup mount", async () => {
-  getUserSettingsMock.mockResolvedValue({ preferredCurrency: "INR" });
+  getUserSettingsMock.mockResolvedValue(createUserSettings("INR"));
   getRatesMock.mockResolvedValue(
     createRateSnapshot({
       rates: {

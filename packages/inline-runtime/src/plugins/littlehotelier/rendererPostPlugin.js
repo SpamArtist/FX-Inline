@@ -68,20 +68,10 @@ function removeStaleLittleHotelierAddons(root, currentHosts) {
   }
 }
 
-function applyLittleHotelierAddonLayout(wrapper) {
-  wrapper.style.setProperty("display", "block");
-  wrapper.style.setProperty("position", "static");
-  wrapper.style.setProperty("float", "none");
-  wrapper.style.setProperty("width", "100%");
-  wrapper.style.setProperty("box-sizing", "border-box");
-  wrapper.style.setProperty("margin-top", "0.35rem");
-  wrapper.style.setProperty("padding", "0.2rem 0 0");
-  wrapper.style.setProperty("line-height", "1.3");
-}
-
-function setLittleHotelierAddonContent(wrapper, convertedAmount) {
+function setLittleHotelierAddonContent(wrapper, convertedAmount, renderPreferences) {
   setInlineConversionContent(wrapper, convertedAmount, {
     originalText: "",
+    renderPreferences,
   });
 
   const prefixNode = wrapper.firstChild;
@@ -112,6 +102,8 @@ export const littleHotelierPricingRendererPostPlugin = {
     rateSnapshot,
     localeHint,
     lightTextCache,
+    baseCurrency,
+    clientRenderPreferences,
     passContext,
   }) {
     const candidates = getCandidateRoots({
@@ -164,6 +156,7 @@ export const littleHotelierPricingRendererPostPlugin = {
         preferredCurrency,
         rateSnapshot,
         localeHint,
+        baseCurrency,
       );
       if (!convertedAmount) {
         existingAddon?.remove();
@@ -184,8 +177,11 @@ export const littleHotelierPricingRendererPostPlugin = {
         wrapper,
         usesLightTextColorForElement(hostNode, lightTextCache),
       );
-      setLittleHotelierAddonContent(wrapper, convertedAmount);
-      applyLittleHotelierAddonLayout(wrapper);
+      setLittleHotelierAddonContent(
+        wrapper,
+        convertedAmount,
+        clientRenderPreferences?.default ?? null,
+      );
 
       if (!existingAddon) {
         hostNode.appendChild(wrapper);
@@ -195,7 +191,7 @@ export const littleHotelierPricingRendererPostPlugin = {
 
       if (
         previousOriginal !== rawPrice ||
-        previousConverted !== `(${convertedAmount})`
+        !previousConverted?.includes(convertedAmount)
       ) {
         conversionsApplied += 1;
       }

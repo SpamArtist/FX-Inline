@@ -17,6 +17,7 @@ const controllerDestroyMock = jest.fn();
 const controllerSetPreferredCurrencyMock = jest.fn();
 const controllerSetRateSnapshotMock = jest.fn();
 const controllerSetEnabledMock = jest.fn();
+const controllerSetClientRenderPreferencesMock = jest.fn();
 const controllerEnqueueMutationRootsMock = jest.fn();
 const controllerShouldIgnoreMutationsMock = jest.fn();
 const controllerRefreshMock = jest.fn();
@@ -42,12 +43,37 @@ function createRateSnapshot(overrides = {}) {
   };
 }
 
+function createUserSettings(overrides = {}) {
+  const allUrls = {
+    enabled: true,
+    domain: "",
+    pageUrl: "",
+    targetCurrencies: ["EUR"],
+    convertedCurrencyPosition: "right",
+    displayStyle: "brackets",
+    highlightColor: "#fff1a8",
+    extraSettings: {},
+    ...(overrides.allUrls || {}),
+  };
+
+  return {
+    schemaVersion: 1,
+    generatedAt: "2026-01-01T00:00:00.000Z",
+    scopes: {
+      allUrls,
+      domains: overrides.domains || {},
+      pages: overrides.pages || {},
+    },
+  };
+}
+
 function resetControllerMocks() {
   controllerStartMock.mockReset();
   controllerDestroyMock.mockReset();
   controllerSetPreferredCurrencyMock.mockReset();
   controllerSetRateSnapshotMock.mockReset();
   controllerSetEnabledMock.mockReset();
+  controllerSetClientRenderPreferencesMock.mockReset();
   controllerEnqueueMutationRootsMock.mockReset();
   controllerShouldIgnoreMutationsMock.mockReset();
   controllerRefreshMock.mockReset();
@@ -60,19 +86,6 @@ async function importRuntimeModuleWithMocks() {
 
   await jest.unstable_mockModule("@/utils/appStorage", () => ({
     getUserSettings: getUserSettingsMock,
-    getOriginFromUrl: (url) => {
-      try {
-        const parsed = new URL(url);
-        return parsed.origin;
-      } catch {
-        return null;
-      }
-    },
-    isAutoConversionEnabledForOrigin: (settings, origin) => {
-      if (settings?.globalAutoConversionEnabled === false) return false;
-      if (!origin) return true;
-      return settings?.localAutoConversionByOrigin?.[origin] !== false;
-    },
   }));
 
   await jest.unstable_mockModule("@/utils/rates/index", () => ({
@@ -95,11 +108,7 @@ beforeEach(() => {
   jest.clearAllMocks();
   resetControllerMocks();
 
-  getUserSettingsMock.mockResolvedValue({
-    preferredCurrency: "EUR",
-    globalAutoConversionEnabled: true,
-    localAutoConversionByOrigin: {},
-  });
+  getUserSettingsMock.mockResolvedValue(createUserSettings());
 
   getRatesMock.mockResolvedValue(createRateSnapshot());
 
@@ -110,6 +119,7 @@ beforeEach(() => {
     setPreferredCurrency: controllerSetPreferredCurrencyMock,
     setRateSnapshot: controllerSetRateSnapshotMock,
     setEnabled: controllerSetEnabledMock,
+    setClientRenderPreferences: controllerSetClientRenderPreferencesMock,
     destroy: controllerDestroyMock,
     enqueueMutationRoots: controllerEnqueueMutationRootsMock,
     shouldIgnoreMutations: controllerShouldIgnoreMutationsMock,
@@ -139,6 +149,13 @@ test("initialize hydrates settings/rates, applies runtime state, and starts cont
   expect(getRatesMock).toHaveBeenCalledWith({ forceRefresh: false });
 
   expect(controllerSetPreferredCurrencyMock).toHaveBeenCalledWith("EUR");
+  expect(controllerSetClientRenderPreferencesMock).toHaveBeenCalledWith({
+      default: {
+        convertedCurrencyPosition: "right",
+        displayStyle: "brackets",
+        highlightColor: "#fff1a8",
+      },
+    });
   expect(controllerSetRateSnapshotMock).toHaveBeenCalledWith(
     expect.objectContaining({ base: "USD" }),
   );
@@ -220,8 +237,8 @@ test("settings updates debounce a fresh settings/rates hydration", async () => {
   controllerSetEnabledMock.mockClear();
 
   await runtime.onSettingsStorageUpdate(
-    { preferredCurrency: "INR" },
-    { preferredCurrency: "EUR" },
+    createUserSettings({ allUrls: { targetCurrencies: ["INR"] } }),
+    createUserSettings({ allUrls: { targetCurrencies: ["EUR"] } }),
   );
 
   jest.advanceTimersByTime(1399);
@@ -245,11 +262,9 @@ test("settings updates debounce a fresh settings/rates hydration", async () => {
 });
 
 test("initialize reflects disabled auto-conversion in runtime state", async () => {
-  getUserSettingsMock.mockResolvedValue({
-    preferredCurrency: "EUR",
-    globalAutoConversionEnabled: false,
-    localAutoConversionByOrigin: {},
-  });
+  getUserSettingsMock.mockResolvedValue(
+    createUserSettings({ allUrls: { enabled: false } }),
+  );
 
   const { createContentConversionRuntime } = await importRuntimeModuleWithMocks();
   const runtime = createContentConversionRuntime();

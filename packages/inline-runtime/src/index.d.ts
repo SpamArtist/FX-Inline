@@ -19,6 +19,19 @@ export type InlineConversionPerfSample = {
   reachedNodeLimit: boolean;
 };
 
+export type InlineConvertedCurrencyPosition =
+  | "top"
+  | "bottom"
+  | "left"
+  | "right"
+  | "tooltip";
+
+export type InlineConvertedCurrencyDisplayStyle =
+  | "pill"
+  | "underline"
+  | "highlightColor"
+  | "brackets";
+
 export type InlineSiteRenderPreferences = {
   wrapperClassName?: string;
   convertedAmountClassName?: string;
@@ -26,6 +39,9 @@ export type InlineSiteRenderPreferences = {
   convertedPrefix?: string;
   convertedSuffix?: string;
   colorStrategy?: "auto" | "inherit";
+  convertedCurrencyPosition?: InlineConvertedCurrencyPosition;
+  displayStyle?: InlineConvertedCurrencyDisplayStyle;
+  highlightColor?: string;
 };
 
 export type InlineRenderPreferences = {
@@ -45,6 +61,7 @@ export type InlinePassContext = {
 
 export type InlineConversionPluginContext = {
   root: ParentNode;
+  baseCurrency?: CurrencyCodeLike | null;
   preferredCurrency: CurrencyCodeLike;
   rateSnapshot: RateSnapshotLike;
   localeHint: string | null;
@@ -99,6 +116,7 @@ export type ConvertVisiblePricesOptions = {
   postPlugins?: InlineConversionPostPlugin[];
   includeDefaultPostPlugins?: boolean;
   clientRenderPreferences?: InlineRenderPreferences | null;
+  baseCurrency?: CurrencyCodeLike | null;
   onPluginError?: (error: unknown, plugin: InlineConversionPlugin) => void;
 };
 
@@ -109,6 +127,7 @@ export type InlineRuntimeRefreshOptions = {
 
 export type InlineRuntimeOptions = {
   root?: ParentNode;
+  baseCurrency?: CurrencyCodeLike | null;
   preferredCurrency?: CurrencyCodeLike | null;
   rateSnapshot?: RateSnapshotLike | null;
   enabled?: boolean;
@@ -130,6 +149,7 @@ export type InlineRuntimeController = {
   start: () => void;
   stop: () => void;
   refresh: (options?: InlineRuntimeRefreshOptions) => void;
+  setBaseCurrency: (currency: CurrencyCodeLike | null) => void;
   setPreferredCurrency: (currency: CurrencyCodeLike | null) => void;
   setRateSnapshot: (snapshot: RateSnapshotLike | null) => void;
   setEnabled: (enabled: boolean) => void;

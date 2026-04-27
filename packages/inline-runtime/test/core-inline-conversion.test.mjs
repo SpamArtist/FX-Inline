@@ -34,7 +34,11 @@ function createRateSnapshot(overrides = {}) {
   };
 }
 
-function convertLittleHotelierPricing(preferredCurrency, rateSnapshot) {
+function convertLittleHotelierPricing(
+  preferredCurrency,
+  rateSnapshot,
+  clientRenderPreferences = null,
+) {
   return convertVisiblePrices(preferredCurrency, rateSnapshot, document.body, {
     clearExisting: false,
     refreshExisting: true,
@@ -42,6 +46,7 @@ function convertLittleHotelierPricing(preferredCurrency, rateSnapshot) {
     includeDefaultPostPlugins: false,
     prePlugins: [littleHotelierPricingDetectorPrePlugin],
     postPlugins: [littleHotelierPricingRendererPostPlugin],
+    clientRenderPreferences,
   });
 }
 
@@ -83,7 +88,7 @@ function setLittleHotelierPricingTable() {
 function getLittleHotelierAddons() {
   return Array.from(
     document.querySelectorAll(
-      'span.ccx-inline-conversion[data-ccx-site="littlehotelier-pricing"]',
+      'span.fx-inline-conversion[data-ccx-site="littlehotelier-pricing"]',
     ),
   );
 }
@@ -123,6 +128,47 @@ test("injects style tag with converted amount line-height and width contract", (
   expect(styleTag).not.toBeNull();
   expect(styleTag.textContent).toContain("line-height: inherit !important;");
   expect(styleTag.textContent).toContain("width: fit-content !important;");
+});
+
+test("applies configured converted currency position and display style", () => {
+  const cases = [
+    { position: "top", style: "pill" },
+    { position: "bottom", style: "underline" },
+    { position: "left", style: "highlightColor" },
+    { position: "right", style: "brackets" },
+    { position: "tooltip", style: "pill" },
+  ];
+
+  for (const { position, style } of cases) {
+    document.body.innerHTML = '<p id="price">Pay $100 now.</p>';
+
+    const applied = convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
+      clearExisting: false,
+      clientRenderPreferences: {
+        default: {
+          convertedCurrencyPosition: position,
+          displayStyle: style,
+          highlightColor: "#abcdef",
+        },
+      },
+    });
+
+    expect(applied).toBe(1);
+
+    const wrapper = document.querySelector(`#price span.${INLINE_CONVERSION_CLASS}`);
+    expect(wrapper.getAttribute("data-fx-inline-position")).toBe(position);
+
+    if (position === "tooltip") {
+      expect(wrapper.getAttribute("data-fx-inline-display-style")).toBeNull();
+      expect(wrapper.getAttribute("data-fx-inline-tooltip")).toBeTruthy();
+      expect(wrapper.getAttribute("title")).toBe(wrapper.getAttribute("data-fx-inline-tooltip"));
+    } else {
+      expect(wrapper.getAttribute("data-fx-inline-display-style")).toBe(style);
+      if (style === "highlightColor") {
+        expect(wrapper.style.getPropertyValue("--fx-inline-highlight-color")).toBe("#abcdef");
+      }
+    }
+  }
 });
 
 test("refreshes existing wrappers in place and clears when target currency matches source", () => {
@@ -488,7 +534,7 @@ test("amazon renderer ignores stale candidates from pre detection", () => {
   ).toBeNull();
 });
 
-test("little hotelier pricing renderer places conversions below original prices", () => {
+test("little hotelier pricing renderer uses default render preferences", () => {
   setLittleHotelierPricingTable();
 
   const applied = convertLittleHotelierPricing("EUR", createRateSnapshot());
@@ -500,19 +546,39 @@ test("little hotelier pricing renderer places conversions below original prices"
 
   const proOutput = document.querySelector("#littleHotelierPro .output.lh-pro");
   expect(proOutput.textContent).toBe("$179");
-  expect(proOutput.querySelector(".ccx-inline-conversion")).toBeNull();
+  expect(proOutput.querySelector(".fx-inline-conversion")).toBeNull();
 
   const proParagraph = document.querySelector("#littleHotelierPro p");
   const proAddon = proParagraph.lastElementChild;
   expect(proAddon).toBe(addons[0]);
   expect(proAddon.getAttribute("data-original")).toBe("$179 USD");
+  expect(proAddon.getAttribute("data-fx-inline-position")).toBe("right");
+  expect(proAddon.getAttribute("data-fx-inline-display-style")).toBe("brackets");
   expect(proAddon.textContent).toMatch(/^≈ \(.+\)$/u);
   expect(proAddon.textContent).not.toContain("$179");
-  expect(proAddon.style.display).toBe("block");
-  expect(proAddon.style.position).toBe("static");
-  expect(proAddon.style.float).toBe("none");
-  expect(proAddon.style.marginTop).toBe("0.35rem");
-  expect(proAddon.style.padding).toBe("0.2rem 0px 0px");
+  expect(proAddon.style.display).toBe("");
+  expect(proAddon.style.position).toBe("");
+  expect(proAddon.style.float).toBe("");
+  expect(proAddon.style.marginTop).toBe("");
+  expect(proAddon.style.padding).toBe("");
+});
+
+test("little hotelier pricing renderer applies admin render preferences", () => {
+  setLittleHotelierPricingTable();
+
+  const applied = convertLittleHotelierPricing("EUR", createRateSnapshot(), {
+    default: {
+      convertedCurrencyPosition: "bottom",
+      displayStyle: "underline",
+    },
+  });
+
+  expect(applied).toBe(2);
+
+  const [proAddon] = getLittleHotelierAddons();
+  expect(proAddon.getAttribute("data-fx-inline-position")).toBe("bottom");
+  expect(proAddon.getAttribute("data-fx-inline-display-style")).toBe("underline");
+  expect(proAddon.textContent).toMatch(/^≈ [^(].+/u);
 });
 
 test("little hotelier pricing renderer refreshes addon nodes in place", () => {
@@ -521,7 +587,7 @@ test("little hotelier pricing renderer refreshes addon nodes in place", () => {
   convertLittleHotelierPricing("EUR", createRateSnapshot());
 
   const initialAddon = getLittleHotelierAddons()[0];
-  const initialConvertedNode = initialAddon.querySelector(".ccx-converted-amount");
+  const initialConvertedNode = initialAddon.querySelector(".fx-inline-converted-amount");
   const initialConvertedText = initialConvertedNode.textContent;
 
   convertLittleHotelierPricing(
@@ -535,7 +601,7 @@ test("little hotelier pricing renderer refreshes addon nodes in place", () => {
 
   const refreshedAddon = getLittleHotelierAddons()[0];
   const refreshedConvertedNode = refreshedAddon.querySelector(
-    ".ccx-converted-amount",
+    ".fx-inline-converted-amount",
   );
 
   expect(getLittleHotelierAddons()).toHaveLength(2);

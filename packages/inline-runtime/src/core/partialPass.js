@@ -38,6 +38,7 @@ export function runPartialConversionPass(
       postPlugins: options.postPlugins,
       includeDefaultPostPlugins: options.includeDefaultPostPlugins,
       clientRenderPreferences: options.clientRenderPreferences,
+      baseCurrency: options.baseCurrency,
       onPluginError: options.onPluginError,
     });
   }

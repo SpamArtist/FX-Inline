@@ -1,9 +1,11 @@
 import type { UserSettings } from "@/utils/appStorage.types";
 import type { RateSnapshot } from "@/utils/rates.types";
+import { getUserSettings } from "@/utils/appStorage";
 import {
-  getOriginFromUrl,
-  isAutoConversionEnabledForOrigin,
-} from "@/utils/appStorage";
+  getPrimaryTargetCurrency,
+  resolveInlineRuntimeSettingsForUrl,
+} from "@/utils/inlineRuntimeSettings";
+import type { ResolvedInlineRuntimeSettings } from "@/utils/inlineRuntimeSettings.types";
 import type { ContentConversionRuntime } from "./content.types";
 import {
   HYDRATION_RETRY_MS,
@@ -35,15 +37,15 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
     roundMs,
     logSettingsStorageUpdate,
   } = createRuntimePerfContext("fx-inline");
-  const currentPageOrigin = getOriginFromUrl(window.location.href);
-
   let settings: UserSettings | null = null;
+  let resolvedSettings: ResolvedInlineRuntimeSettings | null = null;
   let rateSnapshot: RateSnapshot | null = null;
 
   let hydrationRetryTimer: number | null = null;
   let settingsRefreshTimer: number | null = null;
   let isHydratingRates = false;
   let isCleanedUp = false;
+  const loggedUnsupportedSettingKeys = new Set<string>();
   const sitePluginOptions = getContentRuntimeSitePluginOptions(
     window.location.href,
   );
@@ -75,15 +77,11 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
 
   function setSettings(next: UserSettings) {
     settings = next;
+    resolvedSettings = resolveInlineRuntimeSettingsForUrl(next, window.location.href);
   }
 
   function setRateSnapshot(next: RateSnapshot) {
     rateSnapshot = next;
-  }
-
-  function isAutoConversionEnabledForCurrentPage(next: UserSettings | null): boolean {
-    if (!next) return false;
-    return isAutoConversionEnabledForOrigin(next, currentPageOrigin);
   }
 
   function getIsHydratingRates() {
@@ -95,16 +93,36 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
   }
 
   function applyInlineRuntimeState() {
-    if (!settings) {
+    if (!settings || !resolvedSettings) {
       inlineRuntime.setEnabled(false);
       return;
     }
 
-    inlineRuntime.setPreferredCurrency(settings.preferredCurrency);
-    inlineRuntime.setEnabled(isAutoConversionEnabledForCurrentPage(settings));
+    logUnsupportedRuntimeSettings(resolvedSettings);
+
+    const pageSettings = resolvedSettings.settings;
+    inlineRuntime.setPreferredCurrency(getPrimaryTargetCurrency(pageSettings));
+    inlineRuntime.setClientRenderPreferences({
+      default: {
+        convertedCurrencyPosition: pageSettings.convertedCurrencyPosition,
+        displayStyle: pageSettings.displayStyle,
+        highlightColor: pageSettings.highlightColor,
+      },
+    });
+    inlineRuntime.setEnabled(pageSettings.enabled);
 
     if (rateSnapshot) {
       inlineRuntime.setRateSnapshot(rateSnapshot);
+    }
+  }
+
+  function logUnsupportedRuntimeSettings(next: ResolvedInlineRuntimeSettings) {
+    for (const settingKey of next.unsupportedSettingKeys) {
+      if (loggedUnsupportedSettingKeys.has(settingKey)) continue;
+      loggedUnsupportedSettingKeys.add(settingKey);
+      console.error(
+        `[fx-inline] Inline runtime setting "${settingKey}" is not implemented; skipping it for ${next.scopeType}:${next.scopeId}.`,
+      );
     }
   }
 
@@ -193,44 +211,42 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
     if (isCleanedUp) return;
     const startedAt = performance.now();
 
-    const didPreferredCurrencyChange =
-      newSettings?.preferredCurrency !== oldSettings?.preferredCurrency;
-    const didGlobalAutoConversionChange =
-      newSettings?.globalAutoConversionEnabled !== oldSettings?.globalAutoConversionEnabled;
+    const nextSettings = isUserSettingsSnapshot(newSettings)
+      ? newSettings
+      : await getUserSettings();
+    const previousResolved = oldSettings
+      ? resolveInlineRuntimeSettingsForUrl(oldSettings, window.location.href)
+      : null;
+    const nextResolved = resolveInlineRuntimeSettingsForUrl(
+      nextSettings,
+      window.location.href,
+    );
+    const didResolvedSettingsChange =
+      JSON.stringify(previousResolved?.settings ?? null) !==
+      JSON.stringify(nextResolved.settings);
 
-    const oldLocalAutoConversion =
-      oldSettings?.localAutoConversionByOrigin?.[currentPageOrigin ?? ""];
-    const newLocalAutoConversion =
-      newSettings?.localAutoConversionByOrigin?.[currentPageOrigin ?? ""];
-    const didLocalAutoConversionChange =
-      oldLocalAutoConversion !== newLocalAutoConversion;
-
-    if (
-      didPreferredCurrencyChange ||
-      didGlobalAutoConversionChange ||
-      didLocalAutoConversionChange
-    ) {
+    if (didResolvedSettingsChange) {
       logSettingsStorageUpdate(startedAt, {
         refreshed: true,
         missingRateSnapshot: rateSnapshot === null,
-        preferredCurrencyChanged: didPreferredCurrencyChange,
+        preferredCurrencyChanged:
+          getPrimaryTargetCurrency(previousResolved?.settings ?? nextResolved.settings) !==
+          getPrimaryTargetCurrency(nextResolved.settings),
       });
+      settings = nextSettings;
+      resolvedSettings = nextResolved;
       scheduleSettingsRefresh();
       return;
     }
 
-    if (isUserSettingsSnapshot(newSettings)) {
-      settings = {
-        ...settings,
-        ...newSettings,
-      } as UserSettings;
-      applyInlineRuntimeState();
-    }
+    settings = nextSettings;
+    resolvedSettings = nextResolved;
+    applyInlineRuntimeState();
 
     logSettingsStorageUpdate(startedAt, {
       refreshed: false,
       missingRateSnapshot: rateSnapshot === null,
-      preferredCurrencyChanged: didPreferredCurrencyChange,
+      preferredCurrencyChanged: false,
     });
   }
 

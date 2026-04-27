@@ -1,4 +1,5 @@
 import { getUserSettings } from "@/utils/appStorage";
+import { getPrimaryTargetCurrency } from "@/utils/inlineRuntimeSettings";
 import { getRates } from "@/utils/rates/index";
 import type { RateSnapshot } from "@/utils/rates.types";
 import type { PerfPayload } from "../perfLogger.types";
@@ -31,7 +32,7 @@ export async function refreshSettingsAndRates({
   if (perfLoggingEnabled) {
     logPerf("refreshSettingsAndRates", {
       forceRefresh,
-      preferredCurrency: settings.preferredCurrency,
+      preferredCurrency: getPrimaryTargetCurrency(settings.scopes.allUrls),
       rateSource: rateSnapshot.source ?? "unavailable",
       durationMs: roundMs(performance.now() - startedAt),
     });
