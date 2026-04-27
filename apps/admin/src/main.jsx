@@ -240,6 +240,18 @@ function SettingsForm({
           </select>
         </label>
 
+        <div className="target-currency-field" aria-label="Target currency">
+          <div className="subheading">
+            <span>Target currency</span>
+            <strong>{activeTargetCurrency} active</strong>
+          </div>
+          <CurrencySearchDropdown
+            value={activeTargetCurrency}
+            options={currencyOptions}
+            onChange={chooseTarget}
+          />
+        </div>
+
         <div className="display-style-field">
           <span className="field-label">Display style</span>
           <div className="display-style-tabs" role="tablist" aria-label="Display style">
@@ -288,18 +300,6 @@ function SettingsForm({
             })}
           </div>
         </div>
-      </div>
-
-      <div className="target-currency-field" aria-label="Target currency">
-        <div className="subheading">
-          <span>Target currency</span>
-          <strong>{activeTargetCurrency} is active</strong>
-        </div>
-        <CurrencySearchDropdown
-          value={activeTargetCurrency}
-          options={currencyOptions}
-          onChange={chooseTarget}
-        />
       </div>
     </section>
   );
