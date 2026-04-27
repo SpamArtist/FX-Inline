@@ -7,12 +7,14 @@ import { getConvertedAmountText } from "./amountFormatting.js";
 
 const DEFAULT_CONVERTED_CURRENCY_POSITION = "right";
 const DEFAULT_DISPLAY_STYLE = "brackets";
+const DEFAULT_HIGHLIGHT_COLOR = "#fff1a8";
 
 function getRenderPreferences(preferences) {
   return {
     convertedCurrencyPosition:
       preferences?.convertedCurrencyPosition ?? DEFAULT_CONVERTED_CURRENCY_POSITION,
     displayStyle: preferences?.displayStyle ?? DEFAULT_DISPLAY_STYLE,
+    highlightColor: preferences?.highlightColor ?? DEFAULT_HIGHLIGHT_COLOR,
   };
 }
 
@@ -110,6 +112,11 @@ export function setInlineConversionContent(
   }
 
   wrapper.setAttribute("data-fx-inline-display-style", renderPreferences.displayStyle);
+  if (renderPreferences.displayStyle === "highlightColor") {
+    wrapper.style.setProperty("--fx-inline-highlight-color", renderPreferences.highlightColor);
+  } else {
+    wrapper.style.removeProperty("--fx-inline-highlight-color");
+  }
   convertedValueNode.textContent = convertedText;
 
   if (position === "left" || position === "top") {

@@ -12,6 +12,8 @@ const DEFAULT_GENERATED_AT = "1970-01-01T00:00:00.000Z";
 const DEFAULT_TARGET_CURRENCY = "EUR";
 const DEFAULT_POSITION = "right";
 const DEFAULT_DISPLAY_STYLE = "brackets";
+const DEFAULT_HIGHLIGHT_COLOR = "#fff1a8";
+const HEX_COLOR_PATTERN = /^#[0-9a-f]{6}$/iu;
 const VALID_POSITIONS = new Set(["top", "bottom", "left", "right", "tooltip"]);
 const VALID_DISPLAY_STYLES = new Set([
   "pill",
@@ -47,6 +49,12 @@ function asTargetCurrencies(value, fallback) {
   }
 
   return [fallbackTarget];
+}
+
+function asHexColor(value, fallback) {
+  return typeof value === "string" && HEX_COLOR_PATTERN.test(value)
+    ? value.toLowerCase()
+    : fallback;
 }
 
 export function normalizeDomainScope(value) {
@@ -86,6 +94,7 @@ export function createDefaultInlineRuntimeSettings(overrides = {}) {
     ),
     convertedCurrencyPosition: overrides.convertedCurrencyPosition ?? DEFAULT_POSITION,
     displayStyle: overrides.displayStyle ?? DEFAULT_DISPLAY_STYLE,
+    highlightColor: asHexColor(overrides.highlightColor, DEFAULT_HIGHLIGHT_COLOR),
     extraSettings: {
       ...(overrides.extraSettings ?? {}),
     },
@@ -135,6 +144,7 @@ export function sanitizeInlineRuntimeSettings(value, fallback = createDefaultInl
       typeof raw.displayStyle === "string" && VALID_DISPLAY_STYLES.has(raw.displayStyle)
         ? raw.displayStyle
         : fallback.displayStyle,
+    highlightColor: asHexColor(raw.highlightColor, fallback.highlightColor),
     extraSettings: collectExtraSettings(raw),
   };
 }

@@ -148,6 +148,7 @@ test("applies configured converted currency position and display style", () => {
         default: {
           convertedCurrencyPosition: position,
           displayStyle: style,
+          highlightColor: "#abcdef",
         },
       },
     });
@@ -163,6 +164,9 @@ test("applies configured converted currency position and display style", () => {
       expect(wrapper.getAttribute("title")).toBe(wrapper.getAttribute("data-fx-inline-tooltip"));
     } else {
       expect(wrapper.getAttribute("data-fx-inline-display-style")).toBe(style);
+      if (style === "highlightColor") {
+        expect(wrapper.style.getPropertyValue("--fx-inline-highlight-color")).toBe("#abcdef");
+      }
     }
   }
 });

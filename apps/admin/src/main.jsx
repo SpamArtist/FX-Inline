@@ -10,6 +10,7 @@ const DEFAULT_SETTINGS = {
   targetCurrencies: ["EUR"],
   convertedCurrencyPosition: "right",
   displayStyle: "brackets",
+  highlightColor: "#fff1a8",
   extraSettings: {},
 };
 
@@ -27,7 +28,7 @@ const POSITION_OPTIONS = ["top", "bottom", "left", "right", "tooltip"];
 const DISPLAY_STYLE_OPTIONS = [
   { value: "pill", label: "Pill", preview: "EUR 90" },
   { value: "underline", label: "Underline", preview: "EUR 90" },
-  { value: "highlightColor", label: "Highlight color", preview: "EUR 90" },
+  { value: "highlightColor", label: "Highlight", preview: "EUR 90" },
   { value: "brackets", label: "Brackets", preview: "(EUR 90)" },
 ];
 
@@ -162,24 +163,49 @@ function SettingsForm({
         <div className="display-style-field">
           <span className="field-label">Display style</span>
           <div className="display-style-tabs" role="tablist" aria-label="Display style">
-            {DISPLAY_STYLE_OPTIONS.map((style) => (
-              <button
-                key={style.value}
-                type="button"
-                role="tab"
-                aria-selected={settings.displayStyle === style.value}
-                className={
-                  settings.displayStyle === style.value
-                    ? "display-style-tab selected"
-                    : "display-style-tab"
-                }
-                disabled={isTooltip}
-                onClick={() => update({ displayStyle: style.value })}
-              >
-                <span>{style.label}</span>
-                <span className={`style-preview ${style.value}`}>{style.preview}</span>
-              </button>
-            ))}
+            {DISPLAY_STYLE_OPTIONS.map((style) => {
+              const isSelected = settings.displayStyle === style.value;
+              return (
+                <div
+                  key={style.value}
+                  className={isSelected ? "display-style-tab selected" : "display-style-tab"}
+                >
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={isSelected}
+                    className="display-style-tab-button"
+                    disabled={isTooltip}
+                    onClick={() => update({ displayStyle: style.value })}
+                  >
+                    <span>{style.label}</span>
+                    <span
+                      className={`style-preview ${style.value}`}
+                      style={style.value === "highlightColor"
+                        ? { "--preview-highlight-color": settings.highlightColor }
+                        : undefined}
+                    >
+                      {style.preview}
+                    </span>
+                  </button>
+                  {style.value === "highlightColor" ? (
+                    <input
+                      className="highlight-color-picker"
+                      type="color"
+                      value={settings.highlightColor}
+                      disabled={isTooltip}
+                      aria-label="Highlight color"
+                      onChange={(event) =>
+                        update({
+                          displayStyle: "highlightColor",
+                          highlightColor: event.target.value,
+                        })
+                      }
+                    />
+                  ) : null}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

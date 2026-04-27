@@ -17,6 +17,8 @@ const DEFAULT_GENERATED_AT = "1970-01-01T00:00:00.000Z";
 const DEFAULT_TARGET_CURRENCY = CurrencyCode.EURO;
 const DEFAULT_CONVERTED_CURRENCY_POSITION: InlineConvertedCurrencyPosition = "right";
 const DEFAULT_DISPLAY_STYLE: InlineConvertedCurrencyDisplayStyle = "brackets";
+const DEFAULT_HIGHLIGHT_COLOR = "#fff1a8";
+const HEX_COLOR_PATTERN = /^#[0-9a-f]{6}$/iu;
 
 const VALID_CURRENCY_CODES: ReadonlySet<string> = new Set(Object.values(CurrencyCode));
 const VALID_POSITIONS: ReadonlySet<string> = new Set([
@@ -39,6 +41,7 @@ const KNOWN_SETTING_KEYS: ReadonlySet<string> = new Set([
   "targetCurrencies",
   "convertedCurrencyPosition",
   "displayStyle",
+  "highlightColor",
   "extraSettings",
 ]);
 const LEGACY_IGNORED_SETTING_KEYS: ReadonlySet<string> = new Set([
@@ -77,6 +80,11 @@ export const INLINE_RUNTIME_SETTING_REGISTRY: Record<
   displayStyle: {
     key: "displayStyle",
     label: "Display style",
+    runtimeSupported: true,
+  },
+  highlightColor: {
+    key: "highlightColor",
+    label: "Highlight color",
     runtimeSupported: true,
   },
 };
@@ -136,6 +144,12 @@ function asDisplayStyle(
     : fallback;
 }
 
+function asHexColor(value: unknown, fallback: string): string {
+  return typeof value === "string" && HEX_COLOR_PATTERN.test(value)
+    ? value.toLowerCase()
+    : fallback;
+}
+
 export function normalizeDomainScope(value: string | null | undefined): string | null {
   const trimmed = value?.trim();
   if (!trimmed) return null;
@@ -184,6 +198,7 @@ export function createDefaultInlineRuntimeSettings(
     convertedCurrencyPosition:
       overrides.convertedCurrencyPosition ?? DEFAULT_CONVERTED_CURRENCY_POSITION,
     displayStyle: overrides.displayStyle ?? DEFAULT_DISPLAY_STYLE,
+    highlightColor: asHexColor(overrides.highlightColor, DEFAULT_HIGHLIGHT_COLOR),
     extraSettings: {
       ...(overrides.extraSettings ?? {}),
     },
@@ -254,6 +269,7 @@ export function sanitizeInlineRuntimeSettings(
       fallback.convertedCurrencyPosition,
     ),
     displayStyle: asDisplayStyle(raw.displayStyle, fallback.displayStyle),
+    highlightColor: asHexColor(raw.highlightColor, fallback.highlightColor),
     extraSettings: collectExtraSettings(raw),
   };
 }

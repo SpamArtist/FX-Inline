@@ -106,6 +106,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
       default: {
         convertedCurrencyPosition: pageSettings.convertedCurrencyPosition,
         displayStyle: pageSettings.displayStyle,
+        highlightColor: pageSettings.highlightColor,
       },
     });
     inlineRuntime.setEnabled(pageSettings.enabled);

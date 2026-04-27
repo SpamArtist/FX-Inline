@@ -41,6 +41,7 @@ export type InlineSiteRenderPreferences = {
   colorStrategy?: "auto" | "inherit";
   convertedCurrencyPosition?: InlineConvertedCurrencyPosition;
   displayStyle?: InlineConvertedCurrencyDisplayStyle;
+  highlightColor?: string;
 };
 
 export type InlineRenderPreferences = {

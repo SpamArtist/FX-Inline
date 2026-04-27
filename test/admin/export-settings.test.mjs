@@ -77,6 +77,7 @@ test("admin save persists settings and exports the generated manifest", () => {
     targetCurrencies: ["BMD"],
     convertedCurrencyPosition: "left",
     displayStyle: "underline",
+    highlightColor: "#abcdef",
   });
 
   const result = saveAndExportInlineRuntimeSettingsManifest(manifest, {
@@ -88,6 +89,7 @@ test("admin save persists settings and exports the generated manifest", () => {
 
   assert.equal(result.outputPath, outputPath);
   assert.equal(result.manifest.scopes.allUrls.convertedCurrencyPosition, "left");
+  assert.equal(result.manifest.scopes.allUrls.highlightColor, "#abcdef");
   assert.equal(persisted.scopes.allUrls.displayStyle, "underline");
   assert.match(generated, /"targetCurrencies": \[\n        "BMD"\n      \]/);
   assert.match(generated, /"convertedCurrencyPosition": "left"/);

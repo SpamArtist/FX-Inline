@@ -51,6 +51,7 @@ function createUserSettings(overrides = {}) {
     targetCurrencies: ["EUR"],
     convertedCurrencyPosition: "right",
     displayStyle: "brackets",
+    highlightColor: "#fff1a8",
     extraSettings: {},
     ...(overrides.allUrls || {}),
   };
@@ -149,11 +150,12 @@ test("initialize hydrates settings/rates, applies runtime state, and starts cont
 
   expect(controllerSetPreferredCurrencyMock).toHaveBeenCalledWith("EUR");
   expect(controllerSetClientRenderPreferencesMock).toHaveBeenCalledWith({
-    default: {
-      convertedCurrencyPosition: "right",
-      displayStyle: "brackets",
-    },
-  });
+      default: {
+        convertedCurrencyPosition: "right",
+        displayStyle: "brackets",
+        highlightColor: "#fff1a8",
+      },
+    });
   expect(controllerSetRateSnapshotMock).toHaveBeenCalledWith(
     expect.objectContaining({ base: "USD" }),
   );

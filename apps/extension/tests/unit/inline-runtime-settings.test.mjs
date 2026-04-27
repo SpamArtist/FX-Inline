@@ -15,6 +15,7 @@ test("sanitizeInlineRuntimeSettingsManifest applies defaults and drops invalid s
         targetCurrencies: ["INR", "NOPE", "EUR", "INR"],
         convertedCurrencyPosition: "sideways",
         displayStyle: "pill",
+        highlightColor: "yellow",
       },
       domains: {
         "https://Example.com/path": {
@@ -32,15 +33,18 @@ test("sanitizeInlineRuntimeSettingsManifest applies defaults and drops invalid s
   expect(manifest.scopes.allUrls.targetCurrencies).toEqual(["INR"]);
   expect(manifest.scopes.allUrls.convertedCurrencyPosition).toBe("right");
   expect(manifest.scopes.allUrls.displayStyle).toBe("pill");
+  expect(manifest.scopes.allUrls.highlightColor).toBe("#fff1a8");
   expect(Object.keys(manifest.scopes.domains)).toEqual(["example.com"]);
 });
 
 test("settings keep only one target currency", () => {
   const settings = createDefaultInlineRuntimeSettings({
     targetCurrencies: ["GBP", "EUR"],
+    highlightColor: "#ABCDEF",
   });
 
   expect(settings.targetCurrencies).toEqual(["GBP"]);
+  expect(settings.highlightColor).toBe("#abcdef");
 });
 
 test("resolveInlineRuntimeSettingsForUrl uses page, domain, then all_urls precedence", () => {

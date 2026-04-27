@@ -13,6 +13,7 @@ test("loadCurrencyReducerHydration returns preferred currency and rates on succe
         targetCurrencies: ["INR"],
         convertedCurrencyPosition: "right",
         displayStyle: "brackets",
+        highlightColor: "#fff1a8",
         extraSettings: {},
       },
       domains: {},

@@ -23,6 +23,7 @@ export type InlineRuntimeSettings = {
   targetCurrencies: CurrencyCode[];
   convertedCurrencyPosition: InlineConvertedCurrencyPosition;
   displayStyle: InlineConvertedCurrencyDisplayStyle;
+  highlightColor: string;
   extraSettings: Record<string, JsonValue>;
 };
 
@@ -42,7 +43,8 @@ export type InlineRuntimeSettingKey =
   | "pageUrl"
   | "targetCurrencies"
   | "convertedCurrencyPosition"
-  | "displayStyle";
+  | "displayStyle"
+  | "highlightColor";
 
 export type InlineRuntimeSettingRegistryEntry = {
   key: InlineRuntimeSettingKey;

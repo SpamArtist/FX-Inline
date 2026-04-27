@@ -60,7 +60,7 @@ export const INLINE_CONVERSION_CSS = `
 
   :where(.${INLINE_CONVERSION_CLASS})[data-fx-inline-display-style="highlightColor"] .fx-inline-converted-amount {
     border-radius: 0.18em !important;
-    background-color: rgba(250, 204, 21, 0.24) !important;
+    background-color: var(--fx-inline-highlight-color, rgba(250, 204, 21, 0.24)) !important;
     padding: 0.02em 0.22em !important;
   }
 

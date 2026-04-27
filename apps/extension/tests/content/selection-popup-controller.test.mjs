@@ -36,6 +36,7 @@ function createUserSettings(targetCurrency) {
         targetCurrencies: [targetCurrency],
         convertedCurrencyPosition: "right",
         displayStyle: "brackets",
+        highlightColor: "#fff1a8",
         extraSettings: {},
       },
       domains: {},

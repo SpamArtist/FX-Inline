@@ -290,12 +290,12 @@ button:disabled {
 }
 
 .display-style-tab {
+  position: relative;
   min-height: 62px;
-  align-items: flex-start;
-  flex-direction: column;
-  justify-content: center;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
   padding: 8px 10px;
-  text-align: left;
 }
 
 .display-style-tab.selected {
@@ -305,7 +305,23 @@ button:disabled {
   font-weight: 800;
 }
 
-.display-style-tab > span:first-child {
+.display-style-tab-button {
+  min-height: 0;
+  width: 100%;
+  align-items: flex-start;
+  flex-direction: column;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+}
+
+.display-style-tab-button:hover {
+  border-color: transparent;
+}
+
+.display-style-tab-button > span:first-child {
   color: inherit;
   font-size: 0.84rem;
   font-weight: 800;
@@ -332,8 +348,21 @@ button:disabled {
 
 .style-preview.highlightColor {
   border-radius: 4px;
-  background: #fff1a8;
+  background: var(--preview-highlight-color, #fff1a8);
   padding: 2px 5px;
+}
+
+.highlight-color-picker {
+  position: absolute;
+  right: 9px;
+  bottom: 9px;
+  width: 28px;
+  height: 24px;
+  min-height: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: 5px;
+  background: transparent;
+  padding: 0;
 }
 
 .target-currencies {
