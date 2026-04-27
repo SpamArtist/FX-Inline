@@ -98,11 +98,28 @@ button:disabled {
   background: transparent;
 }
 
+.scope-tab-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 34px;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.scope-tab-row .scope-tab {
+  margin-bottom: 0;
+}
+
+.scope-tab-row.active .scope-tab,
 .scope-tab.active {
   border-color: color-mix(in srgb, var(--accent) 42%, var(--line-strong));
   background: #e6f1ed;
   color: var(--accent-dark);
   font-weight: 760;
+}
+
+.scope-delete {
+  min-height: 38px;
+  padding: 0;
 }
 
 .add-scope {
@@ -187,6 +204,26 @@ button:disabled {
 
 .panel-heading {
   padding-bottom: 16px;
+}
+
+.panel-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.danger-icon-button {
+  min-height: 34px;
+  width: 34px;
+  padding: 0;
+  border-color: color-mix(in srgb, var(--danger) 38%, var(--line-strong));
+  color: var(--danger);
+}
+
+.danger-icon-button:hover,
+.scope-delete:hover {
+  border-color: var(--danger);
+  color: var(--danger);
 }
 
 .switch-row {

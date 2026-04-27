@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Check, Globe2, Hammer, Plus, RotateCcw, Save } from "lucide-react";
+import { Check, Globe2, Hammer, Plus, RotateCcw, Save, Trash2, X } from "lucide-react";
 import currencies from "../../extension/assets/currency.json";
 
 const DEFAULT_SETTINGS = {
@@ -79,7 +79,13 @@ function getDomainPages(manifest, domain) {
     .sort(([left], [right]) => left.localeCompare(right));
 }
 
-function SettingsForm({ settings, onChange, title, lockDomainFields = false }) {
+function SettingsForm({
+  settings,
+  onChange,
+  title,
+  lockDomainFields = false,
+  actions = null,
+}) {
   const currencyOptions = useMemo(
     () => currencies.map((currency) => currency.code).sort((a, b) => a.localeCompare(b)),
     [],
@@ -105,14 +111,17 @@ function SettingsForm({ settings, onChange, title, lockDomainFields = false }) {
     <section className="settings-panel" aria-label={title}>
       <div className="panel-heading">
         <h2>{title}</h2>
-        <label className="switch-row">
-          <span>{settings.enabled ? "On" : "Off"}</span>
-          <input
-            type="checkbox"
-            checked={settings.enabled}
-            onChange={(event) => update({ enabled: event.target.checked })}
-          />
-        </label>
+        <div className="panel-actions">
+          {actions}
+          <label className="switch-row">
+            <span>{settings.enabled ? "On" : "Off"}</span>
+            <input
+              type="checkbox"
+              checked={settings.enabled}
+              onChange={(event) => update({ enabled: event.target.checked })}
+            />
+          </label>
+        </div>
       </div>
 
       <div className="form-grid">
@@ -318,6 +327,36 @@ function App() {
     setStatus(`Page override draft created for ${pageUrl}.`);
   }
 
+  function deleteDomain(domain) {
+    setDraftManifest((current) => {
+      const next = clone(current);
+      delete next.scopes.domains[domain];
+
+      for (const pageUrl of Object.keys(next.scopes.pages)) {
+        if (getPageDomain(pageUrl) === domain) {
+          delete next.scopes.pages[pageUrl];
+        }
+      }
+
+      return next;
+    });
+
+    if (activeScope.type === "domain" && activeScope.id === domain) {
+      setActiveScope({ type: "all_urls", id: "all_urls" });
+    }
+
+    setStatus(`Deleted ${domain} from draft settings.`);
+  }
+
+  function deletePageOverride(pageUrl) {
+    setDraftManifest((current) => {
+      const next = clone(current);
+      delete next.scopes.pages[pageUrl];
+      return next;
+    });
+    setStatus(`Deleted page override for ${pageUrl}.`);
+  }
+
   function cancelActiveScope() {
     setDraftManifest((current) => {
       const next = clone(current);
@@ -347,26 +386,13 @@ function App() {
     setStatus(`Reverted ${activeKey}.`);
   }
 
-  async function saveActiveScope() {
+  async function saveAllSettings() {
     setIsSaving(true);
     try {
-      const nextManifest = clone(manifest);
-
-      if (activeScope.type === "all_urls") {
-        nextManifest.scopes.allUrls = clone(draftManifest.scopes.allUrls);
-      } else {
-        const domain = activeScope.id;
-        nextManifest.scopes.domains[domain] = clone(draftManifest.scopes.domains[domain]);
-
-        for (const [pageUrl, settings] of getDomainPages(draftManifest, domain)) {
-          nextManifest.scopes.pages[pageUrl] = clone(settings);
-        }
-      }
-
       const response = await fetch("/api/settings", {
         method: "PUT",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify(nextManifest),
+        body: JSON.stringify(draftManifest),
       });
 
       if (!response.ok) throw new Error("Save failed");
@@ -374,7 +400,7 @@ function App() {
       const saved = payload.manifest;
       setManifest(saved);
       setDraftManifest(clone(saved));
-      setStatus(`Saved ${activeKey} and exported settings.`);
+      setStatus("Saved all settings and exported settings.");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Save failed.");
     } finally {
@@ -415,16 +441,28 @@ function App() {
         </button>
 
         {domainTabs.map((domain) => (
-          <button
-            type="button"
+          <div
             key={domain}
             className={activeScope.type === "domain" && activeScope.id === domain
-              ? "scope-tab active"
-              : "scope-tab"}
-            onClick={() => setActiveScope({ type: "domain", id: domain })}
+              ? "scope-tab-row active"
+              : "scope-tab-row"}
           >
-            {domain}
-          </button>
+            <button
+              type="button"
+              className="scope-tab"
+              onClick={() => setActiveScope({ type: "domain", id: domain })}
+            >
+              {domain}
+            </button>
+            <button
+              type="button"
+              className="scope-delete"
+              aria-label={`Delete ${domain}`}
+              onClick={() => deleteDomain(domain)}
+            >
+              <X size={14} />
+            </button>
+          </div>
         ))}
 
         <button type="button" className="add-scope" onClick={addDomain}>
@@ -444,7 +482,7 @@ function App() {
               <RotateCcw size={16} />
               Cancel
             </button>
-            <button type="button" onClick={saveActiveScope} disabled={isSaving || isBuilding}>
+            <button type="button" onClick={saveAllSettings} disabled={isSaving || isBuilding}>
               <Save size={16} />
               Save
             </button>
@@ -490,6 +528,16 @@ function App() {
                   settings={settings}
                   onChange={(nextSettings) => updatePageDraft(pageUrl, nextSettings)}
                   lockDomainFields
+                  actions={(
+                    <button
+                      type="button"
+                      className="danger-icon-button"
+                      aria-label={`Delete page override ${pageUrl}`}
+                      onClick={() => deletePageOverride(pageUrl)}
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  )}
                 />
               ))
             ) : (
