@@ -592,7 +592,7 @@ function App() {
       <section className="workspace">
         <header className="workspace-header">
           <div>
-            <p>Scope</p>
+            <p>Domain</p>
             <h1>{activeKey}</h1>
           </div>
           <div className="header-actions">
