@@ -143,7 +143,7 @@ export default defineConfig({
   hooks: {
     "vite:build:extendConfig": applyExtensionPageBuildConfig,
   },
-  manifest: ({ mode }) => {
+  manifest: ({ browser, mode }) => {
     const productionConnectSrc =
       "'self' https://open.er-api.com https://api.exchangerate-api.com";
     const devOnlyConnectSrc =
@@ -152,6 +152,20 @@ export default defineConfig({
       mode === "development"
         ? productionConnectSrc + devOnlyConnectSrc
         : productionConnectSrc;
+    const firefoxManifestFields =
+      browser === "firefox"
+        ? {
+          browser_specific_settings: {
+            gecko: {
+              id: "fx-inline@xbotpc",
+              // @ts-ignore - WXT doesn't support this field yet
+              data_collection_permissions: {
+                required: ["none"],
+              },
+            },
+          },
+        }
+        : {};
 
     return {
       ...(releaseManifestOverrides ?? {}),
@@ -184,15 +198,7 @@ export default defineConfig({
       content_security_policy: {
         extension_pages: `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'none'; connect-src ${connectSrc}`,
       },
-      browser_specific_settings: {
-        gecko: {
-          id: "fx-inline@xbotpc",
-          // @ts-ignore - WXT doesn't support this field yet
-          data_collection_permissions: {
-            required: ["none"],
-          },
-        },
-      },
+      ...firefoxManifestFields,
     };
   },
   vite: () => ({
