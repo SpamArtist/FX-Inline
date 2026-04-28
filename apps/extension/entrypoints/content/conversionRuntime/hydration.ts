@@ -1,7 +1,8 @@
 import { getUserSettings } from "@/utils/appStorage";
 import { getPrimaryTargetCurrency } from "@/utils/inlineRuntimeSettings";
-import { getRates } from "@/utils/rates/index";
+import { getCachedRateSnapshot } from "@/utils/rates/cache";
 import type { RateSnapshot } from "@/utils/rates.types";
+import { isValidSnapshot } from "@/utils/rates/validation";
 import type { PerfPayload } from "../perfLogger.types";
 
 export type RefreshSettingsAndRatesParams = {
@@ -24,7 +25,10 @@ export async function refreshSettingsAndRates({
   const startedAt = perfLoggingEnabled ? performance.now() : 0;
 
   const settings = await getUserSettings();
-  const rateSnapshot = await getRates({ forceRefresh });
+  const rateSnapshot = await getCachedRateSnapshot();
+  if (!isValidSnapshot(rateSnapshot)) {
+    throw new Error("FX Inline missing cached rate snapshot for content runtime.");
+  }
 
   setSettings(settings);
   setRateSnapshot(rateSnapshot);

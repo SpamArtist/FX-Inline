@@ -4,7 +4,7 @@ import {
   mayContainCurrencyToken as mayContainCurrencyTokenPortable,
   parseCurrencyValue as parseCurrencyValuePortable,
 } from "@fx-inline/currency-detection";
-import { formatAmountInCurrency as formatAmountInCurrencyShared } from "@fx-inline/inline-runtime";
+import { formatAmountInCurrency as formatAmountInCurrencyShared } from "@fx-inline/inline-runtime/extension";
 import { CURRENCY_SYMBOLS } from "./constants";
 import type {
   CurrencyFormatOptions,
