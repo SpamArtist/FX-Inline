@@ -1,8 +1,9 @@
 import { SETTINGS_KEY } from "@/utils/appStorage";
+import type { UserSettings } from "@/utils/appStorage.types";
 import { DEFAULT_STARTING_CURRENCY } from "@/utils/constants";
+import { watchLocalStorageValue } from "@/utils/localStorage";
 import { collectMutationConversionRoots } from "@/utils/mutationRoots";
 import { parseCurrencyValue } from "@/utils/utils";
-import { storage } from "wxt/utils/storage";
 import { createContentConversionRuntime } from "./conversionRuntime";
 import {
   type ContentScriptLifecycleContext,
@@ -11,7 +12,6 @@ import {
 import { createMutationRootBatcher } from "./mutationBatcher";
 import { createLazySelectionPopupControllerLoader } from "./selectionPopupLoader";
 
-const USER_SETTINGS_STORAGE_KEY = SETTINGS_KEY;
 const PORTAL_DROPDOWN_CLASS = "fx-inline-dropdown-menu-content";
 const UI_CAPTURE_EVENT_TYPES = [
   "pointerdown",
@@ -148,8 +148,8 @@ export async function startContentWorker(
   }
 
   try {
-    settingsUnwatch = storage.watch(
-      USER_SETTINGS_STORAGE_KEY,
+    settingsUnwatch = watchLocalStorageValue<UserSettings>(
+      SETTINGS_KEY,
       conversionRuntime.onSettingsStorageUpdate,
     );
   } catch (error) {

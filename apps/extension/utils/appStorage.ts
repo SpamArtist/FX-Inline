@@ -1,5 +1,4 @@
 import { GENERATED_INLINE_RUNTIME_SETTINGS_MANIFEST } from "../generated/inlineRuntimeSettingsManifest";
-import { storage } from "wxt/utils/storage";
 import { CurrencyCode } from "./enums";
 import type {
   LegacyUserSettings,
@@ -13,8 +12,12 @@ import {
   resolveInlineRuntimeSettingsForUrl,
   sanitizeInlineRuntimeSettingsManifest,
 } from "./inlineRuntimeSettings";
+import {
+  readLocalStorageValue,
+  writeLocalStorageValue,
+} from "./localStorage";
 
-const SETTINGS_KEY = "local:user-settings";
+const SETTINGS_KEY = "user-settings";
 
 const VALID_CURRENCY_CODES: ReadonlySet<string> = new Set(
   Object.values(CurrencyCode),
@@ -23,10 +26,6 @@ const VALID_CURRENCY_CODES: ReadonlySet<string> = new Set(
 const DEFAULT_USER_SETTINGS: UserSettings = sanitizeInlineRuntimeSettingsManifest(
   GENERATED_INLINE_RUNTIME_SETTINGS_MANIFEST,
 );
-
-const userSettingsItem = storage.defineItem<UserSettings>(SETTINGS_KEY, {
-  fallback: DEFAULT_USER_SETTINGS,
-});
 
 function asCurrencyCode(value: unknown): CurrencyCode {
   return typeof value === "string" && VALID_CURRENCY_CODES.has(value)
@@ -143,16 +142,16 @@ export function sanitizeUserSettings(value: unknown): UserSettings {
 
 async function persistSanitizedUserSettings(value: unknown): Promise<UserSettings> {
   const sanitized = sanitizeUserSettings(value);
-  await userSettingsItem.setValue(sanitized);
+  await writeLocalStorageValue(SETTINGS_KEY, sanitized);
   return sanitized;
 }
 
 export async function getUserSettings(): Promise<UserSettings> {
-  const stored = await userSettingsItem.getValue();
+  const stored = await readLocalStorageValue(SETTINGS_KEY, DEFAULT_USER_SETTINGS);
   const sanitized = sanitizeUserSettings(stored);
 
   if (serializeSettings(stored) !== serializeSettings(sanitized)) {
-    await userSettingsItem.setValue(sanitized);
+    await writeLocalStorageValue(SETTINGS_KEY, sanitized);
   }
 
   return sanitized;
