@@ -20,9 +20,12 @@
     "utils/inlineRuntimeSettings.ts",
     "utils/inlineRuntimeSettings.types.ts",
     "utils/installLifecycle.ts",
+    "utils/localStorage.ts",
+    "utils/localStorage.types.ts",
     "utils/mutationRoots.ts",
     "utils/rateMath/index.ts",
     "utils/ratePolicy/index.ts",
+    "utils/rates/validation.ts",
     "hooks/useCurrencyReducer.state.ts",
     "hooks/useCurrencyReducer.hydration.ts"
   ]
