@@ -15,7 +15,6 @@ export const extensionIcons = [
   { size: 16, path: path.join(extensionIconDirectory, "16.png"), maxBytes: 780 },
   { size: 32, path: path.join(extensionIconDirectory, "32.png"), maxBytes: 1_800 },
   { size: 48, path: path.join(extensionIconDirectory, "48.png"), maxBytes: 3_200 },
-  { size: 96, path: path.join(extensionIconDirectory, "96.png"), maxBytes: 8_500 },
   { size: 128, path: path.join(extensionIconDirectory, "128.png"), maxBytes: 12_500 },
 ];
 
