@@ -9,4 +9,5 @@ export type DropdownProps<TValue extends string = string> = {
   displayOption: DropdownOption<TValue>;
   options: DropdownOption<TValue>[];
   onSelect: (option: TValue) => void;
+  selectAriaLabel?: string;
 };
