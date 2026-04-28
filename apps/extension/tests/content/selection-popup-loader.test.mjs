@@ -21,14 +21,14 @@ test("lazy loader imports modules only on first get and caches the popup control
   const importContentStyles = jest
     .fn()
     .mockResolvedValue({ default: "content styles" });
-  const importConverterThemeStyles = jest
+  const resolveThemeStylesheetUrl = jest
     .fn()
-    .mockResolvedValue({ default: "theme styles" });
+    .mockReturnValue("chrome-extension://extension-id/theme.css");
 
   const loader = createLazySelectionPopupControllerLoader({
     importSelectionPopupFactory,
     importContentStyles,
-    importConverterThemeStyles,
+    resolveThemeStylesheetUrl,
   });
 
   expect(loader.getSync()).toBeNull();
@@ -42,11 +42,12 @@ test("lazy loader imports modules only on first get and caches the popup control
 
   expect(importSelectionPopupFactory).toHaveBeenCalledTimes(1);
   expect(importContentStyles).toHaveBeenCalledTimes(1);
-  expect(importConverterThemeStyles).toHaveBeenCalledTimes(1);
+  expect(resolveThemeStylesheetUrl).toHaveBeenCalledTimes(1);
 
   expect(createSelectionPopupController).toHaveBeenCalledTimes(1);
   expect(createSelectionPopupController).toHaveBeenCalledWith(
-    "theme styles\ncontent styles",
+    "content styles",
+    "chrome-extension://extension-id/theme.css",
   );
 });
 
@@ -65,14 +66,14 @@ test("lazy loader deduplicates concurrent get calls", async () => {
   const importContentStyles = jest
     .fn()
     .mockResolvedValue({ default: "content styles" });
-  const importConverterThemeStyles = jest
+  const resolveThemeStylesheetUrl = jest
     .fn()
-    .mockResolvedValue({ default: "theme styles" });
+    .mockReturnValue("chrome-extension://extension-id/theme.css");
 
   const loader = createLazySelectionPopupControllerLoader({
     importSelectionPopupFactory,
     importContentStyles,
-    importConverterThemeStyles,
+    resolveThemeStylesheetUrl,
   });
 
   const firstPromise = loader.get();
@@ -80,7 +81,7 @@ test("lazy loader deduplicates concurrent get calls", async () => {
 
   expect(importSelectionPopupFactory).toHaveBeenCalledTimes(1);
   expect(importContentStyles).toHaveBeenCalledTimes(1);
-  expect(importConverterThemeStyles).toHaveBeenCalledTimes(1);
+  expect(resolveThemeStylesheetUrl).toHaveBeenCalledTimes(0);
 
   resolveFactory({ createSelectionPopupController });
 
@@ -89,4 +90,5 @@ test("lazy loader deduplicates concurrent get calls", async () => {
   expect(first).toBe(popupController);
   expect(second).toBe(popupController);
   expect(createSelectionPopupController).toHaveBeenCalledTimes(1);
+  expect(resolveThemeStylesheetUrl).toHaveBeenCalledTimes(1);
 });
