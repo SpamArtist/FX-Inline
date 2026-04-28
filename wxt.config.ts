@@ -1,7 +1,12 @@
 import path from "path";
-import type { OutputBundle, OutputOptions } from "rollup";
+import type {
+  GetManualChunk,
+  OutputBundle,
+  OutputOptions,
+  PreRenderedChunk,
+} from "rollup";
 import vitePluginSvgr from "vite-plugin-svgr";
-import { defineConfig } from "wxt";
+import { defineConfig, type Entrypoint, type WxtViteConfig } from "wxt";
 import { resolveReleaseTag } from "./scripts/release/versioning.mjs";
 
 const releaseTag = process.env.RELEASE_TAG?.trim();
@@ -46,11 +51,100 @@ function hardenFirefoxInnerHtmlAssignments() {
   };
 }
 
+const extensionManualChunks: GetManualChunk = (moduleId) => {
+  const normalizedModuleId = moduleId.split(path.sep).join("/");
+
+  if (
+    normalizedModuleId.includes("/node_modules/react/") ||
+    normalizedModuleId.includes("/node_modules/react-dom/")
+  ) {
+    return "react-vendor";
+  }
+
+  if (
+    normalizedModuleId.includes("/node_modules/webextension-polyfill/") ||
+    normalizedModuleId.includes("/node_modules/wxt/browser")
+  ) {
+    return "browser-runtime";
+  }
+
+  if (
+    normalizedModuleId.includes("/node_modules/@wxt-dev/storage/") ||
+    normalizedModuleId.endsWith("/apps/extension/utils/appStorage.ts") ||
+    normalizedModuleId.endsWith("/apps/extension/utils/inlineRuntimeSettings.ts")
+  ) {
+    return "extension-storage";
+  }
+
+  if (
+    normalizedModuleId.endsWith("/apps/extension/assets/currency.json") ||
+    normalizedModuleId.endsWith("/apps/extension/utils/enums.ts")
+  ) {
+    return "currency-catalog";
+  }
+
+  return undefined;
+};
+
+function extensionChunkFileNames(chunkInfo: PreRenderedChunk) {
+  const chunkName =
+    chunkInfo.name === "browser" ? "browser-runtime" : chunkInfo.name;
+
+  return `chunks/${chunkName}-[hash].js`;
+}
+
+function isExtensionPageEntrypoint(entrypoint: Entrypoint) {
+  return [
+    "bookmarks",
+    "devtools",
+    "history",
+    "newtab",
+    "options",
+    "popup",
+    "sandbox",
+    "sidepanel",
+    "unlisted-page",
+  ].includes(entrypoint.type);
+}
+
+function applyExtensionPageBuildConfig(
+  entrypoints: readonly Entrypoint[],
+  viteConfig: WxtViteConfig,
+) {
+  if (!entrypoints.some(isExtensionPageEntrypoint)) return;
+
+  viteConfig.build ??= {};
+  viteConfig.build.modulePreload = {
+    polyfill: false,
+  };
+  viteConfig.build.rollupOptions ??= {};
+
+  const existingOutput = viteConfig.build.rollupOptions.output;
+
+  if (Array.isArray(existingOutput)) {
+    for (const output of existingOutput) {
+      output.manualChunks = extensionManualChunks;
+      output.chunkFileNames = extensionChunkFileNames;
+    }
+
+    return;
+  }
+
+  viteConfig.build.rollupOptions.output = {
+    ...(existingOutput ?? {}),
+    chunkFileNames: extensionChunkFileNames,
+    manualChunks: extensionManualChunks,
+  };
+}
+
 // See https://wxt.dev/api/config.html
 export default defineConfig({
   srcDir: "apps/extension",
   publicDir: "apps/extension/public",
   modules: ["@wxt-dev/module-react"],
+  hooks: {
+    "vite:build:extendConfig": applyExtensionPageBuildConfig,
+  },
   manifest: ({ browser, mode }) => {
     const productionConnectSrc =
       "'self' https://open.er-api.com https://api.exchangerate-api.com";
@@ -84,7 +178,7 @@ export default defineConfig({
         "128": "icon/128.png",
       },
       action: {
-        default_title: EXTENSION_NAME,
+        default_title: "FX Inline",
         default_icon: {
           "16": "icon/16.png",
           "32": "icon/32.png",
