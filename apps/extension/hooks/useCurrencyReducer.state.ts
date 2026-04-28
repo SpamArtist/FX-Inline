@@ -224,9 +224,18 @@ export function reduceCurrencyState(
         return state;
       }
 
-      const nextState = [...state];
-      nextState[updatedCurrencyIndex].seq += 1;
-      nextState[updatedCurrencyIndex + 1].seq -= 1;
+      const nextState = state.map((currencyState, index) => {
+        if (index === updatedCurrencyIndex) {
+          return { ...currencyState, seq: currencyState.seq + 1 };
+        }
+
+        if (index === updatedCurrencyIndex + 1) {
+          return { ...currencyState, seq: currencyState.seq - 1 };
+        }
+
+        return currencyState;
+      });
+
       nextState.sort((a, b) => a.seq - b.seq);
       return nextState;
     }

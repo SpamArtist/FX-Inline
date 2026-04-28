@@ -164,6 +164,57 @@ test("reduceCurrencyState CURRENCY_ADD appends a new row and recalculates", () =
   });
 });
 
+test("reduceCurrencyState CURRENCY_SWAP swaps rows without mutating previous state", () => {
+  const context = createContext();
+
+  const state = [
+    {
+      id: "a",
+      code: CurrencyCode["UNITED STATES DOLLAR"],
+      amount: "10",
+      icon: "usd.svg",
+      seq: 1,
+    },
+    {
+      id: "b",
+      code: CurrencyCode.EURO,
+      amount: "8",
+      icon: "eur.svg",
+      seq: 2,
+    },
+    {
+      id: "c",
+      code: CurrencyCode.INDIA,
+      amount: "800",
+      icon: "inr.svg",
+      seq: 3,
+    },
+  ];
+
+  const originalFirst = state[0];
+  const originalSecond = state[1];
+  const originalThird = state[2];
+
+  const next = reduceCurrencyState(state, {
+    type: ActionType.CURRENCY_SWAP,
+    payload: { id: "a" },
+  }, context);
+
+  expect(next.map(({ id, seq }) => ({ id, seq }))).toEqual([
+    { id: "b", seq: 1 },
+    { id: "a", seq: 2 },
+    { id: "c", seq: 3 },
+  ]);
+  expect(state.map(({ id, seq }) => ({ id, seq }))).toEqual([
+    { id: "a", seq: 1 },
+    { id: "b", seq: 2 },
+    { id: "c", seq: 3 },
+  ]);
+  expect(next[0]).not.toBe(originalSecond);
+  expect(next[1]).not.toBe(originalFirst);
+  expect(next[2]).toBe(originalThird);
+});
+
 test("reduceCurrencyState invalid payloads are no-op", () => {
   const context = createContext();
 
