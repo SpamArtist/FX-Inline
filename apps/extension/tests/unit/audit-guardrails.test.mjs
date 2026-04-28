@@ -221,7 +221,7 @@ describe("audit §1.8 generated runtime settings manifest", () => {
   // sanitizing fills it from defaults at runtime. The file claims to be the
   // source of defaults; this test pins the actual contract: every settings
   // record must serialize every InlineRuntimeSettings key.
-  test.failing(
+  test(
     "every settings record in the generated manifest carries every InlineRuntimeSettings key",
     () => {
       const manifest = loadGeneratedManifest();
