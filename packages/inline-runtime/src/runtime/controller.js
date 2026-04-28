@@ -5,7 +5,6 @@ import {
 import { convertVisiblePrices } from "../core/convertVisiblePrices.js";
 import { runPartialConversionPass } from "../core/partialPass.js";
 import { collectMutationConversionRoots } from "../mutationRoots.js";
-import { getRates } from "../rates/index.js";
 import {
   FULL_CONVERSION_DEBOUNCE_MS,
   MUTATION_SUPPRESSION_RELEASE_MS,
@@ -34,7 +33,6 @@ export function createInlineRuntime(options = {}) {
   let clientRenderPreferences = options.clientRenderPreferences ?? null;
   let enabled = options.enabled ?? true;
   let observeMutations = options.observeMutations ?? true;
-  const autoFetchRates = options.autoFetchRates ?? false;
 
   let isRunning = false;
   let isApplyingInlineConversion = false;
@@ -52,16 +50,13 @@ export function createInlineRuntime(options = {}) {
     return isApplyingInlineConversion || suppressMutationDepth > 0;
   }
 
-  async function ensureRateSnapshot(forceRefresh = false) {
-    if (rateSnapshot && !forceRefresh) return rateSnapshot;
-
-    if (!autoFetchRates) {
+  function ensureRateSnapshot() {
+    if (!rateSnapshot) {
       throw new Error(
-        "FX Inline runtime missing rate snapshot. Provide `rateSnapshot` or enable `autoFetchRates`.",
+        "FX Inline runtime missing rate snapshot. Provide `rateSnapshot` before starting or refreshing.",
       );
     }
 
-    rateSnapshot = await getRates({ forceRefresh });
     return rateSnapshot;
   }
 
@@ -73,7 +68,7 @@ export function createInlineRuntime(options = {}) {
     }, MUTATION_SUPPRESSION_RELEASE_MS);
   }
 
-  async function runFullConversion(forceRatesRefresh = false) {
+  async function runFullConversion() {
     if (!isRunning || isDestroyed) return;
 
     if (!root) {
@@ -90,7 +85,7 @@ export function createInlineRuntime(options = {}) {
       throw new Error("FX Inline runtime missing preferred currency.");
     }
 
-    const snapshot = await ensureRateSnapshot(forceRatesRefresh);
+    const snapshot = ensureRateSnapshot();
 
     isApplyingInlineConversion = true;
     suppressMutationDepth += 1;
@@ -114,13 +109,13 @@ export function createInlineRuntime(options = {}) {
     }
   }
 
-  async function scheduleFullConversion(delayMs = FULL_CONVERSION_DEBOUNCE_MS, forceRatesRefresh = false) {
+  async function scheduleFullConversion(delayMs = FULL_CONVERSION_DEBOUNCE_MS) {
     if (!isRunning || isDestroyed) return;
 
     clearTimer(fullTimer);
     fullTimer.value = window.setTimeout(() => {
       fullTimer.value = null;
-      void runFullConversion(forceRatesRefresh).catch((error) => {
+      void runFullConversion().catch((error) => {
         options.onError?.(error);
       });
     }, delayMs);
@@ -251,11 +246,7 @@ export function createInlineRuntime(options = {}) {
       clearInlineConversions(root);
     }
 
-    if (refreshOptions.forceRatesRefresh && autoFetchRates) {
-      rateSnapshot = null;
-    }
-
-    void scheduleFullConversion(0, Boolean(refreshOptions.forceRatesRefresh));
+    void scheduleFullConversion(0);
   }
 
   function setPreferredCurrency(nextCurrency) {

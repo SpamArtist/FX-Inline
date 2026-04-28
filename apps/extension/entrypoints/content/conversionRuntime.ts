@@ -54,7 +54,6 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
     root: document.body,
     observeMutations: false,
     enabled: false,
-    autoFetchRates: false,
     ...sitePluginOptions,
     onPerfSample: perfLoggingEnabled
       ? (sample) => {

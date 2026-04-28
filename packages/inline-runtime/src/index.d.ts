@@ -121,7 +121,6 @@ export type ConvertVisiblePricesOptions = {
 };
 
 export type InlineRuntimeRefreshOptions = {
-  forceRatesRefresh?: boolean;
   clearExisting?: boolean;
 };
 
@@ -132,7 +131,6 @@ export type InlineRuntimeOptions = {
   rateSnapshot?: RateSnapshotLike | null;
   enabled?: boolean;
   observeMutations?: boolean;
-  autoFetchRates?: boolean;
   onPerfSample?: (sample: InlineConversionPerfSample) => void;
   onNodeLimitReached?: (maxNodesPerPass: number) => void;
   includeDefaultPrePlugins?: boolean;

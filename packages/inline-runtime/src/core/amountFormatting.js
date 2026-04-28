@@ -1,7 +1,7 @@
 import { hasThousandMagnitudeHint } from "@fx-inline/currency-detection";
 import { formatAmountInCurrency } from "../formatting.js";
-import { convertAmountWithSnapshot } from "../rates/math/convert.js";
 import { INLINE_COMPACT_THRESHOLD } from "./constants.js";
+import { convertAmountWithSnapshot } from "./rateConversion.js";
 
 export function getConvertedAmountText(
   match,

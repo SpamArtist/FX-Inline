@@ -5,7 +5,6 @@ import { jest } from "@jest/globals";
 const convertVisiblePricesMock = jest.fn();
 const suppressInlineConversionsMock = jest.fn();
 const runPartialConversionPassMock = jest.fn();
-const getRatesMock = jest.fn();
 
 async function importControllerWithMocks() {
   jest.resetModules();
@@ -21,10 +20,6 @@ async function importControllerWithMocks() {
 
   await jest.unstable_mockModule("../src/core/partialPass.js", () => ({
     runPartialConversionPass: runPartialConversionPassMock,
-  }));
-
-  await jest.unstable_mockModule("../src/rates/index.js", () => ({
-    getRates: getRatesMock,
   }));
 
   return import("../src/runtime/controller.js");
@@ -54,7 +49,6 @@ beforeEach(() => {
     connectedRoots: 1,
     deferredRoots: 0,
   });
-  getRatesMock.mockResolvedValue(createSnapshot());
 });
 
 afterEach(() => {
@@ -226,15 +220,16 @@ test("shouldIgnoreMutations remains true until suppression release delay elapses
   expect(runtime.shouldIgnoreMutations()).toBe(false);
 });
 
-test("autoFetchRates fetches snapshot when none is provided", async () => {
+test("start reports missing injected snapshot when none is provided", async () => {
   const { createInlineRuntime } = await importControllerWithMocks();
+  const onError = jest.fn();
 
   const runtime = createInlineRuntime({
     root: document.body,
     preferredCurrency: "EUR",
     enabled: true,
     observeMutations: false,
-    autoFetchRates: true,
+    onError,
   });
 
   runtime.start();
@@ -244,8 +239,12 @@ test("autoFetchRates fetches snapshot when none is provided", async () => {
     await Promise.resolve();
   }
 
-  expect(getRatesMock).toHaveBeenCalledWith({ forceRefresh: false });
-  expect(convertVisiblePricesMock).toHaveBeenCalledTimes(1);
+  expect(onError).toHaveBeenCalledTimes(1);
+  expect(onError.mock.calls[0][0]).toEqual(expect.any(Error));
+  expect(onError.mock.calls[0][0].message).toBe(
+    "FX Inline runtime missing rate snapshot. Provide `rateSnapshot` before starting or refreshing.",
+  );
+  expect(convertVisiblePricesMock).not.toHaveBeenCalled();
 });
 
 test("setClientRenderPreferences schedules a conversion with updated preferences", async () => {
