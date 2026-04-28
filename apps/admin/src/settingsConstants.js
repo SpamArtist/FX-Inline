@@ -11,7 +11,7 @@ export const DEFAULT_SETTINGS = {
 
 export const DEFAULT_MANIFEST = {
   schemaVersion: 1,
-  generatedAt: "1970-01-01T00:00:00.000Z",
+  generatedAt: new Date().toISOString(),
   scopes: {
     allUrls: DEFAULT_SETTINGS,
     domains: {},
