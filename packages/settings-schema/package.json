@@ -1,8 +1,8 @@
 {
-  "name": "@fx-inline/currency-detection",
+  "name": "@fx-inline/settings-schema",
   "version": "0.1.0",
   "private": true,
-  "description": "Portable currency and amount detection/parsing core with strict legacy parity.",
+  "description": "Shared settings manifest schema and sanitizer for FX Inline runtimes.",
   "type": "module",
   "main": "./src/index.js",
   "module": "./src/index.js",
@@ -12,11 +12,6 @@
       "types": "./src/index.d.ts",
       "import": "./src/index.js",
       "default": "./src/index.js"
-    },
-    "./currency-codes": {
-      "types": "./src/currency-codes.d.ts",
-      "import": "./src/currency-codes.js",
-      "default": "./src/currency-codes.js"
     }
   },
   "files": [
@@ -24,6 +19,9 @@
     "README.md"
   ],
   "sideEffects": false,
+  "dependencies": {
+    "@fx-inline/currency-detection": "file:../currency-detection"
+  },
   "engines": {
     "node": ">=20"
   }

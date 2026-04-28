@@ -1,5 +1,9 @@
 import type { CurrencyCode } from "./enums";
-import type { JsonValue } from "./json.types";
+import type {
+  InlineRuntimeSettings as SharedInlineRuntimeSettings,
+  InlineRuntimeSettingsManifest as SharedInlineRuntimeSettingsManifest,
+  ResolvedInlineRuntimeSettings as SharedResolvedInlineRuntimeSettings,
+} from "@fx-inline/settings-schema";
 
 export type InlineRuntimeScopeType = "all_urls" | "domain" | "page";
 
@@ -16,26 +20,10 @@ export type InlineConvertedCurrencyDisplayStyle =
   | "highlightColor"
   | "brackets";
 
-export type InlineRuntimeSettings = {
-  enabled: boolean;
-  domain: string;
-  pageUrl: string;
-  targetCurrencies: CurrencyCode[];
-  convertedCurrencyPosition: InlineConvertedCurrencyPosition;
-  displayStyle: InlineConvertedCurrencyDisplayStyle;
-  highlightColor: string;
-  extraSettings: Record<string, JsonValue>;
-};
+export type InlineRuntimeSettings = SharedInlineRuntimeSettings<CurrencyCode>;
 
-export type InlineRuntimeSettingsManifest = {
-  schemaVersion: 1;
-  generatedAt: string;
-  scopes: {
-    allUrls: InlineRuntimeSettings;
-    domains: Record<string, InlineRuntimeSettings>;
-    pages: Record<string, InlineRuntimeSettings>;
-  };
-};
+export type InlineRuntimeSettingsManifest =
+  SharedInlineRuntimeSettingsManifest<CurrencyCode>;
 
 export type InlineRuntimeSettingKey =
   | "enabled"
@@ -52,9 +40,5 @@ export type InlineRuntimeSettingRegistryEntry = {
   runtimeSupported: boolean;
 };
 
-export type ResolvedInlineRuntimeSettings = {
-  scopeType: InlineRuntimeScopeType;
-  scopeId: string;
-  settings: InlineRuntimeSettings;
-  unsupportedSettingKeys: string[];
-};
+export type ResolvedInlineRuntimeSettings =
+  SharedResolvedInlineRuntimeSettings<CurrencyCode>;
