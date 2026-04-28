@@ -23,6 +23,7 @@
     "utils/mutationRoots.ts",
     "utils/rateMath/index.ts",
     "utils/ratePolicy/index.ts",
+    "utils/rates/validation.ts",
     "hooks/useCurrencyReducer.state.ts",
     "hooks/useCurrencyReducer.hydration.ts"
   ]
