@@ -13,29 +13,42 @@ function parseRgbChannels(colorValue) {
   if (
     !Number.isFinite(redChannel) ||
     !Number.isFinite(greenChannel) ||
-    !Number.isFinite(blueChannel)
+    !Number.isFinite(blueChannel) ||
+    redChannel < 0 ||
+    redChannel > 255 ||
+    greenChannel < 0 ||
+    greenChannel > 255 ||
+    blueChannel < 0 ||
+    blueChannel > 255
   ) {
     return null;
   }
 
-  return {
-    redChannel,
-    greenChannel,
-    blueChannel,
-  };
+  return [redChannel, greenChannel, blueChannel];
+}
+
+function toLinearRgb(channel) {
+  const normalized = channel / 255;
+  if (normalized <= 0.04045) {
+    return normalized / 12.92;
+  }
+
+  return ((normalized + 0.055) / 1.055) ** 2.4;
+}
+
+function getRelativeLuminance([redChannel, greenChannel, blueChannel]) {
+  return (
+    0.2126 * toLinearRgb(redChannel) +
+    0.7152 * toLinearRgb(greenChannel) +
+    0.0722 * toLinearRgb(blueChannel)
+  );
 }
 
 function isLightTextColorValue(colorValue) {
   const channels = parseRgbChannels(colorValue);
   if (!channels) return false;
 
-  const { redChannel, greenChannel, blueChannel } = channels;
-  const perceivedLuminance =
-    0.2126 * redChannel +
-    0.7152 * greenChannel +
-    0.0722 * blueChannel;
-
-  return perceivedLuminance > 170;
+  return getRelativeLuminance(channels) >= 0.6;
 }
 
 export function usesLightTextColorForElement(element, lightTextCache) {
