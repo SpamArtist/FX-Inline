@@ -570,7 +570,9 @@
     {
       "input": "123 BOB",
       "output": {
-        "valid": false
+        "valid": true,
+        "value": 123,
+        "currency": "BOB"
       }
     },
     {
@@ -662,7 +664,9 @@
     {
       "input": "123 COP",
       "output": {
-        "valid": false
+        "valid": true,
+        "value": 123,
+        "currency": "COP"
       }
     },
     {
@@ -1548,7 +1552,9 @@
     {
       "input": "123 VES",
       "output": {
-        "valid": false
+        "valid": true,
+        "value": 123,
+        "currency": "VES"
       }
     },
     {
@@ -2002,7 +2008,9 @@
     {
       "input": "123BOB",
       "output": {
-        "valid": false
+        "valid": true,
+        "value": 123,
+        "currency": "BOB"
       }
     },
     {
@@ -2102,7 +2110,9 @@
     {
       "input": "123COP",
       "output": {
-        "valid": false
+        "valid": true,
+        "value": 123,
+        "currency": "COP"
       }
     },
     {
@@ -3060,7 +3070,9 @@
     {
       "input": "123VES",
       "output": {
-        "valid": false
+        "valid": true,
+        "value": 123,
+        "currency": "VES"
       }
     },
     {
@@ -3516,13 +3528,17 @@
     {
       "input": "BOB 123",
       "output": {
-        "valid": false
+        "valid": true,
+        "value": 123,
+        "currency": "BOB"
       }
     },
     {
       "input": "BOB123",
       "output": {
-        "valid": false
+        "valid": true,
+        "value": 123,
+        "currency": "BOB"
       }
     },
     {
@@ -3708,13 +3724,17 @@
     {
       "input": "COP 123",
       "output": {
-        "valid": false
+        "valid": true,
+        "value": 123,
+        "currency": "COP"
       }
     },
     {
       "input": "COP123",
       "output": {
-        "valid": false
+        "valid": true,
+        "value": 123,
+        "currency": "COP"
       }
     },
     {
@@ -5672,13 +5692,17 @@
     {
       "input": "VES 123",
       "output": {
-        "valid": false
+        "valid": true,
+        "value": 123,
+        "currency": "VES"
       }
     },
     {
       "input": "VES123",
       "output": {
-        "valid": false
+        "valid": true,
+        "value": 123,
+        "currency": "VES"
       }
     },
     {
@@ -6183,7 +6207,15 @@
     },
     {
       "input": "Catalog entries include BOB 123 in the listing.",
-      "output": []
+      "output": [
+        {
+          "raw": "BOB 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "BOB"
+        }
+      ]
     },
     {
       "input": "Catalog entries include BRL 123 in the listing.",
@@ -6311,7 +6343,15 @@
     },
     {
       "input": "Catalog entries include COP 123 in the listing.",
-      "output": []
+      "output": [
+        {
+          "raw": "COP 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "COP"
+        }
+      ]
     },
     {
       "input": "Catalog entries include CRC 123 in the listing.",
@@ -7595,7 +7635,15 @@
     },
     {
       "input": "Catalog entries include VES 123 in the listing.",
-      "output": []
+      "output": [
+        {
+          "raw": "VES 123 ",
+          "start": 24,
+          "end": 32,
+          "value": 123,
+          "currency": "VES"
+        }
+      ]
     },
     {
       "input": "Catalog entries include VND 123 in the listing.",

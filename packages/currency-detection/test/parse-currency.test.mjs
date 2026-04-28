@@ -38,6 +38,27 @@ test("parseCurrencyValue supports roadmap formats", () => {
   }
 });
 
+test("parseCurrencyValue supports active Bolivia, Colombia, and Venezuela ISO codes", () => {
+  const cases = [
+    ["BOB 123", 123, "BOB"],
+    ["123 COP", 123, "COP"],
+    ["VES123", 123, "VES"],
+  ];
+
+  for (const [input, expectedValue, expectedCurrency] of cases) {
+    const parsed = parseCurrencyValue(input);
+    expect(parsed.valid).toBe(true);
+    expect(parsed.value).toBe(expectedValue);
+    expect(parsed.currency).toBe(expectedCurrency);
+  }
+});
+
+test("parseCurrencyValue rejects non-circulating Bolivia, Colombia, and Venezuela unit codes", () => {
+  for (const input of ["BOV 123", "123 COU", "VED123"]) {
+    expect(parseCurrencyValue(input).valid).toBe(false);
+  }
+});
+
 test("extractCurrencyTextMatches finds ISO/symbol snippets", () => {
   const matches = extractCurrencyTextMatches("Deal: $100 and 200 eur today");
 

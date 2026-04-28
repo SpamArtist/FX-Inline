@@ -108,6 +108,42 @@ test("converts unicode yen symbols in mixed listing text", () => {
   );
 });
 
+test("converts active Bolivia, Colombia, and Venezuela ISO price text", () => {
+  document.body.innerHTML =
+    '<p id="country-prices">BOB 69; COP 4000; VES 37</p>';
+
+  const applied = convertVisiblePrices(
+    "EUR",
+    createRateSnapshot({
+      rates: {
+        BOB: 6.9,
+        COP: 4000,
+        VES: 37,
+      },
+    }),
+    document.body,
+    {
+      clearExisting: false,
+    },
+  );
+
+  expect(applied).toBe(3);
+
+  const wrappers = Array.from(
+    document.querySelectorAll(`#country-prices span.${INLINE_CONVERSION_CLASS}`),
+  );
+  expect(wrappers.map((wrapper) => wrapper.getAttribute("data-original"))).toEqual([
+    "BOB 69",
+    "COP 4000",
+    "VES 37",
+  ]);
+  expect(
+    wrappers.map((wrapper) =>
+      wrapper.querySelector(".fx-inline-converted-amount").textContent,
+    ),
+  ).toEqual(["(€9.00)", "(€0.90)", "(€0.90)"]);
+});
+
 test("refreshes existing wrappers in place and clears wrappers when requested", () => {
   document.body.innerHTML = '<p id="price">Price: $100</p>';
 

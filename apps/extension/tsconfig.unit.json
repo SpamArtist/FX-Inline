@@ -21,8 +21,9 @@
     "utils/inlineRuntimeSettings.types.ts",
     "utils/installLifecycle.ts",
     "utils/mutationRoots.ts",
-    "utils/rateMath.ts",
-    "utils/ratePolicy.ts",
+    "utils/rateMath/**/*.ts",
+    "utils/ratePolicy/**/*.ts",
+    "utils/rates/validation.ts",
     "hooks/useCurrencyReducer.state.ts",
     "hooks/useCurrencyReducer.hydration.ts"
   ]
