@@ -49,6 +49,7 @@ await copyArtifactFromOutput(artifacts.sourcesZip);
 
 run(getNpmCommand(), ["run", "build:firefox"]);
 run("node", ["scripts/release/patch-firefox-manifest.mjs"]);
+run("node", ["scripts/release/lint-build-output.mjs"]);
 
 if (release.channel === "rc") {
   run("node", [
