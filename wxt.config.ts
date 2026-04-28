@@ -1,6 +1,8 @@
 import path from "path";
-import type { OutputBundle, OutputOptions } from "rollup";
+import type { OutputOptions } from "rollup";
+import type { InlineConfig, PluginOption } from "vite";
 import vitePluginSvgr from "vite-plugin-svgr";
+import type { Entrypoint, EntrypointGroup } from "wxt";
 import { defineConfig } from "wxt";
 import { resolveReleaseTag } from "./scripts/release/versioning.mjs";
 
@@ -15,31 +17,111 @@ const releaseManifestOverrides = releaseTag
   })()
   : null;
 
-function hardenFirefoxInnerHtmlAssignments() {
+interface SourceReplacement {
+  readonly label: string;
+  readonly from: string;
+  readonly expectedCount: number;
+  readonly to: string;
+}
+
+const reactDomClientProductionModule = "/react-dom/cjs/react-dom-client.production.js";
+const reactDomFirefoxReviewReplacements: readonly SourceReplacement[] = [
+  {
+    label: "script element template",
+    from: `nextResource = ownerDocument.createElement("div");
+                  nextResource.innerHTML = "<script>\\x3c/script>";
+                  nextResource = nextResource.removeChild(
+                    nextResource.firstChild
+                  );`,
+    expectedCount: 1,
+    to: `nextResource = ownerDocument.createElement("script");`,
+  },
+  {
+    label: "host dangerouslySetInnerHTML sink",
+    from: "domElement.innerHTML = key;",
+    expectedCount: 2,
+    to: "domElement.textContent = key;",
+  },
+];
+
+function isHtmlEntrypointGroup(group: EntrypointGroup): group is Entrypoint[] {
+  return Array.isArray(group) && group.some((entry) => entry.inputPath.endsWith(".html"));
+}
+
+function splitHtmlEntrypointGroups(groups: EntrypointGroup[]) {
+  for (let index = 0; index < groups.length; index += 1) {
+    const group = groups[index];
+
+    if (!isHtmlEntrypointGroup(group) || group.length <= 1) {
+      continue;
+    }
+
+    const splitGroups = group.map((entry) => [entry]);
+    groups.splice(index, 1, ...splitGroups);
+    index += splitGroups.length - 1;
+  }
+}
+
+function setIifeOutputFormat(viteConfig: InlineConfig) {
+  viteConfig.build ??= {};
+  viteConfig.build.rollupOptions ??= {};
+
+  const rollupOptions = viteConfig.build.rollupOptions;
+  const outputOptions = rollupOptions.output;
+
+  if (Array.isArray(outputOptions)) {
+    rollupOptions.output = outputOptions.map((output) => ({
+      ...output,
+      format: "iife",
+    }));
+    return;
+  }
+
+  rollupOptions.output = {
+    ...((outputOptions ?? {}) as OutputOptions),
+    format: "iife",
+  };
+}
+
+function replaceReactDomSource(code: string, id: string) {
+  let patchedCode = code;
+
+  for (const replacement of reactDomFirefoxReviewReplacements) {
+    const sourceParts = patchedCode.split(replacement.from);
+    const replacementCount = sourceParts.length - 1;
+
+    if (replacementCount !== replacement.expectedCount) {
+      throw new Error(
+        `[fx-inline] React DOM source changed before applying Firefox HTML hardening: ${replacement.label} expected ${replacement.expectedCount} matches but found ${replacementCount} in ${id}.`,
+      );
+    }
+
+    patchedCode = sourceParts.join(replacement.to);
+  }
+
+  return patchedCode;
+}
+
+function hardenReactDomForFirefoxReview(): PluginOption {
   return {
-    name: "harden-firefox-innerhtml-assignments",
-    apply: "build" as const,
-    enforce: "post" as const,
-    generateBundle(_options: OutputOptions, bundle: OutputBundle) {
-      const scriptTemplatePattern =
-        /\b([\w$]+)=([\w$]+)\.createElement\("div"\),\1\.innerHTML="<script><\\\/script>",\1=\1\.removeChild\(\1\.firstChild\)/g;
-      const dynamicInnerHtmlPattern =
-        /\.innerHTML=([\w$]+)\}\}break;case"(multiple|children)"/g;
+    name: "harden-react-dom-firefox-review",
+    apply: "build",
+    enforce: "pre",
+    transform(code, id) {
+      const normalizedId = id.split(path.sep).join("/");
+      const [normalizedFilePath] = normalizedId.split("?");
 
-      for (const output of Object.values(bundle)) {
-        if (output.type !== "chunk") continue;
-
-        const patchedCode = output.code
-          .replace(scriptTemplatePattern, '$1=$2.createElement("script")')
-          .replace(
-            dynamicInnerHtmlPattern,
-            '.textContent=$1}}break;case"$2"',
-          );
-
-        if (patchedCode !== output.code) {
-          output.code = patchedCode;
-        }
+      if (
+        normalizedFilePath.startsWith("\0") ||
+        !normalizedFilePath.endsWith(reactDomClientProductionModule)
+      ) {
+        return null;
       }
+
+      return {
+        code: replaceReactDomSource(code, id),
+        map: null,
+      };
     },
   };
 }
@@ -94,7 +176,24 @@ export default defineConfig({
       },
     };
   },
-  vite: () => ({
+  hooks: {
+    "entrypoints:grouped": (wxt, groups) => {
+      if (wxt.config.browser !== "firefox") {
+        return;
+      }
+
+      splitHtmlEntrypointGroups(groups);
+    },
+    "vite:build:extendConfig": (entrypoints, viteConfig) => {
+      if (
+        entrypoints.length === 1 &&
+        entrypoints.some((entrypoint) => entrypoint.inputPath.endsWith(".html"))
+      ) {
+        setIifeOutputFormat(viteConfig);
+      }
+    },
+  },
+  vite: (env) => ({
     plugins: [
       vitePluginSvgr({
         svgrOptions: {
@@ -106,7 +205,7 @@ export default defineConfig({
         },
         include: "**/*.svg",
       }),
-      hardenFirefoxInnerHtmlAssignments(),
+      env.browser === "firefox" ? hardenReactDomForFirefoxReview() : null,
     ],
     resolve: {
       alias: {
