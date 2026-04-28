@@ -13,6 +13,11 @@
       "import": "./src/index.js",
       "default": "./src/index.js"
     },
+    "./extension": {
+      "types": "./src/index.d.ts",
+      "import": "./src/extension.js",
+      "default": "./src/extension.js"
+    },
     "./global": {
       "import": "./src/global.js",
       "default": "./src/global.js"
