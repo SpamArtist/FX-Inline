@@ -15,6 +15,8 @@ const releaseManifestOverrides = releaseTag
   })()
   : null;
 
+const EXTENSION_NAME = "FX Inline";
+
 function hardenFirefoxInnerHtmlAssignments() {
   return {
     name: "harden-firefox-innerhtml-assignments",
@@ -49,7 +51,7 @@ export default defineConfig({
   srcDir: "apps/extension",
   publicDir: "apps/extension/public",
   modules: ["@wxt-dev/module-react"],
-  manifest: ({ mode }) => {
+  manifest: ({ browser, mode }) => {
     const productionConnectSrc =
       "'self' https://open.er-api.com https://api.exchangerate-api.com";
     const devOnlyConnectSrc =
@@ -58,6 +60,20 @@ export default defineConfig({
       mode === "development"
         ? productionConnectSrc + devOnlyConnectSrc
         : productionConnectSrc;
+    const firefoxManifestFields =
+      browser === "firefox"
+        ? {
+          browser_specific_settings: {
+            gecko: {
+              id: "fx-inline@xbotpc",
+              // @ts-ignore - WXT doesn't support this field yet
+              data_collection_permissions: {
+                required: ["none"],
+              },
+            },
+          },
+        }
+        : {};
 
     return {
       ...(releaseManifestOverrides ?? {}),
@@ -65,10 +81,10 @@ export default defineConfig({
         "16": "icon/16.png",
         "32": "icon/32.png",
         "48": "icon/48.png",
-        "96": "icon/96.png",
         "128": "icon/128.png",
       },
       action: {
+        default_title: EXTENSION_NAME,
         default_icon: {
           "16": "icon/16.png",
           "32": "icon/32.png",
@@ -83,15 +99,7 @@ export default defineConfig({
       content_security_policy: {
         extension_pages: `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'none'; connect-src ${connectSrc}`,
       },
-      browser_specific_settings: {
-        gecko: {
-          id: "fx-inline@xbotpc",
-          // @ts-ignore - WXT doesn't support this field yet
-          data_collection_permissions: {
-            required: ["none"],
-          },
-        },
-      },
+      ...firefoxManifestFields,
     };
   },
   vite: () => ({

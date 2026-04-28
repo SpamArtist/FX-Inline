@@ -52,10 +52,10 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 - `https://api.exchangerate-api.com/v4/latest/USD`
 
 ### Test Inventory
-- Total test files: `23`
+- Total test files: `24`
 - admin: `2`
 - content: `6`
-- release: `1`
+- release: `2`
 - unit: `14`
 
 ### Scripts
@@ -88,7 +88,7 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run build:unit` | `tsc -p apps/extension/tsconfig.unit.json` |
 | `npm run build:content-tests` | `tsc -p apps/extension/tsconfig.content-tests.json` |
 | `npm run jest` | `node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand` |
-| `npm run test:release` | `node --test test/release/versioning.test.mjs` |
+| `npm run test:release` | `node --test test/release/*.test.mjs` |
 | `npm run test:admin` | `npm run build:backend && node --test test/admin/export-settings.test.mjs` |
 | `npm run test:frontend` | `npm run build:unit && npm run jest -- apps/extension/tests/unit` |
 | `npm run test:content` | `npm run build:content-tests && npm run jest -- --config jest.content.config.cjs apps/extension/tests/content` |
@@ -106,6 +106,7 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run readme:sync:check` | `node scripts/readme-sync.mjs --check` |
 
 ### Recent Changes (first-parent, excluding README automation commits)
+- 2026-04-28 `5e3c44f` docs: align runtime and admin docs
 - 2026-04-28 `23d448c` fix: remove unused extension and admin dead code (#48)
 - 2026-04-28 `601a79e` fix: dedupe inline runtime conversion path (#45)
 - 2026-04-28 `6d2eccd` Merge branch 'main' of https://github.com/SpamArtist/currency-conversion-extension-tool into bug/issue-40-currency-codes
@@ -113,6 +114,5 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 - 2026-04-27 `74df952` Move admin API to NestJS backend (#35)
 - 2026-04-27 `ad7dcf9` Add local admin dashboard and scoped inline runtime settings (#33)
 - 2026-04-27 `662302f` docs: refresh readme snapshot
-- 2026-04-26 `62ccee8` no duplicate inline
 
 <!-- AUTO-GENERATED:END -->

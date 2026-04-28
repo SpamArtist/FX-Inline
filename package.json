@@ -32,7 +32,7 @@
     "build:unit": "tsc -p apps/extension/tsconfig.unit.json",
     "build:content-tests": "tsc -p apps/extension/tsconfig.content-tests.json",
     "jest": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand",
-    "test:release": "node --test test/release/versioning.test.mjs",
+    "test:release": "node --test test/release/*.test.mjs",
     "test:admin": "npm run build:backend && node --test test/admin/export-settings.test.mjs",
     "test:frontend": "npm run build:unit && npm run jest -- apps/extension/tests/unit",
     "test:content": "npm run build:content-tests && npm run jest -- --config jest.content.config.cjs apps/extension/tests/content",
