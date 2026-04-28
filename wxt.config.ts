@@ -80,6 +80,13 @@ export default defineConfig({
         "https://open.er-api.com/*",
         "https://api.exchangerate-api.com/*",
       ],
+      web_accessible_resources: [
+        {
+          resources: ["content-worker.js", "chunks/*.js"],
+          matches: ["<all_urls>"],
+          use_dynamic_url: true,
+        },
+      ],
       content_security_policy: {
         extension_pages: `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'none'; connect-src ${connectSrc}`,
       },

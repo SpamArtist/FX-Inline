@@ -235,6 +235,7 @@ test("autoFetchRates fetches snapshot when none is provided", async () => {
     enabled: true,
     observeMutations: false,
     autoFetchRates: true,
+    loadRates: getRatesMock,
   });
 
   runtime.start();
