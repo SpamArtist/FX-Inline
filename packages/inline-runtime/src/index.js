@@ -1,6 +1,7 @@
 import { createInlineRuntime } from "./runtime/controller.js";
 import { clearInlineConversions, suppressInlineConversions } from "./core/conversionNodes.js";
 import { convertVisiblePrices } from "./core/convertVisiblePrices.js";
+import { INLINE_CONVERSION_CLASS } from "./core/constants.js";
 import { formatAmountInCurrency } from "./formatting.js";
 import {
   AMAZON_STRUCTURED_DETECTOR_PRE_PLUGIN_NAME,
@@ -21,6 +22,7 @@ export {
   convertVisiblePrices,
   suppressInlineConversions,
   clearInlineConversions,
+  INLINE_CONVERSION_CLASS,
   formatAmountInCurrency,
   AMAZON_STRUCTURED_DETECTOR_PRE_PLUGIN_NAME,
   AMAZON_STRUCTURED_ADDON_PLUGIN_NAME,

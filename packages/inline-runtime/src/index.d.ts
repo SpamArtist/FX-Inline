@@ -174,6 +174,8 @@ export function suppressInlineConversions(root?: ParentNode): number;
 
 export function clearInlineConversions(root?: ParentNode): number;
 
+export const INLINE_CONVERSION_CLASS: "fx-inline-conversion";
+
 export function formatAmountInCurrency(
   amount: number,
   currency: CurrencyCodeLike,

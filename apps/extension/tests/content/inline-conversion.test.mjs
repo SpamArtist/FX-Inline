@@ -67,6 +67,20 @@ test("injects converted amount line-height and width styles", () => {
   expect(styleTag.textContent).toContain("width: fit-content !important;");
 });
 
+test("uses shared linearized light-text detection for inline conversion colors", () => {
+  document.body.innerHTML = '<p id="price" style="color: rgb(180, 180, 180)">Pay $100 now.</p>';
+
+  const applied = convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
+    clearExisting: false,
+  });
+
+  expect(applied).toBe(1);
+
+  const wrapper = document.querySelector(`#price span.${INLINE_CONVERSION_CLASS}`);
+  expect(wrapper).not.toBeNull();
+  expect(wrapper.style.getPropertyValue("--fx-inline-converted-color")).toBe("#355aa8");
+});
+
 test("converts unicode yen symbols in mixed listing text", () => {
   document.body.innerHTML = [
     '<h5 id="listing">',

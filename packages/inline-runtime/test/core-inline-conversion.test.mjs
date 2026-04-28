@@ -171,6 +171,20 @@ test("applies configured converted currency position and display style", () => {
   }
 });
 
+test("uses linearized sRGB luminance for light text detection", () => {
+  document.body.innerHTML = '<p id="price" style="color: rgb(180, 180, 180)">Pay $100 now.</p>';
+
+  const applied = convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
+    clearExisting: false,
+  });
+
+  expect(applied).toBe(1);
+
+  const wrapper = document.querySelector(`#price span.${INLINE_CONVERSION_CLASS}`);
+  expect(wrapper).not.toBeNull();
+  expect(wrapper.style.getPropertyValue("--fx-inline-converted-color")).toBe("#355aa8");
+});
+
 test("refreshes existing wrappers in place and clears when target currency matches source", () => {
   document.body.innerHTML = '<p id="price">Price: $100</p>';
 
