@@ -1,6 +1,6 @@
 # E2E Extension Checklist
 
-_Last updated: 2026-04-25_
+_Last updated: 2026-04-28_
 
 ## Preconditions
 
@@ -8,6 +8,7 @@ _Last updated: 2026-04-25_
 - Ensure host permissions are granted for the configured rate providers.
 - Use a page with visible prices and dynamic updates (SPA/news feed/e-commerce).
 - Test at least once on Chromium and once on Firefox.
+- For admin settings checks, run `npm run admin:api` and `npm run dev:admin`.
 
 ## 1. Fresh install welcome page
 
@@ -18,24 +19,39 @@ _Last updated: 2026-04-25_
 
 Expected:
 - Fresh installs open the onboarding page once.
-- The welcome page can open Settings with the runtime fallback path.
+- The DOM-rendered welcome page can open Settings with the runtime fallback path.
 
-## 2. Popup converter and settings actions
+## 2. Admin scoped runtime settings and export
+
+1. Open the admin workbench from the Vite URL.
+2. Confirm settings load from `/api/settings`.
+3. Add a domain scope and an exact page override on that domain.
+4. Change target currency, converted amount position, display style, and highlight color.
+5. Save all settings and confirm the success toast appears.
+6. Confirm `apps/extension/generated/inlineRuntimeSettingsManifest.ts` contains the saved scopes.
+7. Use the admin build action or run `npm run build` and confirm the export step runs before WXT.
+
+Expected:
+- The admin API binds locally and persists sanitized settings to SQLite.
+- Saved all-pages, domain, and page settings are exported into the generated manifest.
+- Page scopes override domain scopes, and domain scopes override the all-pages default.
+
+## 3. Popup converter and settings actions
 
 1. Open extension popup from toolbar.
 2. Verify two rows render with editable amount displays and currency dropdowns.
 3. Change amount in row A, confirm row B recalculates.
 4. Use swap button, confirm row positions/rates swap correctly.
-5. Toggle global auto-conversion off/on, then local origin toggle off/on.
+5. Toggle global auto-conversion off/on, then local page-origin toggle off/on.
 6. Click settings button and confirm options page opens.
 7. Click `Feedback ↗` and confirm external tab opens.
 
 Expected:
 - Conversion stays live while editing/committing amounts.
 - Local toggle is disabled when active tab origin is unavailable.
-- Global/local toggle states persist after reopening popup.
+- Global toggle updates the all-pages scope; local toggle writes a domain scope for the active origin.
 
-## 3. Options page preferred currency persistence
+## 4. Options page preferred currency persistence
 
 1. Open options page.
 2. Change preferred currency to another code.
@@ -43,14 +59,15 @@ Expected:
 4. Reopen popup and verify secondary/default row reflects preferred currency logic.
 
 Expected:
-- Preferred currency persists across popup/content runtime.
+- Preferred currency persists as the first target currency in the all-pages settings scope.
 
-## 4. Selection popup on arbitrary pages
+## 5. Selection popup on arbitrary pages
 
 1. Select values in formats:
 - `100`
 - `USD 100`
 - `100USD`
+- `BOB 123`
 - `R$ 10`
 - `￥39,000`
 - `yen 6M`
@@ -60,39 +77,45 @@ Expected:
 
 Expected:
 - Popup lifecycle remains stable; no duplicate roots or stuck overlays.
+- Numeric-only selections default to EUR as the source currency.
 
-## 5. Inline conversion in text nodes
+## 6. Inline conversion in text nodes
 
 1. Load a page with plain text prices (mixed formats and currencies).
-2. Confirm each converted instance renders as `original (converted)`.
+2. Confirm each converted instance renders as `original (converted)` unless scoped settings choose another display style.
 3. Verify no conversion occurs inside editable or hidden/assistive-only contexts.
 4. Confirm no nested duplicate wrappers after repeated reruns/navigation.
 
 Expected:
 - Wrapper class: `fx-inline-conversion`.
 - Converted amount node: `.fx-inline-converted-amount`.
+- Scoped runtime settings can change target currency, position, display style, and highlight color.
 
-## 6. Structured price conversion coverage
+## 7. Structured price conversion coverage
 
 1. Test Amazon-like split prices (`symbol + whole + decimal + fraction` fragments).
 2. Test sibling symbol/amount layouts, including `yen/month` style text near numeric amount.
-3. Trigger DOM updates (client-side route changes or inserted product cards).
+3. Test a supported Little Hotelier pricing URL path.
+4. Trigger DOM updates (client-side route changes or inserted product cards).
 
 Expected:
 - Add-on wrappers are appended to structured roots/amount nodes and refresh in place.
 - Existing add-ons are removed if source snippet becomes invalid.
+- Site-specific plugins do not duplicate the shared text-node conversion path.
 
-## 7. False-positive safety checks
+## 8. False-positive safety checks
 
 1. Visit content containing usernames/handles (for example `@kes11av`, `kes11buddy`).
 2. Include valid prices nearby (for example `USD350/week`, `KES 11`).
 3. Confirm valid prices convert while handle-like tokens remain untouched.
 4. Verify lowercase prose words matching ISO-like codes (`top`, `all`, `try`, `mad`) do not convert unless uppercase currency tokens are explicit.
+5. Confirm `BOV`, `COU`, and `VED` do not convert, while `BOB`, `COP`, and `VES` do.
 
 Expected:
 - No handle/prose false-positive wrappers.
+- Active country currency codes are accepted; non-circulating unit codes are rejected.
 
-## 8. Rate fetch and refresh behavior
+## 9. Rate fetch and refresh behavior
 
 1. Trigger a conversion with normal network access.
 2. Confirm rate snapshot is cached and reused within market-day policy.
@@ -103,11 +126,12 @@ Expected:
 - Alarm `fx-inline-refresh-rates` refreshes rates every 30 minutes.
 - If fetch fails and cache is valid, conversions still work from cache.
 
-## 9. Runtime stability on dynamic pages
+## 10. Runtime stability on dynamic pages
 
 1. On a high-mutation SPA page, trigger repeated content updates.
 2. Verify conversions continue appearing on newly inserted content.
-3. Navigate or reload quickly to force content script invalidation edges.
+3. Change scoped settings and confirm delayed reconversion applies without duplicate wrappers.
+4. Navigate or reload quickly to force content script invalidation edges.
 
 Expected:
 - No persistent console spam for extension context invalidation during teardown.

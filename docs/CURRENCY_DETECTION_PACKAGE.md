@@ -22,6 +22,7 @@ It intentionally excludes DOM manipulation, rate math, and reducer/state logic.
 - `extraIsoCodes` max `500`; each value must match `^[A-Z]{3,4}$`.
 - `extraMagnitudeProfiles` max `100`; each profile has non-empty locale + non-empty entries.
 - magnitude aliases are additive-only; cannot override built-in aliases.
+- Built-in country currency validation uses active currency codes such as `BOB`, `COP`, and `VES`; non-circulating unit codes such as `BOV`, `COU`, and `VED` are intentionally rejected.
 
 `localeHint`:
 - allowed values: omitted, `null`, or locale string (examples: `en-US`, `pt-BR`, `vi`).
@@ -80,3 +81,4 @@ CI workflow: `.github/workflows/currency-detection-benchmarks.yml`
 - Runs parity baseline + tests + extension regression guard + benchmarks.
 - Publishes benchmark summaries and artifacts.
 - Benchmark comparison is report-only and does not fail the workflow.
+- The main CI workflow also runs lint, TypeScript compile, and `npm run test:all`.

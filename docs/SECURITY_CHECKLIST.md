@@ -1,6 +1,6 @@
 # Security Checklist
 
-_Last updated: 2026-04-25_
+_Last updated: 2026-04-28_
 
 ## 1. Manifest surface and CSP
 
@@ -24,9 +24,11 @@ _Last updated: 2026-04-25_
 ## 3. Storage integrity
 
 - [ ] User settings are sanitized on read/write.
-- [ ] `preferredCurrency` is constrained to known ISO codes.
-- [ ] `globalAutoConversionEnabled` coerces to boolean default when invalid.
-- [ ] `localAutoConversionByOrigin` accepts only canonical `http/https` origins and boolean values.
+- [ ] `local:user-settings` conforms to inline runtime manifest schema version `1`.
+- [ ] `scopes.allUrls`, `scopes.domains`, and `scopes.pages` are normalized before use.
+- [ ] `targetCurrencies` accepts only known active currency codes and stores one primary target.
+- [ ] Domain scopes normalize to hostnames; page scopes accept only canonical `http/https` URLs.
+- [ ] Legacy `preferredCurrency` / global-local auto-conversion settings migrate into scoped settings.
 
 ## 4. DOM safety and injection controls
 
@@ -47,12 +49,23 @@ _Last updated: 2026-04-25_
 - [ ] No browsing history payloads are transmitted; only provider rate endpoints are contacted.
 - [ ] Debug/perf logging is development-default; production logging requires explicit `localStorage` opt-in (`fx-inline:perf=1`).
 
-## 7. Pre-Ship Checks
+## 7. Local admin API and generated settings
 
-- [ ] Run `npm run test:all` before shipping changes.
+- [ ] Admin API binds to loopback by default (`127.0.0.1`) and does not expose a public network listener unless explicitly configured.
+- [ ] Admin API request body limit stays bounded (`1mb`).
+- [ ] Admin settings writes sanitize manifest input before persisting to SQLite.
+- [ ] Generated manifest output is TypeScript code produced from sanitized JSON, not string-concatenated user input.
+- [ ] Admin build endpoint is treated as a local developer operation because it runs `npm run build`.
+- [ ] `apps/admin/data/settings.sqlite` does not contain secrets.
+
+## 8. Pre-Ship Checks
+
+- [ ] Run `npm run lint`, `npm run compile`, and `npm run test:all` before shipping changes.
+- [ ] Confirm `npm run test:all` includes frontend, content, release, and admin export tests.
 - [ ] For tagged releases, validate the tag/version locally:
   - `RELEASE_TAG=v0.4.1 npm run release:validate-tag`
   - `RELEASE_TAG=v0.4.1 npm run release:dry-run`
+- [ ] For documentation changes, run `npm run readme:sync` and `npm run readme:sync:check`.
 - [ ] GitHub Actions release workflow (`.github/workflows/release.yml`) keeps least-privilege permissions (only the GitHub release job requires `contents: write`).
 - [ ] Store credentials (Chrome/Edge/AMO) are stored as GitHub Actions secrets and never committed to the repo.
 - [ ] Re-verify permissions/CSP/host permissions after manifest or dependency changes.

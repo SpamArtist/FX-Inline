@@ -18,6 +18,14 @@ This README has an auto-generated repository snapshot that updates via `npm run 
   - `RELEASE_TAG=v0.4.1 npm run release:dry-run`
   - `RELEASE_TAG=v0.4.1 npm run release:validate-tag`
 
+## Local Admin Settings
+
+- `npm run admin:api` starts the local NestJS admin API on `127.0.0.1:3307`.
+- `npm run dev:admin` starts the Vite admin workbench on port `3306` and proxies `/api` to the local API.
+- The admin workbench edits scoped inline-runtime settings for all pages, domains, and exact page URLs.
+- Saving settings persists them to `apps/admin/data/settings.sqlite` and exports `apps/extension/generated/inlineRuntimeSettingsManifest.ts`.
+- Extension builds run `npm run admin:export-settings` before WXT so the generated manifest is current.
+
 <!-- AUTO-GENERATED:START -->
 
 ## Auto-Generated Repository Snapshot
@@ -44,10 +52,11 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 - `https://api.exchangerate-api.com/v4/latest/USD`
 
 ### Test Inventory
-- Total test files: `19`
+- Total test files: `23`
+- admin: `2`
 - content: `6`
 - release: `1`
-- unit: `12`
+- unit: `14`
 
 ### Scripts
 | Script | Command |
@@ -55,9 +64,14 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run dev` | `wxt` |
 | `npm run dev:firefox` | `wxt -b firefox` |
 | `npm run dev:website` | `vite --config apps/website/vite.config.mjs` |
-| `npm run build` | `wxt build` |
-| `npm run build:firefox` | `wxt build -b firefox` |
+| `npm run dev:admin` | `vite --config apps/admin/vite.config.mjs` |
+| `npm run admin:api` | `npm run build:backend && node dist/backend/main.js` |
+| `npm run admin:export-settings` | `npm run build:backend && node dist/backend/export-settings.js` |
+| `npm run build:backend` | `tsc -p apps/backend/tsconfig.json` |
+| `npm run build` | `npm run admin:export-settings && wxt build` |
+| `npm run build:firefox` | `npm run admin:export-settings && wxt build -b firefox` |
 | `npm run build:website` | `vite build --config apps/website/vite.config.mjs` |
+| `npm run build:admin` | `vite build --config apps/admin/vite.config.mjs` |
 | `npm run zip` | `wxt zip` |
 | `npm run zip:firefox` | `wxt zip -b firefox` |
 | `npm run release:clean` | `node scripts/release/clean.mjs` |
@@ -75,10 +89,11 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run build:content-tests` | `tsc -p apps/extension/tsconfig.content-tests.json` |
 | `npm run jest` | `node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand` |
 | `npm run test:release` | `node --test test/release/versioning.test.mjs` |
+| `npm run test:admin` | `npm run build:backend && node --test test/admin/export-settings.test.mjs` |
 | `npm run test:frontend` | `npm run build:unit && npm run jest -- apps/extension/tests/unit` |
 | `npm run test:content` | `npm run build:content-tests && npm run jest -- --config jest.content.config.cjs apps/extension/tests/content` |
 | `npm run test:unit` | `npm run test:frontend` |
-| `npm run test:all` | `npm run test:frontend && npm run test:content && npm run test:release` |
+| `npm run test:all` | `npm run test:frontend && npm run test:content && npm run test:release && npm run test:admin` |
 | `npm run currency-detection:fixtures` | `node packages/currency-detection/scripts/generate-fixtures.mjs` |
 | `npm run currency-detection:baseline` | `npm run build:unit && npm run currency-detection:fixtures && node packages/currency-detection/scripts/generate-legacy-snapshot.mjs` |
 | `npm run currency-detection:test` | `npm run jest -- packages/currency-detection/test` |
@@ -91,13 +106,13 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run readme:sync:check` | `node scripts/readme-sync.mjs --check` |
 
 ### Recent Changes (first-parent, excluding README automation commits)
+- 2026-04-28 `23d448c` fix: remove unused extension and admin dead code (#48)
+- 2026-04-28 `601a79e` fix: dedupe inline runtime conversion path (#45)
+- 2026-04-28 `6d2eccd` Merge branch 'main' of https://github.com/SpamArtist/currency-conversion-extension-tool into bug/issue-40-currency-codes
+- 2026-04-28 `fd19811` fix: align country currency codes
+- 2026-04-27 `74df952` Move admin API to NestJS backend (#35)
+- 2026-04-27 `ad7dcf9` Add local admin dashboard and scoped inline runtime settings (#33)
+- 2026-04-27 `662302f` docs: refresh readme snapshot
 - 2026-04-26 `62ccee8` no duplicate inline
-- 2026-04-26 `191bb50` Merge branch 'main' of https://github.com/SpamArtist/currency-conversion-extension-tool
-- 2026-04-26 `aa92014` renaming ccx to fx-inline
-- 2026-04-25 `9af33cd` docs: align docs with current extension behavior
-- 2026-04-25 `3b18be5` update
-- 2026-04-23 `a3e4b1e` Merge branch 'main' of https://github.com/SpamArtist/currency-conversion-extension-tool
-- 2026-04-23 `8717671` update
-- 2026-04-21 `c87eb22` Codex/welcome page install (#25)
 
 <!-- AUTO-GENERATED:END -->

@@ -67,6 +67,7 @@ type ParserConfig = {
 - Example: `["USDX", "BTC"]`
 - Allowed values: array length `<= 500`.
 - Each item must match `^[A-Z]{3,4}$`.
+- Built-in validation tracks active country currency codes; for example `BOB`, `COP`, and `VES` are accepted while non-circulating unit codes `BOV`, `COU`, and `VED` are rejected.
 
 `extraMagnitudeProfiles`
 - Additional locale-aware magnitude aliases (for example, custom `"mega"` => `1_000_000`).
@@ -215,3 +216,5 @@ parser.parseValue("USDX 2 mega", { localeHint: "en-US" });
 - `npm run currency-detection:test`
 - `npm run currency-detection:bench`
 - `npm run currency-detection:bench:compare`
+
+The benchmark workflow is report-only for comparisons; main CI still runs lint, TypeScript compile, and the full test suite.

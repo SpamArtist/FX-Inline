@@ -14,6 +14,10 @@ This is a **greenfield** task. Build everything needed from this prompt only.
 2. Use a monorepo layout:
 - `apps/extension` for the extension app.
 - `apps/website` for a standalone static marketing site scaffold (basic Vite setup is enough).
+- `apps/admin` for the local React admin workbench.
+- `apps/backend` for the local NestJS admin API/exporter.
+- `packages/currency-detection` for the portable parser package.
+- `packages/inline-runtime` for the shared inline conversion runtime.
 - `docs` for runbooks/checklists.
 3. Use the existing visual approach:
 - custom CSS theme tokens (`converter-theme.css`) and component CSS,
@@ -21,7 +25,7 @@ This is a **greenfield** task. Build everything needed from this prompt only.
 4. Support Chromium and Firefox builds from one codebase. Include Safari conversion notes.
 5. Include CI + release automation:
    - Workflows under `.github/workflows/`:
-     - `ci.yml` runs `npm run test:all` on PRs and pushes to `main`.
+     - `ci.yml` runs lint, TypeScript compile, and `npm run test:all` on PRs and pushes to `main`.
      - `currency-detection-benchmarks.yml` runs currency detection benchmarks and publishes artifacts/summaries.
      - `release.yml` is tag-driven (on `push` of tags matching `v*`) and validates the tag, runs tests, builds artifacts, and publishes a GitHub release (store publishing steps are gated on configured secrets).
    - Release tags and versioning:
@@ -71,7 +75,7 @@ Implement equivalent manifest behavior via WXT config:
 7. Build hardening behavior:
 - include post-bundle patching for Firefox manifest version fields so generated artifacts match the release tag metadata.
 
-## 4) Required Extension Pages and Entrypoints
+## 4) Required Apps, Pages, and Entrypoints
 
 Implement these extension entrypoints and behaviors exactly.
 
@@ -125,7 +129,7 @@ Implement these extension entrypoints and behaviors exactly.
 - render option label as `emoji code - currency name`
 - sort options by code
 6. On currency change:
-- persist `preferredCurrency`
+- persist the selected code as the first `targetCurrencies` value in the all-pages settings scope
 - show status message: `Preferred currency updated to <CODE>.`
 7. Options HTML metadata:
 - include `<meta name="manifest.open_in_tab" content="true" />`.
@@ -203,6 +207,24 @@ Implement these extension entrypoints and behaviors exactly.
 5. On alarm fire:
 - refresh cached rates
 
+### G) Local Admin Workbench and API
+
+1. Admin frontend:
+- `apps/admin` is a Vite + React workbench.
+- `npm run dev:admin` serves it on port `3306` with `/api` proxied to `http://127.0.0.1:3307`.
+- It edits all-pages, domain, and exact page URL inline-runtime settings.
+- Supported fields: enabled, target currency, converted currency position, display style, and highlight color.
+2. Admin API:
+- `apps/backend` is a NestJS API.
+- `npm run admin:api` starts it on `127.0.0.1:3307` by default.
+- `GET /api/settings` returns the sanitized manifest.
+- `PUT /api/settings` sanitizes, persists to SQLite, and exports the generated TypeScript manifest.
+- `POST /api/build-extension` runs `npm run build` as a local developer operation.
+3. Export contract:
+- default database path: `apps/admin/data/settings.sqlite`
+- generated output path: `apps/extension/generated/inlineRuntimeSettingsManifest.ts`
+- extension build scripts run `npm run admin:export-settings` before WXT builds.
+
 ## 5) Core Runtime Behavior
 
 ### A) Storage Model
@@ -210,21 +232,40 @@ Implement these extension entrypoints and behaviors exactly.
 Use extension local storage with these keys and semantics:
 
 1. Key: `local:user-settings`.
-2. Settings shape:
-- `preferredCurrency`
-- `globalAutoConversionEnabled`
-- `localAutoConversionByOrigin`
-3. Defaults:
-- `preferredCurrency: "EUR"`
-- `globalAutoConversionEnabled: true`
-- `localAutoConversionByOrigin: {}`
-4. Behavior requirements:
+2. Settings shape is an inline runtime settings manifest:
+- `schemaVersion: 1`
+- `generatedAt`
+- `scopes.allUrls`
+- `scopes.domains`
+- `scopes.pages`
+3. Each settings scope includes:
+- `enabled`
+- `domain`
+- `pageUrl`
+- `targetCurrencies`
+- `convertedCurrencyPosition`
+- `displayStyle`
+- `highlightColor`
+- `extraSettings`
+4. Defaults:
+- all-pages scope enabled
+- target currency: `EUR`
+- converted currency position: `right`
+- display style: `brackets`
+- highlight color: `#fff1a8`
+- domain and page scope maps empty
+5. Behavior requirements:
 - sanitize and normalize persisted settings on reads/writes
-- canonicalize origin keys to valid HTTP/HTTPS origins only
+- load defaults from the generated inline-runtime settings manifest
+- migrate legacy `preferredCurrency`, `globalAutoConversionEnabled`, and `localAutoConversionByOrigin` values into the scoped manifest
+- canonicalize domain scopes to hostnames and page scopes to valid HTTP/HTTPS URLs
 - keep helper APIs for full set and partial patch
-5. Auto-conversion enable logic:
-- global off disables all inline auto-conversion
-- otherwise allow by default and only disable per origin when origin map entry is explicitly `false`
+6. Scope resolution and auto-conversion logic:
+- exact page scope overrides domain scope
+- domain scope overrides all-pages scope
+- all-pages disabled suppresses conversion by default
+- popup global toggle updates `scopes.allUrls.enabled`
+- popup local toggle writes/updates a domain scope for the active tab origin
 
 ### B) Rates and Cache Policy
 
@@ -302,6 +343,12 @@ Use extension local storage with these keys and semantics:
 - include sibling currency-word combinations such as `yen/month`
 12. Converted amount style contract:
 - `.fx-inline-converted-amount` must include inherited line-height and `width: fit-content`
+13. Scoped render preferences:
+- resolved settings can set converted currency position: `top`, `bottom`, `left`, `right`, or `tooltip`
+- resolved settings can set display style: `pill`, `underline`, `highlightColor`, or `brackets`
+- `highlightColor` uses the sanitized scope color value
+14. Site-specific plugins:
+- support Little Hotelier pricing pages through dedicated pre/post plugins without duplicating the shared text-node conversion path
 
 ### E) Mutation-Aware Conversion Runtime
 
@@ -405,6 +452,10 @@ Must parse all of these correctly:
 60. `￦3000`
 61. `￠50`
 62. `﹩75`
+63. `BOB 123`
+64. `123 COP`
+65. `VES123`
+
 ### B) Required Invalid Parse Cases
 
 Must reject:
@@ -416,6 +467,9 @@ Must reject:
 5. `foo bar`
 6. `12.3.4 USD`
 7. `27, all`
+8. `BOV 123`
+9. `123 COU`
+10. `VED123`
 
 ### C) Required Text Extraction Cases
 
@@ -438,6 +492,7 @@ Must detect correctly from mixed text:
 15. Ignore username/handle-like boundaries (for example `@kes11av`, `kes11buddy`) while still detecting nearby valid snippets such as `USD350/week` or `KES 11`.
 16. Support composite dollar symbols and Unicode compatibility/full-width symbols inside mixed text.
 17. Support yen alias extraction including `yen/month` sibling-token contexts.
+18. Accept active country currency codes including `BOB`, `COP`, and `VES`; reject non-circulating unit codes `BOV`, `COU`, and `VED`.
 
 ### D) Locale-Aware Magnitude Profiles
 
@@ -465,21 +520,38 @@ Define scripts equivalent in behavior to:
 
 1. `npm run dev`
 2. `npm run dev:firefox`
-3. `npm run build`
-4. `npm run build:firefox`
-5. `npm run zip`
-6. `npm run zip:firefox`
-7. `npm run compile`
-8. `npm run build:unit`
-9. `npm run build:content-tests`
-10. `npm run jest`
-11. `npm run test:frontend`
-12. `npm run test:content`
-13. `npm run test:unit`
-14. `npm run test:all`
-15. `npm run dev:website`
-16. `npm run build:website`
-17. `npm run preview:website`
+3. `npm run dev:website`
+4. `npm run dev:admin`
+5. `npm run admin:api`
+6. `npm run admin:export-settings`
+7. `npm run build:backend`
+8. `npm run build`
+9. `npm run build:firefox`
+10. `npm run build:website`
+11. `npm run build:admin`
+12. `npm run zip`
+13. `npm run zip:firefox`
+14. `npm run lint`
+15. `npm run compile`
+16. `npm run build:unit`
+17. `npm run build:content-tests`
+18. `npm run jest`
+19. `npm run test:frontend`
+20. `npm run test:content`
+21. `npm run test:unit`
+22. `npm run test:release`
+23. `npm run test:admin`
+24. `npm run test:all`
+25. `npm run currency-detection:fixtures`
+26. `npm run currency-detection:baseline`
+27. `npm run currency-detection:test`
+28. `npm run currency-detection:bench`
+29. `npm run currency-detection:bench:compare`
+30. `npm run inline-runtime:build`
+31. `npm run inline-runtime:test`
+32. `npm run preview:website`
+33. `npm run readme:sync`
+34. `npm run readme:sync:check`
 
 ## 8) Testing Requirements (Mandatory)
 
@@ -512,7 +584,16 @@ Add tests equivalent in scope to:
 - amount/currency/swap actions
 - preferred currency application
 - settings/rates hydration behavior
-8. mutation root collector:
+8. scoped settings manifest behavior:
+- sanitization for all-pages, domain, and page scopes
+- page > domain > all-pages resolution
+- legacy settings migration into scoped manifest
+- generated manifest fallback loading
+9. admin settings export behavior:
+- SQLite defaults
+- scoped domain/page persistence
+- generated TypeScript manifest output
+10. mutation root collector:
 - includes element and text-parent roots
 - ignores popup root
 - deduplicates roots
@@ -534,6 +615,7 @@ Include jsdom-level tests for content runtime and selection popup:
 10. structured add-on decorators for Amazon and sibling symbol/amount patterns.
 11. username/handle-like false-positive protections.
 12. extension context invalidation cleanup safety path.
+13. site-specific Little Hotelier pre/post plugin behavior.
 
 ### C) Manual E2E Checklist (`docs/QA_E2E_CHECKLIST.md`)
 
@@ -544,13 +626,14 @@ Must include:
 3. mutation observer catches inserted nodes.
 4. rate refresh behavior across day boundaries.
 5. global and per-origin auto-conversion toggles.
-6. run key scenarios on Chromium and Firefox; note differences.
+6. admin scoped settings save/export/build path.
+7. run key scenarios on Chromium and Firefox; note differences.
 
 ## 9) README Requirements
 
 Include:
 
-1. project layout (`apps/extension`, `apps/website`, `docs`).
+1. project layout (`apps/extension`, `apps/website`, `apps/admin`, `apps/backend`, `packages`, `docs`).
 2. local setup steps.
 3. dev/build/test command guide.
 4. unpacked extension loading instructions.
