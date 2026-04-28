@@ -39,7 +39,6 @@ interface MetaRow {
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(currentDirectory, "../..");
 const DEFAULT_ADMIN_DB_PATH = path.resolve(repoRoot, "apps/admin/data/settings.sqlite");
-const DEFAULT_GENERATED_AT = "1970-01-01T00:00:00.000Z";
 const DEFAULT_TARGET_CURRENCY = "EUR";
 const DEFAULT_POSITION = "right";
 const DEFAULT_DISPLAY_STYLE = "brackets";
@@ -137,7 +136,7 @@ export function createDefaultInlineRuntimeSettings(
 export function createDefaultInlineRuntimeSettingsManifest(): InlineRuntimeSettingsManifest {
   return {
     schemaVersion: INLINE_RUNTIME_SETTINGS_SCHEMA_VERSION,
-    generatedAt: DEFAULT_GENERATED_AT,
+    generatedAt: new Date().toISOString(),
     scopes: {
       allUrls: createDefaultInlineRuntimeSettings(),
       domains: {},

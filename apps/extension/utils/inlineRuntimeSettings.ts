@@ -13,7 +13,6 @@ import type { JsonValue } from "./json.types";
 export const INLINE_RUNTIME_SETTINGS_SCHEMA_VERSION = 1;
 export const INLINE_RUNTIME_ALL_URLS_SCOPE_ID = "all_urls";
 
-const DEFAULT_GENERATED_AT = "1970-01-01T00:00:00.000Z";
 const DEFAULT_TARGET_CURRENCY = CurrencyCode.EURO;
 const DEFAULT_CONVERTED_CURRENCY_POSITION: InlineConvertedCurrencyPosition = "right";
 const DEFAULT_DISPLAY_STYLE: InlineConvertedCurrencyDisplayStyle = "brackets";
@@ -209,7 +208,7 @@ export const DEFAULT_INLINE_RUNTIME_SETTINGS = createDefaultInlineRuntimeSetting
 
 export const DEFAULT_INLINE_RUNTIME_SETTINGS_MANIFEST: InlineRuntimeSettingsManifest = {
   schemaVersion: INLINE_RUNTIME_SETTINGS_SCHEMA_VERSION,
-  generatedAt: DEFAULT_GENERATED_AT,
+  generatedAt: new Date().toISOString(),
   scopes: {
     allUrls: DEFAULT_INLINE_RUNTIME_SETTINGS,
     domains: {},
