@@ -15,6 +15,18 @@ const releaseManifestOverrides = releaseTag
   })()
   : null;
 
+const CHUNKABLE_PAGE_ENTRYPOINT_TYPES = new Set([
+  "bookmarks",
+  "devtools",
+  "history",
+  "newtab",
+  "options",
+  "popup",
+  "sandbox",
+  "sidepanel",
+  "unlisted-page",
+]);
+
 function hardenFirefoxInnerHtmlAssignments() {
   return {
     name: "harden-firefox-innerhtml-assignments",
@@ -44,11 +56,85 @@ function hardenFirefoxInnerHtmlAssignments() {
   };
 }
 
+function normalizeBundleModuleId(id: string): string {
+  return id.split(path.win32.sep).join(path.posix.sep);
+}
+
+export function getFxInlineManualChunk(id: string): string | undefined {
+  const moduleId = normalizeBundleModuleId(id);
+
+  if (moduleId.includes("/node_modules/")) {
+    if (
+      moduleId.includes("/node_modules/react/") ||
+      moduleId.includes("/node_modules/react-dom/") ||
+      moduleId.includes("/node_modules/scheduler/") ||
+      moduleId.includes("/node_modules/lucide-react/") ||
+      moduleId.includes("/node_modules/@radix-ui/react-")
+    ) {
+      return "vendor-react";
+    }
+
+    if (
+      moduleId.includes("/node_modules/@wxt-dev/storage/") ||
+      moduleId.includes("/node_modules/async-mutex/") ||
+      moduleId.includes("/node_modules/dequal/") ||
+      moduleId.includes("/node_modules/wxt/dist/utils/storage.")
+    ) {
+      return "vendor-storage";
+    }
+
+    return undefined;
+  }
+
+  if (
+    moduleId.includes("/apps/extension/assets/currency.json") ||
+    moduleId.includes("/apps/extension/utils/enums.ts") ||
+    moduleId.includes("/apps/extension/utils/constants.ts")
+  ) {
+    return "app-data";
+  }
+
+  if (
+    moduleId.includes("/apps/extension/generated/inlineRuntimeSettingsManifest.ts") ||
+    moduleId.includes("/apps/extension/utils/appStorage.ts") ||
+    moduleId.includes("/apps/extension/utils/inlineRuntimeSettings.ts")
+  ) {
+    return "app-state";
+  }
+
+  return undefined;
+}
+
+function withFxInlineManualChunks(
+  output: OutputOptions | OutputOptions[] | undefined,
+): OutputOptions {
+  const outputOptions = Array.isArray(output) ? output[0] : output;
+
+  return {
+    ...(outputOptions ?? {}),
+    manualChunks: getFxInlineManualChunk,
+  };
+}
+
 // See https://wxt.dev/api/config.html
 export default defineConfig({
   srcDir: "apps/extension",
   publicDir: "apps/extension/public",
   modules: ["@wxt-dev/module-react"],
+  hooks: {
+    "vite:build:extendConfig": (entrypoints, viteConfig) => {
+      const buildsChunkablePage = entrypoints.some((entrypoint) =>
+        CHUNKABLE_PAGE_ENTRYPOINT_TYPES.has(entrypoint.type),
+      );
+      if (!buildsChunkablePage) return;
+
+      viteConfig.build ??= {};
+      viteConfig.build.rollupOptions ??= {};
+      viteConfig.build.rollupOptions.output = withFxInlineManualChunks(
+        viteConfig.build.rollupOptions.output,
+      );
+    },
+  },
   manifest: ({ mode }) => {
     const productionConnectSrc =
       "'self' https://open.er-api.com https://api.exchangerate-api.com";
