@@ -1,5 +1,6 @@
 import {
   applyPreferredCurrencyPreference,
+  createCurrencyIdFactory,
   createInitialCurrenciesState,
   reduceCurrencyState,
 } from "../../test-dist/hooks/useCurrencyReducer.state.js";
@@ -44,6 +45,16 @@ function createContext(overrides = {}) {
     ...overrides,
   };
 }
+
+test("createCurrencyIdFactory scopes ids to each reducer instance", () => {
+  const firstCreateCurrencyId = createCurrencyIdFactory();
+  const secondCreateCurrencyId = createCurrencyIdFactory();
+
+  expect(firstCreateCurrencyId()).toBe("currency-1");
+  expect(firstCreateCurrencyId()).toBe("currency-2");
+  expect(secondCreateCurrencyId()).toBe("currency-1");
+  expect(secondCreateCurrencyId()).toBe("currency-2");
+});
 
 test("createInitialCurrenciesState creates two baseline rows with generated ids", () => {
   const context = createContext({

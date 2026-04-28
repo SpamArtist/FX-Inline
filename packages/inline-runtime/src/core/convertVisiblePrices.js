@@ -29,7 +29,7 @@ export function convertVisiblePrices(
   root = document.body,
   options,
 ) {
-  const passContext = createInlinePassContext();
+  const passContext = createInlinePassContext(options?.createPassId?.());
   const passId = passContext.passId;
 
   try {

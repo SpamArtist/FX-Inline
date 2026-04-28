@@ -40,6 +40,7 @@ export function runPartialConversionPass(
       clientRenderPreferences: options.clientRenderPreferences,
       baseCurrency: options.baseCurrency,
       onPluginError: options.onPluginError,
+      createPassId: options.createPassId,
     });
   }
 

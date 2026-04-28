@@ -118,6 +118,7 @@ export type ConvertVisiblePricesOptions = {
   clientRenderPreferences?: InlineRenderPreferences | null;
   baseCurrency?: CurrencyCodeLike | null;
   onPluginError?: (error: unknown, plugin: InlineConversionPlugin) => void;
+  createPassId?: () => string;
 };
 
 export type InlineRuntimeRefreshOptions = {

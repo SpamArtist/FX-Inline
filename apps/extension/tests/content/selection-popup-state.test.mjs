@@ -97,6 +97,31 @@ test("store initializes with source currency and default secondary row", () => {
   store.destroy();
 });
 
+test("store scopes generated currency ids to each popup instance", () => {
+  const firstStore = createSelectionPopupStateStore({
+    amount: "10",
+    sourceCurrency: CurrencyCode.EURO,
+    hydrationDeps: createFailingHydrationDeps(),
+  });
+  const secondStore = createSelectionPopupStateStore({
+    amount: "20",
+    sourceCurrency: CurrencyCode.INDIA,
+    hydrationDeps: createFailingHydrationDeps(),
+  });
+
+  expect(firstStore.getSnapshot().currencies.map((currency) => currency.id)).toEqual([
+    "currency-1",
+    "currency-2",
+  ]);
+  expect(secondStore.getSnapshot().currencies.map((currency) => currency.id)).toEqual([
+    "currency-1",
+    "currency-2",
+  ]);
+
+  firstStore.destroy();
+  secondStore.destroy();
+});
+
 test("updateAmount recalculates dependent row values", () => {
   const store = createSelectionPopupStateStore({
     amount: "10",

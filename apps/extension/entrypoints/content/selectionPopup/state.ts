@@ -8,6 +8,7 @@ import { loadCurrencyReducerHydration } from "@/hooks/useCurrencyReducer.hydrati
 import {
   DEFAULT_SECONDARY_CURRENCY,
   applyPreferredCurrencyPreference,
+  createCurrencyIdFactory,
   createInitialCurrenciesState,
   recalculateFromIndex,
   reduceCurrencyState,
@@ -21,13 +22,6 @@ type CurrencyListEntry = {
 const CURRENCY_LIST_BY_CODE = new Map<CurrencyCode, CurrencyListEntry>(
   (currencies as CurrencyListEntry[]).map((currency) => [currency.code, currency]),
 );
-
-let currencyIdCounter = 0;
-
-function createCurrencyId() {
-  currencyIdCounter += 1;
-  return `currency-${currencyIdCounter}`;
-}
 
 function getCurrencyStateFromCode(code: CurrencyCode) {
   const currencyFromMap = CURRENCY_CODE_MAP[code];
@@ -80,6 +74,7 @@ export function createSelectionPopupStateStore({
 }: CreateSelectionPopupStateStoreParams): SelectionPopupStateStore {
   let preferredCurrency = DEFAULT_STARTING_CURRENCY;
   let rateSnapshot: RateSnapshot | null = null;
+  const createCurrencyId = createCurrencyIdFactory();
 
   let currenciesState = createInitialCurrenciesState({
     amount,

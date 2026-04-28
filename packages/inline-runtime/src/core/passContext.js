@@ -1,5 +1,3 @@
-let passSequence = 0;
-
 function getNamespaceMap(store, namespace, shouldCreate = false) {
   const normalizedNamespace = String(namespace);
   const existing = store.get(normalizedNamespace);
@@ -11,9 +9,25 @@ function getNamespaceMap(store, namespace, shouldCreate = false) {
   return created;
 }
 
+function createRandomPassToken() {
+  if (globalThis.crypto?.randomUUID) {
+    return globalThis.crypto.randomUUID();
+  }
+
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+}
+
+export function createInlinePassIdFactory() {
+  let passSequence = 0;
+
+  return () => {
+    passSequence += 1;
+    return `inline-pass-${passSequence}`;
+  };
+}
+
 export function createInlinePassId() {
-  passSequence += 1;
-  return `inline-pass-${passSequence}`;
+  return `inline-pass-${createRandomPassToken()}`;
 }
 
 export function createInlinePassContext(passId = createInlinePassId()) {

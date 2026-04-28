@@ -8,6 +8,7 @@ import {
   littleHotelierPricingRendererPostPlugin,
   suppressInlineConversions,
 } from "../src/index.js";
+import { createInlinePassIdFactory } from "../src/core/passContext.js";
 
 const INLINE_CONVERSION_CLASS = "fx-inline-conversion";
 
@@ -423,6 +424,54 @@ test("supports pass-scoped metadata handoff from pre detector to post renderer",
   expect(observed).toHaveLength(1);
   expect(observed[0].count).toBe(1);
   expect(observed[0].passId).toMatch(/^inline-pass-/u);
+});
+
+test("scopes pass id factory sequences to each owner", () => {
+  const firstCreatePassId = createInlinePassIdFactory();
+  const secondCreatePassId = createInlinePassIdFactory();
+
+  expect(firstCreatePassId()).toBe("inline-pass-1");
+  expect(firstCreatePassId()).toBe("inline-pass-2");
+  expect(secondCreatePassId()).toBe("inline-pass-1");
+  expect(secondCreatePassId()).toBe("inline-pass-2");
+});
+
+test("uses provided pass id factory for conversion pass contexts", () => {
+  document.body.innerHTML = "<div>$100</div>";
+  const observedPassIds = [];
+  let passCounter = 0;
+
+  const postPlugin = {
+    name: "observer",
+    phase: "post",
+    apply({ passId }) {
+      observedPassIds.push(passId);
+      return 0;
+    },
+  };
+
+  const createPassId = () => {
+    passCounter += 1;
+    return `owner-pass-${passCounter}`;
+  };
+
+  convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
+    clearExisting: false,
+    includeDefaultPrePlugins: false,
+    includeDefaultPostPlugins: false,
+    postPlugins: [postPlugin],
+    createPassId,
+  });
+
+  convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
+    clearExisting: false,
+    includeDefaultPrePlugins: false,
+    includeDefaultPostPlugins: false,
+    postPlugins: [postPlugin],
+    createPassId,
+  });
+
+  expect(observedPassIds).toEqual(["owner-pass-1", "owner-pass-2"]);
 });
 
 test("does not leak pre/post pass metadata across conversion calls", () => {

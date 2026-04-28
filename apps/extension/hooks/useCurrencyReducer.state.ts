@@ -29,6 +29,15 @@ export type InitialCurrencyStateParams = {
   getCurrencyStateFromCode: CurrencyStateResolver;
 };
 
+export function createCurrencyIdFactory(): () => string {
+  let currencyIdCounter = 0;
+
+  return () => {
+    currencyIdCounter += 1;
+    return `currency-${currencyIdCounter}`;
+  };
+}
+
 export function resolveAltCurrency(
   baseCurrency: CurrencyCode,
   preferredCurrency: CurrencyCode,

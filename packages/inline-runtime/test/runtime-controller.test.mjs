@@ -142,6 +142,42 @@ test("passes plugin configuration into full conversion calls", async () => {
   );
 });
 
+test("scopes pass id sequence to each runtime controller", async () => {
+  const { createInlineRuntime } = await importControllerWithMocks();
+  const observedPassIds = [];
+
+  convertVisiblePricesMock.mockImplementation((...args) => {
+    const options = args[3];
+    observedPassIds.push(options.createPassId());
+    return 1;
+  });
+
+  const firstRuntime = createInlineRuntime({
+    root: document.body,
+    preferredCurrency: "EUR",
+    rateSnapshot: createSnapshot(),
+    enabled: true,
+    observeMutations: false,
+  });
+  const secondRoot = document.createElement("section");
+  document.body.appendChild(secondRoot);
+  const secondRuntime = createInlineRuntime({
+    root: secondRoot,
+    preferredCurrency: "EUR",
+    rateSnapshot: createSnapshot(),
+    enabled: true,
+    observeMutations: false,
+  });
+
+  firstRuntime.start();
+  secondRuntime.start();
+
+  jest.advanceTimersByTime(200);
+  await Promise.resolve();
+
+  expect(observedPassIds).toEqual(["inline-pass-1", "inline-pass-1"]);
+});
+
 test("setEnabled(false) suppresses wrappers and skips conversion", async () => {
   const { createInlineRuntime } = await importControllerWithMocks();
 

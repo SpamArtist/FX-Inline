@@ -3,6 +3,7 @@ import {
   suppressInlineConversions,
 } from "../core/conversionNodes.js";
 import { convertVisiblePrices } from "../core/convertVisiblePrices.js";
+import { createInlinePassIdFactory } from "../core/passContext.js";
 import { runPartialConversionPass } from "../core/partialPass.js";
 import { collectMutationConversionRoots } from "../mutationRoots.js";
 import { getRates } from "../rates/index.js";
@@ -35,6 +36,7 @@ export function createInlineRuntime(options = {}) {
   let enabled = options.enabled ?? true;
   let observeMutations = options.observeMutations ?? true;
   const autoFetchRates = options.autoFetchRates ?? false;
+  const createPassId = createInlinePassIdFactory();
 
   let isRunning = false;
   let isApplyingInlineConversion = false;
@@ -108,6 +110,7 @@ export function createInlineRuntime(options = {}) {
         clientRenderPreferences,
         baseCurrency,
         onPluginError: options.onPluginError,
+        createPassId,
       });
     } finally {
       releaseMutationSuppression();
@@ -172,6 +175,7 @@ export function createInlineRuntime(options = {}) {
             clientRenderPreferences,
             baseCurrency,
             onPluginError: options.onPluginError,
+            createPassId,
           },
         );
 

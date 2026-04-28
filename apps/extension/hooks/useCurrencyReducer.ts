@@ -8,6 +8,7 @@ import { loadCurrencyReducerHydration } from "./useCurrencyReducer.hydration";
 import {
   DEFAULT_SECONDARY_CURRENCY,
   applyPreferredCurrencyPreference,
+  createCurrencyIdFactory,
   createInitialCurrenciesState,
   recalculateFromIndex,
   reduceCurrencyState,
@@ -16,13 +17,6 @@ import {
 const CURRENCY_LIST_BY_CODE = new Map(
   currencies.map((currency) => [currency.code as CurrencyCode, currency]),
 );
-
-let currencyIdCounter = 0;
-
-function createCurrencyId() {
-  currencyIdCounter += 1;
-  return `currency-${currencyIdCounter}`;
-}
 
 function getCurrencyStateFromCode(code: CurrencyCode) {
   const currencyFromMap = CURRENCY_CODE_MAP[code];
@@ -38,6 +32,8 @@ export const useCurrencyReducer = ({
   number: string;
   currency: CurrencyCode;
 }) => {
+  const [createCurrencyId] = useState<() => string>(() => createCurrencyIdFactory());
+
   const [rateSnapshot, setRateSnapshot] = useState<RateSnapshot | null>(null);
   const [preferredCurrency, setPreferredCurrency] = useState<CurrencyCode>(
     DEFAULT_STARTING_CURRENCY,
@@ -102,7 +98,7 @@ export const useCurrencyReducer = ({
         }),
       );
     },
-    [preferredCurrency, rateSnapshot],
+    [preferredCurrency, rateSnapshot, createCurrencyId],
   );
 
   return [currenciesState, dispatch] as const;
