@@ -1,6 +1,9 @@
 import { jest } from "@jest/globals";
 
-import { getMarketDayKey } from "../src/rates/policy/marketDay.js";
+import {
+  getMarketDayKey,
+  shouldUseMarketDayCache,
+} from "../src/rates/policy/marketDay.js";
 import { __setMemoryRateCacheForTests, getRates } from "../src/rates/index.js";
 
 beforeEach(() => {
@@ -11,6 +14,25 @@ beforeEach(() => {
 afterEach(() => {
   __setMemoryRateCacheForTests(null);
   delete global.fetch;
+});
+
+test("getMarketDayKey uses the UTC calendar day", () => {
+  expect(getMarketDayKey(new Date("2026-03-02T00:00:00.000Z"))).toBe(
+    "2026-03-02",
+  );
+  expect(getMarketDayKey(new Date("2026-03-02T23:59:59.999Z"))).toBe(
+    "2026-03-02",
+  );
+  expect(getMarketDayKey(new Date("2026-03-03T00:00:00.000Z"))).toBe(
+    "2026-03-03",
+  );
+});
+
+test("market-day cache validation follows UTC day keys", () => {
+  const now = new Date("2026-03-09T00:30:00.000Z");
+
+  expect(shouldUseMarketDayCache("2026-03-09", now)).toBe(true);
+  expect(shouldUseMarketDayCache("2026-03-08", now)).toBe(false);
 });
 
 test("returns cached snapshot when market-day cache is still valid", async () => {

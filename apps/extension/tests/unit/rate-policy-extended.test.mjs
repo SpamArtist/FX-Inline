@@ -4,14 +4,30 @@ import {
   shouldUseTtlCache,
 } from "../../test-dist/utils/ratePolicy/index.js";
 
-test("market-day key handles weekend and pre-open rollover", () => {
-  const saturday = getMarketDayKey(new Date("2026-03-07T16:00:00.000Z"));
-  const preOpenMonday = getMarketDayKey(new Date("2026-03-09T12:59:00.000Z"));
-  const postOpenMonday = getMarketDayKey(new Date("2026-03-09T13:31:00.000Z"));
+test("market-day key changes only at UTC midnight", () => {
+  const beforeMidnight = getMarketDayKey(
+    new Date("2026-03-08T23:59:59.999Z"),
+  );
+  const atMidnight = getMarketDayKey(new Date("2026-03-09T00:00:00.000Z"));
+  const afterMidnight = getMarketDayKey(new Date("2026-03-09T12:59:00.000Z"));
 
-  expect(saturday).toBe("2026-03-06");
-  expect(preOpenMonday).toBe("2026-03-06");
-  expect(postOpenMonday).toBe("2026-03-09");
+  expect(beforeMidnight).toBe("2026-03-08");
+  expect(atMidnight).toBe("2026-03-09");
+  expect(afterMidnight).toBe("2026-03-09");
+});
+
+test("market-day key is independent of source timezone offsets", () => {
+  const utcInstant = getMarketDayKey(new Date("2026-03-09T00:30:00.000Z"));
+  const newYorkInstant = getMarketDayKey(
+    new Date("2026-03-08T20:30:00.000-04:00"),
+  );
+  const tokyoInstant = getMarketDayKey(
+    new Date("2026-03-09T09:30:00.000+09:00"),
+  );
+
+  expect(newYorkInstant).toBe(utcInstant);
+  expect(tokyoInstant).toBe(utcInstant);
+  expect(utcInstant).toBe("2026-03-09");
 });
 
 test("market-day cache validation fails for missing/old market-day key", () => {
