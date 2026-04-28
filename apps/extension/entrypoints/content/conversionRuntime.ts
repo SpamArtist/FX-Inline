@@ -19,7 +19,7 @@ import {
 import { createRuntimePerfContext } from "./conversionRuntime/logging";
 import { clearTimer } from "./conversionRuntime/timers";
 import { getContentRuntimeSitePluginOptions } from "./sitePlugins";
-import { createInlineRuntime } from "@fx-inline/inline-runtime";
+import { createInlineRuntime } from "@fx-inline/inline-runtime/extension";
 
 export type { ContentConversionRuntime } from "./content.types";
 

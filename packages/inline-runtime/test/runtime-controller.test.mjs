@@ -230,6 +230,8 @@ test("start reports missing injected snapshot when none is provided", async () =
     enabled: true,
     observeMutations: false,
     onError,
+    autoFetchRates: true,
+    loadRates: getRatesMock,
   });
 
   runtime.start();
