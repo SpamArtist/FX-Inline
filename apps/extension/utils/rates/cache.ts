@@ -1,16 +1,15 @@
-import { storage } from "wxt/utils/storage";
 import type { RateSnapshot } from "../rates.types";
+import {
+  readLocalStorageValue,
+  writeLocalStorageValue,
+} from "../localStorage";
 
-const RATE_CACHE_KEY = "local:rate-cache";
-
-const rateCacheItem = storage.defineItem<RateSnapshot | null>(RATE_CACHE_KEY, {
-  fallback: null,
-});
+const RATE_CACHE_KEY = "rate-cache";
 
 export async function getCachedRateSnapshot(): Promise<RateSnapshot | null> {
-  return rateCacheItem.getValue();
+  return readLocalStorageValue<RateSnapshot | null>(RATE_CACHE_KEY, null);
 }
 
 export async function setCachedRateSnapshot(snapshot: RateSnapshot): Promise<void> {
-  await rateCacheItem.setValue(snapshot);
+  await writeLocalStorageValue(RATE_CACHE_KEY, snapshot);
 }

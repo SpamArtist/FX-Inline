@@ -1,8 +1,8 @@
 import { SETTINGS_KEY } from "@/utils/appStorage";
 import { DEFAULT_STARTING_CURRENCY } from "@/utils/constants";
+import { watchLocalStorageValue } from "@/utils/localStorage";
 import { collectMutationConversionRoots } from "@/utils/mutationRoots";
 import { parseCurrencyValue } from "@/utils/utils";
-import { storage } from "wxt/utils/storage";
 import { createContentConversionRuntime } from "./conversionRuntime";
 import { createLazySelectionPopupControllerLoader } from "./selectionPopupLoader";
 
@@ -140,7 +140,7 @@ export default defineContentScript({
     }
 
     try {
-      settingsUnwatch = storage.watch(
+      settingsUnwatch = watchLocalStorageValue(
         USER_SETTINGS_STORAGE_KEY,
         conversionRuntime.onSettingsStorageUpdate,
       );
