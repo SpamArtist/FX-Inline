@@ -1,5 +1,9 @@
 import type { UserSettings } from "@/utils/appStorage.types";
 import type { CurrencyCode } from "@/utils/enums";
+import type {
+  InlineRenderPreferences,
+  InlineRuntimeOptions,
+} from "@fx-inline/inline-runtime/extension";
 
 export type InlineConversionPerfSample = {
   totalMs: number;
@@ -95,6 +99,28 @@ export type MutationRootBatcher = {
   flush: () => void;
   cancel: () => void;
 };
+
+export type ContentRuntimeSitePluginOptions = Pick<
+  InlineRuntimeOptions,
+  "prePlugins" | "postPlugins"
+>;
+
+export type ContentRuntimeSiteOptions = ContentRuntimeSitePluginOptions & {
+  clientRenderPreferences?: InlineRenderPreferences;
+};
+
+export type ContentRuntimeClientRenderPreferences = NonNullable<
+  ContentRuntimeSiteOptions["clientRenderPreferences"]
+>;
+
+export type ContentRuntimeSiteRenderPreferences = NonNullable<
+  ContentRuntimeClientRenderPreferences["sites"]
+>;
+
+export type ContentRuntimeSiteRegistration = {
+  id: string;
+  matches: (url: URL) => boolean;
+} & ContentRuntimeSiteOptions;
 
 export type SelectionPopupController = {
   showPopup: (x: number, y: number, amount: string, currency: CurrencyCode) => void;

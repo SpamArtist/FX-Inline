@@ -227,6 +227,82 @@ test("content runtime selects little hotelier plugins for current locale pricing
   }
 });
 
+test("content runtime exposes amazon site render preferences on amazon pages", async () => {
+  await importRuntimeModuleWithMocks();
+  const { getContentRuntimeSitePluginOptions, isAmazonShoppingPage } =
+    await import("../../test-dist/entrypoints/content/sitePlugins.js");
+
+  expect(isAmazonShoppingPage(new URL("https://www.amazon.com/dp/B000000"))).toBe(
+    true,
+  );
+  expect(
+    isAmazonShoppingPage(new URL("https://smile.amazon.co.uk/gp/product/B000000")),
+  ).toBe(true);
+  expect(isAmazonShoppingPage(new URL("https://amazon.example.com/dp/B000000"))).toBe(
+    false,
+  );
+  expect(
+    getContentRuntimeSitePluginOptions("https://www.amazon.com/dp/B000000"),
+  ).toEqual({
+    clientRenderPreferences: {
+      sites: {
+        amazon: {
+          convertedPrefix: "\u2248 ",
+          wrapperClassName: "fx-inline-site-amazon-addon",
+          convertedAmountClassName: "fx-inline-site-amazon-amount",
+          colorStrategy: "inherit",
+        },
+      },
+    },
+  });
+});
+
+test("content runtime merges site render preferences without dropping user settings", async () => {
+  await importRuntimeModuleWithMocks();
+  const {
+    getContentRuntimeSitePluginOptions,
+    mergeContentRuntimeClientRenderPreferences,
+  } = await import("../../test-dist/entrypoints/content/sitePlugins.js");
+
+  const sitePreferences = getContentRuntimeSitePluginOptions(
+    "https://www.amazon.com/dp/B000000",
+  ).clientRenderPreferences;
+  const userPreferences = {
+    default: {
+      convertedCurrencyPosition: "right",
+      displayStyle: "brackets",
+      highlightColor: "#fff1a8",
+    },
+    sites: {
+      amazon: {
+        convertedSuffix: " client",
+        colorStrategy: "auto",
+      },
+      demo: {
+        convertedPrefix: "demo ",
+      },
+    },
+  };
+
+  expect(
+    mergeContentRuntimeClientRenderPreferences(userPreferences, sitePreferences),
+  ).toEqual({
+    default: userPreferences.default,
+    sites: {
+      amazon: {
+        convertedPrefix: "\u2248 ",
+        wrapperClassName: "fx-inline-site-amazon-addon",
+        convertedAmountClassName: "fx-inline-site-amazon-amount",
+        convertedSuffix: " client",
+        colorStrategy: "auto",
+      },
+      demo: {
+        convertedPrefix: "demo ",
+      },
+    },
+  });
+});
+
 test("settings updates debounce a fresh settings/rates hydration", async () => {
   const { createContentConversionRuntime } = await importRuntimeModuleWithMocks();
   const runtime = createContentConversionRuntime();

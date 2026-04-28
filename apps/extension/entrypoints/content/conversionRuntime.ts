@@ -18,7 +18,10 @@ import {
 } from "./conversionRuntime/hydration";
 import { createRuntimePerfContext } from "./conversionRuntime/logging";
 import { clearTimer } from "./conversionRuntime/timers";
-import { getContentRuntimeSitePluginOptions } from "./sitePlugins";
+import {
+  getContentRuntimeSitePluginOptions,
+  mergeContentRuntimeClientRenderPreferences,
+} from "./sitePlugins";
 import { createInlineRuntime } from "@fx-inline/inline-runtime/extension";
 
 export type { ContentConversionRuntime } from "./content.types";
@@ -102,13 +105,18 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
 
     const pageSettings = resolvedSettings.settings;
     inlineRuntime.setPreferredCurrency(getPrimaryTargetCurrency(pageSettings));
-    inlineRuntime.setClientRenderPreferences({
-      default: {
-        convertedCurrencyPosition: pageSettings.convertedCurrencyPosition,
-        displayStyle: pageSettings.displayStyle,
-        highlightColor: pageSettings.highlightColor,
-      },
-    });
+    inlineRuntime.setClientRenderPreferences(
+      mergeContentRuntimeClientRenderPreferences(
+        {
+          default: {
+            convertedCurrencyPosition: pageSettings.convertedCurrencyPosition,
+            displayStyle: pageSettings.displayStyle,
+            highlightColor: pageSettings.highlightColor,
+          },
+        },
+        sitePluginOptions.clientRenderPreferences,
+      ) ?? null,
+    );
     inlineRuntime.setEnabled(pageSettings.enabled);
 
     if (rateSnapshot) {
