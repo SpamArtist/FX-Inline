@@ -20,8 +20,6 @@ const releaseManifestOverrides = releaseTag
   })()
   : null;
 
-const EXTENSION_NAME = "FX Inline";
-
 function hardenFirefoxInnerHtmlAssignments() {
   return {
     name: "harden-firefox-innerhtml-assignments",
