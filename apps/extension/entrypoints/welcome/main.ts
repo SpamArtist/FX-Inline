@@ -1,7 +1,24 @@
-import { browser } from "wxt/browser";
+import type {
+  ExtensionRuntimeApi,
+  ExtensionRuntimeGlobal,
+} from "./browserRuntime.types";
 import "./style.css";
 
+function getExtensionRuntime(): ExtensionRuntimeApi {
+  const extensionGlobal = globalThis as ExtensionRuntimeGlobal;
+  const extensionRuntime = extensionGlobal.browser?.runtime?.id
+    ? extensionGlobal.browser
+    : extensionGlobal.chrome;
+
+  if (!extensionRuntime) {
+    throw new Error("[fx-inline] Missing extension runtime API on welcome page");
+  }
+
+  return extensionRuntime;
+}
+
 const root = document.getElementById("root");
+const extensionRuntime = getExtensionRuntime();
 
 if (!root) {
   throw new Error("[fx-inline] Missing #root element in welcome page");
@@ -93,10 +110,14 @@ async function openSettingsPage() {
 
   try {
     try {
-      await browser.runtime.openOptionsPage();
+      if (!extensionRuntime.runtime.openOptionsPage) {
+        throw new Error("[fx-inline] runtime.openOptionsPage is unavailable");
+      }
+
+      await extensionRuntime.runtime.openOptionsPage();
     } catch {
-      await browser.tabs.create({
-        url: browser.runtime.getURL("/options.html"),
+      await extensionRuntime.tabs.create({
+        url: extensionRuntime.runtime.getURL("/options.html"),
       });
     }
 

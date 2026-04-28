@@ -44,6 +44,54 @@ function hardenFirefoxInnerHtmlAssignments() {
   };
 }
 
+function getAssetSource(source: string | Uint8Array) {
+  return typeof source === "string" ? source : new TextDecoder().decode(source);
+}
+
+function assertWelcomeBundleHasNoRedundantPreloads() {
+  return {
+    name: "assert-welcome-bundle-has-no-redundant-preloads",
+    apply: "build" as const,
+    enforce: "post" as const,
+    generateBundle(_options: OutputOptions, bundle: OutputBundle) {
+      const welcomeHtml = bundle["welcome.html"];
+
+      if (!welcomeHtml || welcomeHtml.type !== "asset") {
+        return;
+      }
+
+      const welcomeHtmlSource = getAssetSource(welcomeHtml.source);
+      const modulePreloadReferences =
+        welcomeHtmlSource.match(/<link\b[^>]*rel=["']modulepreload["'][^>]*>/g) ?? [];
+      const browserChunkReferences =
+        welcomeHtmlSource.match(/\/chunks\/browser-[^"']+\.js/g) ?? [];
+      const browserChunks = Object.values(bundle)
+        .filter((output) => output.type === "chunk")
+        .filter((output) => /^chunks\/browser-[\w-]+\.js$/.test(output.fileName));
+
+      if (modulePreloadReferences.length > 0) {
+        throw new Error(
+          `welcome.html must not emit modulepreload references: ${modulePreloadReferences.join(", ")}`,
+        );
+      }
+
+      if (browserChunkReferences.length > 0) {
+        throw new Error(
+          `welcome.html must not reference browser shim chunks: ${browserChunkReferences.join(", ")}`,
+        );
+      }
+
+      if (browserChunks.length > 0) {
+        throw new Error(
+          `Unexpected browser shim chunks were emitted: ${browserChunks
+            .map((output) => output.fileName)
+            .join(", ")}`,
+        );
+      }
+    },
+  };
+}
+
 // See https://wxt.dev/api/config.html
 export default defineConfig({
   srcDir: "apps/extension",
@@ -107,7 +155,11 @@ export default defineConfig({
         include: "**/*.svg",
       }),
       hardenFirefoxInnerHtmlAssignments(),
+      assertWelcomeBundleHasNoRedundantPreloads(),
     ],
+    build: {
+      modulePreload: false,
+    },
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./apps/extension"),
