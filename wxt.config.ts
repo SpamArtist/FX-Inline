@@ -60,8 +60,10 @@ const extensionManualChunks: GetManualChunk = (moduleId) => {
   }
 
   if (
+    normalizedModuleId.includes("/node_modules/@wxt-dev/browser/") ||
     normalizedModuleId.includes("/node_modules/webextension-polyfill/") ||
-    normalizedModuleId.includes("/node_modules/wxt/browser")
+    normalizedModuleId.includes("/node_modules/wxt/browser") ||
+    normalizedModuleId.includes("/node_modules/wxt/dist/browser")
   ) {
     return "browser-runtime";
   }
