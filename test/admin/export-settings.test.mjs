@@ -19,6 +19,8 @@ test("admin DB export returns a default manifest on a fresh database", () => {
   const manifest = readInlineRuntimeSettingsManifestFromDb(dbPath);
 
   assert.equal(manifest.schemaVersion, 1);
+  assert.notEqual(manifest.generatedAt, "1970-01-01T00:00:00.000Z");
+  assert.equal(new Date(manifest.generatedAt).toISOString(), manifest.generatedAt);
   assert.equal(manifest.scopes.allUrls.enabled, true);
   assert.deepEqual(manifest.scopes.allUrls.targetCurrencies, ["EUR"]);
 });
