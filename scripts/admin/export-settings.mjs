@@ -2,7 +2,7 @@ import {
   readInlineRuntimeSettingsManifestFromDb,
   resolveAdminDbPath,
   writeGeneratedManifestFile,
-} from "./settings-store.mjs";
+} from "#admin-settings/store";
 
 const dbPath = resolveAdminDbPath();
 const manifest = readInlineRuntimeSettingsManifestFromDb(dbPath);

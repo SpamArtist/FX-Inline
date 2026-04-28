@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import currencies from "../../../extension/assets/currency.json";
 import {
+  CURRENCY_OPTIONS,
   DISPLAY_STYLE_OPTIONS,
   POSITION_OPTIONS,
   getDisplayStylePreview,
@@ -15,12 +15,7 @@ export default function SettingsForm({
   lockDomainFields = false,
 }) {
   const currencyOptions = useMemo(
-    () => currencies
-      .map((currency) => ({
-        code: currency.code,
-        logo: currency.logo,
-      }))
-      .sort((a, b) => a.code.localeCompare(b.code)),
+    () => CURRENCY_OPTIONS,
     [],
   );
   const activeTargetCurrency = settings.targetCurrencies[0] ?? "EUR";

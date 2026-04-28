@@ -24,10 +24,8 @@ export default function App() {
         <WorkspaceHeader
           activeKey={admin.activeKey}
           isSaving={admin.isSaving}
-          isBuilding={admin.isBuilding}
           onCancel={admin.cancelActiveScope}
           onSave={admin.saveAllSettings}
-          onBuild={admin.buildExtension}
         />
 
         <ToastMessage toast={admin.toast} />

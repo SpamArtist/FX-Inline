@@ -1,12 +1,10 @@
-import { Hammer, RotateCcw, Save } from "lucide-react";
+import { RotateCcw, Save } from "lucide-react";
 
 export default function WorkspaceHeader({
   activeKey,
   isSaving,
-  isBuilding,
   onCancel,
   onSave,
-  onBuild,
 }) {
   return (
     <header className="workspace-header">
@@ -15,22 +13,13 @@ export default function WorkspaceHeader({
         <h1>{activeKey}</h1>
       </div>
       <div className="header-actions">
-        <button type="button" onClick={onCancel} disabled={isSaving || isBuilding}>
+        <button type="button" onClick={onCancel} disabled={isSaving}>
           <RotateCcw size={16} />
           Cancel
         </button>
-        <button type="button" onClick={onSave} disabled={isSaving || isBuilding}>
+        <button type="button" onClick={onSave} disabled={isSaving}>
           <Save size={16} />
           Save
-        </button>
-        <button
-          type="button"
-          className="primary"
-          onClick={onBuild}
-          disabled={isSaving || isBuilding}
-        >
-          <Hammer size={16} />
-          {isBuilding ? "Building" : "Build extension"}
         </button>
       </div>
     </header>

@@ -1,31 +1,18 @@
+import {
+  normalizeDomainScope,
+  normalizePageScope,
+} from "#admin-settings/manifest";
+
 export function clone(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
 export function normalizeDomain(value) {
-  const trimmed = value.trim();
-  if (!trimmed) return "";
-
-  try {
-    const parsed = new URL(trimmed.includes("://") ? trimmed : `https://${trimmed}`);
-    return parsed.hostname.toLowerCase();
-  } catch {
-    return "";
-  }
+  return normalizeDomainScope(value) ?? "";
 }
 
 export function normalizePageUrl(value) {
-  const trimmed = value.trim();
-  if (!trimmed) return "";
-
-  try {
-    const parsed = new URL(trimmed);
-    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return "";
-    parsed.hash = "";
-    return parsed.toString();
-  } catch {
-    return "";
-  }
+  return normalizePageScope(value) ?? "";
 }
 
 export function getPageDomain(pageUrl) {

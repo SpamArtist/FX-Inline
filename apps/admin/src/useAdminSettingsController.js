@@ -15,7 +15,6 @@ export default function useAdminSettingsController() {
   const [activeScope, setActiveScope] = useState({ type: "all_urls", id: "all_urls" });
   const [toast, setToast] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [isBuilding, setIsBuilding] = useState(false);
 
   const showMessage = useCallback((message, tone = "info") => {
     setToast({
@@ -232,24 +231,11 @@ export default function useAdminSettingsController() {
       const saved = payload.manifest;
       setManifest(saved);
       setDraftManifest(clone(saved));
-      showMessage("Saved all settings and exported settings.");
+      showMessage("Saved all settings.");
     } catch (error) {
       showMessage(error instanceof Error ? error.message : "Save failed.", "error");
     } finally {
       setIsSaving(false);
-    }
-  }
-
-  async function buildExtension() {
-    setIsBuilding(true);
-    try {
-      const response = await fetch("/api/build-extension", { method: "POST" });
-      if (!response.ok) throw new Error("Build failed");
-      showMessage("Built web extension.");
-    } catch (error) {
-      showMessage(error instanceof Error ? error.message : "Build failed.", "error");
-    } finally {
-      setIsBuilding(false);
     }
   }
 
@@ -260,13 +246,11 @@ export default function useAdminSettingsController() {
     activeSettings,
     addDomain,
     addPageOverride,
-    buildExtension,
     cancelActiveScope,
     deleteDomain,
     deletePageOverride,
     domainPages,
     domainTabs,
-    isBuilding,
     isSaving,
     saveAllSettings,
     selectAllUrls,

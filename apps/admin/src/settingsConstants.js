@@ -1,34 +1,12 @@
-export const DEFAULT_SETTINGS = {
-  enabled: true,
-  domain: "",
-  pageUrl: "",
-  targetCurrencies: ["EUR"],
-  convertedCurrencyPosition: "right",
-  displayStyle: "brackets",
-  highlightColor: "#fff1a8",
-  extraSettings: {},
-};
+import {
+  createDefaultInlineRuntimeSettings,
+  createDefaultInlineRuntimeSettingsManifest,
+  CURRENCY_OPTIONS,
+  DISPLAY_STYLE_OPTIONS,
+  getDisplayStylePreview,
+  POSITION_OPTIONS,
+} from "#admin-settings/manifest";
 
-export const DEFAULT_MANIFEST = {
-  schemaVersion: 1,
-  generatedAt: "1970-01-01T00:00:00.000Z",
-  scopes: {
-    allUrls: DEFAULT_SETTINGS,
-    domains: {},
-    pages: {},
-  },
-};
-
-export const POSITION_OPTIONS = ["top", "bottom", "left", "right", "tooltip"];
-
-export const DISPLAY_STYLE_OPTIONS = [
-  { value: "pill", label: "Pill" },
-  { value: "underline", label: "Underline" },
-  { value: "highlightColor", label: "Highlight" },
-  { value: "brackets", label: "Brackets" },
-];
-
-export function getDisplayStylePreview(displayStyle, targetCurrency) {
-  const preview = `${targetCurrency} 90`;
-  return displayStyle === "brackets" ? `(${preview})` : preview;
-}
+export const DEFAULT_SETTINGS = createDefaultInlineRuntimeSettings();
+export const DEFAULT_MANIFEST = createDefaultInlineRuntimeSettingsManifest();
+export { CURRENCY_OPTIONS, DISPLAY_STYLE_OPTIONS, getDisplayStylePreview, POSITION_OPTIONS };

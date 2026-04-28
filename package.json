@@ -4,6 +4,16 @@
   "description": "FX Inline converts prices directly on webpages into your preferred currency, so you can compare costs without leaving the page.",
   "version": "0.4.1",
   "type": "module",
+  "imports": {
+    "#admin-settings/manifest": {
+      "types": "./packages/admin-settings/src/settings-manifest.d.ts",
+      "default": "./packages/admin-settings/src/settings-manifest.js"
+    },
+    "#admin-settings/store": {
+      "types": "./packages/admin-settings/src/settings-store.d.ts",
+      "default": "./packages/admin-settings/src/settings-store.js"
+    }
+  },
   "scripts": {
     "dev": "wxt",
     "dev:firefox": "wxt -b firefox",
@@ -33,7 +43,7 @@
     "build:content-tests": "tsc -p apps/extension/tsconfig.content-tests.json",
     "jest": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand",
     "test:release": "node --test test/release/versioning.test.mjs",
-    "test:admin": "npm run build:backend && node --test test/admin/export-settings.test.mjs",
+    "test:admin": "npm run build:backend && node --test test/admin/*.test.mjs",
     "test:frontend": "npm run build:unit && npm run jest -- apps/extension/tests/unit",
     "test:content": "npm run build:content-tests && npm run jest -- --config jest.content.config.cjs apps/extension/tests/content",
     "test:unit": "npm run test:frontend",

@@ -6,8 +6,10 @@ import test from "node:test";
 import {
   createDefaultInlineRuntimeSettings,
   createDefaultInlineRuntimeSettingsManifest,
+  normalizeDomainScope,
+  normalizePageScope,
   readInlineRuntimeSettingsManifestFromDb,
-  saveAndExportInlineRuntimeSettingsManifest,
+  sanitizeInlineRuntimeSettingsManifest,
   writeGeneratedManifestFile,
   writeInlineRuntimeSettingsManifestToDb,
 } from "../../dist/backend/settings-store.js";
@@ -67,7 +69,7 @@ test("admin exporter writes a TypeScript generated manifest", () => {
   assert.match(generated, /"targetCurrencies": \[\n {8}"EUR"\n {6}\]/);
 });
 
-test("admin save persists settings and exports the generated manifest", () => {
+test("admin save persists settings without exporting generated source", () => {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "fx-inline-admin-"));
   const dbPath = path.join(tempDir, "settings.sqlite");
   const outputPath = path.join(tempDir, "inlineRuntimeSettingsManifest.ts");
@@ -80,17 +82,59 @@ test("admin save persists settings and exports the generated manifest", () => {
     highlightColor: "#abcdef",
   });
 
-  const result = saveAndExportInlineRuntimeSettingsManifest(manifest, {
-    dbPath,
-    outputPath,
-  });
+  const result = writeInlineRuntimeSettingsManifestToDb(manifest, dbPath);
   const persisted = readInlineRuntimeSettingsManifestFromDb(dbPath);
-  const generated = fs.readFileSync(outputPath, "utf8");
 
-  assert.equal(result.outputPath, outputPath);
-  assert.equal(result.manifest.scopes.allUrls.convertedCurrencyPosition, "left");
-  assert.equal(result.manifest.scopes.allUrls.highlightColor, "#abcdef");
+  assert.equal(Object.hasOwn(result, "outputPath"), false);
+  assert.equal(fs.existsSync(outputPath), false);
+  assert.equal(result.scopes.allUrls.convertedCurrencyPosition, "left");
+  assert.equal(result.scopes.allUrls.highlightColor, "#abcdef");
   assert.equal(persisted.scopes.allUrls.displayStyle, "underline");
-  assert.match(generated, /"targetCurrencies": \[\n {8}"BMD"\n {6}\]/);
-  assert.match(generated, /"convertedCurrencyPosition": "left"/);
+});
+
+test("admin shared settings sanitizer normalizes scoped manifest input", () => {
+  const manifest = sanitizeInlineRuntimeSettingsManifest({
+    generatedAt: "2026-04-28T00:00:00.000Z",
+    scopes: {
+      allUrls: {
+        enabled: false,
+        targetCurrencies: ["not-a-code", "gbp"],
+        convertedCurrencyPosition: "tooltip",
+        displayStyle: "pill",
+        highlightColor: "#ABCDEF",
+        extraSettings: { nested: { enabled: true } },
+      },
+      domains: {
+        "HTTPS://Example.COM/some/path": {
+          targetCurrencies: ["jpy"],
+          highlightColor: "invalid",
+        },
+      },
+      pages: {
+        "https://Example.COM/pricing#fragment": {
+          targetCurrencies: ["cad"],
+          convertedCurrencyPosition: "invalid",
+          displayStyle: "underline",
+        },
+        "ftp://example.com/pricing": {
+          targetCurrencies: ["usd"],
+        },
+      },
+    },
+  });
+
+  assert.equal(normalizeDomainScope(" HTTPS://Store.Example.COM/path "), "store.example.com");
+  assert.equal(normalizePageScope("https://example.com/pricing#plans"), "https://example.com/pricing");
+  assert.equal(manifest.scopes.allUrls.enabled, false);
+  assert.deepEqual(manifest.scopes.allUrls.targetCurrencies, ["GBP"]);
+  assert.equal(manifest.scopes.allUrls.highlightColor, "#abcdef");
+  assert.deepEqual(Object.keys(manifest.scopes.domains), ["example.com"]);
+  assert.deepEqual(manifest.scopes.domains["example.com"].targetCurrencies, ["JPY"]);
+  assert.equal(manifest.scopes.domains["example.com"].highlightColor, "#abcdef");
+  assert.deepEqual(Object.keys(manifest.scopes.pages), ["https://example.com/pricing"]);
+  assert.deepEqual(manifest.scopes.pages["https://example.com/pricing"].targetCurrencies, ["CAD"]);
+  assert.equal(
+    manifest.scopes.pages["https://example.com/pricing"].convertedCurrencyPosition,
+    "tooltip",
+  );
 });
