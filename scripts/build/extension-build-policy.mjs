@@ -56,14 +56,14 @@ export const BUILD_POLICY = {
     "browser-runtime",
     "currency-catalog",
     "extension-storage",
-    "vendor-react",
+    "vendor-preact",
   ],
   forbiddenManifestStrings: [
     "Default Popup Title",
     "Default Extension",
     "Extension Name",
     "New Extension",
-    "WXT + React",
+    "WXT + Preact",
   ],
 };
 

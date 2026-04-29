@@ -1,4 +1,4 @@
-import { ChevronDown, Trash2 } from "lucide-react";
+import { ChevronDown, Trash2 } from "lucide-preact";
 import SettingsForm from "./SettingsForm";
 
 export default function PageOverrideAccordion({

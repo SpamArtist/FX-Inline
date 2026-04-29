@@ -1,6 +1,6 @@
-import * as React from "react"
+import type { ComponentProps } from "preact";
 
-function Input({ className, type, ...props }: React.ComponentProps<"input">) {
+function Input({ className, type, ...props }: ComponentProps<"input">) {
   return (
     <input
       type={type}

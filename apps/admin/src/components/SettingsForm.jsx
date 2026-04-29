@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo } from "preact/hooks";
 import currencies from "../../../extension/assets/currency.json";
 import {
   DISPLAY_STYLE_OPTIONS,

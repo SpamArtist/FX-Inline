@@ -84,7 +84,7 @@ test("build policy allows documented near-duplicate css baseline", async () => {
 test("build policy rejects chunks over the configured size budget", async () => {
   const buildDir = await createBuildFixture({
     js: {
-      "chunks/react-vendor-test.js": "console.log('oversized chunk');",
+      "chunks/preact-vendor-test.js": "console.log('oversized chunk');",
     },
   });
   const policy = relaxedPolicy();
@@ -104,11 +104,11 @@ test("build policy rejects chunks over the configured size budget", async () => 
 test("build policy rejects missing required manual chunk prefixes", async () => {
   const buildDir = await createBuildFixture({
     js: {
-      "chunks/react-vendor-test.js": "console.log('react');",
+      "chunks/preact-vendor-test.js": "console.log('preact');",
     },
   });
   const policy = relaxedPolicy();
-  policy.requiredChunkPrefixes = ["react-vendor", "extension-storage"];
+  policy.requiredChunkPrefixes = ["preact-vendor", "extension-storage"];
 
   const violations = await findBuildPolicyViolations({
     buildDir,

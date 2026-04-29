@@ -5,6 +5,7 @@ import type {
   OutputOptions,
   PreRenderedChunk,
 } from "rollup";
+import preact from "@preact/preset-vite";
 import vitePluginSvgr from "vite-plugin-svgr";
 import { defineConfig, type Entrypoint, type WxtViteConfig } from "wxt";
 import { resolveReleaseTag } from "./scripts/release/versioning.mjs";
@@ -58,13 +59,11 @@ export function getFxInlineManualChunk(id: string): string | undefined {
 
   if (moduleId.includes("/node_modules/")) {
     if (
-      moduleId.includes("/node_modules/react/") ||
-      moduleId.includes("/node_modules/react-dom/") ||
-      moduleId.includes("/node_modules/scheduler/") ||
-      moduleId.includes("/node_modules/lucide-react/") ||
-      moduleId.includes("/node_modules/@radix-ui/react-")
+      moduleId.includes("/node_modules/preact/") ||
+      moduleId.includes("/node_modules/@preact/") ||
+      moduleId.includes("/node_modules/lucide-preact/")
     ) {
-      return "vendor-react";
+      return "vendor-preact";
     }
 
     if (
@@ -102,10 +101,11 @@ const extensionManualChunks: GetManualChunk = (moduleId) => {
   const normalizedModuleId = moduleId.split(path.sep).join("/");
 
   if (
-    normalizedModuleId.includes("/node_modules/react/") ||
-    normalizedModuleId.includes("/node_modules/react-dom/")
+    normalizedModuleId.includes("/node_modules/preact/") ||
+    normalizedModuleId.includes("/node_modules/@preact/") ||
+    normalizedModuleId.includes("/node_modules/lucide-preact/")
   ) {
-    return "vendor-react";
+    return "vendor-preact";
   }
 
   if (
@@ -190,7 +190,6 @@ function applyExtensionPageBuildConfig(
 export default defineConfig({
   srcDir: "apps/extension",
   publicDir: "apps/extension/public",
-  modules: ["@wxt-dev/module-react"],
   hooks: {
     "vite:build:extendConfig": applyExtensionPageBuildConfig,
   },
@@ -254,15 +253,20 @@ export default defineConfig({
   },
   vite: () => ({
     plugins: [
+      preact(),
       vitePluginSvgr({
         svgrOptions: {
-          // svgr options
           exportType: "default",
-          ref: true,
+          jsxRuntime: "classic-preact",
+          ref: false,
           svgo: false,
           titleProp: true,
         },
-        include: "**/*.svg",
+        esbuildOptions: {
+          jsxFactory: "h",
+          jsxFragment: "Fragment",
+        },
+        include: "**/*.svg?component",
       }),
       hardenFirefoxInnerHtmlAssignments(),
     ],

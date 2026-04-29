@@ -14,11 +14,11 @@ import {
 } from "@/utils/inlineRuntimeSettings";
 import { DEFAULT_STARTING_CURRENCY } from "@/utils/constants";
 import { ActionType, type CurrencyCode } from "@/utils/enums";
-import SwitchIcon from "@/assets/switch.svg";
-import ToggleOffIcon from "@/assets/toggle-off.svg";
-import ToggleOnIcon from "@/assets/toggle-on.svg";
-import { ArrowLeftRight, Cog } from "lucide-react";
-import { useEffect, useState } from "react";
+import SwitchIcon from "@/assets/switch.svg?component";
+import ToggleOffIcon from "@/assets/toggle-off.svg?component";
+import ToggleOnIcon from "@/assets/toggle-on.svg?component";
+import { ArrowLeftRight, Cog } from "lucide-preact";
+import { useEffect, useState } from "preact/hooks";
 import { browser } from "wxt/browser";
 import "./App.css";
 

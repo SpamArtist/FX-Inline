@@ -1,4 +1,4 @@
-import { Globe2, Plus, X } from "lucide-react";
+import { Globe2, Plus, X } from "lucide-preact";
 
 export default function ScopeNav({
   activeScope,

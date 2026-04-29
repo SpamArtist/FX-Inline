@@ -148,7 +148,7 @@ function buildAutoSection() {
   const testsBySuite = countTestsBySuite(testFiles);
 
   const knownLayout = [
-    ["apps/extension", "Browser extension app (WXT + React)"],
+    ["apps/extension", "Browser extension app (WXT + Preact)"],
     ["apps/website", "Standalone marketing website (Vite)"],
     ["docs", "Project docs and runbooks"],
     ["packages", "Shared package workspace"],

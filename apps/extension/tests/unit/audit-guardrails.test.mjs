@@ -533,15 +533,11 @@ describe("audit §1.6 AGENTS.md no-migration rule", () => {
 // ---------------------------------------------------------------------------
 
 describe("audit §3.5 eslint config", () => {
-  // Three rules are silenced today because the codebase trips on them. Each
-  // one masks a real correctness or hygiene issue. Re-enable and fix.
-  test.failing(
-    "eslint.config.mjs does not silence react-hooks/set-state-in-effect",
-    () => {
-      const source = readRepoFile("eslint.config.mjs");
-      expect(source).not.toMatch(/"react-hooks\/set-state-in-effect"\s*:\s*"off"/);
-    },
-  );
+  test("eslint.config.mjs has no removed hook lint bypass", () => {
+    const source = readRepoFile("eslint.config.mjs");
+    expect(source).not.toMatch(/react-hooks/);
+    expect(source).not.toMatch(/react-refresh/);
+  });
 
   test.failing(
     "eslint.config.mjs does not silence @typescript-eslint/no-duplicate-enum-values",
@@ -569,10 +565,7 @@ describe("audit §6 package.json hygiene", () => {
     return JSON.parse(readRepoFile("package.json"));
   }
 
-  // §6.4: babel-plugin-react-compiler currently appears in both
-  // `dependencies` and `devDependencies`, which makes installs
-  // non-deterministic and can mask version drift.
-  test.failing("no dependency name appears in both dependencies and devDependencies", () => {
+  test("no dependency name appears in both dependencies and devDependencies", () => {
     const pkg = readPkg();
     const deps = Object.keys(pkg.dependencies ?? {});
     const devDeps = new Set(Object.keys(pkg.devDependencies ?? {}));

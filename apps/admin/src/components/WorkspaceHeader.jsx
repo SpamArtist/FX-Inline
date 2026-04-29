@@ -1,4 +1,4 @@
-import { Hammer, RotateCcw, Save } from "lucide-react";
+import { Hammer, RotateCcw, Save } from "lucide-preact";
 
 export default function WorkspaceHeader({
   activeKey,

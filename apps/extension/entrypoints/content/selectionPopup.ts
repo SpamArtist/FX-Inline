@@ -304,7 +304,7 @@ export function createSelectionPopupController(
     popupRoot.style.pointerEvents = "auto";
 
     const popupContainer = document.createElement("div");
-    popupContainer.id = "popup-react-container";
+    popupContainer.id = "popup-view-container";
     popupContainer.className = "fx-inline-selection-popup-host";
     shadowRoot.appendChild(popupContainer);
 

@@ -1,5 +1,5 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+import preact from "@preact/preset-vite";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -7,7 +7,7 @@ const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   root: currentDirectory,
-  plugins: [react()],
+  plugins: [preact()],
   server: {
     port: 3306,
     strictPort: false,

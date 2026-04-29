@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { Plus } from "lucide-preact";
 import PageOverrideAccordion from "./components/PageOverrideAccordion";
 import ScopeNav from "./components/ScopeNav";
 import SettingsForm from "./components/SettingsForm";

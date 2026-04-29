@@ -5,7 +5,8 @@ import {
   getCurrencyDisplayName,
   getNextAmountDraft,
 } from "@/utils/currencyPresentation";
-import { ChangeEvent, KeyboardEvent, useEffect, useMemo, useRef, useState } from "react";
+import type { JSX } from "preact";
+import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 import CurrencyDropdown from "../CurrencyDropdown/CurrencyDropdown";
 import type { CurrencyBoxProps } from "./CurrencyBox.types";
 export type { AmountPresentationMode, CurrencyBoxVariant } from "./CurrencyBox.types";
@@ -70,8 +71,8 @@ function CurrencyBox({
     setIsEditingAmount(true);
   }
 
-  function handleAmountChange(event: ChangeEvent<HTMLInputElement>) {
-    const nextDraft = getNextAmountDraft(draftAmount, event.target.value);
+  function handleAmountChange(event: JSX.TargetedEvent<HTMLInputElement>) {
+    const nextDraft = getNextAmountDraft(draftAmount, event.currentTarget.value);
     if (nextDraft === draftAmount) return;
 
     setDraftAmount(nextDraft);
@@ -105,7 +106,7 @@ function CurrencyBox({
     setIsEditingAmount(false);
   }
 
-  function onAmountInputKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+  function onAmountInputKeyDown(event: JSX.TargetedKeyboardEvent<HTMLInputElement>) {
     if (event.key === "Enter") {
       finalizeAmountEdit();
       return;
