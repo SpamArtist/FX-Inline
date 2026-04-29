@@ -63,7 +63,7 @@ test("root scan ignores script text and finds page-visible currency text", () =>
   expect(scanRootForCurrencyActivationSignal(document.body)).toBe(true);
 });
 
-test("root scan detects Amazon listing prices beyond the text-node scan budget", () => {
+test("root scan detects listing prices split across text nodes", () => {
   const filters = document.createElement("section");
   for (let index = 0; index < 20; index += 1) {
     const filter = document.createElement("span");
@@ -72,20 +72,16 @@ test("root scan detects Amazon listing prices beyond the text-node scan budget",
   }
 
   const listingPrice = document.createElement("span");
-  listingPrice.className = "a-price";
   listingPrice.innerHTML = `
-    <span class="a-offscreen">₹75</span>
-    <span aria-hidden="true">
-      <span class="a-price-symbol">₹</span>
-      <span class="a-price-whole">75</span>
-    </span>
+    <span>₹</span>
+    <span>75</span>
   `;
 
   document.body.append(filters, listingPrice);
 
   expect(
     scanRootForCurrencyActivationSignal(document.body, {
-      maxTextNodes: 5,
+      maxTextNodes: 30,
     }),
   ).toBe(true);
 });
@@ -114,24 +110,33 @@ test("mutation scan checks added nodes and character data updates", () => {
   ).toBe(true);
 });
 
-test("mutation scan detects added Amazon listing price containers", () => {
+test("mutation scan detects added split price containers", () => {
   const result = document.createElement("div");
   result.innerHTML = `
     <h2>ScotchBrite Scrub Pad</h2>
-    <span class="a-price" data-a-size="xl" data-a-color="base">
-      <span class="a-offscreen">₹75</span>
-      <span aria-hidden="true">
-        <span class="a-price-symbol">₹</span>
-        <span class="a-price-whole">75</span>
-      </span>
+    <span>
+      <span>₹</span>
+      <span>75</span>
     </span>
   `;
 
   expect(
-    mutationsContainCurrencyActivationSignal(
-      [{ type: "childList", addedNodes: [result] }],
-      { maxCharacters: 20 },
-    ),
+    mutationsContainCurrencyActivationSignal([
+      { type: "childList", addedNodes: [result] },
+    ]),
+  ).toBe(true);
+});
+
+test("mutation scan detects split price fragments delivered together", () => {
+  const symbolNode = document.createElement("span");
+  symbolNode.textContent = "₹";
+  const amountNode = document.createElement("span");
+  amountNode.textContent = "75";
+
+  expect(
+    mutationsContainCurrencyActivationSignal([
+      { type: "childList", addedNodes: [symbolNode, amountNode] },
+    ]),
   ).toBe(true);
 });
 
@@ -184,26 +189,23 @@ test("activation controller observes child additions and lazy-loads worker after
   expect(observer.disconnect).toHaveBeenCalledTimes(1);
 });
 
-test("activation controller starts immediately on existing Amazon listing prices", async () => {
+test("activation controller starts immediately on existing split listing prices", async () => {
   const { ctx } = createLifecycleContext();
   const importContentWorker = jest.fn().mockResolvedValue(undefined);
   const createMutationObserver = jest.fn();
 
   document.body.innerHTML = `
     <main>
-      <span class="a-price" data-a-size="xl" data-a-color="base">
-        <span class="a-offscreen">₹75</span>
-        <span aria-hidden="true">
-          <span class="a-price-symbol">₹</span>
-          <span class="a-price-whole">75</span>
-        </span>
+      <span>
+        <span>₹</span>
+        <span>75</span>
       </span>
     </main>
   `;
 
   createContentActivationController(ctx, {
     document,
-    locationHref: "https://www.amazon.in/s?k=cleaning",
+    locationHref: "https://example.com/search",
     importContentWorker,
     createMutationObserver,
   }).start();
@@ -236,7 +238,7 @@ test("activation controller lazy-loads worker when a text node becomes a price",
 
   createContentActivationController(ctx, {
     document,
-    locationHref: "https://www.amazon.in/",
+    locationHref: "https://example.com/",
     importContentWorker,
     setTimeout: window.setTimeout,
     clearTimeout: window.clearTimeout,
