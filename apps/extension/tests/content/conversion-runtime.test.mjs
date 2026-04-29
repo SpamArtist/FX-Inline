@@ -1,7 +1,7 @@
 import { jest } from "@jest/globals";
 
 const getUserSettingsMock = jest.fn();
-const getRatesMock = jest.fn();
+const getCachedRateSnapshotMock = jest.fn();
 
 const createInlineRuntimeMock = jest.fn();
 const littleHotelierPricingDetectorPrePluginMock = {
@@ -88,11 +88,11 @@ async function importRuntimeModuleWithMocks() {
     getUserSettings: getUserSettingsMock,
   }));
 
-  await jest.unstable_mockModule("@/utils/rates/index", () => ({
-    getRates: getRatesMock,
+  await jest.unstable_mockModule("@/utils/rates/cache", () => ({
+    getCachedRateSnapshot: getCachedRateSnapshotMock,
   }));
 
-  await jest.unstable_mockModule("@fx-inline/inline-runtime", () => ({
+  await jest.unstable_mockModule("@fx-inline/inline-runtime/extension", () => ({
     createInlineRuntime: createInlineRuntimeMock,
     littleHotelierPricingDetectorPrePlugin:
       littleHotelierPricingDetectorPrePluginMock,
@@ -110,7 +110,7 @@ beforeEach(() => {
 
   getUserSettingsMock.mockResolvedValue(createUserSettings());
 
-  getRatesMock.mockResolvedValue(createRateSnapshot());
+  getCachedRateSnapshotMock.mockResolvedValue(createRateSnapshot());
 
   createInlineRuntimeMock.mockReturnValue({
     start: controllerStartMock,
@@ -146,7 +146,7 @@ test("initialize hydrates settings/rates, applies runtime state, and starts cont
   await runtime.initialize();
 
   expect(getUserSettingsMock).toHaveBeenCalledTimes(1);
-  expect(getRatesMock).toHaveBeenCalledWith({ forceRefresh: false });
+  expect(getCachedRateSnapshotMock).toHaveBeenCalledTimes(1);
 
   expect(controllerSetPreferredCurrencyMock).toHaveBeenCalledWith("EUR");
   expect(controllerSetClientRenderPreferencesMock).toHaveBeenCalledWith({
@@ -243,7 +243,7 @@ test("settings updates debounce a fresh settings/rates hydration", async () => {
 
   jest.advanceTimersByTime(1399);
   expect(getUserSettingsMock).toHaveBeenCalledTimes(1);
-  expect(getRatesMock).toHaveBeenCalledTimes(1);
+  expect(getCachedRateSnapshotMock).toHaveBeenCalledTimes(1);
 
   jest.advanceTimersByTime(1);
 
@@ -252,7 +252,7 @@ test("settings updates debounce a fresh settings/rates hydration", async () => {
   }
 
   expect(getUserSettingsMock).toHaveBeenCalledTimes(2);
-  expect(getRatesMock).toHaveBeenCalledTimes(2);
+  expect(getCachedRateSnapshotMock).toHaveBeenCalledTimes(2);
 
   expect(controllerSetPreferredCurrencyMock).toHaveBeenCalledWith("EUR");
   expect(controllerSetEnabledMock).toHaveBeenCalledWith(true);
