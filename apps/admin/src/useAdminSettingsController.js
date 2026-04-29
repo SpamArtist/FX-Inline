@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "preact/hooks";
+import { useCallback, useEffect, useState } from "react";
 import { DEFAULT_MANIFEST } from "./settingsConstants";
 import {
   clone,
