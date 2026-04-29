@@ -1,5 +1,8 @@
+import { attachSharedThemeStylesheet } from "@/utils/sharedThemeStylesheet";
 import { browser } from "wxt/browser";
 import "./style.css";
+
+attachSharedThemeStylesheet();
 
 const root = document.getElementById("root");
 

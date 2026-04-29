@@ -1,5 +1,8 @@
+import { attachSharedThemeStylesheet } from "@/utils/sharedThemeStylesheet";
 import { mountOptionsPage } from "./optionsPage";
 import "./style.css";
+
+attachSharedThemeStylesheet();
 
 void mountOptionsPage(document.getElementById("root"), {
   readUserSettings: async () => {
