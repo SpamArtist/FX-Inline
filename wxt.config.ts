@@ -20,18 +20,6 @@ const releaseManifestOverrides = releaseTag
   })()
   : null;
 
-const CHUNKABLE_PAGE_ENTRYPOINT_TYPES = new Set([
-  "bookmarks",
-  "devtools",
-  "history",
-  "newtab",
-  "options",
-  "popup",
-  "sandbox",
-  "sidepanel",
-  "unlisted-page",
-]);
-
 function hardenFirefoxInnerHtmlAssignments() {
   return {
     name: "harden-firefox-innerhtml-assignments",
@@ -108,17 +96,6 @@ export function getFxInlineManualChunk(id: string): string | undefined {
   }
 
   return undefined;
-}
-
-function withFxInlineManualChunks(
-  output: OutputOptions | OutputOptions[] | undefined,
-): OutputOptions {
-  const outputOptions = Array.isArray(output) ? output[0] : output;
-
-  return {
-    ...(outputOptions ?? {}),
-    manualChunks: getFxInlineManualChunk,
-  }
 }
 
 const extensionManualChunks: GetManualChunk = (moduleId) => {
