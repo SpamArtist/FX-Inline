@@ -34,6 +34,8 @@ const CURRENCY_ACTIVATION_PATTERNS = [
   new RegExp(`\\b${ISO_CODE_PATTERN}\\b\\s*${NUMBER_PATTERN}`, "u"),
   new RegExp(`${NUMBER_PATTERN}\\s*\\b${ISO_CODE_PATTERN}\\b`, "u"),
 ];
+const STRUCTURED_PRICE_ROOT_SELECTOR = ".a-price";
+const STRUCTURED_PRICE_OFFSCREEN_SELECTOR = ".a-offscreen";
 
 function getDefaultSelectionText(): string {
   return window.getSelection()?.toString() ?? "";
@@ -80,6 +82,74 @@ function getElementTextWithinLimit(
   return text.length > maxCharacters ? text.slice(0, maxCharacters) : text;
 }
 
+function structuredPriceRootHasCurrencyActivationSignal(
+  priceRoot: Element,
+  maxCharacters: number,
+): boolean {
+  if (isSkippedTextParent(priceRoot)) return false;
+
+  const offscreenText = priceRoot
+    .querySelector(STRUCTURED_PRICE_OFFSCREEN_SELECTOR)
+    ?.textContent?.trim();
+  if (offscreenText && hasCurrencyActivationSignal(offscreenText)) {
+    return true;
+  }
+
+  return hasCurrencyActivationSignal(
+    getElementTextWithinLimit(priceRoot, maxCharacters),
+  );
+}
+
+function elementHasStructuredPriceActivationSignal(
+  element: Element,
+  maxCharacters: number,
+): boolean {
+  if (isSkippedTextParent(element)) return false;
+
+  const nearestPriceRoot = element.matches(STRUCTURED_PRICE_ROOT_SELECTOR)
+    ? element
+    : element.closest(STRUCTURED_PRICE_ROOT_SELECTOR);
+  if (
+    nearestPriceRoot &&
+    structuredPriceRootHasCurrencyActivationSignal(nearestPriceRoot, maxCharacters)
+  ) {
+    return true;
+  }
+
+  for (const priceRoot of Array.from(
+    element.querySelectorAll(STRUCTURED_PRICE_ROOT_SELECTOR),
+  )) {
+    if (structuredPriceRootHasCurrencyActivationSignal(priceRoot, maxCharacters)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function parentNodeHasStructuredPriceActivationSignal(
+  root: ParentNode,
+  maxCharacters: number,
+): boolean {
+  if (root instanceof Element) {
+    return elementHasStructuredPriceActivationSignal(root, maxCharacters);
+  }
+
+  if (!(root instanceof Document || root instanceof DocumentFragment)) {
+    return false;
+  }
+
+  for (const priceRoot of Array.from(
+    root.querySelectorAll(STRUCTURED_PRICE_ROOT_SELECTOR),
+  )) {
+    if (structuredPriceRootHasCurrencyActivationSignal(priceRoot, maxCharacters)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 export function isSupportedContentScriptUrl(url: string): boolean {
   try {
     return SUPPORTED_CONTENT_PROTOCOLS.has(new URL(url).protocol);
@@ -103,11 +173,22 @@ export function nodeHasCurrencyActivationSignal(
 
   if (node instanceof Text) {
     if (isSkippedTextParent(node.parentNode)) return false;
+    if (
+      node.parentElement &&
+      elementHasStructuredPriceActivationSignal(node.parentElement, maxCharacters)
+    ) {
+      return true;
+    }
+
     return hasCurrencyActivationSignal(node.data.slice(0, maxCharacters));
   }
 
   if (node instanceof Element) {
     if (isSkippedTextParent(node)) return false;
+    if (elementHasStructuredPriceActivationSignal(node, maxCharacters)) {
+      return true;
+    }
+
     return hasCurrencyActivationSignal(getElementTextWithinLimit(node, maxCharacters));
   }
 
@@ -123,6 +204,9 @@ export function scanRootForCurrencyActivationSignal(
   const rootNode = root as Node;
   const ownerDocument = root instanceof Document ? root : rootNode.ownerDocument;
   if (!ownerDocument) return false;
+  if (parentNodeHasStructuredPriceActivationSignal(root, maxCharacters)) {
+    return true;
+  }
 
   const walker = ownerDocument.createTreeWalker(rootNode, NodeFilter.SHOW_TEXT);
   let scannedTextNodes = 0;

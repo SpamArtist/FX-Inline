@@ -63,6 +63,33 @@ test("root scan ignores script text and finds page-visible currency text", () =>
   expect(scanRootForCurrencyActivationSignal(document.body)).toBe(true);
 });
 
+test("root scan detects Amazon listing prices beyond the text-node scan budget", () => {
+  const filters = document.createElement("section");
+  for (let index = 0; index < 20; index += 1) {
+    const filter = document.createElement("span");
+    filter.textContent = `Filter ${index}`;
+    filters.append(filter);
+  }
+
+  const listingPrice = document.createElement("span");
+  listingPrice.className = "a-price";
+  listingPrice.innerHTML = `
+    <span class="a-offscreen">₹75</span>
+    <span aria-hidden="true">
+      <span class="a-price-symbol">₹</span>
+      <span class="a-price-whole">75</span>
+    </span>
+  `;
+
+  document.body.append(filters, listingPrice);
+
+  expect(
+    scanRootForCurrencyActivationSignal(document.body, {
+      maxTextNodes: 5,
+    }),
+  ).toBe(true);
+});
+
 test("mutation scan checks added nodes and character data updates", () => {
   const ignoredScript = document.createElement("script");
   ignoredScript.textContent = "const price = '$999'";
@@ -84,6 +111,27 @@ test("mutation scan checks added nodes and character data updates", () => {
     mutationsContainCurrencyActivationSignal([
       { type: "characterData", target: dynamicPriceText, addedNodes: [] },
     ]),
+  ).toBe(true);
+});
+
+test("mutation scan detects added Amazon listing price containers", () => {
+  const result = document.createElement("div");
+  result.innerHTML = `
+    <h2>ScotchBrite Scrub Pad</h2>
+    <span class="a-price" data-a-size="xl" data-a-color="base">
+      <span class="a-offscreen">₹75</span>
+      <span aria-hidden="true">
+        <span class="a-price-symbol">₹</span>
+        <span class="a-price-whole">75</span>
+      </span>
+    </span>
+  `;
+
+  expect(
+    mutationsContainCurrencyActivationSignal(
+      [{ type: "childList", addedNodes: [result] }],
+      { maxCharacters: 20 },
+    ),
   ).toBe(true);
 });
 
@@ -134,6 +182,38 @@ test("activation controller observes child additions and lazy-loads worker after
   expect(importContentWorker).toHaveBeenCalledTimes(1);
   expect(importContentWorker).toHaveBeenCalledWith({});
   expect(observer.disconnect).toHaveBeenCalledTimes(1);
+});
+
+test("activation controller starts immediately on existing Amazon listing prices", async () => {
+  const { ctx } = createLifecycleContext();
+  const importContentWorker = jest.fn().mockResolvedValue(undefined);
+  const createMutationObserver = jest.fn();
+
+  document.body.innerHTML = `
+    <main>
+      <span class="a-price" data-a-size="xl" data-a-color="base">
+        <span class="a-offscreen">₹75</span>
+        <span aria-hidden="true">
+          <span class="a-price-symbol">₹</span>
+          <span class="a-price-whole">75</span>
+        </span>
+      </span>
+    </main>
+  `;
+
+  createContentActivationController(ctx, {
+    document,
+    locationHref: "https://www.amazon.in/s?k=cleaning",
+    importContentWorker,
+    createMutationObserver,
+  }).start();
+
+  await Promise.resolve();
+  await Promise.resolve();
+
+  expect(importContentWorker).toHaveBeenCalledTimes(1);
+  expect(importContentWorker).toHaveBeenCalledWith({});
+  expect(createMutationObserver).not.toHaveBeenCalled();
 });
 
 test("activation controller lazy-loads worker when a text node becomes a price", async () => {
