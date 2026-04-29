@@ -60,8 +60,7 @@ export function getFxInlineManualChunk(id: string): string | undefined {
   if (moduleId.includes("/node_modules/")) {
     if (
       moduleId.includes("/node_modules/preact/") ||
-      moduleId.includes("/node_modules/@preact/") ||
-      moduleId.includes("/node_modules/lucide-preact/")
+      moduleId.includes("/node_modules/@preact/")
     ) {
       return "vendor-preact";
     }
@@ -102,8 +101,7 @@ const extensionManualChunks: GetManualChunk = (moduleId) => {
 
   if (
     normalizedModuleId.includes("/node_modules/preact/") ||
-    normalizedModuleId.includes("/node_modules/@preact/") ||
-    normalizedModuleId.includes("/node_modules/lucide-preact/")
+    normalizedModuleId.includes("/node_modules/@preact/")
   ) {
     return "vendor-preact";
   }

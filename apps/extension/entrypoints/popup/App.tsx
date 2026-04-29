@@ -17,7 +17,7 @@ import { ActionType, type CurrencyCode } from "@/utils/enums";
 import SwitchIcon from "@/assets/switch.svg?component";
 import ToggleOffIcon from "@/assets/toggle-off.svg?component";
 import ToggleOnIcon from "@/assets/toggle-on.svg?component";
-import { ArrowLeftRight, Cog } from "lucide-preact";
+import { ArrowLeftRightIcon, CogIcon } from "@/components/icons/NativeIcons";
 import { useEffect, useState } from "preact/hooks";
 import { browser } from "wxt/browser";
 import "./App.css";
@@ -240,7 +240,7 @@ function App() {
               aria-label="Open extension options"
               title="Open extension options"
             >
-              <Cog size={16} aria-hidden />
+              <CogIcon size={16} aria-hidden />
             </button>
           </>
         )}
@@ -254,7 +254,7 @@ function App() {
               aria-label="Swap currencies"
               title="Swap currencies"
             >
-              <ArrowLeftRight size={16} aria-hidden />
+              <ArrowLeftRightIcon size={16} aria-hidden />
             </button>
 
             <CurrencyBox

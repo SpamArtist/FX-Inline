@@ -1,5 +1,5 @@
-import { ChevronDown } from "lucide-preact";
 import type { JSX } from "preact";
+import { ChevronDownIcon } from "../icons/NativeIcons";
 import type { DropdownProps } from "./Dropdown.types";
 export type { DropdownOption } from "./Dropdown.types";
 
@@ -38,7 +38,9 @@ export default function Dropdown<TValue extends string>({
           </option>
         ))}
       </select>
-      {!isDisabled && <ChevronDown className="fx-inline-dropdown-trigger__arrow" aria-hidden />}
+      {!isDisabled && (
+        <ChevronDownIcon className="fx-inline-dropdown-trigger__arrow" aria-hidden />
+      )}
     </label>
   );
 }

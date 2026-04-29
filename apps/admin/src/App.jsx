@@ -1,9 +1,9 @@
-import { Plus } from "lucide-preact";
 import PageOverrideAccordion from "./components/PageOverrideAccordion";
 import ScopeNav from "./components/ScopeNav";
 import SettingsForm from "./components/SettingsForm";
 import ToastMessage from "./components/ToastMessage";
 import WorkspaceHeader from "./components/WorkspaceHeader";
+import { PlusIcon } from "./components/icons/NativeIcons";
 import useAdminSettingsController from "./useAdminSettingsController";
 
 export default function App() {
@@ -47,7 +47,7 @@ export default function App() {
                 <p>Exact normalized page URLs on {admin.activeDomain} override the domain tab.</p>
               </div>
               <button type="button" onClick={admin.addPageOverride}>
-                <Plus size={16} />
+                <PlusIcon size={16} />
                 Add page URL
               </button>
             </div>

@@ -1,4 +1,4 @@
-import { ChevronDown, Trash2 } from "lucide-preact";
+import { ChevronDownIcon, TrashIcon } from "./icons/NativeIcons";
 import SettingsForm from "./SettingsForm";
 
 export default function PageOverrideAccordion({
@@ -10,7 +10,7 @@ export default function PageOverrideAccordion({
   return (
     <details className="page-accordion">
       <summary className="page-accordion-summary">
-        <ChevronDown className="page-accordion-icon" size={18} aria-hidden="true" />
+        <ChevronDownIcon className="page-accordion-icon" size={18} aria-hidden="true" />
         <span className="page-accordion-title">{pageUrl}</span>
         <span className="page-accordion-meta">
           <span className={settings.enabled ? "page-accordion-state on" : "page-accordion-state"}>
@@ -26,7 +26,7 @@ export default function PageOverrideAccordion({
               onDelete();
             }}
           >
-            <Trash2 size={15} />
+            <TrashIcon size={15} />
           </button>
         </span>
       </summary>

@@ -1,5 +1,9 @@
-import { Check, ChevronDown, Search } from "lucide-preact";
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  SearchIcon,
+} from "./icons/NativeIcons";
 
 export default function CurrencySearchDropdown({ value, options, onChange }) {
   const containerRef = useRef(null);
@@ -87,13 +91,13 @@ export default function CurrencySearchDropdown({ value, options, onChange }) {
       >
         <span>{selected?.logo}</span>
         <strong>{value}</strong>
-        <ChevronDown size={15} />
+        <ChevronDownIcon size={15} />
       </button>
 
       {isOpen ? (
         <div className="currency-select-menu">
           <div className="currency-search">
-            <Search size={15} />
+            <SearchIcon size={15} />
             <input
               ref={searchInputRef}
               value={query}
@@ -120,7 +124,7 @@ export default function CurrencySearchDropdown({ value, options, onChange }) {
                 >
                   <span>{currency.logo}</span>
                   <strong>{currency.code}</strong>
-                  {currency.code === value ? <Check size={14} /> : null}
+                  {currency.code === value ? <CheckIcon size={14} /> : null}
                 </button>
               ))
             ) : (
