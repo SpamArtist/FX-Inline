@@ -21,11 +21,12 @@ This is a **greenfield** task. Build everything needed from this prompt only.
 - `docs` for runbooks/checklists.
 3. Use the existing visual approach:
 - custom CSS theme tokens (`converter-theme.css`) and component CSS,
-- Radix dropdown primitives for currency menus.
+- styled native `<select>` controls for extension currency menus, with the visible chip/icon treatment preserved by CSS.
 4. Support Chromium and Firefox builds from one codebase. Include Safari conversion notes.
 5. Include CI + release automation:
    - Workflows under `.github/workflows/`:
      - `ci.yml` runs lint, TypeScript compile, and `npm run test:all` on PRs and pushes to `main`.
+     - CI also runs the extension build assertions through `npm run build`.
      - `currency-detection-benchmarks.yml` runs currency detection benchmarks and publishes artifacts/summaries.
      - `release.yml` is tag-driven (on `push` of tags matching `v*`) and validates the tag, runs tests, builds artifacts, and publishes a GitHub release (store publishing steps are gated on configured secrets).
    - Release tags and versioning:
@@ -52,8 +53,9 @@ Implement equivalent manifest behavior via WXT config:
 - `srcDir: apps/extension`
 - `publicDir: apps/extension/public`
 2. Icons:
-- `16`, `32`, `48`, `96`, `128` in `manifest.icons`
+- `16`, `32`, `48`, `128` in `manifest.icons`
 - action `default_icon` for `16`, `32`, `48`
+- store-only `512` icon under `apps/extension/store-assets/icon-512.png`, not copied as a runtime public extension icon
 3. Permissions:
 - `activeTab`
 - `storage`
@@ -73,6 +75,11 @@ Implement equivalent manifest behavior via WXT config:
 - `browser_specific_settings.gecko.id = "fx-inline@xbotpc"`
 - include `data_collection_permissions.required = ["none"]`.
 7. Build hardening behavior:
+- set `action.default_title` to `FX Inline`
+- expose only `content-worker.js` and `chunks/*.js` as dynamic web-accessible resources
+- run extension asset optimization before Chrome/Firefox WXT builds
+- run build-output assertions after Chrome/Firefox WXT builds
+- run release build-output linting during artifact verification
 - include post-bundle patching for Firefox manifest version fields so generated artifacts match the release tag metadata.
 
 ## 4) Required Apps, Pages, and Entrypoints
@@ -84,7 +91,7 @@ Implement these extension entrypoints and behaviors exactly.
 1. Main converter shell:
 - title text: `FX INLINE`
 - two currency rows by default
-- each row has a currency dropdown and amount area
+- each row has a styled native currency selector and amount area
 - default source amount: `100`
 - default source currency: `EUR`
 - second row defaults to preferred currency unless same as source; fallback uses EUR/USD alternate logic
@@ -104,15 +111,19 @@ Implement these extension entrypoints and behaviors exactly.
 - local auto-conversion toggle for active tab origin (disabled when origin unavailable)
 - global auto-conversion toggle
 - settings button that opens options page
-6. Options open behavior:
+6. Currency picker implementation:
+- use a styled native `<select>` inside the visible currency chip
+- preserve the currency icon/emoji fallback and selector arrow
+- do not import Radix dropdown primitives into the extension popup bundle
+7. Options open behavior:
 - first call `browser.runtime.openOptionsPage()`
 - fallback: `browser.tabs.create({ url: browser.runtime.getURL("/options.html") })`
-7. Footer:
+8. Footer:
 - include feedback action button text: `Feedback ↗` that opens a new tab to the configured feedback URL
 - text: `© {currentYear} FX Inline`
-8. Popup HTML metadata:
+9. Popup HTML metadata:
 - include `<meta name="manifest.type" content="browser_action" />`.
-- keep popup HTML title as `Default Popup Title` (runtime shell provides visible `FX INLINE` branding).
+- keep popup HTML title as `FX Inline`.
 
 ### B) Options Page (`options.html`, open in tab)
 
@@ -154,18 +165,29 @@ Implement these extension entrypoints and behaviors exactly.
 
 1. Match pattern: `<all_urls>`.
 2. `cssInjectionMode: "manual"`.
-3. Responsibilities:
+3. The injected entrypoint is a lightweight activation shim:
+- return immediately for non-`http`/`https` URLs
+- scan bounded existing text for currency activation signals
+- listen for price-like selections
+- observe added child nodes for currency activation signals
+- import the full worker through `content-worker.js` only after activation
+4. Full worker responsibilities:
 - selection-based popup conversion
 - automatic inline conversion in page text
 - mutation-aware partial/full reconversion runtime
 - storage watch for settings updates
 - context invalidation-safe cleanup for observers/watchers/UI capture listeners
-4. Mutation observation target and options:
+5. Activation shim mutation options:
+- observe `document.body`
+- `childList: true`
+- `subtree: true`
+- no `characterData` observation until the full worker is loaded
+6. Full worker mutation observation target and options:
 - observe `document.body`
 - `childList: true`
 - `subtree: true`
 - `characterData: true`
-5. Ignore self-triggered mutations while conversion suppression is active.
+7. Ignore self-triggered mutations while conversion suppression is active.
 
 ### E) Selection Popup in Webpages
 
@@ -184,7 +206,7 @@ Implement these extension entrypoints and behaviors exactly.
 3. Popup UI behavior:
 - same shell design language as popup, with `FX INLINE` header
 - two rows only
-- currency dropdown controls are disabled
+- native currency selector controls are disabled
 - amounts are click-to-edit with commit/cancel key behavior
 4. Event isolation:
 - capture and swallow `pointerdown`, `mousedown`, `click`, `contextmenu`
@@ -231,7 +253,7 @@ Implement these extension entrypoints and behaviors exactly.
 
 Use extension local storage with these keys and semantics:
 
-1. Key: `local:user-settings`.
+1. Key: `user-settings` in `browser.storage.local`.
 2. Settings shape is an inline runtime settings manifest:
 - `schemaVersion: 1`
 - `generatedAt`
@@ -255,6 +277,7 @@ Use extension local storage with these keys and semantics:
 - highlight color: `#fff1a8`
 - domain and page scope maps empty
 5. Behavior requirements:
+- use a typed local storage adapter over `browser.storage.local`; do not use WXT `storage.defineItem` in MV3 entry bundles
 - sanitize and normalize persisted settings on reads/writes
 - load defaults from the generated inline-runtime settings manifest
 - migrate legacy `preferredCurrency`, `globalAutoConversionEnabled`, and `localAutoConversionByOrigin` values into the scoped manifest
@@ -271,7 +294,7 @@ Use extension local storage with these keys and semantics:
 
 1. Base currency for snapshots: USD.
 2. Cache key:
-- `local:rate-cache`
+- `rate-cache` in `browser.storage.local`.
 3. Cache policy:
 - compute market-day key in `America/New_York`
 - weekends roll back to previous business day
@@ -527,31 +550,49 @@ Define scripts equivalent in behavior to:
 7. `npm run build:backend`
 8. `npm run build`
 9. `npm run build:firefox`
-10. `npm run build:website`
-11. `npm run build:admin`
-12. `npm run zip`
-13. `npm run zip:firefox`
-14. `npm run lint`
-15. `npm run compile`
-16. `npm run build:unit`
-17. `npm run build:content-tests`
-18. `npm run jest`
-19. `npm run test:frontend`
-20. `npm run test:content`
-21. `npm run test:unit`
-22. `npm run test:release`
-23. `npm run test:admin`
-24. `npm run test:all`
-25. `npm run currency-detection:fixtures`
-26. `npm run currency-detection:baseline`
-27. `npm run currency-detection:test`
-28. `npm run currency-detection:bench`
-29. `npm run currency-detection:bench:compare`
-30. `npm run inline-runtime:build`
-31. `npm run inline-runtime:test`
-32. `npm run preview:website`
-33. `npm run readme:sync`
-34. `npm run readme:sync:check`
+10. `npm run postbuild`
+11. `npm run postbuild:firefox`
+12. `npm run build:assert`
+13. `npm run build:assets`
+14. `npm run assets:optimize`
+15. `npm run icons:optimize`
+16. `npm run icons:check`
+17. `npm run build:website`
+18. `npm run build:admin`
+19. `npm run zip`
+20. `npm run zip:firefox`
+21. `npm run release:clean`
+22. `npm run release:dry-run`
+23. `npm run release:describe:json`
+24. `npm run release:validate-tag`
+25. `npm run release:build-artifacts`
+26. `npm run release:verify-artifacts`
+27. `npm run release:lint-build-output`
+28. `npm run release:publish:chrome`
+29. `npm run release:publish:edge`
+30. `npm run lint`
+31. `npm run compile`
+32. `npm run build:unit`
+33. `npm run build:content-tests`
+34. `npm run jest`
+35. `npm run test:frontend`
+36. `npm run test:content`
+37. `npm run test:unit`
+38. `npm run test:release`
+39. `npm run test:assets`
+40. `npm run test:admin`
+41. `npm run test:build`
+42. `npm run test:all`
+43. `npm run currency-detection:fixtures`
+44. `npm run currency-detection:baseline`
+45. `npm run currency-detection:test`
+46. `npm run currency-detection:bench`
+47. `npm run currency-detection:bench:compare`
+48. `npm run inline-runtime:build`
+49. `npm run inline-runtime:test`
+50. `npm run preview:website`
+51. `npm run readme:sync`
+52. `npm run readme:sync:check`
 
 ## 8) Testing Requirements (Mandatory)
 
@@ -598,6 +639,10 @@ Add tests equivalent in scope to:
 - ignores popup root
 - deduplicates roots
 - collapses descendant roots
+11. build, release, and asset guardrails:
+- extension build policy checks manifest placeholders, page chunk names, byte budgets, and duplicate CSS baselines
+- icon asset checks cover optimized extension icons and store-only 512px icon placement
+- release lint checks built output for scaffold titles, invalid version metadata, 96px icons, orphaned assets, and unsafe placeholders
 
 ### B) Content/DOM Integration Tests
 
@@ -628,6 +673,7 @@ Must include:
 5. global and per-origin auto-conversion toggles.
 6. admin scoped settings save/export/build path.
 7. run key scenarios on Chromium and Firefox; note differences.
+8. lightweight all-URLs activation shim starts the full worker only after price text, inserted node, or selection activation signals.
 
 ## 9) README Requirements
 
@@ -640,6 +686,7 @@ Include:
 5. browser compatibility matrix.
 6. known limitations/performance safeguards.
 7. security/privacy notes.
+8. GitHub badges: CI, Currency Detection Benchmarks, and Last Commit.
 
 ## 10) Delivery Expectations
 

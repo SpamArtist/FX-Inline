@@ -1,10 +1,10 @@
 # E2E Extension Checklist
 
-_Last updated: 2026-04-28_
+_Last updated: 2026-04-29_
 
 ## Preconditions
 
-- Build and load the unpacked extension.
+- Build and load the unpacked extension with `npm run build` for Chromium and `npm run build:firefox` for Firefox. These commands run admin settings export, optimized extension assets, and build-output assertions.
 - Ensure host permissions are granted for the configured rate providers.
 - Use a page with visible prices and dynamic updates (SPA/news feed/e-commerce).
 - Test at least once on Chromium and once on Firefox.
@@ -39,15 +39,17 @@ Expected:
 ## 3. Popup converter and settings actions
 
 1. Open extension popup from toolbar.
-2. Verify two rows render with editable amount displays and currency dropdowns.
+2. Verify two rows render with editable amount displays and styled native currency selectors.
 3. Change amount in row A, confirm row B recalculates.
 4. Use swap button, confirm row positions/rates swap correctly.
-5. Toggle global auto-conversion off/on, then local page-origin toggle off/on.
-6. Click settings button and confirm options page opens.
-7. Click `Feedback ↗` and confirm external tab opens.
+5. Change currency with mouse and keyboard navigation, then confirm the chip display and converted value update.
+6. Toggle global auto-conversion off/on, then local page-origin toggle off/on.
+7. Click settings button and confirm options page opens.
+8. Click `Feedback ↗` and confirm external tab opens.
 
 Expected:
 - Conversion stays live while editing/committing amounts.
+- Native selector behavior remains accessible without loading the old Radix popup menu path.
 - Local toggle is disabled when active tab origin is unavailable.
 - Global toggle updates the all-pages scope; local toggle writes a domain scope for the active origin.
 
@@ -128,11 +130,14 @@ Expected:
 
 ## 10. Runtime stability on dynamic pages
 
-1. On a high-mutation SPA page, trigger repeated content updates.
-2. Verify conversions continue appearing on newly inserted content.
-3. Change scoped settings and confirm delayed reconversion applies without duplicate wrappers.
-4. Navigate or reload quickly to force content script invalidation edges.
+1. Visit an `http`/`https` page without visible price text and confirm no conversion UI appears before a price signal.
+2. Select a valid price-like snippet and confirm the selection popup appears after the content worker starts.
+3. On a high-mutation SPA page, trigger repeated content updates.
+4. Verify conversions continue appearing on newly inserted content.
+5. Change scoped settings and confirm delayed reconversion applies without duplicate wrappers.
+6. Navigate or reload quickly to force content script invalidation edges.
 
 Expected:
+- The lightweight all-URLs shim only starts the full worker after initial text, inserted-node, or selection activation signals.
 - No persistent console spam for extension context invalidation during teardown.
 - Conversion runtime remains responsive without runaway mutation loops.
