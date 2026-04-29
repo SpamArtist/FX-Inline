@@ -1,5 +1,4 @@
 import type { ConvertorHodProps } from "./Convertor.types";
-import "./Convertor.css";
 
 export type { ConverterShellVariant } from "./Convertor.types";
 
@@ -9,8 +8,10 @@ export const ConvertorHOD = ({
   headerActions,
   children,
 }: ConvertorHodProps) => {
+  const shellClassName = `fx-inline-theme fx-inline-shell fx-inline-shell--${variant}`;
+
   return (
-    <section className={`fx-inline-theme fx-inline-shell fx-inline-shell--${variant}`}>
+    <section className={shellClassName}>
       <div className="fx-inline-shell__inner">
         <header className="fx-inline-shell__header">
           <h2 className="fx-inline-shell__title">{title}</h2>

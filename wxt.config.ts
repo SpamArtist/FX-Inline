@@ -241,7 +241,7 @@ export default defineConfig({
       ],
       web_accessible_resources: [
         {
-          resources: ["content-worker.js", "chunks/*.js"],
+          resources: ["content-worker.js", "chunks/*.js", "theme.css"],
           matches: ["<all_urls>"],
           use_dynamic_url: true,
         },

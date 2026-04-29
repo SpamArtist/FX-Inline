@@ -1,3 +1,4 @@
+import { browser } from "wxt/browser";
 import type { SelectionPopupController } from "./content.types";
 
 type InlineStyleModule = {
@@ -7,19 +8,22 @@ type InlineStyleModule = {
 type SelectionPopupFactoryModule = {
   createSelectionPopupController: (
     contentStyleText: string,
+    themeStylesheetUrl: string,
   ) => SelectionPopupController;
 };
 
 export type SelectionPopupLoaderDeps = {
   importSelectionPopupFactory?: () => Promise<SelectionPopupFactoryModule>;
   importContentStyles?: () => Promise<InlineStyleModule>;
-  importConverterThemeStyles?: () => Promise<InlineStyleModule>;
+  resolveThemeStylesheetUrl?: () => string;
 };
 
 export type LazySelectionPopupControllerLoader = {
   getSync: () => SelectionPopupController | null;
   get: () => Promise<SelectionPopupController>;
 };
+
+const SHARED_THEME_STYLESHEET_PATH = "/theme.css";
 
 function importSelectionPopupFactory(): Promise<SelectionPopupFactoryModule> {
   return import("./selectionPopup");
@@ -29,8 +33,8 @@ function importContentStyles(): Promise<InlineStyleModule> {
   return import("./content.css?inline");
 }
 
-function importConverterThemeStyles(): Promise<InlineStyleModule> {
-  return import("@/styles/converter-theme.css?inline");
+function resolveThemeStylesheetUrl(): string {
+  return browser.runtime.getURL(SHARED_THEME_STYLESHEET_PATH);
 }
 
 export function createLazySelectionPopupControllerLoader(
@@ -38,8 +42,8 @@ export function createLazySelectionPopupControllerLoader(
 ): LazySelectionPopupControllerLoader {
   const loadPopupFactory = deps.importSelectionPopupFactory ?? importSelectionPopupFactory;
   const loadContentStyles = deps.importContentStyles ?? importContentStyles;
-  const loadConverterThemeStyles =
-    deps.importConverterThemeStyles ?? importConverterThemeStyles;
+  const getThemeStylesheetUrl =
+    deps.resolveThemeStylesheetUrl ?? resolveThemeStylesheetUrl;
 
   let popupController: SelectionPopupController | null = null;
   let pendingPopupController: Promise<SelectionPopupController> | null = null;
@@ -53,10 +57,10 @@ export function createLazySelectionPopupControllerLoader(
         pendingPopupController = Promise.all([
           loadPopupFactory(),
           loadContentStyles(),
-          loadConverterThemeStyles(),
-        ]).then(([selectionPopupModule, contentStylesModule, converterThemeStylesModule]) => {
+        ]).then(([selectionPopupModule, contentStylesModule]) => {
           popupController = selectionPopupModule.createSelectionPopupController(
-            `${converterThemeStylesModule.default}\n${contentStylesModule.default}`,
+            contentStylesModule.default,
+            getThemeStylesheetUrl(),
           );
 
           return popupController;

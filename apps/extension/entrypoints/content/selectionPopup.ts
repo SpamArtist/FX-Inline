@@ -256,6 +256,7 @@ function createSelectionPopupView(
 
 export function createSelectionPopupController(
   contentStyleText: string,
+  themeStylesheetUrl: string,
 ): SelectionPopupController {
   let popupRoot: HTMLDivElement | null = null;
   let popupView: PopupView | null = null;
@@ -284,6 +285,12 @@ export function createSelectionPopupController(
     const shadowRoot = popupRoot.attachShadow({
       mode: "open",
     });
+
+    const themeStylesheet = document.createElement("link");
+    themeStylesheet.id = "fx-inline-theme-stylesheet";
+    themeStylesheet.rel = "stylesheet";
+    themeStylesheet.href = themeStylesheetUrl;
+    shadowRoot.appendChild(themeStylesheet);
 
     const contentStyleTag = document.createElement("style");
     contentStyleTag.id = "content-styles";

@@ -109,6 +109,13 @@ async function waitForPopupContent(controller) {
   });
 }
 
+function createController(createSelectionPopupController) {
+  return createSelectionPopupController(
+    ".mock-style { color: red; }",
+    "chrome-extension://extension-id/theme.css",
+  );
+}
+
 beforeEach(() => {
   jest.clearAllMocks();
 
@@ -124,7 +131,7 @@ afterEach(() => {
 
 test("showPopup renders popup shell, styles, and placement", async () => {
   const { createSelectionPopupController } = await importSelectionPopupModuleWithMocks();
-  const controller = createSelectionPopupController(".mock-style { color: red; }");
+  const controller = createController(createSelectionPopupController);
 
   controller.showPopup(123, 456, "100", "EUR");
   await waitForPopupContent(controller);
@@ -137,6 +144,12 @@ test("showPopup renders popup shell, styles, and placement", async () => {
   expect(popupRoot?.style.top).toBe("456px");
 
   const shadowRoot = getShadowRoot(controller);
+  const themeStylesheet = shadowRoot.querySelector("#fx-inline-theme-stylesheet");
+  expect(themeStylesheet?.getAttribute("rel")).toBe("stylesheet");
+  expect(themeStylesheet?.getAttribute("href")).toBe(
+    "chrome-extension://extension-id/theme.css",
+  );
+
   const styleTag = shadowRoot.querySelector("#content-styles");
   expect(styleTag?.textContent).toContain(".mock-style");
 
@@ -148,7 +161,7 @@ test("showPopup renders popup shell, styles, and placement", async () => {
 
 test("removePopup and destroy are idempotent and clean up the DOM", async () => {
   const { createSelectionPopupController } = await importSelectionPopupModuleWithMocks();
-  const controller = createSelectionPopupController(".mock-style { color: red; }");
+  const controller = createController(createSelectionPopupController);
 
   controller.showPopup(10, 20, "20", "EUR");
   await waitForPopupContent(controller);
@@ -172,7 +185,7 @@ test("removePopup and destroy are idempotent and clean up the DOM", async () => 
 
 test("containsTarget and repeated showPopup replace the popup root", async () => {
   const { createSelectionPopupController } = await importSelectionPopupModuleWithMocks();
-  const controller = createSelectionPopupController(".mock-style { color: red; }");
+  const controller = createController(createSelectionPopupController);
 
   controller.showPopup(10, 20, "20", "EUR");
   await waitForPopupContent(controller);
@@ -201,7 +214,7 @@ test("containsTarget and repeated showPopup replace the popup root", async () =>
 
 test("amount edit interactions commit on blur and Enter, and revert on Escape", async () => {
   const { createSelectionPopupController } = await importSelectionPopupModuleWithMocks();
-  const controller = createSelectionPopupController(".mock-style { color: red; }");
+  const controller = createController(createSelectionPopupController);
 
   controller.showPopup(10, 20, "15", "EUR");
   await waitForPopupContent(controller);
@@ -291,7 +304,7 @@ test("hydration updates preferred currency row after popup mount", async () => {
   );
 
   const { createSelectionPopupController } = await importSelectionPopupModuleWithMocks();
-  const controller = createSelectionPopupController(".mock-style { color: red; }");
+  const controller = createController(createSelectionPopupController);
 
   controller.showPopup(10, 20, "5", "EUR");
 

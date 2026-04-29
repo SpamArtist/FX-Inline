@@ -8,6 +8,7 @@
     "types": ["vite/client"]
   },
   "include": [
+    "../../.wxt/wxt.d.ts",
     "entrypoints/content/*.ts",
     "utils/**/*.ts"
   ]
