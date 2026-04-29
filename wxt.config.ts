@@ -8,7 +8,25 @@ import type {
 import preact from "@preact/preset-vite";
 import vitePluginSvgr from "vite-plugin-svgr";
 import { defineConfig, type Entrypoint, type WxtViteConfig } from "wxt";
+import type { Plugin } from "vite";
 import { resolveReleaseTag } from "./scripts/release/versioning.mjs";
+
+export const EXTENSION_DEV_OPTIMIZE_DEPS_EXCLUDE = [
+  "@prefresh/core",
+  "@prefresh/utils",
+  "preact",
+  "preact/compat",
+  "preact/debug",
+  "preact/devtools",
+  "preact/hooks",
+  "preact/jsx-dev-runtime",
+  "preact/jsx-runtime",
+];
+
+type OptimizeDepsListConfig = {
+  exclude?: string[];
+  include?: string[];
+};
 
 const releaseTag = process.env.RELEASE_TAG?.trim();
 const releaseManifestOverrides = releaseTag
@@ -140,6 +158,30 @@ function extensionChunkFileNames(chunkInfo: PreRenderedChunk) {
   return `chunks/${chunkName}-[hash].js`;
 }
 
+export function removeExtensionDevOptimizedDeps(
+  optimizeDeps: OptimizeDepsListConfig,
+) {
+  const excludedDeps = new Set(EXTENSION_DEV_OPTIMIZE_DEPS_EXCLUDE);
+
+  optimizeDeps.exclude = Array.from(
+    new Set([...(optimizeDeps.exclude ?? []), ...excludedDeps]),
+  );
+  optimizeDeps.include = (optimizeDeps.include ?? []).filter(
+    (dep) => !excludedDeps.has(dep),
+  );
+}
+
+export function extensionDevDependencyOptimizerGuard(): Plugin {
+  return {
+    name: "fx-inline:extension-dev-dependency-optimizer-guard",
+    apply: "serve",
+    enforce: "post",
+    configResolved(config) {
+      removeExtensionDevOptimizedDeps(config.optimizeDeps);
+    },
+  };
+}
+
 function isExtensionPageEntrypoint(entrypoint: Entrypoint) {
   return [
     "bookmarks",
@@ -252,6 +294,7 @@ export default defineConfig({
   vite: () => ({
     plugins: [
       preact(),
+      extensionDevDependencyOptimizerGuard(),
       vitePluginSvgr({
         svgrOptions: {
           exportType: "default",
