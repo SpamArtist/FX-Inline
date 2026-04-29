@@ -154,6 +154,13 @@ export function mutationsContainCurrencyActivationSignal(
   options: CurrencyActivationScanOptions = {},
 ): boolean {
   for (const mutation of mutations) {
+    if (
+      mutation.type === "characterData" &&
+      nodeHasCurrencyActivationSignal(mutation.target, options)
+    ) {
+      return true;
+    }
+
     for (const node of Array.from(mutation.addedNodes)) {
       if (nodeHasCurrencyActivationSignal(node, options)) {
         return true;
@@ -291,6 +298,7 @@ export function createContentActivationController(
     observer = createObserver(handleMutations);
     observer.observe(body, {
       childList: true,
+      characterData: true,
       subtree: true,
     });
   }

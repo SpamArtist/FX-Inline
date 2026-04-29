@@ -63,11 +63,12 @@ test("root scan ignores script text and finds page-visible currency text", () =>
   expect(scanRootForCurrencyActivationSignal(document.body)).toBe(true);
 });
 
-test("mutation scan checks added nodes only", () => {
+test("mutation scan checks added nodes and character data updates", () => {
   const ignoredScript = document.createElement("script");
   ignoredScript.textContent = "const price = '$999'";
   const priceNode = document.createElement("span");
   priceNode.textContent = "Only £19";
+  const dynamicPriceText = document.createTextNode("Deal price ₹1,299");
 
   expect(
     mutationsContainCurrencyActivationSignal([
@@ -77,6 +78,11 @@ test("mutation scan checks added nodes only", () => {
   expect(
     mutationsContainCurrencyActivationSignal([
       { addedNodes: [priceNode] },
+    ]),
+  ).toBe(true);
+  expect(
+    mutationsContainCurrencyActivationSignal([
+      { type: "characterData", target: dynamicPriceText, addedNodes: [] },
     ]),
   ).toBe(true);
 });
@@ -110,6 +116,7 @@ test("activation controller observes child additions and lazy-loads worker after
   expect(importContentWorker).not.toHaveBeenCalled();
   expect(observer.observe).toHaveBeenCalledWith(document.body, {
     childList: true,
+    characterData: true,
     subtree: true,
   });
 
@@ -121,6 +128,49 @@ test("activation controller observes child additions and lazy-loads worker after
   expect(importContentWorker).not.toHaveBeenCalled();
 
   jest.advanceTimersByTime(1);
+  await Promise.resolve();
+  await Promise.resolve();
+
+  expect(importContentWorker).toHaveBeenCalledTimes(1);
+  expect(importContentWorker).toHaveBeenCalledWith({});
+  expect(observer.disconnect).toHaveBeenCalledTimes(1);
+});
+
+test("activation controller lazy-loads worker when a text node becomes a price", async () => {
+  const { ctx } = createLifecycleContext();
+  const importContentWorker = jest.fn().mockResolvedValue(undefined);
+  let mutationCallback = null;
+  const observer = {
+    observe: jest.fn(),
+    disconnect: jest.fn(),
+  };
+  const createMutationObserver = jest.fn((callback) => {
+    mutationCallback = callback;
+    return observer;
+  });
+
+  const dynamicPriceText = document.createTextNode("Loading deal");
+  const priceElement = document.createElement("span");
+  priceElement.append(dynamicPriceText);
+  document.body.append(priceElement);
+
+  createContentActivationController(ctx, {
+    document,
+    locationHref: "https://www.amazon.in/",
+    importContentWorker,
+    setTimeout: window.setTimeout,
+    clearTimeout: window.clearTimeout,
+    createMutationObserver,
+  }).start();
+
+  expect(importContentWorker).not.toHaveBeenCalled();
+
+  dynamicPriceText.data = "Limited deal ₹1,299";
+  mutationCallback([
+    { type: "characterData", target: dynamicPriceText, addedNodes: [] },
+  ]);
+
+  jest.advanceTimersByTime(250);
   await Promise.resolve();
   await Promise.resolve();
 
