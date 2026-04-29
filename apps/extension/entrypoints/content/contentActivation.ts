@@ -9,8 +9,10 @@ import type {
 import { setContentWorkerStartupOptions } from "./contentWorkerStartup";
 
 const ACTIVATION_MUTATION_DEBOUNCE_MS = 250;
-const DEFAULT_SCAN_TEXT_NODE_LIMIT = 350;
+const DEFAULT_SCAN_TEXT_NODE_LIMIT = 15_000;
 const DEFAULT_SCAN_CHARACTER_LIMIT = 20_000;
+const ACTIVATION_TEXT_WINDOW_LIMIT = 512;
+const TEXT_CONTEXT_ANCESTOR_LIMIT = 4;
 const SUPPORTED_CONTENT_PROTOCOLS = new Set(["http:", "https:"]);
 const SKIPPED_TEXT_PARENT_TAGS = new Set([
   "SCRIPT",
@@ -80,6 +82,69 @@ function getElementTextWithinLimit(
   return text.length > maxCharacters ? text.slice(0, maxCharacters) : text;
 }
 
+function normalizeActivationScanText(text: string): string {
+  return text.replace(/\s+/gu, " ").trim();
+}
+
+function appendActivationScanText(rollingText: string, text: string): string {
+  const normalizedText = normalizeActivationScanText(text);
+  if (!normalizedText) return rollingText;
+
+  const nextText = rollingText
+    ? `${rollingText} ${normalizedText}`
+    : normalizedText;
+
+  if (nextText.length <= ACTIVATION_TEXT_WINDOW_LIMIT) {
+    return nextText;
+  }
+
+  return nextText.slice(nextText.length - ACTIVATION_TEXT_WINDOW_LIMIT);
+}
+
+function getNodeTextWithinLimit(
+  node: Node,
+  maxCharacters: number,
+): string | null {
+  if (node instanceof Text) {
+    if (isSkippedTextParent(node.parentNode)) return null;
+    return node.data.slice(0, maxCharacters);
+  }
+
+  if (node instanceof Element) {
+    if (isSkippedTextParent(node)) return null;
+    return getElementTextWithinLimit(node, maxCharacters);
+  }
+
+  return null;
+}
+
+function ancestorTextHasCurrencyActivationSignal(
+  element: Element,
+  maxCharacters: number,
+): boolean {
+  let currentElement: Element | null = element;
+  let checkedAncestors = 0;
+
+  while (
+    currentElement &&
+    checkedAncestors < TEXT_CONTEXT_ANCESTOR_LIMIT &&
+    !isSkippedTextParent(currentElement)
+  ) {
+    if (
+      hasCurrencyActivationSignal(
+        getElementTextWithinLimit(currentElement, maxCharacters),
+      )
+    ) {
+      return true;
+    }
+
+    currentElement = currentElement.parentElement;
+    checkedAncestors += 1;
+  }
+
+  return false;
+}
+
 export function isSupportedContentScriptUrl(url: string): boolean {
   try {
     return SUPPORTED_CONTENT_PROTOCOLS.has(new URL(url).protocol);
@@ -103,12 +168,24 @@ export function nodeHasCurrencyActivationSignal(
 
   if (node instanceof Text) {
     if (isSkippedTextParent(node.parentNode)) return false;
-    return hasCurrencyActivationSignal(node.data.slice(0, maxCharacters));
+    if (hasCurrencyActivationSignal(node.data.slice(0, maxCharacters))) {
+      return true;
+    }
+
+    return node.parentElement
+      ? ancestorTextHasCurrencyActivationSignal(node.parentElement, maxCharacters)
+      : false;
   }
 
   if (node instanceof Element) {
     if (isSkippedTextParent(node)) return false;
-    return hasCurrencyActivationSignal(getElementTextWithinLimit(node, maxCharacters));
+    if (hasCurrencyActivationSignal(getElementTextWithinLimit(node, maxCharacters))) {
+      return true;
+    }
+
+    return node.parentElement
+      ? ancestorTextHasCurrencyActivationSignal(node.parentElement, maxCharacters)
+      : false;
   }
 
   return false;
@@ -127,6 +204,7 @@ export function scanRootForCurrencyActivationSignal(
   const walker = ownerDocument.createTreeWalker(rootNode, NodeFilter.SHOW_TEXT);
   let scannedTextNodes = 0;
   let scannedCharacters = 0;
+  let rollingText = "";
   let currentNode = walker.nextNode();
 
   while (currentNode && scannedTextNodes < maxTextNodes) {
@@ -141,6 +219,11 @@ export function scanRootForCurrencyActivationSignal(
       if (hasCurrencyActivationSignal(text)) {
         return true;
       }
+
+      rollingText = appendActivationScanText(rollingText, text);
+      if (hasCurrencyActivationSignal(rollingText)) {
+        return true;
+      }
     }
 
     currentNode = walker.nextNode();
@@ -153,10 +236,36 @@ export function mutationsContainCurrencyActivationSignal(
   mutations: MutationRecord[],
   options: CurrencyActivationScanOptions = {},
 ): boolean {
+  const maxCharacters = options.maxCharacters ?? DEFAULT_SCAN_CHARACTER_LIMIT;
+  let rollingText = "";
+
   for (const mutation of mutations) {
+    if (
+      mutation.type === "characterData" &&
+      nodeHasCurrencyActivationSignal(mutation.target, options)
+    ) {
+      return true;
+    }
+
+    const targetText = getNodeTextWithinLimit(mutation.target, maxCharacters);
+    if (targetText) {
+      rollingText = appendActivationScanText(rollingText, targetText);
+      if (hasCurrencyActivationSignal(rollingText)) {
+        return true;
+      }
+    }
+
     for (const node of Array.from(mutation.addedNodes)) {
       if (nodeHasCurrencyActivationSignal(node, options)) {
         return true;
+      }
+
+      const nodeText = getNodeTextWithinLimit(node, maxCharacters);
+      if (nodeText) {
+        rollingText = appendActivationScanText(rollingText, nodeText);
+        if (hasCurrencyActivationSignal(rollingText)) {
+          return true;
+        }
       }
     }
   }
@@ -291,6 +400,7 @@ export function createContentActivationController(
     observer = createObserver(handleMutations);
     observer.observe(body, {
       childList: true,
+      characterData: true,
       subtree: true,
     });
   }

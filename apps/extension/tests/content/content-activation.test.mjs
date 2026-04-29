@@ -63,11 +63,35 @@ test("root scan ignores script text and finds page-visible currency text", () =>
   expect(scanRootForCurrencyActivationSignal(document.body)).toBe(true);
 });
 
-test("mutation scan checks added nodes only", () => {
+test("root scan detects listing prices split across text nodes", () => {
+  const filters = document.createElement("section");
+  for (let index = 0; index < 20; index += 1) {
+    const filter = document.createElement("span");
+    filter.textContent = `Filter ${index}`;
+    filters.append(filter);
+  }
+
+  const listingPrice = document.createElement("span");
+  listingPrice.innerHTML = `
+    <span>₹</span>
+    <span>75</span>
+  `;
+
+  document.body.append(filters, listingPrice);
+
+  expect(
+    scanRootForCurrencyActivationSignal(document.body, {
+      maxTextNodes: 30,
+    }),
+  ).toBe(true);
+});
+
+test("mutation scan checks added nodes and character data updates", () => {
   const ignoredScript = document.createElement("script");
   ignoredScript.textContent = "const price = '$999'";
   const priceNode = document.createElement("span");
   priceNode.textContent = "Only £19";
+  const dynamicPriceText = document.createTextNode("Deal price ₹1,299");
 
   expect(
     mutationsContainCurrencyActivationSignal([
@@ -77,6 +101,41 @@ test("mutation scan checks added nodes only", () => {
   expect(
     mutationsContainCurrencyActivationSignal([
       { addedNodes: [priceNode] },
+    ]),
+  ).toBe(true);
+  expect(
+    mutationsContainCurrencyActivationSignal([
+      { type: "characterData", target: dynamicPriceText, addedNodes: [] },
+    ]),
+  ).toBe(true);
+});
+
+test("mutation scan detects added split price containers", () => {
+  const result = document.createElement("div");
+  result.innerHTML = `
+    <h2>ScotchBrite Scrub Pad</h2>
+    <span>
+      <span>₹</span>
+      <span>75</span>
+    </span>
+  `;
+
+  expect(
+    mutationsContainCurrencyActivationSignal([
+      { type: "childList", addedNodes: [result] },
+    ]),
+  ).toBe(true);
+});
+
+test("mutation scan detects split price fragments delivered together", () => {
+  const symbolNode = document.createElement("span");
+  symbolNode.textContent = "₹";
+  const amountNode = document.createElement("span");
+  amountNode.textContent = "75";
+
+  expect(
+    mutationsContainCurrencyActivationSignal([
+      { type: "childList", addedNodes: [symbolNode, amountNode] },
     ]),
   ).toBe(true);
 });
@@ -110,6 +169,7 @@ test("activation controller observes child additions and lazy-loads worker after
   expect(importContentWorker).not.toHaveBeenCalled();
   expect(observer.observe).toHaveBeenCalledWith(document.body, {
     childList: true,
+    characterData: true,
     subtree: true,
   });
 
@@ -121,6 +181,78 @@ test("activation controller observes child additions and lazy-loads worker after
   expect(importContentWorker).not.toHaveBeenCalled();
 
   jest.advanceTimersByTime(1);
+  await Promise.resolve();
+  await Promise.resolve();
+
+  expect(importContentWorker).toHaveBeenCalledTimes(1);
+  expect(importContentWorker).toHaveBeenCalledWith({});
+  expect(observer.disconnect).toHaveBeenCalledTimes(1);
+});
+
+test("activation controller starts immediately on existing split listing prices", async () => {
+  const { ctx } = createLifecycleContext();
+  const importContentWorker = jest.fn().mockResolvedValue(undefined);
+  const createMutationObserver = jest.fn();
+
+  document.body.innerHTML = `
+    <main>
+      <span>
+        <span>₹</span>
+        <span>75</span>
+      </span>
+    </main>
+  `;
+
+  createContentActivationController(ctx, {
+    document,
+    locationHref: "https://example.com/search",
+    importContentWorker,
+    createMutationObserver,
+  }).start();
+
+  await Promise.resolve();
+  await Promise.resolve();
+
+  expect(importContentWorker).toHaveBeenCalledTimes(1);
+  expect(importContentWorker).toHaveBeenCalledWith({});
+  expect(createMutationObserver).not.toHaveBeenCalled();
+});
+
+test("activation controller lazy-loads worker when a text node becomes a price", async () => {
+  const { ctx } = createLifecycleContext();
+  const importContentWorker = jest.fn().mockResolvedValue(undefined);
+  let mutationCallback = null;
+  const observer = {
+    observe: jest.fn(),
+    disconnect: jest.fn(),
+  };
+  const createMutationObserver = jest.fn((callback) => {
+    mutationCallback = callback;
+    return observer;
+  });
+
+  const dynamicPriceText = document.createTextNode("Loading deal");
+  const priceElement = document.createElement("span");
+  priceElement.append(dynamicPriceText);
+  document.body.append(priceElement);
+
+  createContentActivationController(ctx, {
+    document,
+    locationHref: "https://example.com/",
+    importContentWorker,
+    setTimeout: window.setTimeout,
+    clearTimeout: window.clearTimeout,
+    createMutationObserver,
+  }).start();
+
+  expect(importContentWorker).not.toHaveBeenCalled();
+
+  dynamicPriceText.data = "Limited deal ₹1,299";
+  mutationCallback([
+    { type: "characterData", target: dynamicPriceText, addedNodes: [] },
+  ]);
+
+  jest.advanceTimersByTime(250);
   await Promise.resolve();
   await Promise.resolve();
 
