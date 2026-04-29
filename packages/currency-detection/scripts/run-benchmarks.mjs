@@ -34,6 +34,34 @@ function buildLargeExtractionPayload(extractInputs) {
   return chunks.join(" | ");
 }
 
+function buildPagePayload(extractInputs) {
+  return extractInputs.join("\n");
+}
+
+function makeRealWorldParseScenario(name, parser, parseInputs, iterations) {
+  return {
+    name,
+    iterations,
+    batchSize: parseInputs.length,
+    run: () => {
+      for (const input of parseInputs) {
+        parser.parseValue(input);
+      }
+    },
+  };
+}
+
+function makeRealWorldExtractScenario(name, parser, payload, iterations) {
+  return {
+    name,
+    iterations,
+    batchSize: 1,
+    run: () => {
+      parser.extractMatches(payload);
+    },
+  };
+}
+
 async function run() {
   const parser = createCurrencyParser();
   const fixtures = JSON.parse(await readFile(fixturesPath, "utf8"));
@@ -42,9 +70,20 @@ async function run() {
   const extractInputs = fixtures.extractInputs.slice(0, 200);
   const quickFilterInputs = fixtures.quickFilterInputs.slice();
   const thousandHintInputs = fixtures.thousandHintInputs.slice();
+  const realWorld = fixtures.realWorld ?? {
+    saasPricing: { parseInputs: [], extractInputs: [] },
+    amazonByCountry: { parseInputs: [], extractInputs: [] },
+    apartmentRentalsAsia: { parseInputs: [], extractInputs: [] },
+  };
 
   const largeExtractionPayload = buildLargeExtractionPayload(extractInputs);
   const adversarialPayload = `${"x".repeat(20000)} USD 123 ${"y".repeat(20000)}`;
+
+  const saasPricingPayload = buildPagePayload(realWorld.saasPricing.extractInputs);
+  const amazonPayload = buildPagePayload(realWorld.amazonByCountry.extractInputs);
+  const apartmentsPayload = buildPagePayload(
+    realWorld.apartmentRentalsAsia.extractInputs,
+  );
 
   const scenarios = [
     {
@@ -96,6 +135,42 @@ async function run() {
         parser.extractMatches(adversarialPayload);
       },
     },
+    makeRealWorldParseScenario(
+      "parse.real-world.saas-pricing",
+      parser,
+      realWorld.saasPricing.parseInputs,
+      400,
+    ),
+    makeRealWorldParseScenario(
+      "parse.real-world.amazon-multi-country",
+      parser,
+      realWorld.amazonByCountry.parseInputs,
+      400,
+    ),
+    makeRealWorldParseScenario(
+      "parse.real-world.apartment-rentals-asia",
+      parser,
+      realWorld.apartmentRentalsAsia.parseInputs,
+      400,
+    ),
+    makeRealWorldExtractScenario(
+      "extract.real-world.saas-pricing-page",
+      parser,
+      saasPricingPayload,
+      120,
+    ),
+    makeRealWorldExtractScenario(
+      "extract.real-world.amazon-product-page",
+      parser,
+      amazonPayload,
+      120,
+    ),
+    makeRealWorldExtractScenario(
+      "extract.real-world.apartment-listing-asia",
+      parser,
+      apartmentsPayload,
+      120,
+    ),
   ];
 
   const results = [];
@@ -146,6 +221,23 @@ async function run() {
       extractInputs: extractInputs.length,
       quickFilterInputs: quickFilterInputs.length,
       thousandHintInputs: thousandHintInputs.length,
+      realWorld: {
+        saasPricing: {
+          parseInputs: realWorld.saasPricing.parseInputs.length,
+          extractInputs: realWorld.saasPricing.extractInputs.length,
+          extractPayloadChars: saasPricingPayload.length,
+        },
+        amazonByCountry: {
+          parseInputs: realWorld.amazonByCountry.parseInputs.length,
+          extractInputs: realWorld.amazonByCountry.extractInputs.length,
+          extractPayloadChars: amazonPayload.length,
+        },
+        apartmentRentalsAsia: {
+          parseInputs: realWorld.apartmentRentalsAsia.parseInputs.length,
+          extractInputs: realWorld.apartmentRentalsAsia.extractInputs.length,
+          extractPayloadChars: apartmentsPayload.length,
+        },
+      },
     },
     results,
   };

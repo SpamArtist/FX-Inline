@@ -1,8 +1,26 @@
 {
   "schemaVersion": 1,
   "source": "apps/extension/utils/utils.ts (compiled via apps/extension/test-dist/utils/utils.js)",
-  "fixtureSchemaVersion": 1,
+  "fixtureSchemaVersion": 2,
   "parseResults": [
+    {
+      "input": "($0.50 / Count)",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "($0.83 / Fl Oz)",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "(£12.49 / kg)",
+      "output": {
+        "valid": false
+      }
+    },
     {
       "input": "+150 usd",
       "output": {
@@ -28,11 +46,103 @@
       }
     },
     {
+      "input": "$0",
+      "output": {
+        "valid": true,
+        "value": 0,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "$0.00",
+      "output": {
+        "valid": true,
+        "value": 0,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "$0.0004 per request",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$0.0079 per SMS",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$0.0085 per minute",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$0.023 per GB / month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$0.50 per dispute",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$1,200/year",
+      "output": {
+        "valid": false
+      }
+    },
+    {
       "input": "$1,234.56",
       "output": {
         "valid": true,
         "value": 1234.56,
         "currency": "USD"
+      }
+    },
+    {
+      "input": "$1,299.00",
+      "output": {
+        "valid": true,
+        "value": 1299,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "$1,799.99",
+      "output": {
+        "valid": true,
+        "value": 1799.99,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "$10 / month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$10 per user/month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$10 USD per seat / month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$10.99 per user/month",
+      "output": {
+        "valid": false
       }
     },
     {
@@ -60,11 +170,243 @@
       }
     },
     {
+      "input": "$13/month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$14 per user / month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$15 per host, per month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$15 per user/month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$15/user/month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$150/month minimum",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$16 per user/month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$16 USD per seat / month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$165 USD/user/month*",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$199/yr",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$2 user / month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$2,490 / year",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$20/mo per seat",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$20/month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$20/month per member",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$21 per user/month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$24.99",
+      "output": {
+        "valid": true,
+        "value": 24.99,
+        "currency": "USD"
+      }
+    },
+    {
+      "input": "$24.99 per user/month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$24.99 with Subscribe & Save",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$25 / month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$25 USD/user/month*",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$3 per editor / month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$3,600/mo",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$350/month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$39/month per seat",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$4 per user/month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$40 / month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$42 USD/user/month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$5 per editor / month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$70 USD/user/month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
       "input": "﹩75",
       "output": {
         "valid": true,
         "value": 75,
         "currency": "USD"
+      }
+    },
+    {
+      "input": "$8 per member/month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$8 per user / month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$8.15 per user/month avg.",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$8.75 USD",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$8.75 USD per active user/month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$890/mo billed annually",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "$99/month per seat",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "£1,299.00",
+      "output": {
+        "valid": true,
+        "value": 1299,
+        "currency": "GBP"
       }
     },
     {
@@ -84,10 +426,34 @@
       }
     },
     {
+      "input": "£24.99",
+      "output": {
+        "valid": true,
+        "value": 24.99,
+        "currency": "GBP"
+      }
+    },
+    {
+      "input": "¥1,299",
+      "output": {
+        "valid": true,
+        "value": 1299,
+        "currency": "JPY"
+      }
+    },
+    {
       "input": "¥123",
       "output": {
         "valid": true,
         "value": 123,
+        "currency": "JPY"
+      }
+    },
+    {
+      "input": "￥2,498",
+      "output": {
+        "valid": true,
+        "value": 2498,
         "currency": "JPY"
       }
     },
@@ -101,6 +467,12 @@
     },
     {
       "input": "￥３９，０００",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "¥39,800 税込",
       "output": {
         "valid": false
       }
@@ -130,6 +502,18 @@
       }
     },
     {
+      "input": "¥85,000/月",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "￥85,000/月",
+      "output": {
+        "valid": false
+      }
+    },
+    {
       "input": "৳123",
       "output": {
         "valid": true,
@@ -143,6 +527,12 @@
         "valid": true,
         "value": 123,
         "currency": "THB"
+      }
+    },
+    {
+      "input": "฿35,000/month",
+      "output": {
+        "valid": false
       }
     },
     {
@@ -176,6 +566,18 @@
       }
     },
     {
+      "input": "₩600,000/월",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "₩800,000/월",
+      "output": {
+        "valid": false
+      }
+    },
+    {
       "input": "₪123",
       "output": {
         "valid": true,
@@ -189,6 +591,12 @@
         "valid": true,
         "value": 1000000000000,
         "currency": "VND"
+      }
+    },
+    {
+      "input": "₫ 12.500.000/tháng",
+      "output": {
+        "valid": false
       }
     },
     {
@@ -213,6 +621,24 @@
         "valid": true,
         "value": 4295000000000,
         "currency": "VND"
+      }
+    },
+    {
+      "input": "₫ 8 triệu/tháng",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "₫ 8.000.000/tháng",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "₫ 8.500.000",
+      "output": {
+        "valid": false
       }
     },
     {
@@ -276,6 +702,12 @@
       }
     },
     {
+      "input": "₱25,000/month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
       "input": "₲123",
       "output": {
         "valid": false
@@ -312,6 +744,14 @@
       }
     },
     {
+      "input": "₹1,299.00",
+      "output": {
+        "valid": true,
+        "value": 1299,
+        "currency": "INR"
+      }
+    },
+    {
       "input": "₹123",
       "output": {
         "valid": true,
@@ -320,11 +760,83 @@
       }
     },
     {
+      "input": "₹15,000/month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "₹15,999.00",
+      "output": {
+        "valid": true,
+        "value": 15999,
+        "currency": "INR"
+      }
+    },
+    {
+      "input": "₹2,499 (5% off)",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "₹2.5 Lac/month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "₹2.5 Lakh",
+      "output": {
+        "valid": true,
+        "value": 250000,
+        "currency": "INR"
+      }
+    },
+    {
+      "input": "₹2.5 Lakh deposit",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "₹2.5 Lakh/month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "₹25,000/month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "₹85,000/month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
       "input": "₺123",
       "output": {
         "valid": true,
         "value": 123,
         "currency": "TRY"
+      }
+    },
+    {
+      "input": "₺199,99",
+      "output": {
+        "valid": true,
+        "value": 199.99,
+        "currency": "TRY"
+      }
+    },
+    {
+      "input": "₺7.499,00",
+      "output": {
+        "valid": false
       }
     },
     {
@@ -376,6 +888,14 @@
       }
     },
     {
+      "input": "1 299,00 €",
+      "output": {
+        "valid": true,
+        "value": 1299,
+        "currency": "EUR"
+      }
+    },
+    {
       "input": "1 Lakh INR",
       "output": {
         "valid": true,
@@ -389,6 +909,12 @@
         "valid": true,
         "value": 1234,
         "currency": "JPY"
+      }
+    },
+    {
+      "input": "1.299,00 €",
+      "output": {
+        "valid": false
       }
     },
     {
@@ -3218,7 +3744,21 @@
       }
     },
     {
+      "input": "24,99 €",
+      "output": {
+        "valid": true,
+        "value": 24.99,
+        "currency": "EUR"
+      }
+    },
+    {
       "input": "27, all",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "35,000฿/month",
       "output": {
         "valid": false
       }
@@ -3240,11 +3780,41 @@
       }
     },
     {
+      "input": "8 triệu/tháng",
+      "output": {
+        "valid": false
+      }
+    },
+    {
       "input": "A$123",
       "output": {
         "valid": true,
         "value": 123,
         "currency": "AUD"
+      }
+    },
+    {
+      "input": "A$199.99",
+      "output": {
+        "valid": true,
+        "value": 199.99,
+        "currency": "AUD"
+      }
+    },
+    {
+      "input": "A$24.99",
+      "output": {
+        "valid": true,
+        "value": 24.99,
+        "currency": "AUD"
+      }
+    },
+    {
+      "input": "AED 1,799",
+      "output": {
+        "valid": true,
+        "value": 1799,
+        "currency": "AED"
       }
     },
     {
@@ -3359,6 +3929,14 @@
         "valid": true,
         "value": 123,
         "currency": "ARS"
+      }
+    },
+    {
+      "input": "AU$1,299.00",
+      "output": {
+        "valid": true,
+        "value": 1299,
+        "currency": "AUD"
       }
     },
     {
@@ -3634,6 +4212,12 @@
       }
     },
     {
+      "input": "C$24.99",
+      "output": {
+        "valid": false
+      }
+    },
+    {
       "input": "CA$123",
       "output": {
         "valid": true,
@@ -3671,6 +4255,18 @@
         "valid": true,
         "value": 123,
         "currency": "CDF"
+      }
+    },
+    {
+      "input": "CDN$ 24.99",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "CDN$ 379.00",
+      "output": {
+        "valid": false
       }
     },
     {
@@ -3714,11 +4310,31 @@
       }
     },
     {
+      "input": "CNY 8000",
+      "output": {
+        "valid": true,
+        "value": 8000,
+        "currency": "CNY"
+      }
+    },
+    {
+      "input": "CNY 8000/月",
+      "output": {
+        "valid": false
+      }
+    },
+    {
       "input": "CNY123",
       "output": {
         "valid": true,
         "value": 123,
         "currency": "CNY"
+      }
+    },
+    {
+      "input": "Contact sales",
+      "output": {
+        "valid": false
       }
     },
     {
@@ -3770,6 +4386,12 @@
       }
     },
     {
+      "input": "Custom",
+      "output": {
+        "valid": false
+      }
+    },
+    {
       "input": "CVE 123",
       "output": {
         "valid": true,
@@ -3799,6 +4421,12 @@
         "valid": true,
         "value": 123,
         "currency": "CZK"
+      }
+    },
+    {
+      "input": "Deal of the Day ₹999",
+      "output": {
+        "valid": false
       }
     },
     {
@@ -3938,6 +4566,14 @@
       }
     },
     {
+      "input": "EUR 24,99",
+      "output": {
+        "valid": true,
+        "value": 24.99,
+        "currency": "EUR"
+      }
+    },
+    {
       "input": "eur-42.5",
       "output": {
         "valid": true,
@@ -3993,6 +4629,36 @@
     },
     {
       "input": "foo bar",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "Free",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "From $19.99",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "From $39/month per seat",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "From $99/month per seat",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "From ₹2.5 Lakh/month",
       "output": {
         "valid": false
       }
@@ -4134,6 +4800,18 @@
       }
     },
     {
+      "input": "HK$15,000/month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "HK$18,500/month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
       "input": "HKD 123",
       "output": {
         "valid": true,
@@ -4214,6 +4892,34 @@
       }
     },
     {
+      "input": "IDR 5 juta",
+      "output": {
+        "valid": true,
+        "value": 5000000,
+        "currency": "IDR"
+      }
+    },
+    {
+      "input": "IDR 5 miliar",
+      "output": {
+        "valid": true,
+        "value": 5000000000,
+        "currency": "IDR"
+      }
+    },
+    {
+      "input": "IDR 5,000,000/bulan",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "IDR 8,500,000/bulan",
+      "output": {
+        "valid": false
+      }
+    },
+    {
       "input": "IDR123",
       "output": {
         "valid": true,
@@ -4251,6 +4957,12 @@
         "valid": true,
         "value": 123,
         "currency": "INR"
+      }
+    },
+    {
+      "input": "INR 25,000/month",
+      "output": {
+        "valid": false
       }
     },
     {
@@ -4544,6 +5256,12 @@
       }
     },
     {
+      "input": "List Price: $79.99",
+      "output": {
+        "valid": false
+      }
+    },
+    {
       "input": "LKR 123",
       "output": {
         "valid": true,
@@ -4601,6 +5319,12 @@
         "valid": true,
         "value": 123,
         "currency": "LYD"
+      }
+    },
+    {
+      "input": "M.R.P.: ₹1,799.00",
+      "output": {
+        "valid": false
       }
     },
     {
@@ -4788,6 +5512,22 @@
       }
     },
     {
+      "input": "MX$24,999.00",
+      "output": {
+        "valid": true,
+        "value": 24999,
+        "currency": "MXN"
+      }
+    },
+    {
+      "input": "MX$24.99",
+      "output": {
+        "valid": true,
+        "value": 24.99,
+        "currency": "MXN"
+      }
+    },
+    {
       "input": "MXN 123",
       "output": {
         "valid": true,
@@ -4809,6 +5549,20 @@
         "valid": true,
         "value": 123,
         "currency": "MYR"
+      }
+    },
+    {
+      "input": "MYR 2,500",
+      "output": {
+        "valid": true,
+        "value": 2500,
+        "currency": "MYR"
+      }
+    },
+    {
+      "input": "MYR 2,500/month",
+      "output": {
+        "valid": false
       }
     },
     {
@@ -4920,6 +5674,12 @@
       }
     },
     {
+      "input": "NT$20,000/月",
+      "output": {
+        "valid": false
+      }
+    },
+    {
       "input": "NZ$123",
       "output": {
         "valid": true,
@@ -5012,6 +5772,18 @@
       }
     },
     {
+      "input": "PHP 25,000/month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "PHP 35,000/month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
       "input": "PHP123",
       "output": {
         "valid": true,
@@ -5052,6 +5824,12 @@
       }
     },
     {
+      "input": "Prix conseillé : 79,99 €",
+      "output": {
+        "valid": false
+      }
+    },
+    {
       "input": "PYG 123",
       "output": {
         "valid": true,
@@ -5084,11 +5862,31 @@
       }
     },
     {
+      "input": "R$1.299,00",
+      "output": {
+        "valid": false
+      }
+    },
+    {
       "input": "R$123",
       "output": {
         "valid": true,
         "value": 123,
         "currency": "BRL"
+      }
+    },
+    {
+      "input": "R$24,99",
+      "output": {
+        "valid": true,
+        "value": 24.99,
+        "currency": "BRL"
+      }
+    },
+    {
+      "input": "R$3.799,00",
+      "output": {
+        "valid": false
       }
     },
     {
@@ -5113,6 +5911,12 @@
         "valid": true,
         "value": 123,
         "currency": "RON"
+      }
+    },
+    {
+      "input": "RRP: £79.99",
+      "output": {
+        "valid": false
       }
     },
     {
@@ -5172,6 +5976,14 @@
       }
     },
     {
+      "input": "SAR 1,599",
+      "output": {
+        "valid": true,
+        "value": 1599,
+        "currency": "SAR"
+      }
+    },
+    {
       "input": "SAR 123",
       "output": {
         "valid": true,
@@ -5185,6 +5997,30 @@
         "valid": true,
         "value": 123,
         "currency": "SAR"
+      }
+    },
+    {
+      "input": "Save $228/year",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "Save $5.00 (10%)",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "Save $50",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "Save 20%",
+      "output": {
+        "valid": false
       }
     },
     {
@@ -5260,6 +6096,26 @@
       }
     },
     {
+      "input": "SGD 199.99",
+      "output": {
+        "valid": true,
+        "value": 199.99,
+        "currency": "SGD"
+      }
+    },
+    {
+      "input": "SGD 2,200/month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "SGD 3,500/month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
       "input": "SGD123",
       "output": {
         "valid": true,
@@ -5328,6 +6184,24 @@
       }
     },
     {
+      "input": "Starting at $25",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "Starting at 2.9% + 30¢",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "Statt 79,99 €",
+      "output": {
+        "valid": false
+      }
+    },
+    {
       "input": "STN 123",
       "output": {
         "valid": true,
@@ -5393,6 +6267,18 @@
         "valid": true,
         "value": 123,
         "currency": "THB"
+      }
+    },
+    {
+      "input": "THB 35,000/month",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "THB 380,000/year",
+      "output": {
+        "valid": false
       }
     },
     {
@@ -5508,6 +6394,14 @@
       }
     },
     {
+      "input": "TWD 20,000",
+      "output": {
+        "valid": true,
+        "value": 20000,
+        "currency": "TWD"
+      }
+    },
+    {
       "input": "TWD123",
       "output": {
         "valid": true,
@@ -5561,6 +6455,18 @@
         "valid": true,
         "value": 123,
         "currency": "UGX"
+      }
+    },
+    {
+      "input": "US $14.99 /month/license",
+      "output": {
+        "valid": false
+      }
+    },
+    {
+      "input": "US $21.99 /month/license",
+      "output": {
+        "valid": false
       }
     },
     {
@@ -5722,6 +6628,12 @@
       }
     },
     {
+      "input": "VND 8 triệu/tháng",
+      "output": {
+        "valid": false
+      }
+    },
+    {
       "input": "VND 850 triệu",
       "output": {
         "valid": true,
@@ -5751,6 +6663,12 @@
         "valid": true,
         "value": 123,
         "currency": "VUV"
+      }
+    },
+    {
+      "input": "Was: £79.99",
+      "output": {
+        "valid": false
       }
     },
     {
@@ -5918,6 +6836,14 @@
       }
     },
     {
+      "input": "د.إ 1,799",
+      "output": {
+        "valid": true,
+        "value": 1799,
+        "currency": "AED"
+      }
+    },
+    {
       "input": "د.إ123",
       "output": {
         "valid": true,
@@ -5931,6 +6857,14 @@
         "valid": true,
         "value": 123,
         "currency": "KWD"
+      }
+    },
+    {
+      "input": "ر.س 1,599",
+      "output": {
+        "valid": true,
+        "value": 1599,
+        "currency": "SAR"
       }
     },
     {
@@ -6013,6 +6947,511 @@
           "start": 37,
           "end": 43,
           "value": 350,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "591租屋 信義區套房 NT$20,000/月 含水電網路, TWD 20,000, 押二付一, 立即看屋",
+      "output": [
+        {
+          "raw": "NT$20,000",
+          "start": 12,
+          "end": 21,
+          "value": 20000,
+          "currency": "TWD"
+        }
+      ]
+    },
+    {
+      "input": "99.co listing: studio Geylang at S$2,200/month — landlord prefers 1-year lease, 1 month deposit",
+      "output": []
+    },
+    {
+      "input": "amazon.ae Apple iPad AED 1,799 was AED 2,099 You save AED 300 (14%) د.إ 1,799 free shipping",
+      "output": [
+        {
+          "raw": "AED 1,799 ",
+          "start": 21,
+          "end": 31,
+          "value": 1799,
+          "currency": "AED"
+        },
+        {
+          "raw": "AED 2,099 ",
+          "start": 35,
+          "end": 45,
+          "value": 2099,
+          "currency": "AED"
+        },
+        {
+          "raw": "AED 300 ",
+          "start": 54,
+          "end": 62,
+          "value": 300,
+          "currency": "AED"
+        },
+        {
+          "raw": "د.إ 1,799 ",
+          "start": 68,
+          "end": 78,
+          "value": 1799,
+          "currency": "AED"
+        }
+      ]
+    },
+    {
+      "input": "amazon.ca Bose QC45 CDN$ 379.00 was CDN$ 429.00 You save CDN$ 50.00 free Prime shipping",
+      "output": []
+    },
+    {
+      "input": "amazon.ca Echo Dot C$49.99 List Price: C$69.99 Save C$20.00 — Prime exclusive",
+      "output": []
+    },
+    {
+      "input": "amazon.co.jp ソニーWF-1000XM5 ￥39,800 通常配送料無料 ¥39,800 税込 在庫あり",
+      "output": [
+        {
+          "raw": "¥39,800 ",
+          "start": 43,
+          "end": 51,
+          "value": 39800,
+          "currency": "JPY"
+        }
+      ]
+    },
+    {
+      "input": "amazon.co.jp 任天堂Switch ¥32,978 ￥39,980から お得 通常配送料無料 在庫あり",
+      "output": [
+        {
+          "raw": "¥32,978 ",
+          "start": 23,
+          "end": 31,
+          "value": 32978,
+          "currency": "JPY"
+        }
+      ]
+    },
+    {
+      "input": "amazon.co.uk Dyson V8 £329.99 was £379.99 (£12.49 / kg net) Save £50.00 limited time",
+      "output": [
+        {
+          "raw": "£379.99 ",
+          "start": 34,
+          "end": 42,
+          "value": 379.99,
+          "currency": "GBP"
+        },
+        {
+          "raw": "£12.49 ",
+          "start": 43,
+          "end": 50,
+          "value": 12.49,
+          "currency": "GBP"
+        },
+        {
+          "raw": "£50.00 ",
+          "start": 65,
+          "end": 72,
+          "value": 50,
+          "currency": "GBP"
+        }
+      ]
+    },
+    {
+      "input": "amazon.co.uk Sony WH-1000XM5 £279.00 RRP: £379.00 You Save £100.00 (26%) Eligible for FREE Delivery",
+      "output": [
+        {
+          "raw": "£379.00 ",
+          "start": 42,
+          "end": 50,
+          "value": 379,
+          "currency": "GBP"
+        },
+        {
+          "raw": "£100.00 ",
+          "start": 59,
+          "end": 67,
+          "value": 100,
+          "currency": "GBP"
+        }
+      ]
+    },
+    {
+      "input": "amazon.com.au iPhone 15 case AU$24.99 with Prime free delivery, ships from Sydney",
+      "output": [
+        {
+          "raw": "AU$24.99 ",
+          "start": 29,
+          "end": 38,
+          "value": 24.99,
+          "currency": "AUD"
+        }
+      ]
+    },
+    {
+      "input": "amazon.com.au LEGO Star Wars A$199.99 was A$249.99 You save A$50.00 with Prime free delivery",
+      "output": [
+        {
+          "raw": "A$199.99 ",
+          "start": 29,
+          "end": 38,
+          "value": 199.99,
+          "currency": "AUD"
+        },
+        {
+          "raw": "A$249.99 ",
+          "start": 42,
+          "end": 51,
+          "value": 249.99,
+          "currency": "AUD"
+        },
+        {
+          "raw": "A$50.00 ",
+          "start": 60,
+          "end": 68,
+          "value": 50,
+          "currency": "AUD"
+        }
+      ]
+    },
+    {
+      "input": "amazon.com.br PlayStation 5 R$3.799,00 ou em 12x de R$316,58 sem juros, frete GRÁTIS",
+      "output": [
+        {
+          "raw": "R$316,58 ",
+          "start": 52,
+          "end": 61,
+          "value": 316.58,
+          "currency": "BRL"
+        }
+      ]
+    },
+    {
+      "input": "amazon.com.mx iPhone 15 MX$24,999.00 Precio de lista: MX$28,999.00 ahorras MX$4,000.00",
+      "output": [
+        {
+          "raw": "MX$28,999.00 ",
+          "start": 54,
+          "end": 67,
+          "value": 28999,
+          "currency": "MXN"
+        },
+        {
+          "raw": "MX$4,000.00",
+          "start": 75,
+          "end": 86,
+          "value": 4000,
+          "currency": "MXN"
+        }
+      ]
+    },
+    {
+      "input": "amazon.com.tr Xiaomi Redmi ₺7.499,00 ₺8.999,00 yerine — %17 indirim, ücretsiz kargo",
+      "output": []
+    },
+    {
+      "input": "amazon.de Bosch Bohrer-Set 24,99 € Statt 39,99 € — Sie sparen 15,00 € (38%) inkl. MwSt.",
+      "output": [
+        {
+          "raw": "24,99 €",
+          "start": 27,
+          "end": 34,
+          "value": 24.99,
+          "currency": "EUR"
+        },
+        {
+          "raw": "39,99 €",
+          "start": 41,
+          "end": 48,
+          "value": 39.99,
+          "currency": "EUR"
+        },
+        {
+          "raw": "15,00 €",
+          "start": 62,
+          "end": 69,
+          "value": 15,
+          "currency": "EUR"
+        }
+      ]
+    },
+    {
+      "input": "amazon.de Samsung Galaxy 1.299,00 € Unverbindliche Preisempfehlung: 1.499,00 € — Sie sparen 200,00 €",
+      "output": [
+        {
+          "raw": "200,00 €",
+          "start": 92,
+          "end": 100,
+          "value": 200,
+          "currency": "EUR"
+        }
+      ]
+    },
+    {
+      "input": "amazon.fr Le Creuset 24cm 1 299,00 € livraison gratuite avec Prime",
+      "output": [
+        {
+          "raw": "1 299,00 €",
+          "start": 26,
+          "end": 36,
+          "value": 1299,
+          "currency": "EUR"
+        }
+      ]
+    },
+    {
+      "input": "amazon.fr Philips Sonicare 89,99 € Prix conseillé : 119,99 € Économisez 30,00 € livraison gratuite",
+      "output": [
+        {
+          "raw": "89,99 €",
+          "start": 27,
+          "end": 34,
+          "value": 89.99,
+          "currency": "EUR"
+        },
+        {
+          "raw": "119,99 €",
+          "start": 52,
+          "end": 60,
+          "value": 119.99,
+          "currency": "EUR"
+        },
+        {
+          "raw": "30,00 €",
+          "start": 72,
+          "end": 79,
+          "value": 30,
+          "currency": "EUR"
+        }
+      ]
+    },
+    {
+      "input": "amazon.in boAt Rockerz ₹1,299.00 M.R.P.: ₹2,990.00 Save: ₹1,691.00 (57%) ₹2,499 (5% off)",
+      "output": [
+        {
+          "raw": "₹1,299.00 M",
+          "start": 23,
+          "end": 34,
+          "value": 1299000000,
+          "currency": "INR"
+        },
+        {
+          "raw": "₹2,990.00 ",
+          "start": 41,
+          "end": 51,
+          "value": 2990,
+          "currency": "INR"
+        },
+        {
+          "raw": "₹1,691.00 ",
+          "start": 57,
+          "end": 67,
+          "value": 1691,
+          "currency": "INR"
+        },
+        {
+          "raw": "₹2,499 ",
+          "start": 73,
+          "end": 80,
+          "value": 2499,
+          "currency": "INR"
+        }
+      ]
+    },
+    {
+      "input": "amazon.in OnePlus 12R ₹39,999.00 M.R.P.: ₹45,999.00 Save: ₹6,000.00 (13%) Deal of the Day",
+      "output": [
+        {
+          "raw": "₹39,999.00 M",
+          "start": 22,
+          "end": 34,
+          "value": 39999000000,
+          "currency": "INR"
+        },
+        {
+          "raw": "₹45,999.00 ",
+          "start": 41,
+          "end": 52,
+          "value": 45999,
+          "currency": "INR"
+        },
+        {
+          "raw": "₹6,000.00 ",
+          "start": 58,
+          "end": 68,
+          "value": 6000,
+          "currency": "INR"
+        }
+      ]
+    },
+    {
+      "input": "amazon.sa Apple Watch Series 9 SAR 1,599 was SAR 1,899 ر.س 1,599 free returns",
+      "output": [
+        {
+          "raw": "9 SAR",
+          "start": 29,
+          "end": 34,
+          "value": 9,
+          "currency": "SAR"
+        },
+        {
+          "raw": "SAR 1,899 ",
+          "start": 45,
+          "end": 55,
+          "value": 1899,
+          "currency": "SAR"
+        },
+        {
+          "raw": "ر.س 1,599 ",
+          "start": 55,
+          "end": 65,
+          "value": 1599,
+          "currency": "SAR"
+        }
+      ]
+    },
+    {
+      "input": "amazon.sg LEGO Technic SGD 199.99 with free Prime shipping over SGD 40, fulfilled by Amazon SG",
+      "output": [
+        {
+          "raw": "SGD 199.99 ",
+          "start": 23,
+          "end": 34,
+          "value": 199.99,
+          "currency": "SGD"
+        }
+      ]
+    },
+    {
+      "input": "Anaroo Mumbai: 2BHK Bandra West ₹85,000/month, deposit ₹2.5 Lakh, available immediately, no brokerage",
+      "output": [
+        {
+          "raw": "₹85,000",
+          "start": 32,
+          "end": 39,
+          "value": 85000,
+          "currency": "INR"
+        },
+        {
+          "raw": "₹2.5 Lakh",
+          "start": 55,
+          "end": 64,
+          "value": 250000,
+          "currency": "INR"
+        }
+      ]
+    },
+    {
+      "input": "Anker USB-C Hub 7-in-1 $34.99 ($4.99 / Count for 7) Buy 2 save 5%; Buy 3 save 10%; List Price $49.99",
+      "output": [
+        {
+          "raw": "$4.99 ",
+          "start": 31,
+          "end": 37,
+          "value": 4.99,
+          "currency": "USD"
+        },
+        {
+          "raw": "$49.99",
+          "start": 94,
+          "end": 100,
+          "value": 49.99,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "Apple AirPods Pro (2nd Generation): $249.00 List Price: $279.00 Save $30.00 (11%) FREE Returns",
+      "output": [
+        {
+          "raw": "$249.00 ",
+          "start": 36,
+          "end": 44,
+          "value": 249,
+          "currency": "USD"
+        },
+        {
+          "raw": "$279.00 ",
+          "start": 56,
+          "end": 64,
+          "value": 279,
+          "currency": "USD"
+        },
+        {
+          "raw": "$30.00 ",
+          "start": 69,
+          "end": 76,
+          "value": 30,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "Asana Starter $10.99 per user/month, Advanced $24.99 per user/month — billed annually saves 33%",
+      "output": [
+        {
+          "raw": "$10.99 ",
+          "start": 14,
+          "end": 21,
+          "value": 10.99,
+          "currency": "USD"
+        },
+        {
+          "raw": "$24.99 ",
+          "start": 46,
+          "end": 53,
+          "value": 24.99,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "AWS S3 starts at $0.023 per GB / month with $0.0004 per request and free egress under 100 GB",
+      "output": [
+        {
+          "raw": "$0.023 ",
+          "start": 17,
+          "end": 24,
+          "value": 0.023,
+          "currency": "USD"
+        },
+        {
+          "raw": "$0.0004 ",
+          "start": 44,
+          "end": 52,
+          "value": 0.0004,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "BGC studio PHP 35,000/month fully furnished, near Greenbelt and Uptown Mall, parking included",
+      "output": [
+        {
+          "raw": "PHP 35,000",
+          "start": 11,
+          "end": 21,
+          "value": 35000,
+          "currency": "PHP"
+        }
+      ]
+    },
+    {
+      "input": "Calendly: Free $0, Standard $10 USD per seat / month, Teams $16 USD per seat / month, Enterprise contact sales",
+      "output": [
+        {
+          "raw": "$10 ",
+          "start": 28,
+          "end": 32,
+          "value": 10,
+          "currency": "USD"
+        },
+        {
+          "raw": "$16 ",
+          "start": 60,
+          "end": 64,
+          "value": 16,
           "currency": "USD"
         }
       ]
@@ -7770,6 +9209,10 @@
       ]
     },
     {
+      "input": "Cho thuê căn hộ 2PN tại Quận 1: ₫ 12.500.000/tháng, đầy đủ nội thất, view sông Sài Gòn",
+      "output": []
+    },
+    {
       "input": "Comp range starts at ¥6M+ base",
       "output": [
         {
@@ -7801,6 +9244,72 @@
       ]
     },
     {
+      "input": "Comparison: 1BR Tokyo ¥85,000/月 vs Singapore SGD 3,500/month vs Bangkok ฿35,000/month vs Manila ₱25,000/month vs Mumbai ₹85,000/month",
+      "output": [
+        {
+          "raw": "¥85,000",
+          "start": 22,
+          "end": 29,
+          "value": 85000,
+          "currency": "JPY"
+        },
+        {
+          "raw": "SGD 3,500",
+          "start": 45,
+          "end": 54,
+          "value": 3500,
+          "currency": "SGD"
+        },
+        {
+          "raw": "฿35,000",
+          "start": 72,
+          "end": 79,
+          "value": 35000,
+          "currency": "THB"
+        },
+        {
+          "raw": "₱25,000",
+          "start": 96,
+          "end": 103,
+          "value": 25000,
+          "currency": "PHP"
+        },
+        {
+          "raw": "₹85,000",
+          "start": 120,
+          "end": 127,
+          "value": 85000,
+          "currency": "INR"
+        }
+      ]
+    },
+    {
+      "input": "Comparison: same model is $1,299.00 on amazon.com, £1,099.00 on amazon.co.uk, 1.299,00 € on amazon.de, ₹1,29,999 on amazon.in",
+      "output": [
+        {
+          "raw": "$1,299.00 ",
+          "start": 26,
+          "end": 36,
+          "value": 1299,
+          "currency": "USD"
+        },
+        {
+          "raw": "£1,099.00 ",
+          "start": 51,
+          "end": 61,
+          "value": 1099,
+          "currency": "GBP"
+        },
+        {
+          "raw": "₹1,29,999 ",
+          "start": 103,
+          "end": 113,
+          "value": 129999,
+          "currency": "INR"
+        }
+      ]
+    },
+    {
       "input": "Compensation: ¥6-13M base",
       "output": [
         {
@@ -7810,6 +9319,60 @@
           "value": 6000000,
           "rangeEndValue": 13000000,
           "currency": "JPY"
+        }
+      ]
+    },
+    {
+      "input": "Dabang 강남: 전세 5억원 또는 월세 80만원 보증금 2,000만원, ₩800,000/월 관리비 포함",
+      "output": [
+        {
+          "raw": "₩800,000",
+          "start": 42,
+          "end": 50,
+          "value": 800000,
+          "currency": "KRW"
+        }
+      ]
+    },
+    {
+      "input": "Daikanyama 1LDK 8.5万円/月 + 管理費 5,000円/月 - apartment near Ebisu station",
+      "output": []
+    },
+    {
+      "input": "Datadog Pro $15 per host, per month billed annually — save 20% versus the $18 month-to-month rate",
+      "output": [
+        {
+          "raw": "$15 ",
+          "start": 12,
+          "end": 16,
+          "value": 15,
+          "currency": "USD"
+        },
+        {
+          "raw": "$18 ",
+          "start": 74,
+          "end": 78,
+          "value": 18,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "DDProperty Bangkok ฿35,000/month for 1BR in Asok, or THB 380,000/year with 1-month free",
+      "output": [
+        {
+          "raw": "฿35,000",
+          "start": 19,
+          "end": 26,
+          "value": 35000,
+          "currency": "THB"
+        },
+        {
+          "raw": "THB 380,000",
+          "start": 53,
+          "end": 64,
+          "value": 380000,
+          "currency": "THB"
         }
       ]
     },
@@ -7855,6 +9418,44 @@
           "end": 33,
           "value": 10,
           "currency": "EUR"
+        }
+      ]
+    },
+    {
+      "input": "Disewakan apartemen Sudirman 2BR: IDR 8,500,000/bulan termasuk service charge dan keamanan 24 jam",
+      "output": [
+        {
+          "raw": "IDR 8,500,000",
+          "start": 34,
+          "end": 47,
+          "value": 8500000,
+          "currency": "IDR"
+        }
+      ]
+    },
+    {
+      "input": "DocuSign Personal $10 / month, Standard $25 / month, Business Pro $40 / month — first month free",
+      "output": [
+        {
+          "raw": "$10 ",
+          "start": 18,
+          "end": 22,
+          "value": 10,
+          "currency": "USD"
+        },
+        {
+          "raw": "$25 ",
+          "start": 40,
+          "end": 44,
+          "value": 25,
+          "currency": "USD"
+        },
+        {
+          "raw": "$40 ",
+          "start": 66,
+          "end": 70,
+          "value": 40,
+          "currency": "USD"
         }
       ]
     },
@@ -7920,8 +9521,310 @@
       ]
     },
     {
+      "input": "Figma Free, Professional $3 per editor / month, Organization $5 per editor / month, Enterprise $75 per editor/month",
+      "output": [
+        {
+          "raw": "$3 ",
+          "start": 25,
+          "end": 28,
+          "value": 3,
+          "currency": "USD"
+        },
+        {
+          "raw": "$5 ",
+          "start": 61,
+          "end": 64,
+          "value": 5,
+          "currency": "USD"
+        },
+        {
+          "raw": "$75 ",
+          "start": 95,
+          "end": 99,
+          "value": 75,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "Free $0 forever | Pro $10/user/month | Business $20/user/month | Enterprise contact sales",
+      "output": [
+        {
+          "raw": "$0 ",
+          "start": 5,
+          "end": 8,
+          "value": 0,
+          "currency": "USD"
+        },
+        {
+          "raw": "$10",
+          "start": 22,
+          "end": 25,
+          "value": 10,
+          "currency": "USD"
+        },
+        {
+          "raw": "$20",
+          "start": 48,
+          "end": 51,
+          "value": 20,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
       "input": "From March 13 to 27, all users",
       "output": []
+    },
+    {
+      "input": "GitHub Team $4 per user/month, Enterprise $21 per user/month, Free for individual public repos",
+      "output": [
+        {
+          "raw": "$4 ",
+          "start": 12,
+          "end": 15,
+          "value": 4,
+          "currency": "USD"
+        },
+        {
+          "raw": "$21 ",
+          "start": 42,
+          "end": 46,
+          "value": 21,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "Harga sewa mulai dari Rp 5 juta/bulan hingga Rp 12 juta/bulan untuk unit 1BR di Kemang Jakarta Selatan",
+      "output": []
+    },
+    {
+      "input": "Heroku Eco $5/mo, Basic $7/mo, Standard $25-$50/mo, Performance $250-$500/mo, Private custom",
+      "output": [
+        {
+          "raw": "$5",
+          "start": 11,
+          "end": 13,
+          "value": 5,
+          "currency": "USD"
+        },
+        {
+          "raw": "$7",
+          "start": 24,
+          "end": 26,
+          "value": 7,
+          "currency": "USD"
+        },
+        {
+          "raw": "$25",
+          "start": 40,
+          "end": 43,
+          "value": 25,
+          "currency": "USD"
+        },
+        {
+          "raw": "$50",
+          "start": 44,
+          "end": 47,
+          "value": 50,
+          "currency": "USD"
+        },
+        {
+          "raw": "$250",
+          "start": 64,
+          "end": 68,
+          "value": 250,
+          "currency": "USD"
+        },
+        {
+          "raw": "$500",
+          "start": 69,
+          "end": 73,
+          "value": 500,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "HubSpot Marketing Hub starts at $20/mo per seat, scales to $890/mo billed annually for Professional and $3,600/mo for Enterprise",
+      "output": [
+        {
+          "raw": "$20",
+          "start": 32,
+          "end": 35,
+          "value": 20,
+          "currency": "USD"
+        },
+        {
+          "raw": "$890",
+          "start": 59,
+          "end": 63,
+          "value": 890,
+          "currency": "USD"
+        },
+        {
+          "raw": "$3,600",
+          "start": 104,
+          "end": 110,
+          "value": 3600,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "Intercom: From $39/month per seat for Essential, From $99/month per seat for Advanced, Expert custom",
+      "output": [
+        {
+          "raw": "$39",
+          "start": 15,
+          "end": 18,
+          "value": 39,
+          "currency": "USD"
+        },
+        {
+          "raw": "$99",
+          "start": 54,
+          "end": 57,
+          "value": 99,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "Jira Cloud Free $0 up to 10 users, Standard $8.15 per user/month avg., Premium $16 per user/month, Enterprise custom",
+      "output": [
+        {
+          "raw": "$0 ",
+          "start": 16,
+          "end": 19,
+          "value": 0,
+          "currency": "USD"
+        },
+        {
+          "raw": "$8.15 ",
+          "start": 44,
+          "end": 50,
+          "value": 8.15,
+          "currency": "USD"
+        },
+        {
+          "raw": "$16 ",
+          "start": 79,
+          "end": 83,
+          "value": 16,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "Kindle Paperwhite (16 GB) $159.99 was $159.99 Save $40.00 with coupon at checkout, Prime free shipping",
+      "output": [
+        {
+          "raw": "$159.99 ",
+          "start": 26,
+          "end": 34,
+          "value": 159.99,
+          "currency": "USD"
+        },
+        {
+          "raw": "$159.99 ",
+          "start": 38,
+          "end": 46,
+          "value": 159.99,
+          "currency": "USD"
+        },
+        {
+          "raw": "$40.00 ",
+          "start": 51,
+          "end": 58,
+          "value": 40,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "LIFULL HOME'S Osaka ￥85,000/月 + 共益費 ￥5,000/月、敷金1ヶ月、保証会社必須、駅徒歩5分",
+      "output": [
+        {
+          "raw": "￥85,000",
+          "start": 20,
+          "end": 27,
+          "value": 85000,
+          "currency": "JPY"
+        },
+        {
+          "raw": "￥5,000",
+          "start": 36,
+          "end": 42,
+          "value": 5000,
+          "currency": "JPY"
+        }
+      ]
+    },
+    {
+      "input": "Linear Free up to 10 users, Standard $8 per user / month, Plus $14 per user / month",
+      "output": [
+        {
+          "raw": "$8 ",
+          "start": 37,
+          "end": 40,
+          "value": 8,
+          "currency": "USD"
+        },
+        {
+          "raw": "$14 ",
+          "start": 63,
+          "end": 67,
+          "value": 14,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "MagicBricks Bengaluru: from ₹25,000/month for 1BHK to ₹2.5 Lac/month for 4BHK villa in Whitefield",
+      "output": [
+        {
+          "raw": "₹25,000",
+          "start": 28,
+          "end": 35,
+          "value": 25000,
+          "currency": "INR"
+        },
+        {
+          "raw": "₹2.5 Lac",
+          "start": 54,
+          "end": 62,
+          "value": 250000,
+          "currency": "INR"
+        }
+      ]
+    },
+    {
+      "input": "Mailchimp Essentials from $13/month for 500 contacts, Standard from $20/month, Premium from $350/month",
+      "output": [
+        {
+          "raw": "$13",
+          "start": 26,
+          "end": 29,
+          "value": 13,
+          "currency": "USD"
+        },
+        {
+          "raw": "$20",
+          "start": 68,
+          "end": 71,
+          "value": 20,
+          "currency": "USD"
+        },
+        {
+          "raw": "$350",
+          "start": 92,
+          "end": 96,
+          "value": 350,
+          "currency": "USD"
+        }
+      ]
     },
     {
       "input": "Main ￥39,000 and fallback ﹩125",
@@ -7951,6 +9854,25 @@
           "end": 19,
           "value": 1000000,
           "currency": "VND"
+        }
+      ]
+    },
+    {
+      "input": "Manila condo for rent ₱25,000/month + ₱5,000 association dues, 6-month minimum lease near MRT",
+      "output": [
+        {
+          "raw": "₱25,000",
+          "start": 22,
+          "end": 29,
+          "value": 25000,
+          "currency": "PHP"
+        },
+        {
+          "raw": "₱5,000 ",
+          "start": 38,
+          "end": 45,
+          "value": 5000,
+          "currency": "PHP"
         }
       ]
     },
@@ -8021,6 +9943,94 @@
           "start": 46,
           "end": 58,
           "value": 2000000000,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "Mức giá từ ₫ 8 triệu/tháng đến ₫ 15 triệu/tháng cho căn hộ studio tại Quận 7, Phú Mỹ Hưng",
+      "output": [
+        {
+          "raw": "₫ 8 triệu",
+          "start": 11,
+          "end": 20,
+          "value": 8000000,
+          "currency": "VND"
+        },
+        {
+          "raw": "₫ 15 triệu",
+          "start": 31,
+          "end": 41,
+          "value": 15000000,
+          "currency": "VND"
+        }
+      ]
+    },
+    {
+      "input": "Naver 부동산: 월세 60만원 보증금 1,000만원 신촌역 도보 5분, ₩600,000/월 관리비 별도",
+      "output": [
+        {
+          "raw": "₩600,000",
+          "start": 42,
+          "end": 50,
+          "value": 600000,
+          "currency": "KRW"
+        }
+      ]
+    },
+    {
+      "input": "NoBroker Delhi: ₹15,000 to ₹25,000 / month for 1BHK in Lajpat Nagar; brokerage zero, semi-furnished",
+      "output": [
+        {
+          "raw": "₹15,000 ",
+          "start": 16,
+          "end": 24,
+          "value": 15000,
+          "currency": "INR"
+        },
+        {
+          "raw": "₹25,000 ",
+          "start": 27,
+          "end": 35,
+          "value": 25000,
+          "currency": "INR"
+        }
+      ]
+    },
+    {
+      "input": "Notion AI add-on: $8 per member/month — switching to annual saves $96/year per member",
+      "output": [
+        {
+          "raw": "$8 ",
+          "start": 18,
+          "end": 21,
+          "value": 8,
+          "currency": "USD"
+        },
+        {
+          "raw": "$96",
+          "start": 66,
+          "end": 69,
+          "value": 96,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "Notion Free, Plus $10 per user/month, Business $15/user/month billed annually, Enterprise contact sales",
+      "output": [
+        {
+          "raw": "$10 ",
+          "start": 18,
+          "end": 22,
+          "value": 10,
+          "currency": "USD"
+        },
+        {
+          "raw": "$15",
+          "start": 47,
+          "end": 50,
+          "value": 15,
           "currency": "USD"
         }
       ]
@@ -8517,6 +10527,18 @@
       ]
     },
     {
+      "input": "PropertyGuru SG: 2BR Tiong Bahru SGD 3,500/month partially furnished, near Tiong Bahru MRT, 1-year lease",
+      "output": [
+        {
+          "raw": "SGD 3,500",
+          "start": 33,
+          "end": 42,
+          "value": 3500,
+          "currency": "SGD"
+        }
+      ]
+    },
+    {
       "input": "Rates: R$ 10 | RD$ 20 | A$3 | AU$4 | CA$5 | NZ$6 | HK$7 | MX$8 | NT$9 | US$10 | EC$11 | $12",
       "output": [
         {
@@ -8630,6 +10652,182 @@
       ]
     },
     {
+      "input": "Salesforce Starter Suite at $25 USD/user/month* billed annually and Enterprise at $165 USD/user/month*",
+      "output": [
+        {
+          "raw": "$25 ",
+          "start": 28,
+          "end": 32,
+          "value": 25,
+          "currency": "USD"
+        },
+        {
+          "raw": "$165 ",
+          "start": 82,
+          "end": 87,
+          "value": 165,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "Save 20% with annual billing — was $20/mo, now $16/mo for the first year",
+      "output": [
+        {
+          "raw": "$20",
+          "start": 35,
+          "end": 38,
+          "value": 20,
+          "currency": "USD"
+        },
+        {
+          "raw": "$16",
+          "start": 47,
+          "end": 50,
+          "value": 16,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "Slack Free, Pro $8.75 USD per active user/month, Business+ $15 per user/month, Enterprise Grid custom",
+      "output": [
+        {
+          "raw": "$8.75 ",
+          "start": 16,
+          "end": 22,
+          "value": 8.75,
+          "currency": "USD"
+        },
+        {
+          "raw": "$15 ",
+          "start": 59,
+          "end": 63,
+          "value": 15,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "Spacious HK HK$18,500/month for a 350 sqft studio in Sheung Wan, 1-year minimum, fully serviced",
+      "output": [
+        {
+          "raw": "HK$18,500",
+          "start": 12,
+          "end": 21,
+          "value": 18500,
+          "currency": "HKD"
+        }
+      ]
+    },
+    {
+      "input": "Stripe charges 2.9% + 30¢ per successful card charge, plus $0.50 per dispute and $4 per recurring transfer",
+      "output": [
+        {
+          "raw": "30¢",
+          "start": 22,
+          "end": 25,
+          "value": 30,
+          "currency": "USD"
+        },
+        {
+          "raw": "$0.50 ",
+          "start": 59,
+          "end": 65,
+          "value": 0.5,
+          "currency": "USD"
+        },
+        {
+          "raw": "$4 ",
+          "start": 81,
+          "end": 84,
+          "value": 4,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "Studio Bangsar Selatan MYR 2,500/month including utilities, or RM 28,000/year if paid upfront",
+      "output": [
+        {
+          "raw": "MYR 2,500",
+          "start": 23,
+          "end": 32,
+          "value": 2500,
+          "currency": "MYR"
+        }
+      ]
+    },
+    {
+      "input": "Sukhumvit 35,000฿/month furnished, BTS Phrom Phong 200m, deposit 2 months, 1-year minimum",
+      "output": [
+        {
+          "raw": "35,000฿",
+          "start": 10,
+          "end": 17,
+          "value": 35000,
+          "currency": "THB"
+        }
+      ]
+    },
+    {
+      "input": "SUUMO Tokyo Shinjuku: 賃料 85,000円/月 管理費 5,000円 敷金 1ヶ月 礼金 1ヶ月 ¥85,000/月",
+      "output": [
+        {
+          "raw": "¥85,000",
+          "start": 60,
+          "end": 67,
+          "value": 85000,
+          "currency": "JPY"
+        }
+      ]
+    },
+    {
+      "input": "Switch to annual billing and save $228/year on the Pro plan, or $1,200/year on Business",
+      "output": [
+        {
+          "raw": "$228",
+          "start": 34,
+          "end": 38,
+          "value": 228,
+          "currency": "USD"
+        },
+        {
+          "raw": "$1,200",
+          "start": 64,
+          "end": 70,
+          "value": 1200,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "Tableau Creator $70 USD/user/month, Explorer $42 USD/user/month, Viewer $15 USD/user/month",
+      "output": [
+        {
+          "raw": "$70 ",
+          "start": 16,
+          "end": 20,
+          "value": 70,
+          "currency": "USD"
+        },
+        {
+          "raw": "$42 ",
+          "start": 45,
+          "end": 49,
+          "value": 42,
+          "currency": "USD"
+        },
+        {
+          "raw": "$15 ",
+          "start": 72,
+          "end": 76,
+          "value": 15,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
       "input": "Top 10 and all 5 and try 3 with 8 mad and 12 top picks",
       "output": []
     },
@@ -8667,6 +10865,32 @@
       ]
     },
     {
+      "input": "Twilio SMS: $0.0079 per outbound SMS, $0.0075 per inbound, and $0.0085 per voice minute",
+      "output": [
+        {
+          "raw": "$0.0079 ",
+          "start": 12,
+          "end": 20,
+          "value": 0.0079,
+          "currency": "USD"
+        },
+        {
+          "raw": "$0.0075 ",
+          "start": 38,
+          "end": 46,
+          "value": 0.0075,
+          "currency": "USD"
+        },
+        {
+          "raw": "$0.0085 ",
+          "start": 63,
+          "end": 71,
+          "value": 0.0085,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
       "input": "Twitter handles @kes11av and kes11buddy should stay untouched, but USD350/week and KES 11 are valid prices.",
       "output": [
         {
@@ -8690,6 +10914,37 @@
       "output": []
     },
     {
+      "input": "Vercel Hobby $0, Pro $20/month per member, Enterprise $150/month minimum with custom SSO",
+      "output": [
+        {
+          "raw": "$20",
+          "start": 21,
+          "end": 24,
+          "value": 20,
+          "currency": "USD"
+        },
+        {
+          "raw": "$150",
+          "start": 54,
+          "end": 58,
+          "value": 150,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "VND 850 triệu nhận căn hộ 1PN, hoặc ₫ 12.500.000/tháng cho thuê dài hạn tối thiểu 12 tháng",
+      "output": [
+        {
+          "raw": "VND 850 triệu",
+          "start": 0,
+          "end": 13,
+          "value": 850000000,
+          "currency": "VND"
+        }
+      ]
+    },
+    {
       "input": "Words and 200 apples; offer usd 30 and ₹50 now",
       "output": [
         {
@@ -8707,6 +10962,44 @@
           "currency": "INR"
         }
       ]
+    },
+    {
+      "input": "Zoom Pro at US $14.99 /month/license, Business at US $21.99 /month/license, Enterprise tiered annually",
+      "output": [
+        {
+          "raw": "$14.99 ",
+          "start": 15,
+          "end": 22,
+          "value": 14.99,
+          "currency": "USD"
+        },
+        {
+          "raw": "$21.99 ",
+          "start": 53,
+          "end": 60,
+          "value": 21.99,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "input": "贝壳找房 上海 CNY 8000/月 浦东新区一居室, ¥8000/月 押一付三, 业主直租",
+      "output": [
+        {
+          "raw": "CNY 8000",
+          "start": 8,
+          "end": 16,
+          "value": 8000,
+          "currency": "CNY"
+        },
+        {
+          "raw": "¥8000",
+          "start": 28,
+          "end": 33,
+          "value": 8000,
+          "currency": "JPY"
+        }
+      ]
     }
   ],
   "quickFilterResults": [
@@ -8716,6 +11009,14 @@
     },
     {
       "input": "￥３９，０００",
+      "output": false
+    },
+    {
+      "input": "5 minutes walk to MRT Bayfront station",
+      "output": false
+    },
+    {
+      "input": "99.99% uptime SLA — trusted by Fortune 500",
       "output": false
     },
     {
@@ -8729,6 +11030,22 @@
     {
       "input": "Comp starts at yên 6M",
       "output": true
+    },
+    {
+      "input": "Customer Reviews: 4.5 out of 5 stars",
+      "output": false
+    },
+    {
+      "input": "Eligible for FREE Shipping with Prime",
+      "output": false
+    },
+    {
+      "input": "Fully furnished, 2 bedrooms 1 bathroom",
+      "output": false
+    },
+    {
+      "input": "Get started for free, no credit card required",
+      "output": false
     },
     {
       "input": "ＪＰＹ 39000",
@@ -8759,11 +11076,39 @@
       "output": true
     },
     {
+      "input": "Single sign-on with SAML 2.0",
+      "output": false
+    },
+    {
       "input": "الدفع د.إ 4500",
       "output": true
+    },
+    {
+      "input": "신촌역 도보 5분",
+      "output": false
+    },
+    {
+      "input": "近鉄奈良線 徒歩5分",
+      "output": false
     }
   ],
   "thousandHintResults": [
+    {
+      "input": "$10K MRR target by Q3",
+      "output": true
+    },
+    {
+      "input": "₹2.5L/month deposit",
+      "output": false
+    },
+    {
+      "input": "100K+ monthly active users",
+      "output": true
+    },
+    {
+      "input": "Annual contract value: $250K",
+      "output": true
+    },
     {
       "input": "Comp: ¥6-13K",
       "output": true
@@ -8773,12 +11118,28 @@
       "output": true
     },
     {
+      "input": "From $1K/mo to $50K/mo enterprise",
+      "output": true
+    },
+    {
+      "input": "Goal: $1M ARR",
+      "output": false
+    },
+    {
       "input": "No magnitude here",
       "output": false
     },
     {
       "input": "PKR 5000",
       "output": false
+    },
+    {
+      "input": "Plan unlocks at 100K events/month",
+      "output": true
+    },
+    {
+      "input": "Save $2K annually on the Pro plan",
+      "output": true
     },
     {
       "input": "SEK 100",
