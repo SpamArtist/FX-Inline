@@ -41,3 +41,6 @@ jobs:
 
       - name: Run web extension tests
         run: npm run test:all
+
+      - name: Run extension build assertions
+        run: npm run build

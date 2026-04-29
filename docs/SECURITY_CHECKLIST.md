@@ -1,11 +1,14 @@
 # Security Checklist
 
-_Last updated: 2026-04-28_
+_Last updated: 2026-04-29_
 
 ## 1. Manifest surface and CSP
 
 - [ ] `permissions` are limited to `storage`, `alarms`, `activeTab`.
 - [ ] `host_permissions` are limited to approved FX providers only.
+- [ ] `web_accessible_resources` is limited to `content-worker.js` and generated JS chunks with dynamic URLs.
+- [ ] `action.default_title` and extension page titles use `FX Inline`, not WXT scaffold placeholders.
+- [ ] Manifest icons are limited to shipped extension sizes (`16`, `32`, `48`, `128`); store-only `512` icon remains outside extension `public`.
 - [ ] Extension-page CSP includes:
   - `default-src 'self'`
   - `script-src 'self'`
@@ -24,7 +27,8 @@ _Last updated: 2026-04-28_
 ## 3. Storage integrity
 
 - [ ] User settings are sanitized on read/write.
-- [ ] `local:user-settings` conforms to inline runtime manifest schema version `1`.
+- [ ] `browser.storage.local` key `user-settings` conforms to inline runtime manifest schema version `1`.
+- [ ] `browser.storage.local` key `rate-cache` only stores validated rate snapshots.
 - [ ] `scopes.allUrls`, `scopes.domains`, and `scopes.pages` are normalized before use.
 - [ ] `targetCurrencies` accepts only known active currency codes and stores one primary target.
 - [ ] Domain scopes normalize to hostnames; page scopes accept only canonical `http/https` URLs.
@@ -61,7 +65,9 @@ _Last updated: 2026-04-28_
 ## 8. Pre-Ship Checks
 
 - [ ] Run `npm run lint`, `npm run compile`, and `npm run test:all` before shipping changes.
-- [ ] Confirm `npm run test:all` includes frontend, content, release, and admin export tests.
+- [ ] Confirm `npm run test:all` includes frontend, content, release, asset, admin export, and build-policy tests.
+- [ ] Run `npm run build` and `npm run build:firefox` after manifest, asset, content-entrypoint, or release-flow changes.
+- [ ] Confirm `npm run build:assert`, `npm run icons:check`, and `npm run release:lint-build-output` pass where relevant.
 - [ ] For tagged releases, validate the tag/version locally:
   - `RELEASE_TAG=v0.4.1 npm run release:validate-tag`
   - `RELEASE_TAG=v0.4.1 npm run release:dry-run`

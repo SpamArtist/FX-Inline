@@ -12,6 +12,7 @@ export const GENERATED_INLINE_RUNTIME_SETTINGS_MANIFEST =
       ],
       "convertedCurrencyPosition": "right",
       "displayStyle": "brackets",
+      "highlightColor": "",
       "extraSettings": {}
     },
     "domains": {
@@ -24,6 +25,7 @@ export const GENERATED_INLINE_RUNTIME_SETTINGS_MANIFEST =
         ],
         "convertedCurrencyPosition": "right",
         "displayStyle": "brackets",
+        "highlightColor": "", 
         "extraSettings": {}
       }
     },
@@ -37,6 +39,7 @@ export const GENERATED_INLINE_RUNTIME_SETTINGS_MANIFEST =
         ],
         "convertedCurrencyPosition": "bottom",
         "displayStyle": "brackets",
+        "highlightColor": "",
         "extraSettings": {}
       }
     }

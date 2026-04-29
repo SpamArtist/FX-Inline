@@ -1,8 +1,8 @@
 import {
   littleHotelierPricingDetectorPrePlugin,
   littleHotelierPricingRendererPostPlugin,
-} from "@fx-inline/inline-runtime";
-import type { InlineRuntimeOptions } from "@fx-inline/inline-runtime";
+} from "@fx-inline/inline-runtime/extension";
+import type { InlineRuntimeOptions } from "@fx-inline/inline-runtime/extension";
 
 type ContentRuntimeSitePluginOptions = Pick<
   InlineRuntimeOptions,

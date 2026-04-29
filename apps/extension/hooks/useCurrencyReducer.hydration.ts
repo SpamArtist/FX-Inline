@@ -10,7 +10,7 @@ export type CurrencyReducerHydrationResult = {
 
 export type CurrencyReducerHydrationDeps = {
   readUserSettings?: () => Promise<UserSettings>;
-  readRates?: () => Promise<RateSnapshot>;
+  readRates?: () => Promise<RateSnapshot | null>;
 };
 
 export async function loadCurrencyReducerHydration(
@@ -20,12 +20,12 @@ export async function loadCurrencyReducerHydration(
   let readRates = deps.readRates;
 
   if (!readUserSettings || !readRates) {
-    const [{ getUserSettings }, { getRates }] = await Promise.all([
+    const [{ getUserSettings }, { getCachedRateSnapshot }] = await Promise.all([
       import("../utils/appStorage"),
-      import("../utils/rates/index"),
+      import("../utils/rates/cache"),
     ]);
     readUserSettings = readUserSettings ?? getUserSettings;
-    readRates = readRates ?? getRates;
+    readRates = readRates ?? getCachedRateSnapshot;
   }
 
   try {

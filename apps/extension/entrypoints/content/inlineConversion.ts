@@ -3,7 +3,7 @@ import type { InlineConversionPerfSample } from "./content.types";
 import {
   INLINE_CONVERSION_CLASS,
   convertVisiblePrices as convertVisiblePricesShared,
-} from "@fx-inline/inline-runtime";
+} from "@fx-inline/inline-runtime/extension";
 
 export { INLINE_CONVERSION_CLASS };
 

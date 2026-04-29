@@ -1,7 +1,7 @@
 import { jest } from "@jest/globals";
 
 const getUserSettingsMock = jest.fn();
-const getRatesMock = jest.fn();
+const getCachedRateSnapshotMock = jest.fn();
 
 function createRateSnapshot(overrides = {}) {
   const base = {
@@ -52,8 +52,8 @@ async function importSelectionPopupModuleWithMocks() {
     getUserSettings: getUserSettingsMock,
   }));
 
-  await jest.unstable_mockModule("../../test-dist/utils/rates/index.js", () => ({
-    getRates: getRatesMock,
+  await jest.unstable_mockModule("../../test-dist/utils/rates/cache.js", () => ({
+    getCachedRateSnapshot: getCachedRateSnapshotMock,
   }));
 
   return import("../../test-dist/entrypoints/content/selectionPopup.js");
@@ -120,7 +120,7 @@ beforeEach(() => {
   jest.clearAllMocks();
 
   getUserSettingsMock.mockResolvedValue(createUserSettings("EUR"));
-  getRatesMock.mockResolvedValue(createRateSnapshot());
+  getCachedRateSnapshotMock.mockResolvedValue(createRateSnapshot());
 
   document.body.innerHTML = "";
 });
@@ -293,7 +293,7 @@ test("amount edit interactions commit on blur and Enter, and revert on Escape", 
 
 test("hydration updates preferred currency row after popup mount", async () => {
   getUserSettingsMock.mockResolvedValue(createUserSettings("INR"));
-  getRatesMock.mockResolvedValue(
+  getCachedRateSnapshotMock.mockResolvedValue(
     createRateSnapshot({
       rates: {
         USD: 1,
