@@ -1,4 +1,4 @@
-import { Globe2, Plus, X } from "lucide-react";
+import { GlobeIcon, PlusIcon, XIcon } from "./icons/NativeIcons";
 
 export default function ScopeNav({
   activeScope,
@@ -11,7 +11,7 @@ export default function ScopeNav({
   return (
     <aside className="scope-nav" aria-label="Settings scopes">
       <div className="brand">
-        <Globe2 size={22} />
+        <GlobeIcon size={22} />
         <div>
           <strong>FX Inline Admin</strong>
           <span>Runtime settings</span>
@@ -46,13 +46,13 @@ export default function ScopeNav({
             aria-label={`Delete ${domain}`}
             onClick={() => onDeleteDomain(domain)}
           >
-            <X size={14} />
+            <XIcon size={14} />
           </button>
         </div>
       ))}
 
       <button type="button" className="add-scope" onClick={onAddDomain}>
-        <Plus size={16} />
+        <PlusIcon size={16} />
         Add domain
       </button>
     </aside>

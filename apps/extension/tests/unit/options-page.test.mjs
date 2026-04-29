@@ -32,7 +32,7 @@ async function flushAsyncWork() {
   await new Promise((resolve) => setTimeout(resolve, 0));
 }
 
-test("createCurrencyOptions sorts and labels currencies without React", () => {
+test("createCurrencyOptions sorts and labels currencies without UI framework coupling", () => {
   const options = createCurrencyOptions({
     of: (code) => `Currency ${code}`,
   });

@@ -1,5 +1,5 @@
-import { ChevronDown } from "lucide-react";
-import type { ChangeEvent } from "react";
+import type { JSX } from "preact";
+import { ChevronDownIcon } from "../icons/NativeIcons";
 import type { DropdownProps } from "./Dropdown.types";
 export type { DropdownOption } from "./Dropdown.types";
 
@@ -13,8 +13,8 @@ export default function Dropdown<TValue extends string>({
   onSelect,
   selectAriaLabel = DEFAULT_SELECT_ARIA_LABEL,
 }: DropdownProps<TValue>) {
-  function onCurrencyChange(event: ChangeEvent<HTMLSelectElement>) {
-    onSelect(event.target.value as TValue);
+  function onCurrencyChange(event: JSX.TargetedEvent<HTMLSelectElement>) {
+    onSelect(event.currentTarget.value as TValue);
   }
 
   return (
@@ -38,7 +38,9 @@ export default function Dropdown<TValue extends string>({
           </option>
         ))}
       </select>
-      {!isDisabled && <ChevronDown className="fx-inline-dropdown-trigger__arrow" aria-hidden />}
+      {!isDisabled && (
+        <ChevronDownIcon className="fx-inline-dropdown-trigger__arrow" aria-hidden />
+      )}
     </label>
   );
 }

@@ -1,4 +1,8 @@
-import { Hammer, RotateCcw, Save } from "lucide-react";
+import {
+  HammerIcon,
+  RotateCcwIcon,
+  SaveIcon,
+} from "./icons/NativeIcons";
 
 export default function WorkspaceHeader({
   activeKey,
@@ -16,11 +20,11 @@ export default function WorkspaceHeader({
       </div>
       <div className="header-actions">
         <button type="button" onClick={onCancel} disabled={isSaving || isBuilding}>
-          <RotateCcw size={16} />
+          <RotateCcwIcon size={16} />
           Cancel
         </button>
         <button type="button" onClick={onSave} disabled={isSaving || isBuilding}>
-          <Save size={16} />
+          <SaveIcon size={16} />
           Save
         </button>
         <button
@@ -29,7 +33,7 @@ export default function WorkspaceHeader({
           onClick={onBuild}
           disabled={isSaving || isBuilding}
         >
-          <Hammer size={16} />
+          <HammerIcon size={16} />
           {isBuilding ? "Building" : "Build extension"}
         </button>
       </div>

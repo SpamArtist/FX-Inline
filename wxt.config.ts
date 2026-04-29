@@ -5,9 +5,28 @@ import type {
   OutputOptions,
   PreRenderedChunk,
 } from "rollup";
+import preact from "@preact/preset-vite";
 import vitePluginSvgr from "vite-plugin-svgr";
 import { defineConfig, type Entrypoint, type WxtViteConfig } from "wxt";
+import type { Plugin } from "vite";
 import { resolveReleaseTag } from "./scripts/release/versioning.mjs";
+
+export const EXTENSION_DEV_OPTIMIZE_DEPS_EXCLUDE = [
+  "@prefresh/core",
+  "@prefresh/utils",
+  "preact",
+  "preact/compat",
+  "preact/debug",
+  "preact/devtools",
+  "preact/hooks",
+  "preact/jsx-dev-runtime",
+  "preact/jsx-runtime",
+];
+
+type OptimizeDepsListConfig = {
+  exclude?: string[];
+  include?: string[];
+};
 
 const releaseTag = process.env.RELEASE_TAG?.trim();
 const releaseManifestOverrides = releaseTag
@@ -58,13 +77,10 @@ export function getFxInlineManualChunk(id: string): string | undefined {
 
   if (moduleId.includes("/node_modules/")) {
     if (
-      moduleId.includes("/node_modules/react/") ||
-      moduleId.includes("/node_modules/react-dom/") ||
-      moduleId.includes("/node_modules/scheduler/") ||
-      moduleId.includes("/node_modules/lucide-react/") ||
-      moduleId.includes("/node_modules/@radix-ui/react-")
+      moduleId.includes("/node_modules/preact/") ||
+      moduleId.includes("/node_modules/@preact/")
     ) {
-      return "vendor-react";
+      return "vendor-preact";
     }
 
     if (
@@ -102,10 +118,10 @@ const extensionManualChunks: GetManualChunk = (moduleId) => {
   const normalizedModuleId = moduleId.split(path.sep).join("/");
 
   if (
-    normalizedModuleId.includes("/node_modules/react/") ||
-    normalizedModuleId.includes("/node_modules/react-dom/")
+    normalizedModuleId.includes("/node_modules/preact/") ||
+    normalizedModuleId.includes("/node_modules/@preact/")
   ) {
-    return "vendor-react";
+    return "vendor-preact";
   }
 
   if (
@@ -140,6 +156,30 @@ function extensionChunkFileNames(chunkInfo: PreRenderedChunk) {
     chunkInfo.name === "browser" ? "browser-runtime" : chunkInfo.name;
 
   return `chunks/${chunkName}-[hash].js`;
+}
+
+export function removeExtensionDevOptimizedDeps(
+  optimizeDeps: OptimizeDepsListConfig,
+) {
+  const excludedDeps = new Set(EXTENSION_DEV_OPTIMIZE_DEPS_EXCLUDE);
+
+  optimizeDeps.exclude = Array.from(
+    new Set([...(optimizeDeps.exclude ?? []), ...excludedDeps]),
+  );
+  optimizeDeps.include = (optimizeDeps.include ?? []).filter(
+    (dep) => !excludedDeps.has(dep),
+  );
+}
+
+export function extensionDevDependencyOptimizerGuard(): Plugin {
+  return {
+    name: "fx-inline:extension-dev-dependency-optimizer-guard",
+    apply: "serve",
+    enforce: "post",
+    configResolved(config) {
+      removeExtensionDevOptimizedDeps(config.optimizeDeps);
+    },
+  };
 }
 
 function isExtensionPageEntrypoint(entrypoint: Entrypoint) {
@@ -190,7 +230,6 @@ function applyExtensionPageBuildConfig(
 export default defineConfig({
   srcDir: "apps/extension",
   publicDir: "apps/extension/public",
-  modules: ["@wxt-dev/module-react"],
   hooks: {
     "vite:build:extendConfig": applyExtensionPageBuildConfig,
   },
@@ -254,15 +293,21 @@ export default defineConfig({
   },
   vite: () => ({
     plugins: [
+      preact(),
+      extensionDevDependencyOptimizerGuard(),
       vitePluginSvgr({
         svgrOptions: {
-          // svgr options
           exportType: "default",
-          ref: true,
+          jsxRuntime: "classic-preact",
+          ref: false,
           svgo: false,
           titleProp: true,
         },
-        include: "**/*.svg",
+        esbuildOptions: {
+          jsxFactory: "h",
+          jsxFragment: "Fragment",
+        },
+        include: "**/*.svg?component",
       }),
       hardenFirefoxInnerHtmlAssignments(),
     ],

@@ -484,6 +484,11 @@ button:disabled {
   flex: 0 0 auto;
 }
 
+.currency-select {
+  position: relative;
+  width: 100%;
+}
+
 .currency-select-trigger {
   width: 100%;
   justify-content: space-between;
@@ -496,6 +501,9 @@ button:disabled {
 }
 
 .currency-select-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
   z-index: 40;
   width: 320px;
   max-width: calc(100vw - 32px);
@@ -531,10 +539,15 @@ button:disabled {
 .currency-option {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 8px;
+  width: 100%;
   min-height: 34px;
+  border: 0;
   border-radius: 6px;
+  background: transparent;
   padding: 0 8px;
+  color: var(--ink);
   cursor: pointer;
   outline: 0;
 }

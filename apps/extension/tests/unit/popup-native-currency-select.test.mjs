@@ -42,7 +42,7 @@ test("popup currency picker uses native select markup", () => {
 test("extension source does not import Radix DropdownMenu", () => {
   const radixImports = collectExtensionSourceFiles(extensionRoot).flatMap((sourcePath) => {
     const source = fs.readFileSync(sourcePath, "utf8");
-    return source.includes("@radix-ui/react-dropdown-menu") ? [sourcePath] : [];
+    return source.includes("@radix-ui/") ? [sourcePath] : [];
   });
 
   expect(radixImports).toEqual([]);

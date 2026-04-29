@@ -3,7 +3,7 @@ import { CURRENCY_CODE_MAP, DEFAULT_STARTING_CURRENCY } from "@/utils/constants"
 import { CurrencyCode } from "@/utils/enums";
 import type { RateSnapshot } from "@/utils/rates.types";
 import type { CurrencyState, DispatchAction } from "@/utils/types";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "preact/hooks";
 import { loadCurrencyReducerHydration } from "./useCurrencyReducer.hydration";
 import {
   DEFAULT_SECONDARY_CURRENCY,

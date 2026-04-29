@@ -43,7 +43,7 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 - Description: FX Inline converts prices directly on webpages into your preferred currency, so you can compare costs without leaving the page.
 
 ### Layout
-- `apps/extension/` - Browser extension app (WXT + React)
+- `apps/extension/` - Browser extension app (WXT + Preact)
 - `apps/website/` - Standalone marketing website (Vite)
 - `docs/` - Project docs and runbooks
 - `packages/` - Shared package workspace

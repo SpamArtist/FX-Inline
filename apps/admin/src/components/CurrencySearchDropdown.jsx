@@ -1,8 +1,14 @@
-import { useMemo, useState } from "react";
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { Check, ChevronDown, Search } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  SearchIcon,
+} from "./icons/NativeIcons";
 
 export default function CurrencySearchDropdown({ value, options, onChange }) {
+  const containerRef = useRef(null);
+  const searchInputRef = useRef(null);
+  const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const filteredOptions = useMemo(() => {
     const normalizedQuery = query.trim().toUpperCase();
@@ -14,50 +20,119 @@ export default function CurrencySearchDropdown({ value, options, onChange }) {
   }, [options, query]);
   const selected = options.find((currency) => currency.code === value);
 
+  useEffect(() => {
+    if (!isOpen) return undefined;
+
+    const handlePointerDown = (event) => {
+      if (containerRef.current?.contains(event.target)) return;
+
+      setIsOpen(false);
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    searchInputRef.current?.focus();
+  }, [isOpen]);
+
+  function toggleMenu() {
+    setIsOpen((current) => {
+      const next = !current;
+      if (next) setQuery("");
+      return next;
+    });
+  }
+
+  function closeMenu() {
+    setIsOpen(false);
+  }
+
+  function chooseCurrency(code) {
+    onChange(code);
+    closeMenu();
+  }
+
+  function handleKeyDown(event) {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeMenu();
+    }
+  }
+
+  function handleSearchKeyDown(event) {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeMenu();
+      return;
+    }
+
+    event.stopPropagation();
+  }
+
   return (
-    <DropdownMenu.Root onOpenChange={(open) => {
-      if (open) setQuery("");
-    }}>
-      <DropdownMenu.Trigger className="currency-select-trigger">
+    <div
+      ref={containerRef}
+      className="currency-select"
+      onKeyDown={handleKeyDown}
+    >
+      <button
+        type="button"
+        className="currency-select-trigger"
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        onClick={toggleMenu}
+      >
         <span>{selected?.logo}</span>
         <strong>{value}</strong>
-        <ChevronDown size={15} />
-      </DropdownMenu.Trigger>
-      <DropdownMenu.Portal>
-        <DropdownMenu.Content
-          className="currency-select-menu"
-          align="start"
-          sideOffset={6}
-        >
+        <ChevronDownIcon size={15} />
+      </button>
+
+      {isOpen ? (
+        <div className="currency-select-menu">
           <div className="currency-search">
-            <Search size={15} />
+            <SearchIcon size={15} />
             <input
-              autoFocus
+              ref={searchInputRef}
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              onKeyDown={(event) => event.stopPropagation()}
+              onKeyDown={handleSearchKeyDown}
               placeholder="Search currency code"
             />
           </div>
-          <div className="currency-options" aria-label="Currency options">
+          <div
+            className="currency-options"
+            role="listbox"
+            aria-label="Currency options"
+          >
             {filteredOptions.length ? (
               filteredOptions.map((currency) => (
-                <DropdownMenu.Item
+                <button
+                  type="button"
                   key={currency.code}
                   className="currency-option"
-                  onSelect={() => onChange(currency.code)}
+                  role="option"
+                  aria-selected={currency.code === value}
+                  data-highlighted={currency.code === value ? "" : undefined}
+                  onClick={() => chooseCurrency(currency.code)}
                 >
                   <span>{currency.logo}</span>
                   <strong>{currency.code}</strong>
-                  {currency.code === value ? <Check size={14} /> : null}
-                </DropdownMenu.Item>
+                  {currency.code === value ? <CheckIcon size={14} /> : null}
+                </button>
               ))
             ) : (
               <div className="currency-option empty">No matching currency</div>
             )}
           </div>
-        </DropdownMenu.Content>
-      </DropdownMenu.Portal>
-    </DropdownMenu.Root>
+        </div>
+      ) : null}
+    </div>
   );
 }
