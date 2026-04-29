@@ -56,7 +56,7 @@ export const BUILD_POLICY = {
     "browser-runtime",
     "currency-catalog",
     "extension-storage",
-    "react-vendor",
+    "vendor-react",
   ],
   forbiddenManifestStrings: [
     "Default Popup Title",

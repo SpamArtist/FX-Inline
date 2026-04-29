@@ -128,7 +128,7 @@ const extensionManualChunks: GetManualChunk = (moduleId) => {
     normalizedModuleId.includes("/node_modules/react/") ||
     normalizedModuleId.includes("/node_modules/react-dom/")
   ) {
-    return "react-vendor";
+    return "vendor-react";
   }
 
   if (
@@ -215,18 +215,7 @@ export default defineConfig({
   publicDir: "apps/extension/public",
   modules: ["@wxt-dev/module-react"],
   hooks: {
-    "vite:build:extendConfig": (entrypoints, viteConfig) => {
-      const buildsChunkablePage = entrypoints.some((entrypoint) =>
-        CHUNKABLE_PAGE_ENTRYPOINT_TYPES.has(entrypoint.type),
-      );
-      if (!buildsChunkablePage) return;
-
-      viteConfig.build ??= {};
-      viteConfig.build.rollupOptions ??= {};
-      viteConfig.build.rollupOptions.output = withFxInlineManualChunks(
-        viteConfig.build.rollupOptions.output,
-      );
-    }
+    "vite:build:extendConfig": applyExtensionPageBuildConfig,
   },
   manifest: ({ browser, mode }) => {
     const productionConnectSrc =
