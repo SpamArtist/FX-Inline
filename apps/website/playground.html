@@ -10,36 +10,28 @@
     <title>FX Inline | Currency Detection Playground</title>
     <meta
       name="description"
-      content="Test FX Inline's standalone currency detection parser against plain text and inspect full and partial matches."
+      content="Preview how FX Inline adds local-currency hints to pricing pages and inspect the parser behind the inline conversion experience."
     />
     <meta
       name="robots"
       content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1"
     />
-    <meta name="theme-color" content="#f7f7f2" />
-    <link rel="canonical" href="https://replace-with-fx-inline-domain.example/playground.html" />
+    <meta name="theme-color" content="#faf8f1" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="FX Inline" />
-    <meta property="og:title" content="FX Inline Currency Detection Playground" />
+    <meta property="og:title" content="FX Inline Pricing Page Preview" />
     <meta
       property="og:description"
-      content="Try the FX Inline parser in a restrained playground and inspect full and partial currency matches."
+      content="Preview local-currency hints beside existing pricing-page prices."
     />
-    <meta property="og:url" content="https://replace-with-fx-inline-domain.example/playground.html" />
-    <meta
-      property="og:image"
-      content="https://replace-with-fx-inline-domain.example/assets/fx-inline-site-mark.svg"
-    />
+    <meta property="og:image" content="/assets/fx-inline-site-mark.svg" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="FX Inline Currency Detection Playground" />
+    <meta name="twitter:title" content="FX Inline Pricing Page Preview" />
     <meta
       name="twitter:description"
-      content="Standalone parser playground for currency and amount detection with full and partial match outputs."
+      content="Preview inline local-currency hints and inspect the detection parser."
     />
-    <meta
-      name="twitter:image"
-      content="https://replace-with-fx-inline-domain.example/assets/fx-inline-site-mark.svg"
-    />
+    <meta name="twitter:image" content="/assets/fx-inline-site-mark.svg" />
     <link rel="icon" type="image/svg+xml" href="/assets/fx-inline-site-mark.svg" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
@@ -52,13 +44,13 @@
         <span>FX Inline</span>
       </a>
       <nav class="site-nav" aria-label="Primary navigation">
-        <a href="./index.html#pilot">Pilot</a>
-        <a href="./index.html#proof">Proof</a>
+        <a href="./index.html#demo">Demo</a>
+        <a href="./index.html#workflow">Workflow</a>
         <a href="./index.html#scope">Scope</a>
         <a href="./index.html#trust">Trust</a>
         <a aria-current="page" href="./playground.html">Playground</a>
       </nav>
-      <a class="header-cta" href="mailto:REPLACE_WITH_DEMO_EMAIL?subject=FX%20Inline%20pilot%20demo&body=Hi%20FX%20Inline%2C%0A%0AWe%20want%20to%20see%20a%20pilot%20demo%20for%20our%20pricing%20page.%0A%0ACompany%3A%20%0AWebsite%3A%20%0ATarget%20currencies%3A%20%0A%0AThanks.">Request demo</a>
+      <a class="header-cta" href="./index.html#page-review">Request assessment</a>
     </header>
 
     <main id="main-content">
@@ -67,14 +59,96 @@
           <p class="eyebrow">Parser proof surface</p>
           <h1 id="playground-title">Currency Detection Playground</h1>
           <p>
-            Run <code>@fx-inline/currency-detection</code> against plain text and inspect
-            the exact full and partial matches that power FX Inline's page-layer demos.
+            Preview inline local-currency hints for a pricing page and inspect the exact
+            parser matches behind the product experience.
           </p>
         </div>
         <div class="playground-notes" aria-label="Playground details">
           <p><strong>5,000</strong><span>character input cap</span></p>
           <p><strong>Live</strong><span>paste-triggered detection</span></p>
           <p><strong>Copy</strong><span>full or partial results</span></p>
+        </div>
+      </section>
+
+      <section
+        class="pricing-url-tool section-band"
+        aria-labelledby="pricing-url-title"
+      >
+        <div class="pricing-url-copy">
+          <p class="eyebrow">Website pricing page</p>
+          <h2 id="pricing-url-title">Preview inline hints for a customer pricing page.</h2>
+          <p>
+            Enter a pricing page URL and target currency. FX Inline keeps the original
+            price visible and adds local estimates beside detected prices.
+          </p>
+        </div>
+
+        <div class="pricing-url-component">
+          <div class="pricing-url-controls" aria-label="Pricing page preview controls">
+            <label>
+              Pricing page URL
+              <input
+                id="pricing-page-url"
+                type="url"
+                value="https://example.com/pricing"
+                placeholder="https://example.com/pricing"
+              />
+            </label>
+            <label>
+              Target currency
+              <select id="preview-currency">
+                <option value="EUR" selected>EUR</option>
+                <option value="GBP">GBP</option>
+                <option value="INR">INR</option>
+                <option value="JPY">JPY</option>
+                <option value="CAD">CAD</option>
+              </select>
+            </label>
+            <button id="refresh-preview" class="btn btn-primary" type="button">
+              Refresh preview
+            </button>
+          </div>
+
+          <div class="pricing-preview-browser" aria-live="polite">
+            <div class="stage-topbar">
+              <span></span>
+              <span></span>
+              <span></span>
+              <p id="preview-domain">example.com/pricing</p>
+            </div>
+            <div class="pricing-preview-page">
+              <div class="preview-page-header">
+                <p>Plans</p>
+                <strong>Choose the right plan</strong>
+              </div>
+              <div class="preview-plan-grid">
+                <article>
+                  <p class="plan-name">Starter</p>
+                  <p class="preview-price" data-preview-price="$29/mo">
+                    <span>$29/mo</span>
+                    <em data-preview-hint>approx EUR 27/mo</em>
+                  </p>
+                  <small>For lean teams validating a new market.</small>
+                </article>
+                <article>
+                  <p class="plan-name">Growth</p>
+                  <p class="preview-price" data-preview-price="$99/mo">
+                    <span>$99/mo</span>
+                    <em data-preview-hint>approx EUR 92/mo</em>
+                  </p>
+                  <small>For teams scaling international demand.</small>
+                </article>
+                <article>
+                  <p class="plan-name">Business</p>
+                  <p class="preview-price" data-preview-price="$249/mo">
+                    <span>$249/mo</span>
+                    <em data-preview-hint>approx EUR 232/mo</em>
+                  </p>
+                  <small>For managed pricing-page rollout.</small>
+                </article>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -153,7 +227,7 @@ Mức giá từ ₫ 3.65 tỷ đến ₫ 4.2 tỷ.</textarea>
     <footer class="site-footer">
       <p>© <span id="year">2026</span> FX Inline</p>
       <a href="./index.html">Home</a>
-      <a href="mailto:REPLACE_WITH_DEMO_EMAIL?subject=FX%20Inline%20pilot%20demo">Contact</a>
+      <a href="./index.html#page-review">Request assessment</a>
     </footer>
 
     <script type="module" src="./main.js"></script>
