@@ -704,31 +704,68 @@ h1 {
   align-items: end;
 }
 
-.proof-links {
+.store-buttons {
   display: grid;
-  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  align-content: end;
 }
 
-.proof-links a {
-  display: grid;
-  min-height: 70px;
-  align-content: center;
-  gap: 4px;
-  padding: 0 16px;
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius);
-  background: rgba(255, 255, 255, 0.76);
+.store-button {
+  min-height: 62px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 0 18px 0 10px;
+  border: 6px solid rgba(75, 214, 132, 0.22);
+  border-radius: 18px;
+  background: linear-gradient(180deg, #5ee59c, #39d77f);
+  box-shadow: 0 16px 38px rgba(14, 116, 104, 0.17);
+  color: #061911;
+  font-size: 1.04rem;
+  font-weight: 850;
   text-decoration: none;
 }
 
-.proof-links span {
-  color: var(--ink);
-  font-weight: 800;
+.store-button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(75, 214, 132, 0.36);
+  background: linear-gradient(180deg, #65eba3, #35d27a);
 }
 
-.proof-links strong {
-  color: var(--teal-dark);
-  font-size: 0.85rem;
+.store-icon {
+  position: relative;
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  border: 3px solid #fff;
+  border-radius: 999px;
+  box-shadow: 0 4px 12px rgba(21, 29, 24, 0.18);
+}
+
+.store-icon::after {
+  position: absolute;
+  inset: 8px;
+  border-radius: 999px;
+  background: #fff;
+  content: "";
+}
+
+.store-icon-chrome {
+  background: conic-gradient(#ea4335 0 25%, #fbbc04 0 50%, #34a853 0 75%, #4285f4 0);
+}
+
+.store-icon-firefox {
+  background: conic-gradient(#8b3ff2 0 22%, #e8572a 0 58%, #ffb000 0 84%, #8b3ff2 0);
+}
+
+.store-icon-safari {
+  background: conic-gradient(#1e5bff 0 48%, #55c7ff 0 78%, #cbeaff 0);
+}
+
+.store-icon-edge {
+  background: conic-gradient(#1769d8 0 25%, #18a1d9 0 52%, #20c58d 0 78%, #0b6f67 0);
 }
 
 .faq-list {
@@ -1248,6 +1285,10 @@ textarea:focus-visible {
 
   .timeline,
   .trust-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .store-buttons {
     grid-template-columns: 1fr;
   }
 
