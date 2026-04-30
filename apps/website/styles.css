@@ -254,6 +254,10 @@ h1 {
   letter-spacing: 0;
 }
 
+.hero-title-accent {
+  color: var(--clay);
+}
+
 .hero-statement {
   margin-top: 22px;
   max-width: 14ch;
