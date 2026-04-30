@@ -1,11 +1,9 @@
-import { createCurrencyParser } from "@fx-inline/currency-detection";
-
-const parser = createCurrencyParser();
 const pricingPageUrlInput = document.getElementById("pricing-page-url");
 const previewCurrencyInput = document.getElementById("preview-currency");
 const previewDomain = document.getElementById("preview-domain");
 const refreshPreviewButton = document.getElementById("refresh-preview");
-const previewPriceNodes = document.querySelectorAll("[data-preview-price]");
+const previewSurface = document.querySelector("[data-preview-surface]");
+const previewPage = document.querySelector("[data-preview-page]");
 
 const PREVIEW_RATES_FROM_USD = {
   EUR: 0.92,
@@ -23,14 +21,54 @@ const PREVIEW_NUMBER_LOCALES = {
   CAD: "en-CA",
 };
 
+const PREVIEW_PLANS = [
+  {
+    name: "Starter",
+    price: "$29/mo",
+    description: "For lean teams validating a new market.",
+  },
+  {
+    name: "Growth",
+    price: "$99/mo",
+    description: "For teams scaling international demand.",
+    featured: true,
+  },
+  {
+    name: "Business",
+    price: "$249/mo",
+    description: "For managed pricing-page rollout.",
+  },
+];
+
+let previewLoadTimer = 0;
+
 if (
   !pricingPageUrlInput ||
   !previewCurrencyInput ||
   !previewDomain ||
   !refreshPreviewButton ||
-  previewPriceNodes.length === 0
+  !previewSurface ||
+  !previewPage
 ) {
   throw new Error("Pricing page preview DOM is missing required controls.");
+}
+
+function createNode(tagName, className, text) {
+  const node = document.createElement(tagName);
+
+  if (className) {
+    node.className = className;
+  }
+
+  if (text !== undefined) {
+    node.textContent = text;
+  }
+
+  return node;
+}
+
+function setPreviewState(state) {
+  previewSurface.setAttribute("data-state", state);
 }
 
 function getPreviewCurrency() {
@@ -61,7 +99,18 @@ function getBillingSuffix(rawPrice) {
   return billingMatch ? billingMatch[0] : "";
 }
 
-function formatPreviewHint(value, targetCurrency, billingSuffix) {
+function getUsdValue(rawPrice) {
+  const priceMatch = rawPrice.match(/\$([\d,]+(?:\.\d+)?)/u);
+
+  if (!priceMatch) {
+    return 0;
+  }
+
+  return Number(priceMatch[1].replaceAll(",", ""));
+}
+
+function formatPreviewHint(rawPrice, targetCurrency) {
+  const value = getUsdValue(rawPrice);
   const rate = PREVIEW_RATES_FROM_USD[targetCurrency] || PREVIEW_RATES_FROM_USD.EUR;
   const locale = PREVIEW_NUMBER_LOCALES[targetCurrency] || PREVIEW_NUMBER_LOCALES.EUR;
   const convertedValue = value * rate;
@@ -69,32 +118,108 @@ function formatPreviewHint(value, targetCurrency, billingSuffix) {
     maximumFractionDigits: 0,
   }).format(convertedValue);
 
-  return `approx ${targetCurrency} ${formattedValue}${billingSuffix}`;
+  return `approx ${targetCurrency} ${formattedValue}${getBillingSuffix(rawPrice)}`;
 }
 
-function updatePricingPreview() {
-  const targetCurrency = getPreviewCurrency();
+function clearPreviewPage() {
+  previewPage.replaceChildren();
+}
+
+function renderReadyPreview() {
+  window.clearTimeout(previewLoadTimer);
+  setPreviewState("ready");
+  refreshPreviewButton.disabled = false;
+  refreshPreviewButton.textContent = "Refresh preview";
   previewDomain.textContent = getPreviewDomainLabel(pricingPageUrlInput.value);
+  clearPreviewPage();
 
-  for (const priceNode of previewPriceNodes) {
-    const rawPrice = priceNode.getAttribute("data-preview-price") || "";
-    const hintNode = priceNode.querySelector("[data-preview-hint]");
-    const match = parser.extractMatches(rawPrice, { localeHint: "en-US" })[0];
+  const placeholder = createNode("div", "preview-placeholder");
+  placeholder.append(
+    createNode("strong", "", "Load a pricing page preview"),
+    createNode(
+      "p",
+      "",
+      "Enter a pricing page URL, choose a target currency, and refresh the preview.",
+    ),
+  );
+  previewPage.append(placeholder);
+}
 
-    if (!hintNode || !match) {
-      continue;
+function renderLoadingPreview(domainLabel) {
+  setPreviewState("loading");
+  refreshPreviewButton.disabled = true;
+  refreshPreviewButton.textContent = "Loading";
+  previewDomain.textContent = domainLabel;
+  clearPreviewPage();
+
+  const loading = createNode("div", "preview-loading");
+  loading.append(
+    createNode("span", "preview-spinner"),
+    createNode("strong", "", "Loading pricing page"),
+    createNode("p", "", `Preparing local-currency hints for ${domainLabel}.`),
+  );
+  previewPage.append(loading);
+}
+
+function renderLoadedPreview(domainLabel, targetCurrency) {
+  setPreviewState("loaded");
+  refreshPreviewButton.disabled = false;
+  refreshPreviewButton.textContent = "Refresh preview";
+  clearPreviewPage();
+
+  const header = createNode("div", "preview-page-header");
+  const headerCopy = createNode("div");
+  headerCopy.append(
+    createNode("p", "", "Loaded pricing page"),
+    createNode("strong", "", "Local-currency hints added"),
+  );
+  header.append(headerCopy, createNode("span", "preview-status-pill", "FX Inline active"));
+
+  const grid = createNode("div", "preview-plan-grid");
+
+  for (const plan of PREVIEW_PLANS) {
+    const article = createNode("article");
+
+    if (plan.featured) {
+      article.classList.add("is-featured");
     }
 
-    hintNode.textContent = formatPreviewHint(
-      match.value,
-      targetCurrency,
-      getBillingSuffix(rawPrice),
+    const price = createNode("p", "preview-price");
+    price.append(
+      createNode("span", "", plan.price),
+      createNode("em", "local-price-hint", formatPreviewHint(plan.price, targetCurrency)),
     );
+
+    article.append(
+      createNode("p", "plan-name", plan.name),
+      price,
+      createNode("small", "", plan.description),
+    );
+    grid.append(article);
   }
+
+  const footer = createNode(
+    "p",
+    "preview-page-note",
+    `Preview loaded from ${domainLabel}. Original prices stay visible.`,
+  );
+
+  previewPage.append(header, grid, footer);
 }
 
-pricingPageUrlInput.addEventListener("input", updatePricingPreview);
-previewCurrencyInput.addEventListener("change", updatePricingPreview);
-refreshPreviewButton.addEventListener("click", updatePricingPreview);
+function refreshPricingPreview() {
+  const targetCurrency = getPreviewCurrency();
+  const domainLabel = getPreviewDomainLabel(pricingPageUrlInput.value);
 
-updatePricingPreview();
+  renderLoadingPreview(domainLabel);
+  window.clearTimeout(previewLoadTimer);
+  previewLoadTimer = window.setTimeout(() => {
+    renderLoadedPreview(domainLabel, targetCurrency);
+  }, 420);
+}
+
+pricingPageUrlInput.addEventListener("input", renderReadyPreview);
+previewCurrencyInput.addEventListener("change", renderReadyPreview);
+refreshPreviewButton.addEventListener("click", refreshPricingPreview);
+
+renderReadyPreview();

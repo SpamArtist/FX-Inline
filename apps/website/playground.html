@@ -92,45 +92,19 @@
             </button>
           </div>
 
-          <div class="pricing-preview-browser" aria-live="polite">
+          <div
+            class="pricing-preview-browser"
+            data-preview-surface
+            data-state="ready"
+            aria-live="polite"
+          >
             <div class="stage-topbar">
               <span></span>
               <span></span>
               <span></span>
               <p id="preview-domain">example.com/pricing</p>
             </div>
-            <div class="pricing-preview-page">
-              <div class="preview-page-header">
-                <p>Plans</p>
-                <strong>Choose the right plan</strong>
-              </div>
-              <div class="preview-plan-grid">
-                <article>
-                  <p class="plan-name">Starter</p>
-                  <p class="preview-price" data-preview-price="$29/mo">
-                    <span>$29/mo</span>
-                    <em data-preview-hint>approx EUR 27/mo</em>
-                  </p>
-                  <small>For lean teams validating a new market.</small>
-                </article>
-                <article>
-                  <p class="plan-name">Growth</p>
-                  <p class="preview-price" data-preview-price="$99/mo">
-                    <span>$99/mo</span>
-                    <em data-preview-hint>approx EUR 92/mo</em>
-                  </p>
-                  <small>For teams scaling international demand.</small>
-                </article>
-                <article>
-                  <p class="plan-name">Business</p>
-                  <p class="preview-price" data-preview-price="$249/mo">
-                    <span>$249/mo</span>
-                    <em data-preview-hint>approx EUR 232/mo</em>
-                  </p>
-                  <small>For managed pricing-page rollout.</small>
-                </article>
-              </div>
-            </div>
+            <div class="pricing-preview-page" data-preview-page></div>
           </div>
         </div>
       </section>

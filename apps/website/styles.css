@@ -909,19 +909,26 @@ textarea {
   white-space: nowrap;
 }
 
+.pricing-url-controls .btn:disabled {
+  cursor: wait;
+  opacity: 0.74;
+}
+
 .pricing-preview-browser {
   background: #fff;
 }
 
 .pricing-preview-page {
+  min-height: 390px;
   padding: 22px;
 }
 
 .preview-page-header {
-  min-height: 92px;
+  min-height: 96px;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
   border-bottom: 1px solid var(--line);
 }
 
@@ -936,6 +943,53 @@ textarea {
   margin-top: 6px;
   font-size: 1.65rem;
   line-height: 1.05;
+}
+
+.preview-status-pill {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  border: 1px solid color-mix(in srgb, var(--teal) 42%, var(--line));
+  border-radius: 999px;
+  background: #f4fffb;
+  color: var(--teal-dark);
+  font-size: 0.84rem;
+  font-weight: 820;
+  white-space: nowrap;
+}
+
+.preview-placeholder,
+.preview-loading {
+  min-height: 330px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 12px;
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+.preview-placeholder strong,
+.preview-loading strong {
+  color: var(--ink);
+  font-size: 1.4rem;
+  line-height: 1.1;
+}
+
+.preview-placeholder p,
+.preview-loading p {
+  max-width: 34ch;
+  line-height: 1.55;
+}
+
+.preview-spinner {
+  width: 34px;
+  height: 34px;
+  border: 3px solid var(--line);
+  border-top-color: var(--teal);
+  border-radius: 999px;
+  animation: preview-spin 0.84s linear infinite;
 }
 
 .preview-plan-grid {
@@ -953,7 +1007,7 @@ textarea {
   background: #fff;
 }
 
-.preview-plan-grid article:nth-child(2) {
+.preview-plan-grid article.is-featured {
   border-color: color-mix(in srgb, var(--teal) 44%, var(--line));
   background: #f4fffb;
 }
@@ -989,6 +1043,19 @@ textarea {
   margin-top: 40px;
   color: var(--ink-soft);
   line-height: 1.45;
+}
+
+.preview-page-note {
+  margin-top: 18px;
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+@keyframes preview-spin {
+  to {
+    transform: rotate(1turn);
+  }
 }
 
 select,
