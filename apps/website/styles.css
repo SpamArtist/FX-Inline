@@ -106,7 +106,7 @@ button {
 }
 
 .site-header {
-  width: min(1220px, calc(100% - var(--page-pad) * 2));
+  width: min(1440px, calc(100% - var(--page-pad) * 2));
   min-height: 74px;
   margin: 0 auto;
   display: flex;
@@ -205,7 +205,7 @@ button {
 }
 
 .section-band {
-  width: min(1220px, calc(100% - var(--page-pad) * 2));
+  width: min(1440px, calc(100% - var(--page-pad) * 2));
   margin: 0 auto;
 }
 
@@ -213,8 +213,8 @@ button {
   position: relative;
   min-height: calc(100svh - 74px);
   display: grid;
-  grid-template-columns: minmax(0, 0.82fr) minmax(460px, 1.18fr);
-  gap: 54px;
+  grid-template-columns: minmax(0, 0.88fr) minmax(560px, 1.12fr);
+  gap: 68px;
   align-items: center;
   padding: 58px 0 86px;
 }
@@ -233,7 +233,7 @@ button {
 
 .hero-copy {
   min-width: 0;
-  max-width: 640px;
+  max-width: 760px;
 }
 
 .eyebrow {
@@ -260,7 +260,7 @@ h1 {
 
 .hero-statement {
   margin-top: 22px;
-  max-width: 14ch;
+  max-width: 17ch;
   color: var(--ink);
   font-size: clamp(2rem, 4vw, 4.2rem);
   font-weight: 820;
@@ -311,7 +311,7 @@ h1 {
 }
 
 .pricing-stage {
-  width: min(100%, 680px);
+  width: min(100%, 760px);
   border: 1px solid var(--line-strong);
   border-radius: 8px;
   background: #fdfcf7;
@@ -830,7 +830,7 @@ textarea {
 }
 
 .site-footer {
-  width: min(1220px, calc(100% - var(--page-pad) * 2));
+  width: min(1440px, calc(100% - var(--page-pad) * 2));
   min-height: 94px;
   margin: 0 auto;
   display: flex;
