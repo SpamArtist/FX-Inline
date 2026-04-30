@@ -61,6 +61,6 @@ const reviewNote = document.querySelector("[data-review-note]");
 if (reviewButton && reviewNote) {
   reviewButton.addEventListener("click", () => {
     reviewNote.textContent =
-      "Request brief prepared. Connect this form to your chosen inbox or CRM endpoint before launch.";
+      "Assessment request prepared. Connect this form to the production contact workflow before launch.";
   });
 }
