@@ -23,6 +23,7 @@
     "build:admin": "vite build --config apps/admin/vite.config.mjs",
     "icons:optimize": "node scripts/optimize-icons.mjs --source",
     "icons:check": "node scripts/optimize-icons.mjs --check",
+    "prezip": "npm run admin:export-settings && npm run build:assets",
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
     "release:clean": "node scripts/release/clean.mjs",
