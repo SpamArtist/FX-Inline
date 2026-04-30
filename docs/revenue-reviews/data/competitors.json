@@ -1,11 +1,76 @@
 {
-  "updated_at": "2026-04-19",
+  "updated_at": "2026-04-30",
   "project": "FX Inline",
   "notes": [
     "Registry maintained from repo-backed revenue reviews.",
-    "Entries emphasize products competing for the same user intent or buyer budget, not only pure inline-conversion clones."
+    "Entries emphasize products competing for the same user intent or buyer budget, not only pure inline-conversion clones.",
+    "Updated on 2026-04-30 from fresh revenue-review competitor and marketplace research."
   ],
   "competitors": [
+    {
+      "id": "amazonsaver",
+      "name": "AmazonSaver",
+      "type": "adjacent_shopping_assistant",
+      "first_seen": "2026-04-19",
+      "last_verified": "2026-04-19",
+      "pricing_model": "Free browser extension",
+      "traction": "Official site claims support for 10+ Amazon Europe stores and a 5.0 user rating; independent install volume was not verified this run",
+      "positioning": "Cross-market Amazon Europe comparison with automatic currency conversion and explicit savings framing",
+      "what_they_do_better": [
+        "Very clear wedge",
+        "Obvious ROI story",
+        "Easy before-and-after narrative"
+      ],
+      "what_they_do_worse": [
+        "Narrower use case",
+        "Site-claim traction rather than strong independently verified marketplace proof"
+      ],
+      "fx_inline_takeaway": "A narrow wedge with visible savings can be easier to sell than a generic browser utility."
+    },
+    {
+      "id": "bestprice_assistant",
+      "name": "BestPrice Assistant",
+      "type": "adjacent_shopping_assistant",
+      "first_seen": "2026-04-18",
+      "last_verified": "2026-04-19",
+      "pricing_model": "Free extension",
+      "traction": "Chrome listing showed 4,000 users and 61 ratings at 4.8",
+      "positioning": "Shopping assistant with price comparison, offers, store ratings, and automatic euro conversion",
+      "what_they_do_better": [
+        "Stronger money-saving story",
+        "Comparison and store-rating value",
+        "Better shopper-intent framing"
+      ],
+      "what_they_do_worse": [
+        "Much broader and more commercial-data heavy than FX Inline"
+      ],
+      "fx_inline_takeaway": "Saving money beats raw conversion as a consumer message."
+    },
+    {
+      "id": "chrome_currency_converter",
+      "name": "Chrome Currency Converter / BestPrice Assistant",
+      "type": "direct_extension_incumbent",
+      "first_seen": "2026-04-18",
+      "last_verified": "2026-04-30",
+      "pricing_model": "Free",
+      "traction": "Chrome listing showed 40,000 users and about 1.6K ratings at 3.5/3.6 depending on listing view.",
+      "positioning": "Do not compete head-on for generic consumer utility. Use feature gaps as a review-mining source.",
+      "what_they_do_better": [
+        "Installed base",
+        "Feature depth",
+        "Whitelist/blacklist",
+        "Fee/tax adjustment",
+        "Popup converter"
+      ],
+      "what_they_do_worse": [
+        "Mediocre rating despite scale",
+        "Generic utility framing"
+      ],
+      "fx_inline_takeaway": "Do not compete head-on for generic consumer utility. Use feature gaps as a review-mining source.",
+      "sources": [
+        "https://chromewebstore.google.com/detail/chrome-currency-converter/anbfhidldjknonaihbalghlebaijealk"
+      ]
+    },
     {
       "id": "click_currency",
       "name": "Click Currency",
@@ -28,125 +93,48 @@
       "fx_inline_takeaway": "Monetization without trust and quality is not a shortcut."
     },
     {
-      "id": "currency_wiki_extension",
-      "name": "Currency.Wiki Extension",
-      "type": "direct_extension",
-      "first_seen": "2026-04-18",
-      "last_verified": "2026-04-19",
-      "pricing_model": "Freemium with Extension Pro at 7.95 USD/month plus paid credit packs",
-      "traction": "Official pricing still supports a real paid extension motion; Chrome store snippet still showed roughly 60,000 users and a 4.8 rating",
-      "positioning": "Cross-browser currency platform with in-page conversion, AI scans, website tools, and document conversion",
-      "what_they_do_better": [
-        "Real monetization architecture",
-        "Broad trust surface",
-        "Cross-product ecosystem",
-        "Clear free-to-paid boundaries"
-      ],
-      "what_they_do_worse": [
-        "Broader, heavier surface area",
-        "More platform complexity than a focused wedge needs"
-      ],
-      "fx_inline_takeaway": "Freemium works when there is trust, scale, and a broader platform story."
-    },
-    {
-      "id": "chrome_currency_converter",
-      "name": "Chrome Currency Converter",
-      "type": "direct_extension",
-      "first_seen": "2026-04-18",
-      "last_verified": "2026-04-19",
-      "pricing_model": "Free extension",
-      "traction": "Chrome listing showed 40,000 users and 1.5K ratings at 3.6",
-      "positioning": "Automatic in-page conversion with whitelist or blacklist, fee and tax adjustments, popup converter, and many options",
-      "what_they_do_better": [
-        "Installed base",
-        "Feature depth for shoppers",
-        "Mature options surface"
-      ],
-      "what_they_do_worse": [
-        "Middle-of-the-road rating despite strong scale",
-        "Feels utility-heavy rather than trust-rich"
-      ],
-      "fx_inline_takeaway": "Distribution can beat elegance for years, but mediocre ratings cap monetization quality."
-    },
-    {
-      "id": "universal_automatic_currency_converter",
-      "name": "Universal Automatic Currency Converter",
-      "type": "direct_extension",
-      "first_seen": "2026-04-18",
-      "last_verified": "2026-04-19",
-      "pricing_model": "Free extension",
-      "traction": "Chrome listing showed about 6,000 users and 118 ratings at 4.2; Firefox listing showed 720 users and 74 reviews at 4.2",
-      "positioning": "Highly customizable automatic conversion for all browsing needs",
-      "what_they_do_better": [
-        "Customization depth",
-        "Whitelist and display controls",
-        "Cross-browser presence"
-      ],
-      "what_they_do_worse": [
-        "Review complaints about setup complexity",
-        "Wrong-value complaints",
-        "Performance complaints on dynamic pages"
-      ],
-      "fx_inline_takeaway": "Users want control, but complexity and performance problems kill goodwill."
-    },
-    {
-      "id": "direct_currency_converter",
-      "name": "Direct Currency Converter",
-      "type": "direct_extension",
-      "first_seen": "2026-04-18",
-      "last_verified": "2026-04-19",
-      "pricing_model": "Free extension with optional external API key path",
-      "traction": "Chrome listing showed 875 users and 83 ratings at 4.2; Firefox listing showed 188 users and 28 reviews at 3.5",
-      "positioning": "Automatic browsing conversion with tooltip details, force-currency mode, URL exclusion, and configurable sources",
-      "what_they_do_better": [
-        "Browsing-oriented feature set",
-        "Force-currency behavior",
-        "Privacy language"
-      ],
-      "what_they_do_worse": [
-        "Settings friction",
-        "Review complaints about broken save behavior and usability"
-      ],
-      "fx_inline_takeaway": "Site controls matter, but settings UX cannot be a mess."
-    },
-    {
-      "id": "rapid_currency_converter",
-      "name": "Rapid Currency Converter",
-      "type": "direct_extension",
+      "id": "converter_app_currency_extension",
+      "name": "Converter.app Currency Converter Browser Extension",
+      "type": "new_direct_extension",
       "first_seen": "2026-04-19",
-      "last_verified": "2026-04-19",
-      "pricing_model": "Free extension",
-      "traction": "Chrome listing showed 293 users and 20 ratings at 4.3",
-      "positioning": "Hover, select, and quick on-page conversion with formatting controls and strong privacy framing",
+      "last_verified": "2026-04-30",
+      "pricing_model": "Not verified as paid in this run",
+      "traction": "Reddit launch on April 16, 2026 with Chrome and Firefox links.",
+      "positioning": "New entrants are using story-led launches; FX Inline should use concrete before/after demos, not generic feature lists.",
       "what_they_do_better": [
-        "Presents the value through shopper convenience",
-        "Ships format controls users can understand",
-        "Pairs on-page and popup conversion cleanly"
+        "Clear personal pain story",
+        "Right-click overlay",
+        "Historical charts linked to existing platform"
       ],
       "what_they_do_worse": [
-        "Still small",
-        "Not obviously differentiated beyond convenience UX"
+        "Early traction unknown"
       ],
-      "fx_inline_takeaway": "Even small entrants package the value around shopping friction better than FX Inline's current copy."
+      "fx_inline_takeaway": "New entrants are using story-led launches; FX Inline should use concrete before/after demos, not generic feature lists.",
+      "sources": [
+        "https://www.reddit.com/r/chrome_extensions/comments/1snidrp/i_made_a_currency_converter_browser_extension/"
+      ]
     },
     {
-      "id": "currencyos",
-      "name": "CurrencyOS",
-      "type": "direct_extension",
-      "first_seen": "2026-04-18",
-      "last_verified": "2026-04-19",
-      "pricing_model": "Free extension",
-      "traction": "Official site was visible; no strong public marketplace traction signal verified this run",
-      "positioning": "Chrome extension with onboarding, hourly sync, omnibox conversion, popup conversion, and context-menu flow",
+      "id": "cresotech_currency_converter",
+      "name": "Cresotech Currency Converter",
+      "type": "direct_hover_extension",
+      "first_seen": "2026-04-30",
+      "last_verified": "2026-04-30",
+      "pricing_model": "Free",
+      "traction": "Chrome-Stats shows 1,000 users and 4.47 rating from 49 reviews.",
+      "positioning": "Simplicity beats feature sprawl; never annoy users for ratings.",
       "what_they_do_better": [
-        "Explicit onboarding story",
-        "More setup guidance on the website"
+        "Hover-based conversion with very simple UX",
+        "Low-risk permission posture",
+        "Clear lightweight positioning"
       ],
       "what_they_do_worse": [
-        "Still reads like a generic utility",
-        "No obvious business differentiation"
+        "Review-mining flags intrusive rating prompts"
       ],
-      "fx_inline_takeaway": "Even free competitors tell the setup story better than FX Inline's current site."
+      "fx_inline_takeaway": "Simplicity beats feature sprawl; never annoy users for ratings.",
+      "sources": [
+        "https://chrome-stats.com/d/alkjjgkgebbehkjgcalgajpefchdhhfj"
+      ]
     },
     {
       "id": "currency_converter_injector",
@@ -166,83 +154,6 @@
         "Tiny scale"
       ],
       "fx_inline_takeaway": "Security sloppiness gets noticed immediately, even at low scale."
-    },
-    {
-      "id": "in_line_currency_converter",
-      "name": "In-line Currency Converter",
-      "type": "direct_extension",
-      "first_seen": "2026-04-18",
-      "last_verified": "2026-04-19",
-      "pricing_model": "Free extension",
-      "traction": "Firefox listing showed 29 users and 6 reviews at 4.0",
-      "positioning": "Automatic webpage conversion plus right-click conversion",
-      "what_they_do_better": [
-        "Hybrid auto and manual model",
-        "Privacy-first messaging",
-        "Positive sentiment when it solves the basic use case"
-      ],
-      "what_they_do_worse": [
-        "Requests around highlight readability and extra currency support",
-        "Very small scale"
-      ],
-      "fx_inline_takeaway": "Readability and locale sensitivity matter even when the core feature works."
-    },
-    {
-      "id": "xe_currency_converter_switcher",
-      "name": "Xe Currency Converter & Price Switcher",
-      "type": "direct_extension",
-      "first_seen": "2026-04-18",
-      "last_verified": "2026-04-19",
-      "pricing_model": "Free extension tied to Xe brand",
-      "traction": "Firefox listing showed 188 users and 1 review at 3.0",
-      "positioning": "Brand-led toolbar and on-page conversion with live mid-market rates",
-      "what_they_do_better": [
-        "Strong parent brand",
-        "Rate credibility"
-      ],
-      "what_they_do_worse": [
-        "Review feedback says it defaults badly and still feels slower than opening a website",
-        "Weak extension-specific UX"
-      ],
-      "fx_inline_takeaway": "Brand strength does not save an extension with bad default UX."
-    },
-    {
-      "id": "bestprice_assistant",
-      "name": "BestPrice Assistant",
-      "type": "adjacent_shopping_assistant",
-      "first_seen": "2026-04-18",
-      "last_verified": "2026-04-19",
-      "pricing_model": "Free extension",
-      "traction": "Chrome listing showed 4,000 users and 61 ratings at 4.8",
-      "positioning": "Shopping assistant with price comparison, offers, store ratings, and automatic euro conversion",
-      "what_they_do_better": [
-        "Stronger money-saving story",
-        "Comparison and store-rating value",
-        "Better shopper-intent framing"
-      ],
-      "what_they_do_worse": [
-        "Much broader and more commercial-data heavy than FX Inline"
-      ],
-      "fx_inline_takeaway": "Saving money beats raw conversion as a consumer message."
-    },
-    {
-      "id": "savely",
-      "name": "Savely",
-      "type": "adjacent_shopping_assistant",
-      "first_seen": "2026-04-18",
-      "last_verified": "2026-04-19",
-      "pricing_model": "Free extension with affiliate commissions",
-      "traction": "Chrome listing showed 5,000 users and 24 ratings at 4.3",
-      "positioning": "Real-time price comparison and savings while browsing",
-      "what_they_do_better": [
-        "Direct savings framing",
-        "Affiliate-aligned monetization story",
-        "Clear commerce use case"
-      ],
-      "what_they_do_worse": [
-        "Less focused on currency-specific trust or localization"
-      ],
-      "fx_inline_takeaway": "Affiliate and commerce-intent monetization are easier to explain than 'currency conversion' alone."
     },
     {
       "id": "currency_converter_pro",
@@ -265,24 +176,68 @@
       "fx_inline_takeaway": "A clean generic utility with strong ratings can still win the install battle."
     },
     {
-      "id": "mlv_multi_country_pricing",
-      "name": "MLV Multi Country Pricing",
-      "type": "ecommerce_localization_app",
-      "first_seen": "2026-04-19",
-      "last_verified": "2026-04-19",
-      "pricing_model": "29 USD/month app with free trial",
-      "traction": "Shopify App Store showed 4.6 from 406 reviews",
-      "positioning": "Country-specific prices, local currency display, and international market localization for Shopify merchants",
+      "id": "currency_wiki_extension",
+      "name": "Currency.Wiki Extension/Web/Document Pro",
+      "type": "direct_and_adjacent_platform",
+      "first_seen": "2026-04-18",
+      "last_verified": "2026-04-30",
+      "pricing_model": "$7.95/mo Extension Pro, $3.99/mo Web Pro, $14.99/mo Document Pro, paid credit packs",
+      "traction": "Currency.Wiki claims 50k+ Chrome extension users on its extension page; Chrome Web Store snippets also show a 60k-user widget listing. Pricing page shows Stripe billing and clear free-to-paid limits.",
+      "positioning": "Do not copy the breadth. Copy the explicit free/paid boundaries and trust surface after the B2B wedge works.",
       "what_they_do_better": [
-        "Clear merchant value tied to revenue outcomes",
-        "Large review proof",
-        "Support is treated as part of the product"
+        "Real paid packaging",
+        "Cross-browser/app ecosystem",
+        "Clear limits and upgrade prompts",
+        "Trust assets including company identity and legal pages"
       ],
       "what_they_do_worse": [
-        "Heavier platform-specific scope",
-        "More complex merchant setup than FX Inline's possible wedge"
+        "Broad and heavy product surface",
+        "AI-scan positioning may be overkill for simple price hints"
       ],
-      "fx_inline_takeaway": "Merchant money flows to localization products that improve revenue, not to clever browser tech by itself."
+      "fx_inline_takeaway": "Do not copy the breadth. Copy the explicit free/paid boundaries and trust surface after the B2B wedge works.",
+      "sources": [
+        "https://currency.wiki/extensions/chrome",
+        "https://currency.wiki/pricing"
+      ]
+    },
+    {
+      "id": "currencyapi",
+      "name": "currencyapi.com",
+      "type": "rate_api_substitute",
+      "first_seen": "2026-04-30",
+      "last_verified": "2026-04-30",
+      "pricing_model": "$9.99/mo Small plan, $39.99/mo Medium, $79.99/mo Large",
+      "traction": "Pricing page exposes normal API economics: requests, update frequency, support and commercial use.",
+      "positioning": "API access is not a first-revenue wedge for FX Inline.",
+      "what_they_do_better": [
+        "Clear API packaging"
+      ],
+      "what_they_do_worse": [
+        "Commodity market with low entry price"
+      ],
+      "fx_inline_takeaway": "API access is not a first-revenue wedge for FX Inline.",
+      "sources": [
+        "https://currencyapi.com/pricing/"
+      ]
+    },
+    {
+      "id": "currencyos",
+      "name": "CurrencyOS",
+      "type": "direct_extension",
+      "first_seen": "2026-04-18",
+      "last_verified": "2026-04-19",
+      "pricing_model": "Free extension",
+      "traction": "Official site was visible; no strong public marketplace traction signal verified this run",
+      "positioning": "Chrome extension with onboarding, hourly sync, omnibox conversion, popup conversion, and context-menu flow",
+      "what_they_do_better": [
+        "Explicit onboarding story",
+        "More setup guidance on the website"
+      ],
+      "what_they_do_worse": [
+        "Still reads like a generic utility",
+        "No obvious business differentiation"
+      ],
+      "fx_inline_takeaway": "Even free competitors tell the setup story better than FX Inline's current site."
     },
     {
       "id": "cvc_multi_currency_converter",
@@ -305,100 +260,106 @@
       "fx_inline_takeaway": "If FX Inline targets merchants, it must sell speed and low implementation friction, not generic localization features."
     },
     {
-      "id": "xe_currency_data_api",
-      "name": "XE Currency Data API",
-      "type": "b2b_api_substitute",
-      "first_seen": "2026-04-17",
-      "last_verified": "2026-04-19",
-      "pricing_model": "Paid B2B API from 799 USD/year to 4499 USD/year plus add-ons",
-      "traction": "Enterprise-grade brand and pricing, used as proof of willingness to pay rather than direct extension competition",
-      "positioning": "Reliable FX data infrastructure for business systems",
-      "what_they_do_better": [
-        "Enterprise trust",
-        "Real pricing power",
-        "Rate reliability and documentation"
-      ],
-      "what_they_do_worse": [
-        "Not built for quick page-layer deployment or scrappy pilot speed"
-      ],
-      "fx_inline_takeaway": "B2B willingness to pay is real, but FX Inline must sell a different shape of value."
-    },
-    {
-      "id": "wise_partnerships",
-      "name": "Wise Partnerships",
-      "type": "affiliate_substitute",
-      "first_seen": "2026-04-17",
-      "last_verified": "2026-04-19",
-      "pricing_model": "Referral and partnership commissions",
-      "traction": "Global brand with explicit partner and influencer programs",
-      "positioning": "Monetize money-transfer and multi-currency financial intent",
-      "what_they_do_better": [
-        "Actual referral economics",
-        "Strong trust",
-        "Clear commission model"
-      ],
-      "what_they_do_worse": [
-        "Not a browsing utility or inline localization product"
-      ],
-      "fx_inline_takeaway": "Affiliate monetization is viable, but only after traffic exists."
-    },
-    {
-      "id": "travelpayouts",
-      "name": "Travelpayouts",
-      "type": "affiliate_substitute",
-      "first_seen": "2026-04-17",
-      "last_verified": "2026-04-19",
-      "pricing_model": "Travel affiliate payouts and partner tools",
-      "traction": "Large partner network used by travel publishers and creators",
-      "positioning": "Monetize travel demand across flights, hotels, car rentals, insurance, and more",
-      "what_they_do_better": [
-        "Clear affiliate distribution engine",
-        "Large partner network"
-      ],
-      "what_they_do_worse": [
-        "Not solving inline conversion itself"
-      ],
-      "fx_inline_takeaway": "Travel intent can monetize, but FX Inline currently lacks the traffic engine to exploit it."
-    },
-    {
-      "id": "converter_app_currency_extension",
-      "name": "Converter.app Currency Extension",
-      "type": "new_launch_direct_extension",
-      "first_seen": "2026-04-19",
-      "last_verified": "2026-04-19",
-      "pricing_model": "Likely free extension tied to a broader converter.app platform",
-      "traction": "Fresh Reddit launch activity on April 16 and April 17, 2026; public traction not yet verified",
-      "positioning": "Right-click on-page currency conversion linked to a broader converter and charting platform",
-      "what_they_do_better": [
-        "Cross-sells from a broader utility platform",
-        "Frames the value around eliminating context switching"
-      ],
-      "what_they_do_worse": [
-        "No proven traction yet",
-        "Still another lightweight entrant in an easy-to-clone category"
-      ],
-      "fx_inline_takeaway": "The defensible layer is not the basic extension concept. It is trust, niche focus, and commercial packaging."
-    },
-    {
-      "id": "pricetip",
-      "name": "PriceTip",
+      "id": "direct_currency_converter",
+      "name": "Direct Currency Converter",
       "type": "direct_extension",
-      "first_seen": "2026-04-19",
+      "first_seen": "2026-04-18",
       "last_verified": "2026-04-19",
-      "pricing_model": "Free extension",
-      "traction": "Chrome Web Store showed 7,000 users and 141 ratings at 4.7",
-      "positioning": "Hover-first currency tooltip conversion with automatic rate updates and multilingual packaging",
+      "pricing_model": "Free extension with optional external API key path",
+      "traction": "Chrome listing showed 875 users and 83 ratings at 4.2; Firefox listing showed 188 users and 28 reviews at 3.5",
+      "positioning": "Automatic browsing conversion with tooltip details, force-currency mode, URL exclusion, and configurable sources",
       "what_they_do_better": [
-        "Stronger public trust signals",
-        "Simple hover-first messaging",
-        "Clear privacy disclosure",
-        "Broader language reach"
+        "Browsing-oriented feature set",
+        "Force-currency behavior",
+        "Privacy language"
       ],
       "what_they_do_worse": [
-        "Still a free utility without a clear business wedge",
-        "Narrower product ambition than a merchant-side offer"
+        "Settings friction",
+        "Review complaints about broken save behavior and usability"
       ],
-      "fx_inline_takeaway": "Better packaging and clearer controls can outperform cleverer underlying tech."
+      "fx_inline_takeaway": "Site controls matter, but settings UX cannot be a mess."
+    },
+    {
+      "id": "exchange_rate_api",
+      "name": "ExchangeRate-API",
+      "type": "rate_api_substitute",
+      "first_seen": "2026-04-30",
+      "last_verified": "2026-04-30",
+      "pricing_model": "Free and paid API plans",
+      "traction": "Official page emphasizes 165 currencies, uptime and support.",
+      "positioning": "Do not build a commodity rate API; buy/use reliable rates and sell the UX/business outcome.",
+      "what_they_do_better": [
+        "Commodity rate infrastructure with uptime/support posture"
+      ],
+      "what_they_do_worse": [
+        "Does not solve UX or pricing-page conversion alone"
+      ],
+      "fx_inline_takeaway": "Do not build a commodity rate API; buy/use reliable rates and sell the UX/business outcome.",
+      "sources": [
+        "https://www.exchangerate-api.com/"
+      ]
+    },
+    {
+      "id": "frankfurter_open_source_extension",
+      "name": "Open-source Frankfurter-powered extension",
+      "type": "new_direct_extension",
+      "first_seen": "2026-04-30",
+      "last_verified": "2026-04-30",
+      "pricing_model": "Free open source",
+      "traction": "Reddit launch in February 2026.",
+      "positioning": "Trust copy is table stakes; revenue needs a buyer with budget.",
+      "what_they_do_better": [
+        "Open-source trust",
+        "No ads/no strange permissions copy",
+        "Charts and multilingual support"
+      ],
+      "what_they_do_worse": [
+        "Likely hobby-scale",
+        "No obvious monetization"
+      ],
+      "fx_inline_takeaway": "Trust copy is table stakes; revenue needs a buyer with budget.",
+      "sources": [
+        "https://www.reddit.com/r/chrome_extensions/comments/1r85njb/i_built_a_simple_opensource_currency_converter/"
+      ]
+    },
+    {
+      "id": "fx_auto_convert",
+      "name": "FX Auto Convert",
+      "type": "new_direct_extension_watch",
+      "first_seen": "2026-04-30",
+      "last_verified": "2026-04-30",
+      "pricing_model": "Not fully verified; appears as a new direct extension watch item",
+      "traction": "Recently added all-sites extension with inline/tooltip/replace modes. It proves new entrants keep appearing and that all-sites host permissions create trust risk.",
+      "positioning": "Recently added all-sites extension with inline/tooltip/replace modes. It proves new entrants keep appearing and that all-sites host permissions create trust risk.",
+      "what_they_do_better": [],
+      "what_they_do_worse": [],
+      "fx_inline_takeaway": "Recently added all-sites extension with inline/tooltip/replace modes. It proves new entrants keep appearing and that all-sites host permissions create trust risk.",
+      "sources": [
+        "https://chrome-stats.com/d/eiokcbadjmmbeiblkdlbkpfoojbmfbpd"
+      ]
+    },
+    {
+      "id": "in_line_currency_converter",
+      "name": "In-line Currency Converter Firefox",
+      "type": "small_direct_extension",
+      "first_seen": "2026-04-18",
+      "last_verified": "2026-04-30",
+      "pricing_model": "Free with buy-me-a-coffee style donation link",
+      "traction": "Firefox listing shows 29 users and 4.0 rating from 6 reviews.",
+      "positioning": "Consumer donation can exist but should not drive strategy.",
+      "what_they_do_better": [
+        "Privacy copy",
+        "Auto plus context-menu paths",
+        "Donation/support link"
+      ],
+      "what_they_do_worse": [
+        "Tiny traction",
+        "Generic differentiation"
+      ],
+      "fx_inline_takeaway": "Consumer donation can exist but should not drive strategy.",
+      "sources": [
+        "https://addons.mozilla.org/en-US/firefox/addon/in-line-currency-converter/"
+      ]
     },
     {
       "id": "minimal_currency_converter",
@@ -421,6 +382,98 @@
       "fx_inline_takeaway": "FX Inline cannot claim zero permissions, so it needs to explain its runtime surface much better."
     },
     {
+      "id": "mlv_multi_country_pricing",
+      "name": "MLV Multi Country Pricing",
+      "type": "merchant_localization_saas",
+      "first_seen": "2026-04-19",
+      "last_verified": "2026-04-30",
+      "pricing_model": "$29/month or $279/year; 15-day free trial",
+      "traction": "Shopify listing shows 405 reviews and 4.5 rating in fresh view; review summary praises multi-country pricing, setup and support.",
+      "positioning": "This is the better business category to learn from: sell outcome, support and setup, not generic conversion.",
+      "what_they_do_better": [
+        "Clear merchant ROI",
+        "Paid from day one",
+        "Support-driven onboarding",
+        "Country-specific price management"
+      ],
+      "what_they_do_worse": [
+        "A negative current review mentions no contact, incompatibility and lost international orders"
+      ],
+      "fx_inline_takeaway": "This is the better business category to learn from: sell outcome, support and setup, not generic conversion.",
+      "sources": [
+        "https://apps.shopify.com/country-pricing-auto-switch",
+        "https://apps.shopify.com/country-pricing-auto-switch/reviews"
+      ]
+    },
+    {
+      "id": "paddle_localized_pricing",
+      "name": "Paddle localized pricing",
+      "type": "checkout_localization_substitute",
+      "first_seen": "2026-04-30",
+      "last_verified": "2026-04-30",
+      "pricing_model": "Bundled into Paddle billing",
+      "traction": "Official docs connect local currencies to trust, bank fees and payment approval.",
+      "positioning": "Borrow the trust/payment-confidence narrative; sell low-effort pricing-page experiments.",
+      "what_they_do_better": [
+        "Merchant-of-record platform integration",
+        "Country-specific pricing",
+        "Checkout localization"
+      ],
+      "what_they_do_worse": [
+        "Only helps teams using Paddle or willing to implement Paddle pricing"
+      ],
+      "fx_inline_takeaway": "Borrow the trust/payment-confidence narrative; sell low-effort pricing-page experiments.",
+      "sources": [
+        "https://developer.paddle.com/build/products/offer-localized-pricing"
+      ]
+    },
+    {
+      "id": "pricetip",
+      "name": "PriceTip",
+      "type": "direct_hover_extension",
+      "first_seen": "2026-04-19",
+      "last_verified": "2026-04-30",
+      "pricing_model": "Free",
+      "traction": "Chrome listing shows 6k-7k users and about 4.6 rating across localized views.",
+      "positioning": "Borrow hover simplicity for consumer UX; avoid coercive review prompts and coverage gaps.",
+      "what_they_do_better": [
+        "Simple hover proposition",
+        "Multilingual listing",
+        "Small package",
+        "Per-site disablement"
+      ],
+      "what_they_do_worse": [
+        "Currency coverage requests",
+        "Stopped-working/Invalid Date complaints from review mining",
+        "Potential rating-prompt concerns"
+      ],
+      "fx_inline_takeaway": "Borrow hover simplicity for consumer UX; avoid coercive review prompts and coverage gaps.",
+      "sources": [
+        "https://chromewebstore.google.com/detail/pricetip-%E2%80%94-currency-toolt/napifcagjkgokhhgfbagpcaedfdmikfk",
+        "https://chrome-stats.com/d/napifcagjkgokhhgfbagpcaedfdmikfk"
+      ]
+    },
+    {
+      "id": "rapid_currency_converter",
+      "name": "Rapid Currency Converter",
+      "type": "direct_extension",
+      "first_seen": "2026-04-19",
+      "last_verified": "2026-04-19",
+      "pricing_model": "Free extension",
+      "traction": "Chrome listing showed 293 users and 20 ratings at 4.3",
+      "positioning": "Hover, select, and quick on-page conversion with formatting controls and strong privacy framing",
+      "what_they_do_better": [
+        "Presents the value through shopper convenience",
+        "Ships format controls users can understand",
+        "Pairs on-page and popup conversion cleanly"
+      ],
+      "what_they_do_worse": [
+        "Still small",
+        "Not obviously differentiated beyond convenience UX"
+      ],
+      "fx_inline_takeaway": "Even small entrants package the value around shopping friction better than FX Inline's current copy."
+    },
+    {
       "id": "reta",
       "name": "RETA",
       "type": "adjacent_shopping_assistant",
@@ -441,24 +494,151 @@
       "fx_inline_takeaway": "Comparison math and shopping outcomes are easier to market than generic FX conversion."
     },
     {
-      "id": "amazonsaver",
-      "name": "AmazonSaver",
+      "id": "savely",
+      "name": "Savely",
       "type": "adjacent_shopping_assistant",
-      "first_seen": "2026-04-19",
+      "first_seen": "2026-04-18",
       "last_verified": "2026-04-19",
-      "pricing_model": "Free browser extension",
-      "traction": "Official site claims support for 10+ Amazon Europe stores and a 5.0 user rating; independent install volume was not verified this run",
-      "positioning": "Cross-market Amazon Europe comparison with automatic currency conversion and explicit savings framing",
+      "pricing_model": "Free extension with affiliate commissions",
+      "traction": "Chrome listing showed 5,000 users and 24 ratings at 4.3",
+      "positioning": "Real-time price comparison and savings while browsing",
       "what_they_do_better": [
-        "Very clear wedge",
-        "Obvious ROI story",
-        "Easy before-and-after narrative"
+        "Direct savings framing",
+        "Affiliate-aligned monetization story",
+        "Clear commerce use case"
       ],
       "what_they_do_worse": [
-        "Narrower use case",
-        "Site-claim traction rather than strong independently verified marketplace proof"
+        "Less focused on currency-specific trust or localization"
       ],
-      "fx_inline_takeaway": "A narrow wedge with visible savings can be easier to sell than a generic browser utility."
+      "fx_inline_takeaway": "Affiliate and commerce-intent monetization are easier to explain than 'currency conversion' alone."
+    },
+    {
+      "id": "stripe_adaptive_pricing",
+      "name": "Stripe localized prices",
+      "type": "checkout_localization_substitute",
+      "first_seen": "2026-04-30",
+      "last_verified": "2026-04-30",
+      "pricing_model": "Stripe fees and conversion fees; not a standalone extension",
+      "traction": "Official docs present Adaptive Pricing as recommended and low-complexity for checkout localization.",
+      "positioning": "Position FX Inline before checkout and as a learning layer, not as a payment processor.",
+      "what_they_do_better": [
+        "Checkout integration",
+        "FX risk management",
+        "Trust",
+        "Global payment coverage"
+      ],
+      "what_they_do_worse": [
+        "Does not solve public pricing-page comprehension before checkout in every custom site"
+      ],
+      "fx_inline_takeaway": "Position FX Inline before checkout and as a learning layer, not as a payment processor.",
+      "sources": [
+        "https://docs.stripe.com/payments/currencies/localize-prices"
+      ]
+    },
+    {
+      "id": "travelpayouts",
+      "name": "Travelpayouts",
+      "type": "affiliate_substitute",
+      "first_seen": "2026-04-17",
+      "last_verified": "2026-04-19",
+      "pricing_model": "Travel affiliate payouts and partner tools",
+      "traction": "Large partner network used by travel publishers and creators",
+      "positioning": "Monetize travel demand across flights, hotels, car rentals, insurance, and more",
+      "what_they_do_better": [
+        "Clear affiliate distribution engine",
+        "Large partner network"
+      ],
+      "what_they_do_worse": [
+        "Not solving inline conversion itself"
+      ],
+      "fx_inline_takeaway": "Travel intent can monetize, but FX Inline currently lacks the traffic engine to exploit it."
+    },
+    {
+      "id": "universal_automatic_currency_converter",
+      "name": "Universal Automatic Currency Converter",
+      "type": "direct_extension",
+      "first_seen": "2026-04-18",
+      "last_verified": "2026-04-30",
+      "pricing_model": "Free",
+      "traction": "Chrome-Stats shows 6,000 users, 4.22 rating, 118 reviews; Chrome listing also shows 7,000 users in fresh store view.",
+      "positioning": "Copy site controls and original visibility; avoid settings complexity.",
+      "what_they_do_better": [
+        "Customization depth",
+        "Original-price display",
+        "Hover and shortcut flows",
+        "Site controls"
+      ],
+      "what_they_do_worse": [
+        "Cluttered UI complaints",
+        "Wrong values/rounding complaints",
+        "Some CPU/memory complaints in Firefox reviews"
+      ],
+      "fx_inline_takeaway": "Copy site controls and original visibility; avoid settings complexity.",
+      "sources": [
+        "https://chromewebstore.google.com/detail/universal-automatic-curre/hbjagjepkeogombomfeefdmjnclgojli",
+        "https://chrome-stats.com/d/hbjagjepkeogombomfeefdmjnclgojli",
+        "https://addons.mozilla.org/en-US/firefox/addon/ua-currency-converter/reviews/"
+      ]
+    },
+    {
+      "id": "wise_partnerships",
+      "name": "Wise Partnerships",
+      "type": "affiliate_substitute",
+      "first_seen": "2026-04-17",
+      "last_verified": "2026-04-19",
+      "pricing_model": "Referral and partnership commissions",
+      "traction": "Global brand with explicit partner and influencer programs",
+      "positioning": "Monetize money-transfer and multi-currency financial intent",
+      "what_they_do_better": [
+        "Actual referral economics",
+        "Strong trust",
+        "Clear commission model"
+      ],
+      "what_they_do_worse": [
+        "Not a browsing utility or inline localization product"
+      ],
+      "fx_inline_takeaway": "Affiliate monetization is viable, but only after traffic exists."
+    },
+    {
+      "id": "xe_currency_converter_switcher",
+      "name": "Xe Currency Converter & Price Switcher",
+      "type": "direct_brand_extension",
+      "first_seen": "2026-04-18",
+      "last_verified": "2026-04-30",
+      "pricing_model": "Free, tied to Xe money-transfer/API ecosystem",
+      "traction": "Xe has strong brand trust; official page emphasizes 130+ currencies, mid-market rates, and privacy.",
+      "positioning": "Copy privacy and rate-source clarity; FX Inline cannot outbrand Xe.",
+      "what_they_do_better": [
+        "Rate credibility",
+        "Privacy language",
+        "Broad use-case copy"
+      ],
+      "what_they_do_worse": [
+        "Extension itself is not necessarily the main revenue product"
+      ],
+      "fx_inline_takeaway": "Copy privacy and rate-source clarity; FX Inline cannot outbrand Xe.",
+      "sources": [
+        "https://www.xe.com/xe-browser-extension/"
+      ]
+    },
+    {
+      "id": "xe_currency_data_api",
+      "name": "XE Currency Data API",
+      "type": "b2b_api_substitute",
+      "first_seen": "2026-04-17",
+      "last_verified": "2026-04-19",
+      "pricing_model": "Paid B2B API from 799 USD/year to 4499 USD/year plus add-ons",
+      "traction": "Enterprise-grade brand and pricing, used as proof of willingness to pay rather than direct extension competition",
+      "positioning": "Reliable FX data infrastructure for business systems",
+      "what_they_do_better": [
+        "Enterprise trust",
+        "Real pricing power",
+        "Rate reliability and documentation"
+      ],
+      "what_they_do_worse": [
+        "Not built for quick page-layer deployment or scrappy pilot speed"
+      ],
+      "fx_inline_takeaway": "B2B willingness to pay is real, but FX Inline must sell a different shape of value."
     }
   ]
 }

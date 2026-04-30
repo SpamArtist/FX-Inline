@@ -1,0 +1,66 @@
+{
+  "date": "2026-04-30",
+  "generated_at": "2026-04-30T05:42:11Z",
+  "own_product": {
+    "fx_inline": {
+      "public_review_status": "No meaningful public review base found this run. Firefox listing/reviews show no reviews in accessible pages; Extpose mirror showed zero Chrome installs/ratings in older crawl metadata, while the current direct Chrome Web Store page was not fully accessible via plain text.",
+      "revenue_implication": "There is no review moat. Do not charge consumers until activation, reliability, and trust are proven. Use marketplace presence as proof for B2B outreach instead.",
+      "source_ids": [
+        "fx_inline_firefox",
+        "fx_inline_firefox_reviews",
+        "fx_inline_extpose"
+      ]
+    }
+  },
+  "themes": {
+    "positive": [
+      "Users like conversion without leaving the page: hover, right-click, inline, popup, or overlay all reduce context switching.",
+      "Original-price visibility matters; users want conversion context without losing the source price.",
+      "Site-specific controls, quick on/off toggles and per-site disablement recur as useful features.",
+      "Clean lightweight UI is praised more than feature depth when the job is simple.",
+      "Privacy/no tracking/no strange permissions is an explicit trust signal in new entrant launches and marketplace listings.",
+      "For merchants, support and onboarding are revenue features, not overhead. MLV reviews repeatedly mention responsive support as the reason setup worked."
+    ],
+    "negative": [
+      "Wrong values, stale rates, aggressive rounding and ambiguous symbols damage trust immediately.",
+      "Confusing settings are a recurring complaint for mature extensions.",
+      "Extensions that stop working on dynamic pages or after browser updates get punished in reviews.",
+      "CPU/memory overload on complex sites is a real risk for all-page conversion tools.",
+      "Intrusive rating prompts are called out and can create ethical/trust concerns.",
+      "Currency coverage gaps produce feature requests and bad reviews, especially for non-US/non-EU users."
+    ],
+    "feature_requests": [
+      "Quick on/off toggle",
+      "Per-site disablement and site currency override",
+      "More currencies and better ambiguous-symbol handling",
+      "Cached/offline rates and clear last-updated timestamp",
+      "Hover mode plus inline mode plus context-menu fallback",
+      "Original value shown beside converted value",
+      "Readable highlights and less intrusive UI",
+      "Better options search and currency selection"
+    ],
+    "trust_concerns": [
+      "All-sites permissions create perceived risk even when necessary.",
+      "Rate accuracy and source credibility must be visible.",
+      "Any merchant-facing pricing hint must avoid implying checkout-final pricing unless checkout is integrated.",
+      "Analytics must be privacy-scoped and disclosed clearly; the current extension posture is data-collection-minimal."
+    ],
+    "revenue_relevant_insights": [
+      "Consumer extension users value the tool but have many free options, so consumer premium is a poor first-dollar path.",
+      "Merchant reviews show willingness to pay when localization is tied to international sales, setup and support.",
+      "The best B2B language is not “currency converter”; it is “reduce buyer confusion and improve international pricing confidence.”",
+      "Support quality can be packaged into a paid pilot because buyers need help integrating localized pricing safely."
+    ]
+  },
+  "source_ids": [
+    "universal_currency_converter_stats",
+    "cresotech_currency_converter_stats",
+    "pricetip_stats",
+    "mlv_shopify_reviews",
+    "direct_currency_converter_firefox_reviews",
+    "ua_currency_converter_firefox_reviews",
+    "reddit_converter_app",
+    "reddit_frankfurter_extension",
+    "in_line_currency_converter_firefox"
+  ]
+}
