@@ -134,6 +134,14 @@ button {
   border-radius: 8px;
 }
 
+.brand-wordmark {
+  white-space: nowrap;
+}
+
+.brand-accent {
+  color: var(--clay);
+}
+
 .site-nav {
   display: flex;
   align-items: center;
