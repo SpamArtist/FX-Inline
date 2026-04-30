@@ -5,5 +5,7 @@ module.exports = {
     "<rootDir>/**/tests/**/*.test.mjs",
     "<rootDir>/**/test/**/*.test.mjs",
   ],
+  modulePathIgnorePatterns: ["<rootDir>/.claude/"],
+  testPathIgnorePatterns: ["<rootDir>/.claude/"],
   transform: {},
 };

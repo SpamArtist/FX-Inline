@@ -2,6 +2,8 @@
 module.exports = {
   testEnvironment: "jsdom",
   testMatch: ["<rootDir>/apps/extension/tests/content/**/*.test.mjs"],
+  modulePathIgnorePatterns: ["<rootDir>/.claude/"],
+  testPathIgnorePatterns: ["<rootDir>/.claude/"],
   transform: {
     "^.+\\.[cm]?js$": "<rootDir>/apps/extension/tests/content/jest-content-transformer.cjs",
   },
