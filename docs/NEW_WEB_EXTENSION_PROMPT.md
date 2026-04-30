@@ -10,7 +10,7 @@ This is a **greenfield** task. Build everything needed from this prompt only.
 
 ## 1) Required Stack and Project Shape
 
-1. Use **WXT + React + TypeScript** for the extension.
+1. Use **WXT + Preact + TypeScript** for the extension UI.
 2. Use a monorepo layout:
 - `apps/extension` for the extension app.
 - `apps/website` for a standalone static marketing site scaffold (basic Vite setup is enough).
@@ -20,7 +20,7 @@ This is a **greenfield** task. Build everything needed from this prompt only.
 - `packages/inline-runtime` for the shared inline conversion runtime.
 - `docs` for runbooks/checklists.
 3. Use the existing visual approach:
-- custom CSS theme tokens (`converter-theme.css`) and component CSS,
+- shared extension theme CSS (`apps/extension/public/theme.css`) plus component/entrypoint CSS,
 - styled native `<select>` controls for extension currency menus, with the visible chip/icon treatment preserved by CSS.
 4. Support Chromium and Firefox builds from one codebase. Include Safari conversion notes.
 5. Include CI + release automation:
@@ -76,7 +76,7 @@ Implement equivalent manifest behavior via WXT config:
 - include `data_collection_permissions.required = ["none"]`.
 7. Build hardening behavior:
 - set `action.default_title` to `FX Inline`
-- expose only `content-worker.js` and `chunks/*.js` as dynamic web-accessible resources
+- expose only `content-worker.js`, `chunks/*.js`, and `theme.css` as dynamic web-accessible resources
 - run extension asset optimization before Chrome/Firefox WXT builds
 - run build-output assertions after Chrome/Firefox WXT builds
 - run release build-output linting during artifact verification
@@ -201,8 +201,9 @@ Implement these extension entrypoints and behaviors exactly.
 - absolute positioned root with id `popup-root`
 - attached open Shadow DOM
 - very high z-index (`9999999`)
-- inject combined inline CSS (`converter-theme.css` + `content.css`) via a `<style id="content-styles">`
-- mount UI inside container id `popup-react-container` (container class `fx-inline-selection-popup-host`)
+- link the shared runtime stylesheet from `/theme.css` inside the Shadow DOM
+- inject content-specific inline CSS from `content.css` via `<style id="content-styles">`
+- mount the direct DOM UI inside container id `popup-view-container` (container class `fx-inline-selection-popup-host`)
 3. Popup UI behavior:
 - same shell design language as popup, with `FX INLINE` header
 - two rows only

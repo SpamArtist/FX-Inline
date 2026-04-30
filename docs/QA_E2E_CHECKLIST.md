@@ -46,10 +46,12 @@ Expected:
 6. Toggle global auto-conversion off/on, then local page-origin toggle off/on.
 7. Click settings button and confirm options page opens.
 8. Click `Feedback ↗` and confirm external tab opens.
+9. Confirm popup, options, welcome, and selection popup UI load the shared `/theme.css` stylesheet without missing theme styles.
 
 Expected:
 - Conversion stays live while editing/committing amounts.
 - Native selector behavior remains accessible without loading the old Radix popup menu path.
+- Shared theme styling is consistent across extension pages and the selection popup Shadow DOM.
 - Local toggle is disabled when active tab origin is unavailable.
 - Global toggle updates the all-pages scope; local toggle writes a domain scope for the active origin.
 

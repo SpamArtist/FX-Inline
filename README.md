@@ -30,6 +30,7 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 
 - The all-URLs content script is a small activation shim. It loads `content-worker.js` only after a bounded currency signal scan, a matching added node, or a price-like selection on supported `http`/`https` pages.
 - The popup currency picker uses a styled native `<select>` to keep the extension bundle small while preserving keyboard and browser accessibility behavior.
+- Popup, options, welcome, and selection-popup UI share `apps/extension/public/theme.css`; the selection popup links the same runtime stylesheet inside its Shadow DOM and keeps page-specific content CSS inline.
 - Chrome and Firefox builds run admin settings export, optimized extension assets, and build-output assertions before completion.
 
 <!-- AUTO-GENERATED:START -->
@@ -58,13 +59,13 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 - `https://api.exchangerate-api.com/v4/latest/USD`
 
 ### Test Inventory
-- Total test files: `32`
+- Total test files: `35`
 - admin: `2`
 - assets: `1`
-- build: `1`
+- build: `2`
 - content: `8`
 - release: `3`
-- unit: `17`
+- unit: `19`
 
 ### Scripts
 | Script | Command |
@@ -124,13 +125,13 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run readme:sync:check` | `node scripts/readme-sync.mjs --check` |
 
 ### Recent Changes (first-parent, excluding README automation commits)
-- 2026-04-28 `1fb37b5` refactor: replace popup Radix dropdown (#73)
-- 2026-04-28 `9400f16` reduce duplicated MV3 storage bundle code (#83)
-- 2026-04-28 `64f082e` [codex] Manifest hygiene (#86)
-- 2026-04-28 `44c0a79` Optimize extension icon assets (#87)
-- 2026-04-28 `bf0700c` Dev optimized (#92)
-- 2026-04-28 `b466797` Update inlineRuntimeSettingsManifest.ts
-- 2026-04-28 `0e8cb06` Merge branch 'main' of https://github.com/SpamArtist/currency-conversion-extension-tool into codex/issue-69-content-script-size
-- 2026-04-28 `482c9f3` perf: split all urls content worker
+- 2026-04-29 `9f6c6b0` Replace React with Preact across admin and extension apps (#94)
+- 2026-04-29 `c4e1a24` Share extension theme stylesheet (#74)
+- 2026-04-29 `9741b4b` lint fixes
+- 2026-04-29 `1ade4ae` fixes
+- 2026-04-29 `001ee96` Merge branch 'main' of https://github.com/SpamArtist/currency-conversion-extension-tool into codex/issue-65-options-chunk-split
+- 2026-04-28 `1dff4d1` perf: split options page chunks
+- 2026-04-28 `5e3c44f` docs: align runtime and admin docs
+- 2026-04-28 `23d448c` fix: remove unused extension and admin dead code (#48)
 
 <!-- AUTO-GENERATED:END -->

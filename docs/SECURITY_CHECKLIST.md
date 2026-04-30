@@ -6,7 +6,7 @@ _Last updated: 2026-04-29_
 
 - [ ] `permissions` are limited to `storage`, `alarms`, `activeTab`.
 - [ ] `host_permissions` are limited to approved FX providers only.
-- [ ] `web_accessible_resources` is limited to `content-worker.js` and generated JS chunks with dynamic URLs.
+- [ ] `web_accessible_resources` is limited to `content-worker.js`, generated JS chunks, and the static shared `theme.css` stylesheet with dynamic URLs.
 - [ ] `action.default_title` and extension page titles use `FX Inline`, not WXT scaffold placeholders.
 - [ ] Manifest icons are limited to shipped extension sizes (`16`, `32`, `48`, `128`); store-only `512` icon remains outside extension `public`.
 - [ ] Extension-page CSP includes:
