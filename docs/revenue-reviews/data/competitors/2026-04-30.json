@@ -1,362 +1,502 @@
 {
   "date": "2026-04-30",
-  "generated_at": "2026-04-30T05:42:11Z",
-  "research_mode": "Fresh web research plus rolling competitor registry continuity. Previous generated narrative reports were not used as analytical ground truth.",
-  "additions_or_newly_relevant": [
+  "generated_at": "2026-04-30T07:49:25.845Z",
+  "additions_or_changes": [
     {
-      "id": "fx_auto_convert",
-      "name": "FX Auto Convert",
-      "type": "new_direct_extension_watch",
-      "why_it_matters": "Recently added all-sites extension with inline/tooltip/replace modes. It proves new entrants keep appearing and that all-sites host permissions create trust risk.",
-      "source_ids": [
-        "fx_auto_convert_chrome_stats"
-      ]
+      "id": "inlinecurrencyconverter",
+      "change": "Newly added direct Chrome competitor watch item: single-click/select/context inline conversion, free/no login/no API key positioning, tiny traction but clear trust copy."
+    },
+    {
+      "id": "inmytwocents_currencyconverter",
+      "change": "Newly added direct Firefox competitor watch item: open-source automatic inline conversion, favorites, dynamic content, custom regex, no-tracking copy."
+    },
+    {
+      "id": "coinverse",
+      "change": "Newly added Firefox competitor watch item: automatic primary-currency detection using geolocation and instant selection conversion."
+    },
+    {
+      "id": "quick_currency_converter",
+      "change": "Newly added Firefox substitute: high rating and 920 users for simple converter/quick preview workflow."
+    },
+    {
+      "id": "smartcs_currency_converter",
+      "change": "Newly added merchant-localization benchmark: Shopify app with $12/mo premium plan, 4.8 rating and support/design support messaging."
     },
     {
       "id": "converter_app_currency_extension",
-      "name": "Converter.app Currency Converter Browser Extension",
-      "type": "new_direct_extension_watch",
-      "why_it_matters": "Reddit launch on April 16, 2026 frames the pain as travel planning and context switching, with a right-click overlay and historical charts.",
-      "source_ids": [
-        "reddit_converter_app"
-      ]
+      "change": "Still newly relevant: April 2026 Reddit launch shows right-click overlay plus historical charts as a current entrant pattern."
     },
     {
       "id": "frankfurter_open_source_extension",
-      "name": "Open-source Frankfurter-powered currency converter extension",
-      "type": "new_direct_extension_watch",
-      "why_it_matters": "Reddit launch emphasizes no ads, no weird permissions and open-source trust; this is the trust copy FX Inline must beat.",
-      "source_ids": [
-        "reddit_frankfurter_extension"
-      ]
+      "change": "Still relevant: open-source/no-ads/no-weird-permissions positioning shows trust copy is table stakes."
+    },
+    {
+      "id": "mlv_multi_country_pricing",
+      "change": "Updated review count/rating and review insight: support quality rescues merchant trust after compatibility issues that cost orders."
     },
     {
       "id": "stripe_adaptive_pricing",
-      "name": "Stripe Adaptive Pricing / FX Quotes / manual localized prices",
-      "type": "b2b_checkout_localization_substitute",
-      "why_it_matters": "Stripe validates the buyer problem and will absorb many checkout-localization use cases. FX Inline must sell pre-checkout/pricing-page learning, not pretend to replace Stripe.",
-      "source_ids": [
-        "stripe_localized_pricing"
-      ]
+      "change": "Updated from official docs: local currency at checkout is now very low/no-code in Stripe, so FX Inline must position before checkout and as experimentation/landing-page layer."
     },
     {
-      "id": "paddle_localized_pricing",
-      "name": "Paddle localized pricing",
-      "type": "b2b_checkout_localization_substitute",
-      "why_it_matters": "Paddle explicitly frames local prices as trust and payment-acceptance improvement. FX Inline can borrow that business language for pricing-page hints.",
-      "source_ids": [
-        "paddle_localized_pricing"
-      ]
+      "id": "geotargetly_geo_currency",
+      "change": "Late sidecar research elevated GeoTargetly Geo Currency as the clearest low-code B2B substitute: one snippet, selector-based price targeting, IP location rules, real-time rates and pricing from $12/mo monthly or $9/mo annual."
+    },
+    {
+      "id": "currency_converter_plus_shopify",
+      "change": "Late sidecar research added Currency Converter Plus as a merchant benchmark: $9.99/mo, 4.7 rating from 208 reviews, 222 currencies, minute-updated rates and support positioning."
+    },
+    {
+      "id": "hoppy_multi_currency_converter",
+      "change": "Late sidecar research added Hoppy as a free Shopify localization benchmark with strong early reviews, geolocation and 160+ currencies."
+    },
+    {
+      "id": "rapid_currency_converter",
+      "change": "Late sidecar research elevated Rapid Currency Converter as another direct Chrome competitor."
+    },
+    {
+      "id": "centsvert",
+      "change": "Late sidecar research elevated Centsvert as a tiny but positioned direct-extension watch item."
+    },
+    {
+      "id": "nomisview",
+      "change": "Late sidecar research elevated NomisView as a Firefox watch item."
+    },
+    {
+      "id": "currencylayer",
+      "change": "Late sidecar research added Currencylayer as another commodity rate API substitute."
     }
   ],
   "competitors": [
     {
       "id": "currency_wiki_extension",
       "name": "Currency.Wiki Extension/Web/Document Pro",
-      "type": "direct_and_adjacent_platform",
-      "pricing": "$7.95/mo Extension Pro, $3.99/mo Web Pro, $14.99/mo Document Pro, paid credit packs",
-      "traction": "Currency.Wiki claims 50k+ Chrome extension users on its extension page; Chrome Web Store snippets also show a 60k-user widget listing. Pricing page shows Stripe billing and clear free-to-paid limits.",
-      "does_better": [
-        "Real paid packaging",
-        "Cross-browser/app ecosystem",
-        "Clear limits and upgrade prompts",
-        "Trust assets including company identity and legal pages"
-      ],
-      "does_worse": [
-        "Broad and heavy product surface",
-        "AI-scan positioning may be overkill for simple price hints"
-      ],
-      "fx_inline_action": "Do not copy the breadth. Copy the explicit free/paid boundaries and trust surface after the B2B wedge works.",
-      "source_ids": [
-        "currency_wiki_chrome",
-        "currency_wiki_pricing"
-      ]
+      "category": "direct_and_adjacent_platform",
+      "pricing_model": "$7.95/mo Extension Pro, $3.99/mo Web Pro, $14.99/mo Document Pro, paid credits",
+      "current_signal": "Real paid packaging, free/paid limits, Stripe billing, trial, legal/trust pages and claimed large extension user base.",
+      "fx_inline_action": "Copy packaging discipline later; do not copy product breadth before first pilot."
     },
     {
       "id": "chrome_currency_converter",
       "name": "Chrome Currency Converter / BestPrice Assistant",
-      "type": "direct_extension_incumbent",
-      "pricing": "Free",
-      "traction": "Chrome listing showed 40,000 users and about 1.6K ratings at 3.5/3.6 depending on listing view.",
-      "does_better": [
-        "Installed base",
-        "Feature depth",
-        "Whitelist/blacklist",
-        "Fee/tax adjustment",
-        "Popup converter"
-      ],
-      "does_worse": [
-        "Mediocre rating despite scale",
-        "Generic utility framing"
-      ],
-      "fx_inline_action": "Do not compete head-on for generic consumer utility. Use feature gaps as a review-mining source.",
-      "source_ids": [
-        "chrome_currency_converter_store"
-      ]
+      "category": "direct_extension_incumbent",
+      "pricing_model": "Free",
+      "current_signal": "Large Chrome install base and many ratings, but mediocre rating and reliability complaints.",
+      "fx_inline_action": "Use review complaints as product QA guidance; do not compete head-on as generic utility."
     },
     {
       "id": "universal_automatic_currency_converter",
       "name": "Universal Automatic Currency Converter",
-      "type": "direct_extension",
-      "pricing": "Free",
-      "traction": "Chrome-Stats shows 6,000 users, 4.22 rating, 118 reviews; Chrome listing also shows 7,000 users in fresh store view.",
-      "does_better": [
-        "Customization depth",
-        "Original-price display",
-        "Hover and shortcut flows",
-        "Site controls"
-      ],
-      "does_worse": [
-        "Cluttered UI complaints",
-        "Wrong values/rounding complaints",
-        "Some CPU/memory complaints in Firefox reviews"
-      ],
-      "fx_inline_action": "Copy site controls and original visibility; avoid settings complexity.",
-      "source_ids": [
-        "universal_currency_converter_store",
-        "universal_currency_converter_stats",
-        "ua_currency_converter_firefox_reviews"
-      ]
+      "category": "direct_extension",
+      "pricing_model": "Free",
+      "current_signal": "Feature-rich automatic/hover conversion with whitelist controls; reviews flag confusing settings, wrong values and CPU/memory issues.",
+      "fx_inline_action": "Copy original-price visibility and site controls; avoid settings complexity and performance regressions."
     },
     {
       "id": "pricetip",
       "name": "PriceTip",
-      "type": "direct_hover_extension",
-      "pricing": "Free",
-      "traction": "Chrome listing shows 6k-7k users and about 4.6 rating across localized views.",
-      "does_better": [
-        "Simple hover proposition",
-        "Multilingual listing",
-        "Small package",
-        "Per-site disablement"
-      ],
-      "does_worse": [
-        "Currency coverage requests",
-        "Stopped-working/Invalid Date complaints from review mining",
-        "Potential rating-prompt concerns"
-      ],
-      "fx_inline_action": "Borrow hover simplicity for consumer UX; avoid coercive review prompts and coverage gaps.",
-      "source_ids": [
-        "pricetip_store",
-        "pricetip_stats"
-      ]
+      "category": "direct_hover_extension",
+      "pricing_model": "Free",
+      "current_signal": "Simple hover conversion with good rating; review themes include broader currency requests and reliability issues.",
+      "fx_inline_action": "Borrow hover simplicity for consumer UX, but keep B2B as revenue focus."
     },
     {
-      "id": "cresotech_currency_converter",
-      "name": "Cresotech Currency Converter",
-      "type": "direct_hover_extension",
-      "pricing": "Free",
-      "traction": "Chrome-Stats shows 1,000 users and 4.47 rating from 49 reviews.",
-      "does_better": [
-        "Hover-based conversion with very simple UX",
-        "Low-risk permission posture",
-        "Clear lightweight positioning"
-      ],
-      "does_worse": [
-        "Review-mining flags intrusive rating prompts"
-      ],
-      "fx_inline_action": "Simplicity beats feature sprawl; never annoy users for ratings.",
-      "source_ids": [
-        "cresotech_currency_converter_stats"
-      ]
+      "id": "direct_currency_converter",
+      "name": "Direct Currency Converter",
+      "category": "direct_extension",
+      "pricing_model": "Free with optional external API key path",
+      "current_signal": "Clear privacy copy, tooltip details, source configurability and force-currency behavior.",
+      "fx_inline_action": "Improve FX Inline store/listing copy around privacy, rate source and settings."
     },
     {
-      "id": "xe_currency_converter_switcher",
-      "name": "Xe Currency Converter & Price Switcher",
-      "type": "direct_brand_extension",
-      "pricing": "Free, tied to Xe money-transfer/API ecosystem",
-      "traction": "Xe has strong brand trust; official page emphasizes 130+ currencies, mid-market rates, and privacy.",
-      "does_better": [
-        "Rate credibility",
-        "Privacy language",
-        "Broad use-case copy"
-      ],
-      "does_worse": [
-        "Extension itself is not necessarily the main revenue product"
-      ],
-      "fx_inline_action": "Copy privacy and rate-source clarity; FX Inline cannot outbrand Xe.",
-      "source_ids": [
-        "xe_extension"
-      ]
+      "id": "inlinecurrencyconverter",
+      "name": "InlineCurrencyConverter",
+      "category": "new_direct_extension_watch",
+      "pricing_model": "Free",
+      "current_signal": "Tiny Chrome entrant with no-login/no-API-key/free positioning and selection/context-menu inline flow.",
+      "fx_inline_action": "Treat no-login/free/privacy copy as table stakes; revenue needs B2B buyer."
     },
     {
-      "id": "mlv_multi_country_pricing",
-      "name": "MLV Multi Country Pricing",
-      "type": "merchant_localization_saas",
-      "pricing": "$29/month or $279/year; 15-day free trial",
-      "traction": "Shopify listing shows 405 reviews and 4.5 rating in fresh view; review summary praises multi-country pricing, setup and support.",
-      "does_better": [
-        "Clear merchant ROI",
-        "Paid from day one",
-        "Support-driven onboarding",
-        "Country-specific price management"
-      ],
-      "does_worse": [
-        "A negative current review mentions no contact, incompatibility and lost international orders"
-      ],
-      "fx_inline_action": "This is the better business category to learn from: sell outcome, support and setup, not generic conversion.",
-      "source_ids": [
-        "mlv_shopify_listing",
-        "mlv_shopify_reviews"
-      ]
+      "id": "inmytwocents_currencyconverter",
+      "name": "InMyTwoCents CurrencyConverter",
+      "category": "new_direct_firefox_extension_watch",
+      "pricing_model": "Free open source",
+      "current_signal": "Automatic inline conversion, favorites, dynamic content, custom regex, no data collection.",
+      "fx_inline_action": "Open-source trust and custom regex are competitor proof, not monetization proof."
     },
     {
-      "id": "stripe_adaptive_pricing",
-      "name": "Stripe localized prices",
-      "type": "checkout_localization_substitute",
-      "pricing": "Stripe fees and conversion fees; not a standalone extension",
-      "traction": "Official docs present Adaptive Pricing as recommended and low-complexity for checkout localization.",
-      "does_better": [
-        "Checkout integration",
-        "FX risk management",
-        "Trust",
-        "Global payment coverage"
-      ],
-      "does_worse": [
-        "Does not solve public pricing-page comprehension before checkout in every custom site"
-      ],
-      "fx_inline_action": "Position FX Inline before checkout and as a learning layer, not as a payment processor.",
-      "source_ids": [
-        "stripe_localized_pricing"
-      ]
+      "id": "coinverse",
+      "name": "Coinverse",
+      "category": "new_direct_firefox_extension_watch",
+      "pricing_model": "Free",
+      "current_signal": "Geolocation/primary-currency detection and instant conversion, tiny but current entrant.",
+      "fx_inline_action": "Geolocation convenience may matter, but it raises privacy copy needs."
     },
     {
-      "id": "paddle_localized_pricing",
-      "name": "Paddle localized pricing",
-      "type": "checkout_localization_substitute",
-      "pricing": "Bundled into Paddle billing",
-      "traction": "Official docs connect local currencies to trust, bank fees and payment approval.",
-      "does_better": [
-        "Merchant-of-record platform integration",
-        "Country-specific pricing",
-        "Checkout localization"
-      ],
-      "does_worse": [
-        "Only helps teams using Paddle or willing to implement Paddle pricing"
-      ],
-      "fx_inline_action": "Borrow the trust/payment-confidence narrative; sell low-effort pricing-page experiments.",
-      "source_ids": [
-        "paddle_localized_pricing"
-      ]
-    },
-    {
-      "id": "exchange_rate_api",
-      "name": "ExchangeRate-API",
-      "type": "rate_api_substitute",
-      "pricing": "Free and paid API plans",
-      "traction": "Official page emphasizes 165 currencies, uptime and support.",
-      "does_better": [
-        "Commodity rate infrastructure with uptime/support posture"
-      ],
-      "does_worse": [
-        "Does not solve UX or pricing-page conversion alone"
-      ],
-      "fx_inline_action": "Do not build a commodity rate API; buy/use reliable rates and sell the UX/business outcome.",
-      "source_ids": [
-        "exchangerate_api"
-      ]
-    },
-    {
-      "id": "currencyapi",
-      "name": "currencyapi.com",
-      "type": "rate_api_substitute",
-      "pricing": "$9.99/mo Small plan, $39.99/mo Medium, $79.99/mo Large",
-      "traction": "Pricing page exposes normal API economics: requests, update frequency, support and commercial use.",
-      "does_better": [
-        "Clear API packaging"
-      ],
-      "does_worse": [
-        "Commodity market with low entry price"
-      ],
-      "fx_inline_action": "API access is not a first-revenue wedge for FX Inline.",
-      "source_ids": [
-        "currencyapi_pricing"
-      ]
-    },
-    {
-      "id": "in_line_currency_converter",
-      "name": "In-line Currency Converter Firefox",
-      "type": "small_direct_extension",
-      "pricing": "Free with buy-me-a-coffee style donation link",
-      "traction": "Firefox listing shows 29 users and 4.0 rating from 6 reviews.",
-      "does_better": [
-        "Privacy copy",
-        "Auto plus context-menu paths",
-        "Donation/support link"
-      ],
-      "does_worse": [
-        "Tiny traction",
-        "Generic differentiation"
-      ],
-      "fx_inline_action": "Consumer donation can exist but should not drive strategy.",
-      "source_ids": [
-        "in_line_currency_converter_firefox"
-      ]
+      "id": "quick_currency_converter",
+      "name": "Quick Currency Converter",
+      "category": "substitute_firefox_extension",
+      "pricing_model": "Free",
+      "current_signal": "High rating and 920 users for simple quick preview/calculator workflow.",
+      "fx_inline_action": "Simple workflows can earn trust faster than broad settings."
     },
     {
       "id": "converter_app_currency_extension",
       "name": "Converter.app Currency Converter Browser Extension",
-      "type": "new_direct_extension",
-      "pricing": "Not verified as paid in this run",
-      "traction": "Reddit launch on April 16, 2026 with Chrome and Firefox links.",
-      "does_better": [
-        "Clear personal pain story",
-        "Right-click overlay",
-        "Historical charts linked to existing platform"
-      ],
-      "does_worse": [
-        "Early traction unknown"
-      ],
-      "fx_inline_action": "New entrants are using story-led launches; FX Inline should use concrete before/after demos, not generic feature lists.",
-      "source_ids": [
-        "reddit_converter_app"
-      ]
+      "category": "new_direct_extension",
+      "pricing_model": "Not verified paid",
+      "current_signal": "April 2026 Reddit launch uses travel pain story, right-click overlay and historical chart integration.",
+      "fx_inline_action": "Use story-led demos, not generic feature lists."
     },
     {
       "id": "frankfurter_open_source_extension",
       "name": "Open-source Frankfurter-powered extension",
-      "type": "new_direct_extension",
-      "pricing": "Free open source",
-      "traction": "Reddit launch in February 2026.",
-      "does_better": [
-        "Open-source trust",
-        "No ads/no strange permissions copy",
-        "Charts and multilingual support"
-      ],
-      "does_worse": [
-        "Likely hobby-scale",
-        "No obvious monetization"
-      ],
-      "fx_inline_action": "Trust copy is table stakes; revenue needs a buyer with budget.",
-      "source_ids": [
-        "reddit_frankfurter_extension"
-      ]
+      "category": "new_direct_extension",
+      "pricing_model": "Free open source",
+      "current_signal": "No ads, no strange permissions, charts and multilingual support.",
+      "fx_inline_action": "Trust copy is baseline; paid revenue needs a business buyer."
+    },
+    {
+      "id": "stripe_adaptive_pricing",
+      "name": "Stripe Adaptive Pricing/localized prices",
+      "category": "checkout_localization_substitute",
+      "pricing_model": "Bundled into Stripe payment fees and conversion fees",
+      "current_signal": "Official docs position low/no-code local currency checkout support in many countries.",
+      "fx_inline_action": "Position before checkout and as pricing-page learning layer."
+    },
+    {
+      "id": "paddle_localized_pricing",
+      "name": "Paddle localized pricing",
+      "category": "checkout_localization_substitute",
+      "pricing_model": "Bundled into Paddle billing",
+      "current_signal": "Official docs tie local currencies to customer confidence and payment acceptance.",
+      "fx_inline_action": "Borrow trust narrative but avoid payment-stack claims."
+    },
+    {
+      "id": "mlv_multi_country_pricing",
+      "name": "MLV Multi Country Pricing",
+      "category": "merchant_localization_saas",
+      "pricing_model": "$29/mo or $279/year; 15-day trial",
+      "current_signal": "Strong Shopify review base; support/setup quality is repeatedly praised and compatibility problems are revenue-critical.",
+      "fx_inline_action": "Sell outcome and support, not generic conversion."
+    },
+    {
+      "id": "smartcs_currency_converter",
+      "name": "SmartCS: Currency Converter",
+      "category": "merchant_localization_saas",
+      "pricing_model": "Free plan and $12/mo premium",
+      "current_signal": "Shopify listing emphasizes auto-detection, multi-currency checkout, rounding, performance and support/design support.",
+      "fx_inline_action": "Merchant apps prove support and setup are monetizable."
+    },
+    {
+      "id": "currencyapi",
+      "name": "currencyapi.com",
+      "category": "rate_api_substitute",
+      "pricing_model": "Free, $9.99/mo, $39.99/mo, $79.99/mo, custom",
+      "current_signal": "Clear commodity API packaging with request limits and support tiers.",
+      "fx_inline_action": "Do not build generic rate API first."
+    },
+    {
+      "id": "exchange_rate_api",
+      "name": "ExchangeRate-API",
+      "category": "rate_api_substitute",
+      "pricing_model": "Free and paid plans",
+      "current_signal": "Low-cost API plan economics and support posture.",
+      "fx_inline_action": "Use commodity rates; sell page-layer outcome."
+    },
+    {
+      "id": "xe_currency_converter_switcher",
+      "name": "Xe Currency Converter & Price Switcher",
+      "category": "direct_brand_extension",
+      "pricing_model": "Free tied to Xe ecosystem",
+      "current_signal": "Brand trust and rate-source credibility are much stronger than FX Inline.",
+      "fx_inline_action": "Copy rate-source clarity; do not try to outbrand Xe."
+    },
+    {
+      "id": "xe_currency_data_api",
+      "name": "Xe Currency Data API",
+      "category": "b2b_api_substitute",
+      "pricing_model": "Annual packages starting around $799/year plus add-ons",
+      "current_signal": "Enterprise proof of paid FX data demand.",
+      "fx_inline_action": "Paid B2B budget exists, but FX Inline must sell a different layer."
+    },
+    {
+      "id": "geotargetly_geo_currency",
+      "name": "GeoTargetly Geo Currency",
+      "category": "low_code_b2b_geo_currency_widget",
+      "pricing_model": "GeoTargetly plans start at $12/mo monthly or $9/mo yearly; Geo Currency is included in the geo-personalization suite.",
+      "current_signal": "Low-code JavaScript snippet competitor for pricing localization: page scope, CSS price selectors, IP-based location rules, minute-updated rates from multiple sources, original-currency tooltip, integrations across Shopify, WordPress, Webflow, Squarespace and custom stacks.",
+      "fx_inline_action": "This is the clearest SaaS substitute. FX Inline must be narrower and service-led: pricing-page local-currency hints with preview, selector pinning and implementation help, not broad geo-personalization."
+    },
+    {
+      "id": "currency_converter_plus_shopify",
+      "name": "Currency Converter Plus",
+      "category": "merchant_localization_saas",
+      "pricing_model": "$9.99/mo or $99.90/year with 30-day trial",
+      "current_signal": "Shopify app with 4.7 rating from 208 reviews, 222 currencies, automatic country detection, 1-minute rate updates and support-heavy positioning.",
+      "fx_inline_action": "Merchant apps prove buyers pay for stable implementation and support; FX Inline should borrow support/setup packaging for pilots."
+    },
+    {
+      "id": "hoppy_multi_currency_converter",
+      "name": "Hoppy Multi Currency Converter",
+      "category": "merchant_localization_saas",
+      "pricing_model": "Free Shopify app",
+      "current_signal": "Shopify app with 4.9 rating from 38-39 reviews, geolocation, real-time rates, 160+ currencies, country selector, rounding and price display features.",
+      "fx_inline_action": "Free merchant apps raise the bar for generic conversion; FX Inline needs a narrower B2B SaaS/pricing-page outcome."
+    },
+    {
+      "id": "currencylayer",
+      "name": "Currencylayer",
+      "category": "rate_api_substitute",
+      "pricing_model": "Free, then paid plans around $9.99-$99.99/mo depending on request volume and update frequency",
+      "current_signal": "Commodity FX API with historical rates, conversion endpoints, HTTPS, support tiers and update frequencies from daily to 60-second.",
+      "fx_inline_action": "Another reason not to sell a generic rate API; buy or integrate rates and sell the page-layer workflow."
+    },
+    {
+      "id": "rapid_currency_converter",
+      "name": "Rapid Currency Converter",
+      "category": "direct_extension",
+      "pricing_model": "Free extension",
+      "current_signal": "Direct Chrome competitor with 4.3 rating from 20 ratings in sidecar research, hover/select/quick conversion and shopper-convenience positioning.",
+      "fx_inline_action": "Reinforces that consumer convenience is crowded; use review themes for UX but monetize B2B."
+    },
+    {
+      "id": "centsvert",
+      "name": "Centsvert Smart Currency",
+      "category": "direct_extension_watch",
+      "pricing_model": "Not verified paid",
+      "current_signal": "Tiny but well-positioned smart currency conversion entrant from sidecar research.",
+      "fx_inline_action": "Watch positioning, but do not chase tiny direct-extension clones."
+    },
+    {
+      "id": "nomisview",
+      "name": "NomisView",
+      "category": "direct_firefox_extension_watch",
+      "pricing_model": "Not verified paid",
+      "current_signal": "Newly elevated Firefox watch item from sidecar research.",
+      "fx_inline_action": "Maintain as marketplace watch item; no strategic shift."
     }
   ],
-  "source_ids": [
-    "fx_inline_firefox",
-    "fx_inline_firefox_reviews",
-    "fx_inline_extpose",
-    "xe_extension",
-    "chrome_currency_converter_store",
-    "universal_currency_converter_store",
-    "universal_currency_converter_stats",
-    "cresotech_currency_converter_stats",
-    "pricetip_store",
-    "pricetip_stats",
-    "currency_wiki_chrome",
-    "currency_wiki_pricing",
-    "stripe_localized_pricing",
-    "paddle_localized_pricing",
-    "mlv_shopify_listing",
-    "mlv_shopify_reviews",
-    "currencyapi_pricing",
-    "exchangerate_api",
-    "reddit_converter_app",
-    "reddit_frankfurter_extension",
-    "in_line_currency_converter_firefox",
-    "direct_currency_converter_firefox_reviews",
-    "ua_currency_converter_firefox_reviews",
-    "fx_auto_convert_chrome_stats"
+  "sources": [
+    {
+      "id": "fx_inline_firefox",
+      "title": "FX Inline Firefox Add-ons listing",
+      "url": "https://addons.mozilla.org/en-US/firefox/addon/fx-inline/"
+    },
+    {
+      "id": "fx_inline_extpose",
+      "title": "FX Inline Chrome metadata mirror",
+      "url": "https://extpose.com/ext/cicoldboionelecmpjpkkdhicjbpfefj"
+    },
+    {
+      "id": "currency_wiki_pricing",
+      "title": "Currency.Wiki pricing",
+      "url": "https://currency.wiki/pricing"
+    },
+    {
+      "id": "currency_wiki_chrome",
+      "title": "Currency.Wiki Chrome extension page",
+      "url": "https://currency.wiki/extensions/chrome"
+    },
+    {
+      "id": "uacc_chrome",
+      "title": "Universal Automatic Currency Converter Chrome listing",
+      "url": "https://chromewebstore.google.com/detail/universal-automatic-curre/hbjagjepkeogombomfeefdmjnclgojli"
+    },
+    {
+      "id": "uacc_firefox_reviews",
+      "title": "Universal Automatic Currency Converter Firefox reviews",
+      "url": "https://addons.mozilla.org/en-US/firefox/addon/ua-currency-converter/reviews/"
+    },
+    {
+      "id": "uacc_chrome_stats",
+      "title": "Universal Automatic Currency Converter review summary",
+      "url": "https://chrome-stats.com/d/ua-currency-converter/reviews"
+    },
+    {
+      "id": "chrome_currency_converter",
+      "title": "Chrome Currency Converter listing",
+      "url": "https://chromewebstore.google.com/detail/chrome-currency-converter/anbfhidldjknonaihbalghlebaijealk"
+    },
+    {
+      "id": "chrome_currency_converter_stats",
+      "title": "Chrome Currency Converter review summary",
+      "url": "https://chrome-stats.com/d/anbfhidldjknonaihbalghlebaijealk?hl=en"
+    },
+    {
+      "id": "pricetip_chrome",
+      "title": "PriceTip Chrome listing",
+      "url": "https://chromewebstore.google.com/detail/pricetip-%E2%80%94-currency-toolt/napifcagjkgokhhgfbagpcaedfdmikfk"
+    },
+    {
+      "id": "pricetip_stats",
+      "title": "PriceTip review summary",
+      "url": "https://chrome-stats.com/d/napifcagjkgokhhgfbagpcaedfdmikfk?hl=en"
+    },
+    {
+      "id": "direct_currency_converter",
+      "title": "Direct Currency Converter listing",
+      "url": "https://chromewebstore.google.com/detail/direct-currency-converter/hgdfddnhgpincbchioebogaljemgkpgl"
+    },
+    {
+      "id": "inline_currency_converter_chrome",
+      "title": "InlineCurrencyConverter Chrome listing",
+      "url": "https://chromewebstore.google.com/detail/inlinecurrencyconverter/epnfjidempemegaghhnnljhomehpllgp"
+    },
+    {
+      "id": "converter_app_reddit",
+      "title": "Converter.app currency extension launch thread",
+      "url": "https://www.reddit.com/r/chrome_extensions/comments/1snidrp/i_made_a_currency_converter_browser_extension/"
+    },
+    {
+      "id": "frankfurter_extension_reddit",
+      "title": "Open-source Frankfurter-powered extension launch thread",
+      "url": "https://www.reddit.com/r/chrome_extensions/comments/1r85njb/i_built_a_simple_opensource_currency_converter/"
+    },
+    {
+      "id": "frankfurter_docs",
+      "title": "Frankfurter API docs",
+      "url": "https://frankfurter.dev/docs"
+    },
+    {
+      "id": "in_line_currency_converter_firefox",
+      "title": "In-line Currency Converter Firefox listing",
+      "url": "https://addons.mozilla.org/en-US/firefox/addon/in-line-currency-converter/"
+    },
+    {
+      "id": "inmytwocents_firefox",
+      "title": "InMyTwoCents CurrencyConverter Firefox listing",
+      "url": "https://addons.mozilla.org/en-US/firefox/addon/inmytwocents-currencyconverter/"
+    },
+    {
+      "id": "coinverse_firefox",
+      "title": "Coinverse Firefox listing",
+      "url": "https://addons.mozilla.org/en-US/firefox/addon/coinverse/"
+    },
+    {
+      "id": "quick_currency_converter_firefox",
+      "title": "Quick Currency Converter Firefox listing",
+      "url": "https://addons.mozilla.org/en-US/firefox/addon/quick-currency-converter/"
+    },
+    {
+      "id": "stripe_localize_prices",
+      "title": "Stripe localize prices docs",
+      "url": "https://docs.stripe.com/payments/currencies/localize-prices"
+    },
+    {
+      "id": "stripe_adaptive_pricing",
+      "title": "Stripe Adaptive Pricing docs",
+      "url": "https://docs.stripe.com/payments/checkout/adaptive-pricing"
+    },
+    {
+      "id": "paddle_localize_prices",
+      "title": "Paddle localized pricing docs",
+      "url": "https://developer.paddle.com/build/products/offer-localized-pricing"
+    },
+    {
+      "id": "mlv_shopify",
+      "title": "MLV Multi Country Pricing Shopify listing",
+      "url": "https://apps.shopify.com/country-pricing-auto-switch"
+    },
+    {
+      "id": "mlv_shopify_reviews",
+      "title": "MLV Multi Country Pricing reviews",
+      "url": "https://apps.shopify.com/country-pricing-auto-switch/reviews"
+    },
+    {
+      "id": "smartcs_shopify",
+      "title": "SmartCS Currency Converter Shopify listing",
+      "url": "https://apps.shopify.com/currency-switcher"
+    },
+    {
+      "id": "currencyapi_pricing",
+      "title": "currencyapi.com pricing",
+      "url": "https://currencyapi.com/pricing/"
+    },
+    {
+      "id": "exchange_rate_api",
+      "title": "ExchangeRate-API pricing and product page",
+      "url": "https://www.exchangerate-api.com/"
+    },
+    {
+      "id": "xe_extension",
+      "title": "Xe browser extension page",
+      "url": "https://www.xe.com/xe-browser-extension/"
+    },
+    {
+      "id": "xe_api",
+      "title": "Xe Currency Data API",
+      "url": "https://www.xe.com/en-us/platform/xecurrencydata/"
+    },
+    {
+      "id": "chrome_payments_policy",
+      "title": "Chrome Web Store accepting payment policy",
+      "url": "https://developer.chrome.com/docs/webstore/program-policies/accepting-payment"
+    },
+    {
+      "id": "chrome_affiliate_policy",
+      "title": "Chrome Web Store affiliate ads policy",
+      "url": "https://developer.chrome.com/docs/webstore/program-policies/affiliate-ads/"
+    },
+    {
+      "id": "chrome_privacy_policy",
+      "title": "Chrome Web Store privacy and user data policy",
+      "url": "https://developer.chrome.com/docs/webstore/program-policies/policies"
+    },
+    {
+      "id": "reddit_saas_localized_pricing",
+      "title": "Reddit SaaS localized pricing thread",
+      "url": "https://www.reddit.com/r/SaaS/comments/1od13we/localized_pricing/"
+    },
+    {
+      "id": "reddit_local_currency_lift",
+      "title": "Reddit SaaS local-currency pricing conversion thread",
+      "url": "https://www.reddit.com/r/SaaS/comments/1sdzgwn/moved_our_pricing_from_usd_to_local_currencies/"
+    },
+    {
+      "id": "geotargetly_geo_currency",
+      "title": "GeoTargetly Geo Currency",
+      "url": "https://geotargetly.com/geo-currency"
+    },
+    {
+      "id": "geotargetly_pricing",
+      "title": "GeoTargetly pricing",
+      "url": "https://geotargetly.com/pricing"
+    },
+    {
+      "id": "geotargetly_geo_currency_help",
+      "title": "GeoTargetly Geo Currency help",
+      "url": "https://help.geotargetly.com/en/articles/10385753-geo-currency-how-it-works"
+    },
+    {
+      "id": "shopify_currency_converter_plus",
+      "title": "Currency Converter Plus Shopify listing",
+      "url": "https://apps.shopify.com/currency-converter-plus"
+    },
+    {
+      "id": "hoppy_currency_converter",
+      "title": "Hoppy Multi Currency Converter Shopify listing",
+      "url": "https://apps.shopify.com/hoppy-currency-converter"
+    },
+    {
+      "id": "currencylayer_pricing",
+      "title": "Currencylayer pricing",
+      "url": "https://currencylayer.com/pricing"
+    },
+    {
+      "id": "rapid_currency_converter",
+      "title": "Rapid Currency Converter Chrome listing",
+      "url": "https://chromewebstore.google.com/detail/rapid-currency-converter/cbbfphmmpeojhblmcbnkedcfbocnmlkm?hl=en"
+    },
+    {
+      "id": "centsvert",
+      "title": "Centsvert Chrome listing",
+      "url": "https://chromewebstore.google.com/detail/centsvert-smart-currency/pgmkmlikhnhebhicpmeoceceekjebppi"
+    },
+    {
+      "id": "nomisview",
+      "title": "NomisView Firefox listing",
+      "url": "https://addons.mozilla.org/en-US/firefox/addon/nomisview/"
+    }
   ]
 }

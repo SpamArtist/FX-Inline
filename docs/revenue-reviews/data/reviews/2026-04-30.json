@@ -1,66 +1,121 @@
 {
   "date": "2026-04-30",
-  "generated_at": "2026-04-30T05:42:11Z",
-  "own_product": {
+  "generated_at": "2026-04-30T07:49:25.845Z",
+  "sources": [
+    {
+      "id": "fx_inline_firefox",
+      "title": "FX Inline Firefox Add-ons listing",
+      "url": "https://addons.mozilla.org/en-US/firefox/addon/fx-inline/"
+    },
+    {
+      "id": "fx_inline_extpose",
+      "title": "FX Inline Chrome metadata mirror",
+      "url": "https://extpose.com/ext/cicoldboionelecmpjpkkdhicjbpfefj"
+    },
+    {
+      "id": "uacc_firefox_reviews",
+      "title": "Universal Automatic Currency Converter Firefox reviews",
+      "url": "https://addons.mozilla.org/en-US/firefox/addon/ua-currency-converter/reviews/"
+    },
+    {
+      "id": "uacc_chrome_stats",
+      "title": "Universal Automatic Currency Converter review summary",
+      "url": "https://chrome-stats.com/d/ua-currency-converter/reviews"
+    },
+    {
+      "id": "chrome_currency_converter_stats",
+      "title": "Chrome Currency Converter review summary",
+      "url": "https://chrome-stats.com/d/anbfhidldjknonaihbalghlebaijealk?hl=en"
+    },
+    {
+      "id": "pricetip_stats",
+      "title": "PriceTip review summary",
+      "url": "https://chrome-stats.com/d/napifcagjkgokhhgfbagpcaedfdmikfk?hl=en"
+    },
+    {
+      "id": "mlv_shopify_reviews",
+      "title": "MLV Multi Country Pricing reviews",
+      "url": "https://apps.shopify.com/country-pricing-auto-switch/reviews"
+    },
+    {
+      "id": "reddit_saas_localized_pricing",
+      "title": "Reddit SaaS localized pricing thread",
+      "url": "https://www.reddit.com/r/SaaS/comments/1od13we/localized_pricing/"
+    },
+    {
+      "id": "reddit_local_currency_lift",
+      "title": "Reddit SaaS local-currency pricing conversion thread",
+      "url": "https://www.reddit.com/r/SaaS/comments/1sdzgwn/moved_our_pricing_from_usd_to_local_currencies/"
+    },
+    {
+      "id": "geotargetly_geo_currency",
+      "title": "GeoTargetly Geo Currency",
+      "url": "https://geotargetly.com/geo-currency"
+    },
+    {
+      "id": "shopify_currency_converter_plus",
+      "title": "Currency Converter Plus Shopify listing",
+      "url": "https://apps.shopify.com/currency-converter-plus"
+    },
+    {
+      "id": "hoppy_currency_converter",
+      "title": "Hoppy Multi Currency Converter Shopify listing",
+      "url": "https://apps.shopify.com/hoppy-currency-converter"
+    }
+  ],
+  "findings": {
     "fx_inline": {
-      "public_review_status": "No meaningful public review base found this run. Firefox listing/reviews show no reviews in accessible pages; Extpose mirror showed zero Chrome installs/ratings in older crawl metadata, while the current direct Chrome Web Store page was not fully accessible via plain text.",
-      "revenue_implication": "There is no review moat. Do not charge consumers until activation, reliability, and trust are proven. Use marketplace presence as proof for B2B outreach instead.",
-      "source_ids": [
-        "fx_inline_firefox",
-        "fx_inline_firefox_reviews",
-        "fx_inline_extpose"
+      "positive": [],
+      "negative": [
+        "Firefox listing has no reviews; Chrome metadata mirror showed zero installs/ratings for older listing metadata."
+      ],
+      "feature_requests": [],
+      "trust_concerns": [
+        "All-sites access is visible in marketplace permissions; privacy copy must work harder."
+      ],
+      "revenue_insights": [
+        "There is not enough public consumer traction to justify consumer paywall work now."
+      ]
+    },
+    "competitors": {
+      "positive": [
+        "Users praise inline/hover conversion when it stays out of the way.",
+        "Users value original-price visibility, quick toggle/whitelist controls, context-menu conversion, broad currency coverage and simple setup.",
+        "Merchant app reviews repeatedly praise responsive setup support and location-based pricing that works through checkout.",
+        "Low-code B2B and Shopify products sell implementation speed, support, geolocation, selector configuration, rate freshness and original-currency fallback as core value."
+      ],
+      "negative": [
+        "Repeated complaints center on wrong or stale rates, ambiguous symbols, broken settings, settings not saving, dynamic-page breakage, garbled output, CPU/memory spikes and confusing UI.",
+        "Some review surfaces call out intrusive rating prompts, extension reliability regressions and compatibility issues.",
+        "Shopify merchant reviews show localization failures can directly cost orders, which makes support and rollback part of the product.",
+        "Cheap low-code widgets and free Shopify apps make a generic FX Inline widget difficult to price unless it is tied to a narrower SaaS pricing-page outcome."
+      ],
+      "feature_requests": [
+        "Multiple currencies at once.",
+        "Cleaner original/converted display controls.",
+        "More currency coverage and cryptocurrency/base-currency options.",
+        "Whitelisting/blacklisting that is easy to understand and actually persists.",
+        "Right-click and hover flows for low-distraction conversion."
+      ],
+      "trust_concerns": [
+        "No tracking/no data collection copy is now table stakes, not differentiation.",
+        "Chrome affiliate rules make passive affiliate injection a bad fit.",
+        "Marketplace users notice security sloppiness quickly, including exposed API keys and broad permissions."
+      ],
+      "revenue_insights": [
+        "Consumer users reward convenience but mostly expect free tools.",
+        "Merchants and SaaS teams pay when local pricing is connected to sales, checkout confidence and support.",
+        "Paid support/setup is part of the value in merchant-localization products, not an afterthought."
       ]
     }
   },
-  "themes": {
-    "positive": [
-      "Users like conversion without leaving the page: hover, right-click, inline, popup, or overlay all reduce context switching.",
-      "Original-price visibility matters; users want conversion context without losing the source price.",
-      "Site-specific controls, quick on/off toggles and per-site disablement recur as useful features.",
-      "Clean lightweight UI is praised more than feature depth when the job is simple.",
-      "Privacy/no tracking/no strange permissions is an explicit trust signal in new entrant launches and marketplace listings.",
-      "For merchants, support and onboarding are revenue features, not overhead. MLV reviews repeatedly mention responsive support as the reason setup worked."
-    ],
-    "negative": [
-      "Wrong values, stale rates, aggressive rounding and ambiguous symbols damage trust immediately.",
-      "Confusing settings are a recurring complaint for mature extensions.",
-      "Extensions that stop working on dynamic pages or after browser updates get punished in reviews.",
-      "CPU/memory overload on complex sites is a real risk for all-page conversion tools.",
-      "Intrusive rating prompts are called out and can create ethical/trust concerns.",
-      "Currency coverage gaps produce feature requests and bad reviews, especially for non-US/non-EU users."
-    ],
-    "feature_requests": [
-      "Quick on/off toggle",
-      "Per-site disablement and site currency override",
-      "More currencies and better ambiguous-symbol handling",
-      "Cached/offline rates and clear last-updated timestamp",
-      "Hover mode plus inline mode plus context-menu fallback",
-      "Original value shown beside converted value",
-      "Readable highlights and less intrusive UI",
-      "Better options search and currency selection"
-    ],
-    "trust_concerns": [
-      "All-sites permissions create perceived risk even when necessary.",
-      "Rate accuracy and source credibility must be visible.",
-      "Any merchant-facing pricing hint must avoid implying checkout-final pricing unless checkout is integrated.",
-      "Analytics must be privacy-scoped and disclosed clearly; the current extension posture is data-collection-minimal."
-    ],
-    "revenue_relevant_insights": [
-      "Consumer extension users value the tool but have many free options, so consumer premium is a poor first-dollar path.",
-      "Merchant reviews show willingness to pay when localization is tied to international sales, setup and support.",
-      "The best B2B language is not “currency converter”; it is “reduce buyer confusion and improve international pricing confidence.”",
-      "Support quality can be packaged into a paid pilot because buyers need help integrating localized pricing safely."
-    ]
-  },
-  "source_ids": [
-    "universal_currency_converter_stats",
-    "cresotech_currency_converter_stats",
-    "pricetip_stats",
-    "mlv_shopify_reviews",
-    "direct_currency_converter_firefox_reviews",
-    "ua_currency_converter_firefox_reviews",
-    "reddit_converter_app",
-    "reddit_frankfurter_extension",
-    "in_line_currency_converter_firefox"
+  "revenue_relevant_insights": [
+    "FX Inline has no public review proof, so consumer paid plans are premature.",
+    "Users value low-friction inline/hover conversion and original-price visibility.",
+    "Wrong rates, confusing settings and performance issues are the fastest path to bad reviews.",
+    "Merchant/SaaS buyers care about support and order/conversion impact more than generic conversion convenience.",
+    "Recent SaaS conversations describe local-currency pricing as a conversion/friction issue, which supports the B2B pricing-page pilot angle but does not prove demand alone.",
+    "GeoTargetly proves there is a cheap low-code widget substitute; FX Inline has to win on implementation confidence, pricing-page specificity and service delivery, not generic local-currency display.",
+    "Shopify currency apps show support, setup, rate freshness and geolocation are already expected in paid localization products."
   ]
 }
