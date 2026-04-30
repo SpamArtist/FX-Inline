@@ -816,8 +816,23 @@ textarea {
   padding: 0 12px;
 }
 
-.review-form input::placeholder {
+.review-form textarea {
+  min-height: 136px;
+  padding: 12px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.review-form input::placeholder,
+.review-form textarea::placeholder {
   color: #9aa49b;
+}
+
+.optional-label {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: lowercase;
 }
 
 .review-form .btn {

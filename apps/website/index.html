@@ -403,37 +403,27 @@
               See the <span class="text-nowrap">local-currency</span> version of your pricing page.
             </h2>
             <p>
-              Start with the URL, current pricing currency, and target markets. FX Inline
-              can assess the page structure and show where local-currency hints belong.
+              Leave a work email and any useful pricing-page context. FX Inline can
+              assess the page structure and show where local-currency hints belong.
             </p>
           </div>
           <form class="review-form" aria-label="Pricing page review request">
             <label>
-              Company
-              <input type="text" name="company" autocomplete="organization" placeholder="Acme SaaS" />
-            </label>
-            <label>
-              Pricing page URL
-              <input
-                type="url"
-                name="pricing-url"
-                autocomplete="url"
-                placeholder="https://example.com/pricing"
-              />
-            </label>
-            <label>
-              Target markets
-              <input type="text" name="markets" placeholder="EU, UK, India" />
-            </label>
-            <label>
               Work email
               <input type="email" name="email" autocomplete="email" placeholder="you@company.com" />
+            </label>
+            <label>
+              Description <span class="optional-label">optional</span>
+              <textarea
+                name="description"
+                placeholder="Share the pricing page URL, target markets, or rollout context."
+              ></textarea>
             </label>
             <button class="btn btn-primary" type="button" data-review-button>
               Request assessment
             </button>
             <p class="form-note" data-review-note>
-              Share the page URL and target markets to begin the pricing-page assessment.
+              Share your work email and optional context to start the pricing-page review.
             </p>
           </form>
         </div>
