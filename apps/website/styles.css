@@ -64,6 +64,10 @@ img {
   max-width: 100%;
 }
 
+.text-nowrap {
+  white-space: nowrap;
+}
+
 p,
 h1,
 h2,
