@@ -10,3 +10,4 @@ test-dist
 apps/extension/test-dist
 dist
 .legacy-parser-*
+/apps/extension/generated/*
