@@ -1,3 +1,5 @@
+import { initializeRateTicker } from "./rateTicker.js";
+
 const yearElement = document.getElementById("year");
 
 if (yearElement) {
@@ -5,6 +7,8 @@ if (yearElement) {
     year: "numeric",
   }).format(new Date());
 }
+
+initializeRateTicker();
 
 const marketPrices = {
   eur: {
