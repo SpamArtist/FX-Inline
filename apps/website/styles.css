@@ -113,9 +113,11 @@ button {
   background: var(--ink);
   color: rgba(250, 248, 241, 0.82);
   font-family:
-    "SFMono-Regular", Consolas, "Liberation Mono", Menlo, ui-monospace, monospace;
-  font-size: 0.78rem;
+    "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-feature-settings: "cv05", "cv11", "ss01";
+  font-size: 12px;
   letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
 }
 
 .rate-ticker-track {
