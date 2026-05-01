@@ -118,7 +118,7 @@ function formatPreviewHint(rawPrice, targetCurrency) {
     maximumFractionDigits: 0,
   }).format(convertedValue);
 
-  return `approx ${targetCurrency} ${formattedValue}${getBillingSuffix(rawPrice)}`;
+  return `~ ${targetCurrency} ${formattedValue}${getBillingSuffix(rawPrice)}`;
 }
 
 function clearPreviewPage() {

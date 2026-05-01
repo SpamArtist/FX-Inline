@@ -12,24 +12,24 @@ initializeRateTicker();
 
 const marketPrices = {
   eur: {
-    starter: "approx EUR 27",
-    pro: "approx EUR 92",
-    business: "approx EUR 232",
+    starter: "~ EUR 27",
+    pro: "~ EUR 92",
+    business: "~ EUR 232",
   },
   gbp: {
-    starter: "approx GBP 23",
-    pro: "approx GBP 79",
-    business: "approx GBP 199",
+    starter: "~ GBP 23",
+    pro: "~ GBP 79",
+    business: "~ GBP 199",
   },
   inr: {
-    starter: "approx INR 2,415",
-    pro: "approx INR 8,240",
-    business: "approx INR 20,730",
+    starter: "~ INR 2,415",
+    pro: "~ INR 8,240",
+    business: "~ INR 20,730",
   },
   jpy: {
-    starter: "approx JPY 4,520",
-    pro: "approx JPY 15,430",
-    business: "approx JPY 38,820",
+    starter: "~ JPY 4,520",
+    pro: "~ JPY 15,430",
+    business: "~ JPY 38,820",
   },
 };
 
