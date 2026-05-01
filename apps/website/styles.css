@@ -651,6 +651,151 @@ h1 {
   font-weight: 780;
 }
 
+.magnitude-band {
+  display: grid;
+  grid-template-columns: minmax(0, 0.7fr) minmax(520px, 1fr);
+  gap: 56px;
+  align-items: center;
+  padding: 94px 0;
+  border-top: 1px solid var(--line);
+}
+
+.magnitude-copy {
+  max-width: 680px;
+}
+
+.magnitude-copy h2 {
+  margin-top: 0;
+  font-size: clamp(2.35rem, 4vw, 4.25rem);
+  line-height: 1.01;
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+
+.magnitude-copy p {
+  margin-top: 18px;
+  color: var(--ink-soft);
+  font-size: 1.05rem;
+  line-height: 1.65;
+}
+
+.magnitude-illustration {
+  min-width: 0;
+  min-height: 390px;
+  display: grid;
+  align-content: space-between;
+  gap: 24px;
+  margin: 0;
+  padding: 26px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(135deg, rgba(14, 116, 104, 0.12), transparent 46%),
+    rgba(255, 255, 255, 0.78);
+  box-shadow: 0 22px 70px rgba(21, 29, 24, 0.08);
+}
+
+.magnitude-axis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-family:
+    "SFMono-Regular", Consolas, "Liberation Mono", Menlo, ui-monospace, monospace;
+  font-size: 0.76rem;
+  font-weight: 740;
+  text-align: center;
+}
+
+.magnitude-lanes {
+  display: grid;
+  gap: 12px;
+}
+
+.magnitude-lane {
+  min-height: 56px;
+  display: grid;
+  grid-template-columns: minmax(120px, 0.35fr) minmax(160px, 1fr) minmax(86px, 0.24fr);
+  align-items: center;
+  gap: 16px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.magnitude-lane:last-child {
+  border-bottom: 0;
+}
+
+.magnitude-token {
+  color: var(--ink);
+  font-weight: 820;
+}
+
+.magnitude-scale {
+  position: relative;
+  height: 10px;
+  border-radius: 999px;
+  background:
+    linear-gradient(
+      90deg,
+      var(--teal) 0 2px,
+      transparent 2px calc(50% - 1px),
+      rgba(14, 116, 104, 0.32) calc(50% - 1px) calc(50% + 1px),
+      transparent calc(50% + 1px) calc(100% - 2px),
+      var(--clay) calc(100% - 2px) 100%
+    ),
+    rgba(14, 116, 104, 0.1);
+}
+
+.magnitude-marker {
+  position: absolute;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  border: 3px solid #fff;
+  border-radius: 999px;
+  background: var(--teal);
+  box-shadow: 0 6px 16px rgba(21, 29, 24, 0.16);
+  transform: translate(-50%, -50%);
+}
+
+.magnitude-marker-k {
+  left: 12%;
+}
+
+.magnitude-marker-m {
+  left: 52%;
+  background: var(--amber);
+}
+
+.magnitude-marker-b {
+  left: 89%;
+  background: var(--clay);
+}
+
+.magnitude-marker-crore {
+  left: 61%;
+  background: var(--teal-dark);
+}
+
+.magnitude-lane data {
+  color: var(--ink-soft);
+  font-family:
+    "SFMono-Regular", Consolas, "Liberation Mono", Menlo, ui-monospace, monospace;
+  font-size: 0.84rem;
+  font-weight: 760;
+  text-align: right;
+}
+
+.magnitude-illustration figcaption {
+  max-width: 560px;
+  color: var(--ink-soft);
+  font-size: 0.96rem;
+  line-height: 1.55;
+}
+
 .workflow-band,
 .trust-band,
 .proof-band,
@@ -1566,6 +1711,7 @@ textarea:focus-visible {
 
 .signal-band,
 .demo-section,
+.magnitude-band,
 .workflow-band,
 .scope-section,
 .trust-band,
@@ -1580,6 +1726,7 @@ textarea:focus-visible {
 @media (max-width: 1100px) {
   .hero,
   .signal-band,
+  .magnitude-band,
   .scope-layout,
   .review-layout,
   .proof-band,
@@ -1638,6 +1785,7 @@ textarea:focus-visible {
   .comparison,
   .scope-board,
   .scope-boundary-list,
+  .magnitude-lane,
   .pricing-url-controls,
   .preview-plan-grid {
     grid-template-columns: 1fr;
@@ -1673,6 +1821,10 @@ textarea:focus-visible {
 
   .stage-plan small {
     margin-top: 28px;
+  }
+
+  .magnitude-lane data {
+    text-align: left;
   }
 }
 
@@ -1731,6 +1883,11 @@ textarea:focus-visible {
     font-size: 2.7rem;
   }
 
+  .magnitude-illustration {
+    min-height: 0;
+    padding: 20px;
+  }
+
   .contrast-footer {
     padding-top: 62px;
   }
@@ -1756,6 +1913,7 @@ textarea:focus-visible {
 
   .signal-band,
   .demo-section,
+  .magnitude-band,
   .workflow-band,
   .scope-section,
   .trust-band,

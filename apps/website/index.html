@@ -304,6 +304,62 @@
         </div>
       </section>
 
+      <section class="section-band magnitude-band" aria-labelledby="magnitude-title">
+        <div class="magnitude-copy">
+          <h2 id="magnitude-title">Magnitude-aware hints for real pricing language.</h2>
+          <p>
+            FX Inline reads compact and localized scale words before it renders a
+            conversion, so K, M, crore, and regional large-unit notation keep their
+            intended size.
+          </p>
+        </div>
+
+        <figure
+          class="magnitude-illustration"
+          aria-label="Examples of magnitude-aware price detection"
+        >
+          <div class="magnitude-axis" aria-hidden="true">
+            <span>1K</span>
+            <span>1M</span>
+            <span>1B</span>
+          </div>
+          <div class="magnitude-lanes">
+            <div class="magnitude-lane">
+              <span class="magnitude-token">USD 100K</span>
+              <span class="magnitude-scale" aria-hidden="true">
+                <span class="magnitude-marker magnitude-marker-k"></span>
+              </span>
+              <data value="100000">100,000</data>
+            </div>
+            <div class="magnitude-lane">
+              <span class="magnitude-token">¥6-13M</span>
+              <span class="magnitude-scale" aria-hidden="true">
+                <span class="magnitude-marker magnitude-marker-m"></span>
+              </span>
+              <data value="6000000">6M to 13M</data>
+            </div>
+            <div class="magnitude-lane">
+              <span class="magnitude-token">₫ 3.65 tỷ</span>
+              <span class="magnitude-scale" aria-hidden="true">
+                <span class="magnitude-marker magnitude-marker-b"></span>
+              </span>
+              <data value="3650000000">3.65B</data>
+            </div>
+            <div class="magnitude-lane">
+              <span class="magnitude-token">INR 2 crore</span>
+              <span class="magnitude-scale" aria-hidden="true">
+                <span class="magnitude-marker magnitude-marker-crore"></span>
+              </span>
+              <data value="20000000">20M</data>
+            </div>
+          </div>
+          <figcaption>
+            Compact ranges and localized magnitude profiles are normalized before the
+            local-currency hint is added.
+          </figcaption>
+        </figure>
+      </section>
+
       <section id="workflow" class="section-band workflow-band" aria-labelledby="workflow-title">
         <div class="workflow-heading">
           <p class="workflow-index"><span>02</span> / Implementation path</p>
