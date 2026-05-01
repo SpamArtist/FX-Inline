@@ -1,3 +1,4 @@
+import { initializeBrowserInstallCta } from "./browserInstall.js";
 import { initializeRateTicker } from "./rateTicker.js";
 
 const yearElement = document.getElementById("year");
@@ -9,6 +10,7 @@ if (yearElement) {
 }
 
 initializeRateTicker();
+initializeBrowserInstallCta();
 
 const marketPrices = {
   eur: {
