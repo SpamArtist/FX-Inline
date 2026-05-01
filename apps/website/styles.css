@@ -284,25 +284,6 @@ h1 {
   gap: 12px;
 }
 
-.hero-proof {
-  margin-top: 28px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  color: var(--ink-soft);
-  font-size: 0.91rem;
-}
-
-.hero-proof span {
-  min-height: 34px;
-  display: inline-flex;
-  align-items: center;
-  padding: 0 11px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.62);
-}
-
 .hero-visual {
   min-width: 0;
   min-height: 560px;
@@ -1255,10 +1236,6 @@ textarea:focus-visible {
 
   .hero-actions .btn {
     width: 100%;
-  }
-
-  .hero-proof {
-    display: grid;
   }
 
   .stage-header {
