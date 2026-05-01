@@ -303,44 +303,68 @@
       </section>
 
       <section id="workflow" class="section-band workflow-band" aria-labelledby="workflow-title">
-        <div class="section-copy">
-          <h2 id="workflow-title">Implementation confidence, not another generic widget.</h2>
-          <p>
-            FX Inline pairs automated price detection with selector review, controlled
-            rendering, and a visible rollback path for pricing pages that matter.
-          </p>
+        <div class="workflow-heading">
+          <p class="workflow-index"><span>02</span> / Implementation path</p>
+          <div class="section-copy workflow-copy">
+            <h2 id="workflow-title">
+              Three steps. <em>Two weeks, not two quarters.</em>
+            </h2>
+            <p>
+              A fixed-scope pricing-page implementation: one surface, one controlled
+              integration, one measurable outcome. FX Inline handles detection, rate
+              sourcing, and rendering boundaries while your team keeps checkout untouched.
+            </p>
+          </div>
         </div>
-        <ol class="timeline">
+        <ol class="timeline workflow-steps">
           <li>
-            <span>01</span>
-            <h3>Review the pricing page</h3>
+            <p class="step-kicker"><span>01</span> / Audit</p>
+            <div class="step-visual step-visual-audit" aria-hidden="true">
+              <span>$</span>
+              <span>EUR</span>
+              <span>INR</span>
+            </div>
+            <h3>Map your pricing surface and target currencies.</h3>
             <p>
-              Inspect pricing markup, dynamic behavior, currency patterns, and buyer-facing
-              copy before choosing the right deployment shape.
+              Share the pricing page and priority regions. We return a one-page integration
+              spec covering selectors, fallback behavior, rate policy, and rounding rules.
+            </p>
+            <p class="step-output">
+              <span>Output</span>
+              <strong>Integration spec · 2 business days</strong>
             </p>
           </li>
           <li>
-            <span>02</span>
-            <h3>Pin safe selectors</h3>
+            <p class="step-kicker"><span>02</span> / Ship</p>
+            <div class="step-visual step-visual-code" aria-hidden="true">
+              <code>&lt;script src="fx.js" data-page="pricing"&gt;&lt;/script&gt;</code>
+            </div>
+            <h3>One controlled tag goes on your pricing page.</h3>
             <p>
-              Target the visible price elements that should receive hints and leave the rest
-              of the page untouched.
+              Hints render server-side where possible and fail closed otherwise. No layout
+              shift, no checkout changes, and a clean removal path stays available.
+            </p>
+            <p class="step-output">
+              <span>Change</span>
+              <strong>1 file · CSP-compatible</strong>
             </p>
           </li>
           <li>
-            <span>03</span>
-            <h3>Render secondary hints</h3>
+            <p class="step-kicker"><span>03</span> / Measure</p>
+            <div class="step-visual step-visual-chart" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <h3>Review attribution before expanding the rollout.</h3>
             <p>
-              Add local estimates beside original prices with restrained styling and clear
-              secondary hierarchy.
+              We split traffic, monitor hint rendering, and report international conversion
+              deltas by region so the next market decision is based on observed behavior.
             </p>
-          </li>
-          <li>
-            <span>04</span>
-            <h3>QA and hand off</h3>
-            <p>
-              Check mobile, dynamic plans, page speed, rate freshness, support notes, and the
-              removal path before rollout.
+            <p class="step-output">
+              <span>Readout</span>
+              <strong>14-day report · expansion plan</strong>
             </p>
           </li>
         </ol>
