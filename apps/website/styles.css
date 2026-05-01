@@ -744,7 +744,7 @@ h1 {
 
 .timeline h3,
 .trust-grid h3,
-.scope-columns h3 {
+.scope-board h3 {
   margin-top: 18px;
   color: var(--ink);
   font-size: 1.35rem;
@@ -884,55 +884,80 @@ h1 {
 }
 
 .scope-layout {
-  grid-template-columns: minmax(0, 0.8fr) minmax(520px, 1.05fr);
+  grid-template-columns: minmax(0, 0.72fr) minmax(560px, 1fr);
   align-items: start;
 }
 
-.scope-columns {
+.scope-board {
+  grid-column: 2;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1px;
   border: 1px solid var(--line);
   background: var(--line);
 }
 
-.scope-columns section {
-  min-height: 420px;
+.scope-board article {
+  min-height: 270px;
   padding: 24px;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.84);
 }
 
-.scope-columns section:nth-child(2) {
+.scope-board span {
+  color: var(--amber);
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
+.scope-board p {
+  margin-top: 16px;
+  color: var(--ink-soft);
+  line-height: 1.52;
+}
+
+.scope-boundary-list {
+  grid-column: 2;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-top: 0;
+  list-style: none;
   background: #fbfaf5;
 }
 
-.scope-columns ul {
-  margin: 22px 0 0;
-  padding: 0;
-  list-style: none;
+.scope-boundary-list li {
+  min-height: 92px;
+  display: grid;
+  grid-template-columns: minmax(116px, 0.4fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 18px;
+  padding: 20px 24px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
 }
 
-.scope-columns li {
-  position: relative;
-  padding: 13px 0 13px 22px;
-  border-top: 1px solid var(--line);
+.scope-boundary-list li:nth-child(2n) {
+  border-right: 0;
+}
+
+.scope-boundary-list li:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.scope-boundary-list strong {
+  color: var(--ink);
+  font-family:
+    "SFMono-Regular", Consolas, "Liberation Mono", Menlo, ui-monospace, monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.scope-boundary-list span {
   color: var(--ink-soft);
-  line-height: 1.45;
-}
-
-.scope-columns li::before {
-  position: absolute;
-  top: 1.35em;
-  left: 0;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  content: "";
-  background: var(--teal);
-}
-
-.scope-columns section:nth-child(2) li::before {
-  background: var(--clay);
+  line-height: 1.48;
 }
 
 .trust-grid {
@@ -1616,6 +1641,11 @@ textarea:focus-visible {
   .footer-copy h2 {
     max-width: 880px;
   }
+
+  .scope-board,
+  .scope-boundary-list {
+    grid-column: auto;
+  }
 }
 
 @media (max-width: 860px) {
@@ -1632,10 +1662,22 @@ textarea:focus-visible {
   }
 
   .comparison,
-  .scope-columns,
+  .scope-board,
+  .scope-boundary-list,
   .pricing-url-controls,
   .preview-plan-grid {
     grid-template-columns: 1fr;
+  }
+
+  .scope-boundary-list li,
+  .scope-boundary-list li:nth-child(2n),
+  .scope-boundary-list li:nth-last-child(-n + 2) {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .scope-boundary-list li:last-child {
+    border-bottom: 0;
   }
 
   .footer-bottom {
@@ -1778,7 +1820,8 @@ textarea:focus-visible {
 
   .timeline li,
   .trust-grid article,
-  .scope-columns section {
+  .scope-board article,
+  .scope-boundary-list li {
     min-height: 0;
   }
 

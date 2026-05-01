@@ -374,38 +374,50 @@
 
       <section id="scope" class="scope-section" aria-labelledby="scope-title">
         <div class="section-band scope-layout">
-          <div class="section-copy">
-            <h2 id="scope-title">Pricing page. Target markets. Managed rollout.</h2>
+          <div class="section-copy scope-intro">
+            <h2 id="scope-title">One pricing surface. Selected markets. Controlled rollout.</h2>
             <p>
-              FX Inline is designed for public pricing surfaces where buyers need familiar
-              local context before they reach checkout.
+              FX Inline fits the public pricing-page moment: visitors keep seeing your
+              source price while local-currency hints make the value easier to judge.
             </p>
           </div>
 
-          <div class="scope-columns">
-            <section aria-labelledby="included-title">
-              <h3 id="included-title">Designed for</h3>
-              <ul>
-                <li>Public SaaS pricing pages</li>
-                <li>Inline local-currency price hints</li>
-                <li>Target-market currency display</li>
-                <li>Selector-aware page integration</li>
-                <li>Visual QA across desktop and mobile</li>
-                <li>Rollback-ready script deployment</li>
-              </ul>
-            </section>
-            <section aria-labelledby="excluded-title">
-              <h3 id="excluded-title">Clear boundaries</h3>
-              <ul>
-                <li>Checkout pricing stays in the billing stack</li>
-                <li>Full-site translation remains separate</li>
-                <li>Conversion lift is measured, not assumed</li>
-                <li>No hidden affiliate link behavior</li>
-                <li>Unknown page structures fail closed</li>
-                <li>Original prices remain the source of truth</li>
-              </ul>
-            </section>
+          <div class="scope-board" aria-label="FX Inline rollout scope">
+            <article>
+              <span>Surface</span>
+              <h3>Public pricing page</h3>
+              <p>One pricing surface is mapped, checked, and kept separate from checkout logic.</p>
+            </article>
+            <article>
+              <span>Markets</span>
+              <h3>Selected buyer currencies</h3>
+              <p>Local hints stay limited to priority regions instead of becoming full-site localization.</p>
+            </article>
+            <article>
+              <span>Controls</span>
+              <h3>Selector-aware rollout</h3>
+              <p>Known price elements get pinned behavior, fallback rules, and a clean removal path.</p>
+            </article>
           </div>
+
+          <ul class="scope-boundary-list" aria-label="Scope boundaries">
+            <li>
+              <strong>Checkout</strong>
+              <span>Billing-stack pricing stays where it is.</span>
+            </li>
+            <li>
+              <strong>Translation</strong>
+              <span>Full-site language work remains separate.</span>
+            </li>
+            <li>
+              <strong>Measurement</strong>
+              <span>Expansion is based on observed behavior.</span>
+            </li>
+            <li>
+              <strong>Fail-safe</strong>
+              <span>Unknown page structures do not render hints.</span>
+            </li>
+          </ul>
         </div>
       </section>
 
