@@ -27,6 +27,7 @@ This is a **greenfield** task. Build everything needed from this prompt only.
    - Workflows under `.github/workflows/`:
      - `ci.yml` runs lint, TypeScript compile, and `npm run test:all` on PRs and pushes to `main`.
      - CI also runs the extension build assertions through `npm run build`.
+     - Compile, extension unit/content test builds, Chrome build, Firefox build, and Chrome/source zip packaging refresh the generated inline-runtime settings manifest before consuming it.
      - `currency-detection-benchmarks.yml` runs currency detection benchmarks and publishes artifacts/summaries.
      - `release.yml` is tag-driven (on `push` of tags matching `v*`) and validates the tag, runs tests, builds artifacts, and publishes a GitHub release (store publishing steps are gated on configured secrets).
    - Release tags and versioning:
@@ -78,6 +79,8 @@ Implement equivalent manifest behavior via WXT config:
 - set `action.default_title` to `FX Inline`
 - expose only `content-worker.js`, `chunks/*.js`, and `theme.css` as dynamic web-accessible resources
 - run extension asset optimization before Chrome/Firefox WXT builds
+- run admin settings export before Chrome/Firefox builds, TypeScript compile, extension unit/content test builds, and Chrome/source zip packaging
+- run extension asset optimization before Chrome/source zip packaging through `prezip`
 - run build-output assertions after Chrome/Firefox WXT builds
 - run release build-output linting during artifact verification
 - include post-bundle patching for Firefox manifest version fields so generated artifacts match the release tag metadata.
@@ -246,7 +249,9 @@ Implement these extension entrypoints and behaviors exactly.
 3. Export contract:
 - default database path: `apps/admin/data/settings.sqlite`
 - generated output path: `apps/extension/generated/inlineRuntimeSettingsManifest.ts`
+- generated manifest files under `apps/extension/generated/` are ignored local build output.
 - extension build scripts run `npm run admin:export-settings` before WXT builds.
+- `compile`, extension unit/content test build scripts, and Chrome/source zip packaging also run `npm run admin:export-settings` before consuming the generated manifest.
 
 ## 5) Core Runtime Behavior
 
@@ -560,40 +565,44 @@ Define scripts equivalent in behavior to:
 16. `npm run icons:check`
 17. `npm run build:website`
 18. `npm run build:admin`
-19. `npm run zip`
-20. `npm run zip:firefox`
-21. `npm run release:clean`
-22. `npm run release:dry-run`
-23. `npm run release:describe:json`
-24. `npm run release:validate-tag`
-25. `npm run release:build-artifacts`
-26. `npm run release:verify-artifacts`
-27. `npm run release:lint-build-output`
-28. `npm run release:publish:chrome`
-29. `npm run release:publish:edge`
-30. `npm run lint`
-31. `npm run compile`
-32. `npm run build:unit`
-33. `npm run build:content-tests`
-34. `npm run jest`
-35. `npm run test:frontend`
-36. `npm run test:content`
-37. `npm run test:unit`
-38. `npm run test:release`
-39. `npm run test:assets`
-40. `npm run test:admin`
-41. `npm run test:build`
-42. `npm run test:all`
-43. `npm run currency-detection:fixtures`
-44. `npm run currency-detection:baseline`
-45. `npm run currency-detection:test`
-46. `npm run currency-detection:bench`
-47. `npm run currency-detection:bench:compare`
-48. `npm run inline-runtime:build`
-49. `npm run inline-runtime:test`
-50. `npm run preview:website`
-51. `npm run readme:sync`
-52. `npm run readme:sync:check`
+19. `npm run prezip`
+20. `npm run zip`
+21. `npm run zip:firefox`
+22. `npm run release:clean`
+23. `npm run release:dry-run`
+24. `npm run release:describe:json`
+25. `npm run release:validate-tag`
+26. `npm run release:build-artifacts`
+27. `npm run release:verify-artifacts`
+28. `npm run release:lint-build-output`
+29. `npm run release:publish:chrome`
+30. `npm run release:publish:edge`
+31. `npm run precompile`
+32. `npm run lint`
+33. `npm run compile`
+34. `npm run prebuild:unit`
+35. `npm run build:unit`
+36. `npm run prebuild:content-tests`
+37. `npm run build:content-tests`
+38. `npm run jest`
+39. `npm run test:frontend`
+40. `npm run test:content`
+41. `npm run test:unit`
+42. `npm run test:release`
+43. `npm run test:assets`
+44. `npm run test:admin`
+45. `npm run test:build`
+46. `npm run test:all`
+47. `npm run currency-detection:fixtures`
+48. `npm run currency-detection:baseline`
+49. `npm run currency-detection:test`
+50. `npm run currency-detection:bench`
+51. `npm run currency-detection:bench:compare`
+52. `npm run inline-runtime:build`
+53. `npm run inline-runtime:test`
+54. `npm run preview:website`
+55. `npm run readme:sync`
+56. `npm run readme:sync:check`
 
 ## 8) Testing Requirements (Mandatory)
 

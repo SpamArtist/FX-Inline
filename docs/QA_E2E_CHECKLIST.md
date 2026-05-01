@@ -1,10 +1,11 @@
 # E2E Extension Checklist
 
-_Last updated: 2026-04-29_
+_Last updated: 2026-05-01_
 
 ## Preconditions
 
 - Build and load the unpacked extension with `npm run build` for Chromium and `npm run build:firefox` for Firefox. These commands run admin settings export, optimized extension assets, and build-output assertions.
+- Use `npm run zip -- --sources` when validating Chrome/source archives; `prezip` runs admin settings export and extension asset optimization before WXT zips.
 - Ensure host permissions are granted for the configured rate providers.
 - Use a page with visible prices and dynamic updates (SPA/news feed/e-commerce).
 - Test at least once on Chromium and once on Firefox.
@@ -30,10 +31,12 @@ Expected:
 5. Save all settings and confirm the success toast appears.
 6. Confirm `apps/extension/generated/inlineRuntimeSettingsManifest.ts` contains the saved scopes.
 7. Use the admin build action or run `npm run build` and confirm the export step runs before WXT.
+8. Run `npm run compile`, `npm run test:frontend`, or `npm run test:content` and confirm the npm lifecycle export runs before TypeScript consumes the generated manifest.
 
 Expected:
 - The admin API binds locally and persists sanitized settings to SQLite.
 - Saved all-pages, domain, and page settings are exported into the generated manifest.
+- The generated manifest remains local ignored build output and is refreshed by export/build/compile/test-build commands.
 - Page scopes override domain scopes, and domain scopes override the all-pages default.
 
 ## 3. Popup converter and settings actions
