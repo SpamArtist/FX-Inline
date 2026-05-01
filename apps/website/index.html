@@ -560,9 +560,62 @@
       </section>
     </main>
 
-    <footer class="site-footer">
-      <p>© <span id="year">2026</span> FX Inline</p>
-      <a href="./playground.html">Playground</a>
+    <footer class="contrast-footer" aria-labelledby="footer-title">
+      <div class="footer-shell">
+        <div class="footer-main">
+          <div class="footer-copy">
+            <h2 id="footer-title">
+              Local-currency pricing clarity <em>this month.</em> Checkout can stay put.
+            </h2>
+            <p>
+              Share the pricing page and target markets. FX Inline returns a scoped
+              integration plan, then adds secondary local estimates beside the prices
+              buyers already see.
+            </p>
+            <div class="footer-actions" aria-label="Footer actions">
+              <a class="footer-primary" href="#page-review">Start pricing review</a>
+              <a class="footer-secondary" href="./playground.html">Open playground</a>
+            </div>
+          </div>
+
+          <dl class="footer-spec" aria-label="Implementation summary">
+            <div>
+              <dt>Review</dt>
+              <dd>Pricing DOM and target markets</dd>
+            </div>
+            <div>
+              <dt>Spec</dt>
+              <dd>2 business days</dd>
+            </div>
+            <div>
+              <dt>Launch window</dt>
+              <dd>Within 14 business days</dd>
+            </div>
+            <div>
+              <dt>Scope</dt>
+              <dd>1 pricing page &middot; selected currencies</dd>
+            </div>
+            <div>
+              <dt>Rollback</dt>
+              <dd>Clean removal path included</dd>
+            </div>
+            <div>
+              <dt>Checkout</dt>
+              <dd>No billing-stack changes</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="footer-bottom">
+          <p>© <span id="year">2026</span> FX Inline. Built for pricing pages.</p>
+          <nav aria-label="Footer navigation">
+            <a href="#workflow">Implementation</a>
+            <a href="#scope">Scope</a>
+            <a href="./playground.html">Playground</a>
+            <a href="mailto:hello@fxinline.io">hello@fxinline.io</a>
+          </nav>
+        </div>
+      </div>
     </footer>
 
     <script type="module" src="./main.js"></script>
