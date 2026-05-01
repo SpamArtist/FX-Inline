@@ -1012,38 +1012,12 @@ h1 {
   background: linear-gradient(180deg, #65eba3, #35d27a);
 }
 
-.store-icon {
-  position: relative;
+.store-logo {
   flex: 0 0 auto;
   width: 30px;
   height: 30px;
-  border: 3px solid #fff;
-  border-radius: 999px;
-  box-shadow: 0 4px 12px rgba(21, 29, 24, 0.18);
-}
-
-.store-icon::after {
-  position: absolute;
-  inset: 8px;
-  border-radius: 999px;
-  background: #fff;
-  content: "";
-}
-
-.store-icon-chrome {
-  background: conic-gradient(#ea4335 0 25%, #fbbc04 0 50%, #34a853 0 75%, #4285f4 0);
-}
-
-.store-icon-firefox {
-  background: conic-gradient(#8b3ff2 0 22%, #e8572a 0 58%, #ffb000 0 84%, #8b3ff2 0);
-}
-
-.store-icon-safari {
-  background: conic-gradient(#1e5bff 0 48%, #55c7ff 0 78%, #cbeaff 0);
-}
-
-.store-icon-edge {
-  background: conic-gradient(#1769d8 0 25%, #18a1d9 0 52%, #20c58d 0 78%, #0b6f67 0);
+  display: block;
+  filter: drop-shadow(0 4px 10px rgba(21, 29, 24, 0.2));
 }
 
 .faq-list {
