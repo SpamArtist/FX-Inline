@@ -106,6 +106,82 @@ button {
   top: 16px;
 }
 
+.rate-ticker {
+  width: 100%;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(250, 248, 241, 0.16);
+  background: var(--ink);
+  color: rgba(250, 248, 241, 0.82);
+  font-family:
+    "SFMono-Regular", Consolas, "Liberation Mono", Menlo, ui-monospace, monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0;
+}
+
+.rate-ticker-track {
+  width: max-content;
+  display: flex;
+  animation: rate-scroll 42s linear infinite;
+  will-change: transform;
+}
+
+.rate-ticker:hover .rate-ticker-track,
+.rate-ticker:focus-within .rate-ticker-track {
+  animation-play-state: paused;
+}
+
+.rate-ticker-list {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  margin: 0;
+  padding: 8px 15px;
+  white-space: nowrap;
+  list-style: none;
+}
+
+.rate-ticker-list li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: max-content;
+}
+
+.ticker-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: #d9a84d;
+}
+
+.ticker-dot-clay {
+  background: #d17a6f;
+}
+
+.rate-delta {
+  font-weight: 780;
+}
+
+.rate-delta.is-up {
+  color: #d9a84d;
+}
+
+.rate-delta.is-down {
+  color: #d17a6f;
+}
+
+@keyframes rate-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rate-ticker-track {
+    animation: none;
+  }
+}
+
 .site-header {
   width: min(1440px, calc(100% - var(--page-pad) * 2));
   min-height: 74px;
