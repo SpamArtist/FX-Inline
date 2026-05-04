@@ -131,6 +131,7 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run readme:sync:check` | `node scripts/readme-sync.mjs --check` |
 
 ### Recent Changes (first-parent, excluding README automation commits)
+- 2026-05-03 `43adb19` docs: refresh readme snapshot
 - 2026-05-01 `1276fb9` docs: align generated settings workflow docs
 - 2026-04-30 `307c757` ci: prepare generated settings before zipping
 - 2026-04-30 `c7bc061` ci: generate settings before extension tests
@@ -138,6 +139,5 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 - 2026-04-30 `b726254` ignoring inlineRuntimeSettingsManifest
 - 2026-04-30 `d1fdeff` default inlineRuntimeSettingsManifest
 - 2026-04-30 `a78897d` docs: add revenue review for 2026-04-30
-- 2026-04-30 `bbbeef8` docs: add revenue review for 2026-04-30
 
 <!-- AUTO-GENERATED:END -->
