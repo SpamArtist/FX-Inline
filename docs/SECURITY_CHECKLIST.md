@@ -1,6 +1,6 @@
 # Security Checklist
 
-_Last updated: 2026-05-01_
+_Last updated: 2026-05-05_
 
 ## 1. Manifest surface and CSP
 
@@ -70,6 +70,7 @@ _Last updated: 2026-05-01_
 - [ ] Run `npm run build` and `npm run build:firefox` after manifest, asset, content-entrypoint, or release-flow changes.
 - [ ] Run `npm run zip -- --sources` when checking Chrome/source archive generation; `prezip` must run admin settings export and asset optimization before WXT zips.
 - [ ] Confirm `npm run build:assert`, `npm run icons:check`, and `npm run release:lint-build-output` pass where relevant.
+- [ ] Review `currency-conversion-extension-tool-threat-model.md` after changes to content activation, DOM conversion, rates, admin API exposure, release publishing, or B2B runtime surfaces.
 - [ ] For tagged releases, validate the tag/version locally:
   - `RELEASE_TAG=v0.4.1 npm run release:validate-tag`
   - `RELEASE_TAG=v0.4.1 npm run release:dry-run`
