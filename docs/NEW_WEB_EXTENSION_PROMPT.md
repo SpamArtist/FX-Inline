@@ -172,7 +172,7 @@ Implement these extension entrypoints and behaviors exactly.
 - return immediately for non-`http`/`https` URLs
 - scan bounded existing text for currency activation signals
 - listen for price-like selections
-- observe added child nodes for currency activation signals
+- observe added child nodes and text mutations for currency activation signals
 - import the full worker through `content-worker.js` only after activation
 4. Full worker responsibilities:
 - selection-based popup conversion
@@ -184,7 +184,7 @@ Implement these extension entrypoints and behaviors exactly.
 - observe `document.body`
 - `childList: true`
 - `subtree: true`
-- no `characterData` observation until the full worker is loaded
+- `characterData: true`
 6. Full worker mutation observation target and options:
 - observe `document.body`
 - `childList: true`
@@ -683,7 +683,7 @@ Must include:
 5. global and per-origin auto-conversion toggles.
 6. admin scoped settings save/export/build path.
 7. run key scenarios on Chromium and Firefox; note differences.
-8. lightweight all-URLs activation shim starts the full worker only after price text, inserted node, or selection activation signals.
+8. lightweight all-URLs activation shim starts the full worker only after price text, DOM mutation, or selection activation signals.
 
 ## 9) README Requirements
 

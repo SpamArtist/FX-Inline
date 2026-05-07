@@ -29,7 +29,7 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 
 ## Current Runtime Notes
 
-- The all-URLs content script is a small activation shim. It loads `content-worker.js` only after a bounded currency signal scan, a matching added node, or a price-like selection on supported `http`/`https` pages.
+- The all-URLs content script is a small activation shim. It loads `content-worker.js` only after a bounded currency signal scan, a matching DOM mutation, or a price-like selection on supported `http`/`https` pages.
 - The popup currency picker uses a styled native `<select>` to keep the extension bundle small while preserving keyboard and browser accessibility behavior.
 - Popup, options, welcome, and selection-popup UI share `apps/extension/public/theme.css`; the selection popup links the same runtime stylesheet inside its Shadow DOM and keeps page-specific content CSS inline.
 - Chrome and Firefox builds run admin settings export, optimized extension assets, and build-output assertions before completion.
@@ -136,6 +136,7 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run readme:sync:check` | `node scripts/readme-sync.mjs --check` |
 
 ### Recent Changes (first-parent, excluding README automation commits)
+- 2026-05-06 `a859146` docs: refresh README history snapshot
 - 2026-05-05 `57edff3` docs: link security review artifacts
 - 2026-05-04 `9c5f5df` docs: add security threat model
 - 2026-05-04 `ce4036b` docs: align release docs with current workflow
@@ -143,6 +144,5 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 - 2026-05-01 `1276fb9` docs: align generated settings workflow docs
 - 2026-04-30 `307c757` ci: prepare generated settings before zipping
 - 2026-04-30 `c7bc061` ci: generate settings before extension tests
-- 2026-04-30 `cb75476` deleting inlineRuntimeSettingsManifest.ts
 
 <!-- AUTO-GENERATED:END -->

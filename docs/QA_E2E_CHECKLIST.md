@@ -1,6 +1,6 @@
 # E2E Extension Checklist
 
-_Last updated: 2026-05-01_
+_Last updated: 2026-05-07_
 
 ## Preconditions
 
@@ -143,6 +143,6 @@ Expected:
 6. Navigate or reload quickly to force content script invalidation edges.
 
 Expected:
-- The lightweight all-URLs shim only starts the full worker after initial text, inserted-node, or selection activation signals.
+- The lightweight all-URLs shim only starts the full worker after initial text, DOM mutation, or selection activation signals.
 - No persistent console spam for extension context invalidation during teardown.
 - Conversion runtime remains responsive without runaway mutation loops.
