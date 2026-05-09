@@ -72,8 +72,8 @@ _Last updated: 2026-05-05_
 - [ ] Confirm `npm run build:assert`, `npm run icons:check`, and `npm run release:lint-build-output` pass where relevant.
 - [ ] Review `currency-conversion-extension-tool-threat-model.md` after changes to content activation, DOM conversion, rates, admin API exposure, release publishing, or B2B runtime surfaces.
 - [ ] For tagged releases, validate the tag/version locally:
-  - `RELEASE_TAG=v0.4.1 npm run release:validate-tag`
-  - `RELEASE_TAG=v0.4.1 npm run release:dry-run`
+  - `RELEASE_TAG=v0.5.0 npm run release:validate-tag`
+  - `RELEASE_TAG=v0.5.0 npm run release:dry-run`
 - [ ] For documentation changes, run `npm run readme:sync` and `npm run readme:sync:check`.
 - [ ] GitHub Actions release workflow (`.github/workflows/release.yml`) keeps least-privilege permissions (only the GitHub release job requires `contents: write`).
 - [ ] Store credentials (Chrome/Edge/AMO) are stored as GitHub Actions secrets and never committed to the repo.

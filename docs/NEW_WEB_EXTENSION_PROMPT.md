@@ -34,8 +34,8 @@ This is a **greenfield** task. Build everything needed from this prompt only.
      - Tag format: `vMAJOR.MINOR.PATCH` (final) or `vMAJOR.MINOR.PATCH-rc.N` (RC).
      - `scripts/release/versioning.mjs` maps final tags to a browser-safe manifest version `MAJOR.MINOR.PATCH.50000`, and RC tags to `MAJOR.MINOR.PATCH.N`.
      - Local sanity commands:
-       - `RELEASE_TAG=v0.4.1 npm run release:dry-run`
-       - `RELEASE_TAG=v0.4.1 npm run release:validate-tag`
+       - `RELEASE_TAG=v0.5.0 npm run release:dry-run`
+       - `RELEASE_TAG=v0.5.0 npm run release:validate-tag`
 
 ## 2) Product Identity
 
