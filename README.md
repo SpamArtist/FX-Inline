@@ -136,6 +136,7 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run readme:sync:check` | `node scripts/readme-sync.mjs --check` |
 
 ### Recent Changes (first-parent, excluding README automation commits)
+- 2026-05-09 `7e4ab13` docs: refresh release examples
 - 2026-05-08 `dbfd9b9` docs: add repository map presentation
 - 2026-05-08 `4a95f43` docs: refresh readme history snapshot
 - 2026-05-07 `fdc16bb` docs: align content activation docs
@@ -143,6 +144,5 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 - 2026-05-05 `57edff3` docs: link security review artifacts
 - 2026-05-04 `9c5f5df` docs: add security threat model
 - 2026-05-04 `ce4036b` docs: align release docs with current workflow
-- 2026-05-03 `43adb19` docs: refresh readme snapshot
 
 <!-- AUTO-GENERATED:END -->
