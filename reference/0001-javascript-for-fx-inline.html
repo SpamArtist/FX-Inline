@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>JavaScript for FX Inline Reference</title>
+    <style>
+      :root {
+        --bg: #f5f2ea;
+        --card: #fffdf8;
+        --ink: #1f2933;
+        --muted: #52606d;
+        --line: #d9d1c3;
+        --accent: #a64b2a;
+        --accent-soft: #f3ddd3;
+        --code: #efe8db;
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+        background:
+          radial-gradient(circle at top left, #fff7ed 0, transparent 28rem),
+          linear-gradient(180deg, #f8f4ec 0%, #f1ece2 100%);
+        color: var(--ink);
+      }
+
+      main {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 48px 24px 72px;
+      }
+
+      h1, h2 {
+        margin: 0 0 12px;
+        line-height: 1.1;
+      }
+
+      h1 { font-size: 2.8rem; }
+      h2 { font-size: 1.4rem; margin-top: 28px; }
+
+      p, li {
+        font-size: 1.02rem;
+        line-height: 1.7;
+      }
+
+      .lede {
+        color: var(--muted);
+        max-width: 44rem;
+        margin-bottom: 24px;
+      }
+
+      .panel {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 22px 24px;
+        margin-top: 18px;
+        box-shadow: 0 12px 30px rgba(31, 41, 51, 0.06);
+      }
+
+      code {
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+        background: var(--code);
+        padding: 0.15rem 0.35rem;
+        border-radius: 6px;
+      }
+
+      pre {
+        margin: 14px 0 0;
+        padding: 16px;
+        overflow: auto;
+        border-radius: 14px;
+        background: #201a17;
+        color: #f8efe7;
+      }
+
+      .pill {
+        display: inline-block;
+        padding: 0.35rem 0.7rem;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-size: 0.9rem;
+        letter-spacing: 0.02em;
+      }
+
+      ul {
+        padding-left: 1.2rem;
+      }
+
+      @media print {
+        body { background: #fff; }
+        .panel { box-shadow: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="pill">Quick Reference</div>
+      <h1>JavaScript for FX Inline</h1>
+      <p class="lede">
+        Use this sheet while reading the extension. It compresses the JavaScript ideas
+        that show up repeatedly in this repository.
+      </p>
+
+      <section class="panel">
+        <h2>1. Modules tell you where logic lives</h2>
+        <p>
+          Each file is a module. Files share logic with <code>export</code> and consume
+          it with <code>import</code>.
+        </p>
+        <pre><code>import { getRates } from "@/utils/rates/index";
+export async function getUserSettings() { ... }</code></pre>
+        <p>
+          Reading trick: start at the imports, then scan exported functions. That gives
+          you the file's dependencies and responsibilities fast.
+        </p>
+      </section>
+
+      <section class="panel">
+        <h2>2. Functions are the main unit of behavior</h2>
+        <p>
+          Most files exist to define small functions that transform data, schedule work,
+          or connect browser APIs.
+        </p>
+        <pre><code>function logWelcomePageError(error) {
+  console.warn("...", error);
+}</code></pre>
+        <p>
+          When a function only wraps another function call, it usually exists to name a
+          responsibility or isolate an edge case.
+        </p>
+      </section>
+
+      <section class="panel">
+        <h2>3. Objects hold named state</h2>
+        <p>
+          JavaScript objects are everywhere in this repo: settings, alarm options,
+          browser event payloads, and reducer actions.
+        </p>
+        <pre><code>{
+  periodInMinutes: 30,
+  forceRefresh: true
+}</code></pre>
+        <p>
+          Reading trick: object keys are often better clues than variable names because
+          they reveal the contract expected by another function or API.
+        </p>
+      </section>
+
+      <section class="panel">
+        <h2>4. Arrays drive batch work</h2>
+        <p>
+          Arrays usually mean “a list we will map, filter, loop over, or pass into a
+          helper like <code>Promise.all</code>.”
+        </p>
+        <pre><code>const VALID_CURRENCY_CODES = new Set(
+  Object.values(CurrencyCode),
+);</code></pre>
+        <p>
+          Common reading pattern: if you see <code>map</code>, ask “what list is being
+          transformed?” If you see <code>Object.entries</code>, ask “which object is being
+          turned into key/value pairs?”
+        </p>
+      </section>
+
+      <section class="panel">
+        <h2>5. async/await marks delayed work</h2>
+        <p>
+          If a function is <code>async</code>, it returns a promise. <code>await</code>
+          pauses inside that function until the promise settles.
+        </p>
+        <pre><code>async function initializeRateRefresh(forceRefresh = false) {
+  await Promise.all([
+    scheduleRateRefreshAlarm(),
+    getRates({ forceRefresh }),
+  ]);
+}</code></pre>
+        <p>
+          Reading trick: draw a box around every <code>await</code>. Those are the points
+          where control flow can pause or fail.
+        </p>
+      </section>
+
+      <section class="panel">
+        <h2>6. WXT entrypoints are runtime borders</h2>
+        <p>
+          Files under <code>apps/extension/entrypoints/</code> are where the extension
+          actually starts running: background, popup, options, content.
+        </p>
+        <pre><code>export default defineContentScript({
+  matches: ["&lt;all_urls&gt;"],
+  main(ctx) {
+    createContentActivationController(ctx).start();
+  },
+});</code></pre>
+        <p>
+          Reading trick: if you want to know “where does this feature begin?”, start in
+          an entrypoint, then follow imports downward into utilities and packages.
+        </p>
+      </section>
+
+      <section class="panel">
+        <h2>7. Preact hooks manage UI state</h2>
+        <p>
+          In UI files, state changes usually happen with hooks like
+          <code>useState</code>, <code>useEffect</code>, and callback-driven reducers.
+        </p>
+        <pre><code>const [rateSnapshot, setRateSnapshot] = useState(null);
+
+useEffect(() =&gt; {
+  async function loadSettingsAndRates() { ... }
+  loadSettingsAndRates();
+}, []);</code></pre>
+        <p>
+          Reading trick: find state declarations first, then effects, then event
+          handlers or dispatch functions.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>
