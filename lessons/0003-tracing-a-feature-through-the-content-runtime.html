@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 0003: Tracing a Feature Through the Content Runtime</title>
+    <style>
+      :root {
+        --bg: #f2efe8;
+        --paper: #fffdfa;
+        --ink: #1d2430;
+        --muted: #5c6675;
+        --line: #ddd3c6;
+        --accent: #7c3aed;
+        --accent-soft: #ede9fe;
+        --warm: #0f766e;
+        --warm-soft: #ccfbf1;
+        --code-bg: #171923;
+        --code-ink: #f8fafc;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        color: var(--ink);
+        font-family: Georgia, "Times New Roman", serif;
+        background:
+          radial-gradient(circle at top left, rgba(124, 58, 237, 0.12), transparent 24rem),
+          radial-gradient(circle at top right, rgba(15, 118, 110, 0.10), transparent 24rem),
+          linear-gradient(180deg, #f8f5ef 0%, #f2ece2 100%);
+      }
+      main {
+        max-width: 1020px;
+        margin: 0 auto;
+        padding: 40px 22px 72px;
+      }
+      h1, h2, h3 { line-height: 1.12; margin: 0; }
+      h1 { font-size: clamp(2.5rem, 5vw, 4.1rem); margin-top: 8px; }
+      h2 { font-size: 1.6rem; margin-bottom: 14px; }
+      h3 { font-size: 1.14rem; margin-bottom: 10px; }
+      p, li { font-size: 1.05rem; line-height: 1.76; }
+      .hero {
+        background: linear-gradient(135deg, rgba(255, 253, 250, 0.96), rgba(244, 240, 255, 0.96));
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        padding: 28px;
+        box-shadow: 0 18px 48px rgba(29, 36, 48, 0.08);
+      }
+      .eyebrow, .tag {
+        display: inline-block;
+        padding: 0.35rem 0.7rem;
+        border-radius: 999px;
+        font-size: 0.88rem;
+        letter-spacing: 0.03em;
+      }
+      .eyebrow { background: var(--accent-soft); color: var(--accent); }
+      .tag { background: var(--warm-soft); color: var(--warm); }
+      .lede { color: var(--muted); max-width: 52rem; margin-top: 14px; margin-bottom: 0; }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 18px;
+        margin-top: 22px;
+      }
+      .card, .section {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        padding: 22px;
+        box-shadow: 0 12px 28px rgba(29, 36, 48, 0.05);
+      }
+      .section { margin-top: 20px; }
+      code {
+        font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+        background: #eee8df;
+        border-radius: 6px;
+        padding: 0.12rem 0.35rem;
+      }
+      pre {
+        margin: 12px 0 0;
+        padding: 16px;
+        border-radius: 16px;
+        overflow: auto;
+        background: var(--code-bg);
+        color: var(--code-ink);
+      }
+      a { color: var(--accent); }
+      ol, ul { padding-left: 1.2rem; }
+      .prompt {
+        border-left: 4px solid var(--accent);
+        padding-left: 14px;
+      }
+      .exercise {
+        background: linear-gradient(180deg, #fffefd, #fbf8ff);
+      }
+      .footer-note { margin-top: 18px; color: var(--muted); }
+      @media print {
+        body { background: #fff; }
+        .hero, .card, .section { box-shadow: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="hero">
+        <div class="eyebrow">Lesson 0003</div>
+        <h1>Trace a Feature Through the Content Runtime</h1>
+        <p class="lede">
+          This lesson teaches one skill only: how to trace a single user-visible behavior
+          across multiple modules and understand why the system is split the way it is. The
+          behavior is simple to say but architecturally rich: a page contains price-like text,
+          the extension detects that signal, promotes itself into a full content worker, and
+          then maintains conversions as the page changes.
+        </p>
+        <div class="grid">
+          <div class="card">
+            <h3>Open this lesson</h3>
+            <p>
+              Run:
+              <code>open /Users/xbotpc/Desktop/XBOTPC/Work/Code/currency-conversion-extension-tool/lessons/0003-tracing-a-feature-through-the-content-runtime.html</code>
+            </p>
+          </div>
+          <div class="card">
+            <h3>Keep beside it</h3>
+            <p>
+              Use the reference sheet:
+              <code>/Users/xbotpc/Desktop/XBOTPC/Work/Code/currency-conversion-extension-tool/reference/0003-content-runtime-tracing.html</code>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>The feature path</h2>
+        <p>
+          Here is the execution path you are learning to follow:
+        </p>
+        <ol>
+          <li><code>apps/extension/entrypoints/content/index.tsx</code> starts the content script.</li>
+          <li><code>contentActivation.ts</code> decides whether the page is interesting enough to activate.</li>
+          <li>When the page looks interesting, the extension dynamically imports <code>content-worker.js</code>.</li>
+          <li><code>contentWorker.ts</code> creates the steady-state runtime and the mutation batching machinery.</li>
+          <li><code>conversionRuntime.ts</code> hydrates settings and rates, configures the shared inline runtime, and reacts to later updates.</li>
+          <li>The shared package <code>@fx-inline/inline-runtime/extension</code> does the actual conversion work.</li>
+        </ol>
+        <p>
+          This is the first important jump in level: you are no longer reading files in
+          isolation. You are reading a pipeline.
+        </p>
+      </section>
+
+      <section class="section">
+        <h2>Stage 1: lightweight activation instead of eager runtime startup</h2>
+        <p>
+          The content entrypoint is tiny:
+        </p>
+        <pre><code>export default defineContentScript({
+  matches: ["&lt;all_urls&gt;"],
+  cssInjectionMode: "manual",
+  main(ctx) {
+    createContentActivationController(ctx).start();
+  },
+});</code></pre>
+        <p>
+          That tells you something architectural immediately: the extension does not begin by
+          spinning up the full conversion runtime on every page. It begins with a cheap controller
+          whose job is to decide whether full activation is justified.
+        </p>
+        <p class="prompt">
+          Advanced reading question: why is this split valuable for an extension that runs on
+          <code>&lt;all_urls&gt;</code>?
+        </p>
+      </section>
+
+      <section class="section">
+        <h2>Stage 2: signal detection as a promotion gate</h2>
+        <p>
+          In <code>contentActivation.ts</code>, the controller performs cheap detection first.
+        </p>
+        <pre><code>if (scanRootForCurrencyActivationSignal(body)) {
+  void loadWorker().catch((error) =&gt; {
+    console.warn("[fx-inline] Failed to start content worker after initial price scan", error);
+  });
+  return;
+}</code></pre>
+        <p>
+          The controller is effectively asking: “do I have enough evidence that this page contains
+          currency-like text?” Only then does it promote the page into the heavier runtime.
+        </p>
+        <p>
+          Notice the cost-control strategy:
+        </p>
+        <ul>
+          <li>regex-based signal scanning instead of full conversion work</li>
+          <li>text and node count limits to cap scan cost</li>
+          <li>a mutation observer plus debounce for late-arriving page content</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h2>Stage 3: lazy loading the worker</h2>
+        <p>
+          Promotion happens here:
+        </p>
+        <pre><code>async function importContentWorker(options = {}) {
+  setContentWorkerStartupOptions(options);
+  await import(getExtensionResourceUrl("content-worker.js"));
+}</code></pre>
+        <p>
+          This is not just syntax. It is a design move:
+        </p>
+        <ul>
+          <li><code>setContentWorkerStartupOptions(...)</code> stores boot options in a global handoff slot.</li>
+          <li><code>import(...)</code> loads the heavier worker only when needed.</li>
+          <li><code>getExtensionResourceUrl(...)</code> resolves the extension-bundled script path at runtime.</li>
+        </ul>
+        <p>
+          The paired file <code>contentWorkerStartup.ts</code> exists purely to create this
+          handoff seam. That is a good example of a small file with architectural weight.
+        </p>
+      </section>
+
+      <section class="section">
+        <h2>Stage 4: worker startup defines the steady-state system</h2>
+        <p>
+          Once promoted, <code>contentWorker.ts</code> stops being about detection and starts
+          being about long-lived coordination.
+        </p>
+        <pre><code>const conversionRuntime = createContentConversionRuntime();
+const mutationBatcher = createMutationRootBatcher({
+  shouldIgnoreMutations: conversionRuntime.shouldIgnoreMutations,
+  collectRoots: (mutations) =&gt; collectMutationConversionRoots(...),
+  enqueueRoots: conversionRuntime.enqueueMutationRoots,
+});</code></pre>
+        <p>
+          This is the next important reading heuristic: when you see a factory creating a runtime
+          object and wiring adapters around it, you are looking at the composition root for that
+          subsystem.
+        </p>
+        <p>
+          The worker owns three concerns:
+        </p>
+        <ul>
+          <li>lifecycle and cleanup</li>
+          <li>mutation observation and batching</li>
+          <li>UI affordances like the selection popup and event capture</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h2>Stage 5: the runtime object is really a local service</h2>
+        <p>
+          In <code>conversionRuntime.ts</code>, the returned object is:
+        </p>
+        <pre><code>return {
+  initialize,
+  onSettingsStorageUpdate,
+  enqueueMutationRoots,
+  recordSelectionConversion,
+  shouldIgnoreMutations,
+  cleanup,
+};</code></pre>
+        <p>
+          Treat this as a local service with hidden state:
+        </p>
+        <ul>
+          <li><code>settings</code>, <code>resolvedSettings</code>, and <code>rateSnapshot</code> are private state.</li>
+          <li><code>initialize()</code> performs hydration and startup.</li>
+          <li><code>onSettingsStorageUpdate(...)</code> is an event handler for state changes.</li>
+          <li><code>cleanup()</code> closes the lifecycle.</li>
+        </ul>
+        <p>
+          That means this file is closer to a state machine than to a bag of helpers.
+        </p>
+      </section>
+
+      <section class="section">
+        <h2>Stage 6: mutation batching is the performance seam</h2>
+        <p>
+          Raw DOM mutation events would be too noisy to process directly. The batcher solves that:
+        </p>
+        <pre><code>function push(mutations) {
+  if (shouldIgnoreMutations()) return;
+
+  pendingMutations.push(...mutations);
+  if (pendingTimer !== null) return;
+
+  pendingTimer = scheduleTimeout(flush, debounceMs);
+}</code></pre>
+        <p>
+          That is an architectural seam, not just a utility. It decouples observation frequency
+          from conversion frequency. In other words: “the DOM may change constantly, but the
+          expensive conversion pass should happen on our schedule, not the browser’s raw event rate.”
+        </p>
+      </section>
+
+      <section class="section">
+        <h2>Stage 7: package boundaries reveal intended abstractions</h2>
+        <p>
+          The app layer does not reach deep into implementation details. Instead it uses:
+        </p>
+        <pre><code>import { createInlineRuntime } from "@fx-inline/inline-runtime/extension";</code></pre>
+        <p>
+          That is a strong signal that the package boundary is deliberate. The content runtime
+          configures and feeds the shared runtime, but the package owns the conversion mechanics.
+        </p>
+        <p>
+          Advanced reading rule: when a package import sits at the center of a subsystem, ask
+          what responsibilities stay in the app layer and what responsibilities are delegated.
+        </p>
+      </section>
+
+      <section class="section exercise">
+        <h2>Practice: explain the design, not just the code</h2>
+        <p>
+          Answer these in your own words:
+        </p>
+        <ol>
+          <li>Why does the extension use <code>contentActivation.ts</code> before loading the worker?</li>
+          <li>What problem does <code>createMutationRootBatcher(...)</code> solve that a raw <code>MutationObserver</code> callback would not?</li>
+          <li>Why is <code>createContentConversionRuntime()</code> better modeled as a runtime service than as a set of stateless helpers?</li>
+          <li>Why is the import from <code>@fx-inline/inline-runtime/extension</code> a meaningful architectural clue?</li>
+        </ol>
+        <p class="prompt">
+          Hard checkpoint: describe the exact handoff path from initial page detection to the first
+          call that can eventually cause inline conversions to appear on the page. Use file names.
+        </p>
+      </section>
+
+      <section class="section">
+        <h2>What you should be able to do now</h2>
+        <ul>
+          <li>trace one feature across multiple files without losing the thread</li>
+          <li>separate activation code from steady-state runtime code</li>
+          <li>spot performance seams such as batching and lazy loading</li>
+          <li>recognize when a factory-returned object is really a local service or state machine</li>
+          <li>use package boundaries to infer intended abstractions</li>
+        </ul>
+        <p>
+          If this lands cleanly, the next lesson should move again from “trace the pipeline” to
+          “evaluate the design”: identifying where this architecture is resilient, where it is
+          coupled, and where you would safely modify it.
+        </p>
+      </section>
+
+      <p class="footer-note">
+        Sources: repo files under <code>apps/extension/entrypoints/content/</code>,
+        <code>packages/inline-runtime/src/extension.js</code>, [MDN MutationObserver](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver),
+        [WXT Content Scripts Guide](https://wxt.dev/guide/essentials/content-scripts), and
+        [WXT Entrypoint Loaders](https://wxt.dev/guide/essentials/config/entrypoint-loaders).
+      </p>
+    </main>
+  </body>
+</html>

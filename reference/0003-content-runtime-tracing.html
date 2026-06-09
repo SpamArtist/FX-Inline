@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Content Runtime Tracing Reference</title>
+    <style>
+      :root {
+        --bg: #f4f0ff;
+        --paper: #fffdfd;
+        --ink: #1f1d2b;
+        --muted: #615f73;
+        --line: #ddd7f0;
+        --accent: #1e40af;
+        --accent-soft: #dbeafe;
+        --code-bg: #16161f;
+        --code-ink: #f8fafc;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "Iowan Old Style", "Palatino Linotype", serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(30, 64, 175, 0.10), transparent 23rem),
+          linear-gradient(180deg, #f8f6ff 0%, #f2effa 100%);
+      }
+      main {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 48px 24px 72px;
+      }
+      h1, h2 { line-height: 1.12; margin: 0 0 12px; }
+      h1 { font-size: 2.7rem; }
+      h2 { font-size: 1.35rem; margin-top: 28px; }
+      p, li { font-size: 1.03rem; line-height: 1.72; }
+      .pill {
+        display: inline-block;
+        padding: 0.35rem 0.7rem;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-size: 0.9rem;
+      }
+      .panel {
+        margin-top: 18px;
+        padding: 22px 24px;
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        box-shadow: 0 12px 28px rgba(31, 29, 43, 0.06);
+      }
+      code {
+        font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+        background: #edeafb;
+        padding: 0.12rem 0.35rem;
+        border-radius: 6px;
+      }
+      pre {
+        margin: 14px 0 0;
+        padding: 16px;
+        border-radius: 14px;
+        overflow: auto;
+        background: var(--code-bg);
+        color: var(--code-ink);
+      }
+      ul { padding-left: 1.2rem; }
+      @media print {
+        body { background: #fff; }
+        .panel { box-shadow: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="pill">Quick Reference</div>
+      <h1>Tracing the Content Runtime</h1>
+      <p>
+        Use this sheet when you need to follow one behavior across multiple modules in the
+        extension. This is no longer “syntax reading.” It is execution-graph reading.
+      </p>
+
+      <section class="panel">
+        <h2>1. Start at the entrypoint, then ask who promotes the system</h2>
+        <pre><code>defineContentScript({
+  main(ctx) {
+    createContentActivationController(ctx).start();
+  },
+});</code></pre>
+        <p>
+          First question: does this entrypoint do the full job itself, or does it decide when
+          to hand off to a heavier subsystem?
+        </p>
+      </section>
+
+      <section class="panel">
+        <h2>2. Separate trigger code from steady-state runtime code</h2>
+        <p>
+          In this repo, <code>contentActivation.ts</code> is a lightweight trigger layer.
+          <code>contentWorker.ts</code> and <code>conversionRuntime.ts</code> are the steady-state
+          runtime layer.
+        </p>
+        <p>
+          Reading rule: if one file scans, debounces, or lazy-loads, and another hydrates,
+          observes, and updates state continuously, they have different responsibilities.
+        </p>
+      </section>
+
+      <section class="panel">
+        <h2>3. Lazy promotion is an architectural move</h2>
+        <pre><code>setContentWorkerStartupOptions(options);
+await import(getExtensionResourceUrl("content-worker.js"));</code></pre>
+        <p>
+          Read this as “do not pay the full runtime cost until the page shows evidence that
+          the feature is needed.”
+        </p>
+      </section>
+
+      <section class="panel">
+        <h2>4. Mutation observers usually need a batching seam</h2>
+        <pre><code>const mutationObserver = new MutationObserver((mutations) =&gt; {
+  mutationBatcher.push(mutations);
+});</code></pre>
+        <p>
+          Raw DOM mutation streams are noisy. A batcher is often the seam between observation
+          and meaningful work.
+        </p>
+      </section>
+
+      <section class="panel">
+        <h2>5. Runtime objects often hide a small state machine</h2>
+        <pre><code>return {
+  initialize,
+  onSettingsStorageUpdate,
+  enqueueMutationRoots,
+  recordSelectionConversion,
+  shouldIgnoreMutations,
+  cleanup,
+};</code></pre>
+        <p>
+          If a factory returns a bundle of methods over closed-over state, treat it like a local
+          service with lifecycle phases, not just “a bunch of functions.”
+        </p>
+      </section>
+
+      <section class="panel">
+        <h2>6. Crossing package boundaries usually means “stable seam”</h2>
+        <pre><code>import { createInlineRuntime } from "@fx-inline/inline-runtime/extension";</code></pre>
+        <p>
+          When the app layer imports a package entrypoint instead of deep internals, that is a
+          clue that the package is the intended abstraction boundary.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

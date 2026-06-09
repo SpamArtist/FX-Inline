@@ -16,10 +16,14 @@
   Use for: understanding dynamic imports and lazy module loading in hydration logic.
 - [MDN try...catch](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch)
   Use for: reading fallback paths that recover with cached or null-safe state.
+- [MDN MutationObserver](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver)
+  Use for: understanding how the extension observes DOM changes before batching conversion work.
 - [WXT Entrypoints Guide](https://wxt.dev/guide/essentials/entrypoints)
   Use for: understanding how `background.ts`, popup pages, options pages, and content scripts become extension runtime entrypoints.
 - [WXT Content Scripts Guide](https://wxt.dev/guide/essentials/content-scripts)
   Use for: understanding the content-script model used by the extension’s page-injection logic.
+- [WXT Entrypoint Loaders](https://wxt.dev/guide/essentials/config/entrypoint-loaders)
+  Use for: understanding build-time vs runtime behavior for entrypoints and why runtime code placement matters.
 
 ## Wisdom (Communities)
 
