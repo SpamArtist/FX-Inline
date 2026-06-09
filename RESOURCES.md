@@ -10,6 +10,12 @@
   Use for: reading functions that return promises and use `await`, which appears throughout the extension.
 - [MDN Using promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises)
   Use for: understanding concurrent flows such as `Promise.all(...)` and error handling.
+- [MDN Promise.all()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all)
+  Use for: reading parallel async work, especially in startup and hydration code.
+- [MDN import()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import)
+  Use for: understanding dynamic imports and lazy module loading in hydration logic.
+- [MDN try...catch](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch)
+  Use for: reading fallback paths that recover with cached or null-safe state.
 - [WXT Entrypoints Guide](https://wxt.dev/guide/essentials/entrypoints)
   Use for: understanding how `background.ts`, popup pages, options pages, and content scripts become extension runtime entrypoints.
 - [WXT Content Scripts Guide](https://wxt.dev/guide/essentials/content-scripts)

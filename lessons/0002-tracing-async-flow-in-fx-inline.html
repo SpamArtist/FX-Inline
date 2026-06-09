@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 0002: Tracing Async Flow in FX Inline</title>
+    <style>
+      :root {
+        --bg: #f4f1ea;
+        --paper: #fffdfa;
+        --ink: #1b2430;
+        --muted: #5f6b7a;
+        --line: #ddd3c5;
+        --accent: #1d4ed8;
+        --accent-soft: #dbeafe;
+        --warm: #92400e;
+        --warm-soft: #ffedd5;
+        --code-bg: #161b22;
+        --code-ink: #f8fafc;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        color: var(--ink);
+        font-family: Georgia, "Times New Roman", serif;
+        background:
+          radial-gradient(circle at top left, rgba(29, 78, 216, 0.10), transparent 22rem),
+          radial-gradient(circle at top right, rgba(146, 64, 14, 0.08), transparent 22rem),
+          linear-gradient(180deg, #f8f5ee 0%, #f2ede5 100%);
+      }
+      main {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 40px 22px 72px;
+      }
+      h1, h2, h3 { line-height: 1.12; margin: 0; }
+      h1 { font-size: clamp(2.4rem, 5vw, 4rem); margin-top: 8px; }
+      h2 { font-size: 1.55rem; margin-bottom: 14px; }
+      h3 { font-size: 1.12rem; margin-bottom: 10px; }
+      p, li { font-size: 1.04rem; line-height: 1.74; }
+      .hero {
+        background: linear-gradient(135deg, rgba(255, 253, 250, 0.96), rgba(245, 248, 255, 0.96));
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        padding: 28px;
+        box-shadow: 0 18px 48px rgba(27, 36, 48, 0.08);
+      }
+      .eyebrow, .tag {
+        display: inline-block;
+        padding: 0.35rem 0.7rem;
+        border-radius: 999px;
+        font-size: 0.88rem;
+        letter-spacing: 0.03em;
+      }
+      .eyebrow { background: var(--accent-soft); color: var(--accent); }
+      .tag { background: var(--warm-soft); color: var(--warm); }
+      .lede { color: var(--muted); max-width: 48rem; margin-top: 14px; margin-bottom: 0; }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 18px;
+        margin-top: 22px;
+      }
+      .card, .section {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        padding: 22px;
+        box-shadow: 0 12px 28px rgba(27, 36, 48, 0.05);
+      }
+      .section { margin-top: 20px; }
+      code {
+        font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+        background: #efe9df;
+        border-radius: 6px;
+        padding: 0.12rem 0.35rem;
+      }
+      pre {
+        margin: 12px 0 0;
+        padding: 16px;
+        border-radius: 16px;
+        overflow: auto;
+        background: var(--code-bg);
+        color: var(--code-ink);
+      }
+      a { color: var(--accent); }
+      ol, ul { padding-left: 1.2rem; }
+      .prompt {
+        border-left: 4px solid var(--accent);
+        padding-left: 14px;
+      }
+      .exercise {
+        background: linear-gradient(180deg, #fffefd, #f7fbff);
+      }
+      .footer-note { margin-top: 18px; color: var(--muted); }
+      @media print {
+        body { background: #fff; }
+        .hero, .card, .section { box-shadow: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="hero">
+        <div class="eyebrow">Lesson 0002</div>
+        <h1>Trace Async Flow Without Getting Lost</h1>
+        <p class="lede">
+          This lesson teaches one skill only: how to follow delayed work through this
+          extension. When a file uses <code>async</code>, <code>await</code>,
+          <code>Promise.all(...)</code>, dynamic <code>import(...)</code>, or
+          <code>try/catch</code>, you should be able to tell what happens first, what runs
+          in parallel, and what fallback behavior exists.
+        </p>
+        <div class="grid">
+          <div class="card">
+            <h3>Open this lesson</h3>
+            <p>
+              Run:
+              <code>open /Users/xbotpc/Desktop/XBOTPC/Work/Code/currency-conversion-extension-tool/lessons/0002-tracing-async-flow-in-fx-inline.html</code>
+            </p>
+          </div>
+          <div class="card">
+            <h3>Keep beside it</h3>
+            <p>
+              Use the async reference sheet:
+              <code>/Users/xbotpc/Desktop/XBOTPC/Work/Code/currency-conversion-extension-tool/reference/0002-async-flow-in-fx-inline.html</code>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>The core reading rule</h2>
+        <p>
+          Async code looks sequential, but it is really “start work, wait, continue.”
+          The mistake beginners make is reading it as if everything happens immediately and
+          synchronously.
+        </p>
+        <p>
+          In this repository, async code usually appears for four reasons:
+        </p>
+        <ul>
+          <li>talking to browser APIs such as alarms, tabs, or storage</li>
+          <li>loading cached state or fetching fresh data</li>
+          <li>lazily importing modules only when needed</li>
+          <li>recovering from failure with cached or null-safe fallback values</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h2>Example 1: startup work in the background script</h2>
+        <p>
+          In <code>apps/extension/entrypoints/background.ts</code>, look at this helper:
+        </p>
+        <pre><code>async function initializeRateRefresh(forceRefresh = false) {
+  await Promise.all([
+    scheduleRateRefreshAlarm(),
+    getRates({ forceRefresh }),
+  ]);
+}</code></pre>
+        <p>
+          Read this line by line:
+        </p>
+        <ol>
+          <li>The function is <code>async</code>, so callers receive a promise.</li>
+          <li><code>Promise.all([...])</code> starts both tasks right away.</li>
+          <li>The function waits until both are finished or until one rejects.</li>
+          <li>If either task fails, the whole <code>await</code> throws.</li>
+        </ol>
+        <p class="prompt">
+          Key reading question: “are these tasks independent enough to run in parallel?”
+          Here the answer is yes, because scheduling an alarm and fetching rates do not need
+          to happen one after the other.
+        </p>
+      </section>
+
+      <section class="section">
+        <h2>Example 2: fire-and-observe event handlers</h2>
+        <p>
+          Still in <code>background.ts</code>, notice this call site:
+        </p>
+        <pre><code>browser.runtime.onStartup.addListener(() =&gt; {
+  void initializeRateRefresh().catch((error) =&gt; {
+    logRateRefreshError("onStartup", error);
+  });
+});</code></pre>
+        <p>
+          This is not the same as <code>await initializeRateRefresh()</code>. The event
+          listener starts the work and returns immediately. The <code>void</code> says
+          “ignore the promise value here,” while <code>.catch(...)</code> still handles
+          failures explicitly.
+        </p>
+        <p>
+          Reading rule: in event-driven extension code, this pattern often means
+          “kick off background work, but do not block the event callback on the result.”
+        </p>
+      </section>
+
+      <section class="section">
+        <h2>Example 3: fallback logic in rates loading</h2>
+        <p>
+          In <code>apps/extension/utils/rates/index.ts</code>:
+        </p>
+        <pre><code>const cached = await getCachedRateSnapshot();
+
+if (
+  !opts?.forceRefresh &&
+  isValidSnapshot(cached) &&
+  shouldUseMarketDayCache(cached.marketDayKey)
+) {
+  return cached;
+}
+
+try {
+  const fetched = await fetchLatestUsdSnapshotFromClient();
+  await setCachedRateSnapshot(snapshotWithMarketDay);
+  return snapshotWithMarketDay;
+} catch (error) {
+  if (isValidSnapshot(cached)) {
+    return cached;
+  }
+  throw error;
+}</code></pre>
+        <p>
+          This is the canonical repo pattern for resilient async flow:
+        </p>
+        <ul>
+          <li>read cached state first</li>
+          <li>return early if cache is good enough</li>
+          <li>otherwise fetch fresh data</li>
+          <li>if fetch fails, fall back to cached data when possible</li>
+          <li>only throw if there is no safe cached fallback</li>
+        </ul>
+        <p>
+          When reading a <code>try/catch</code> block here, ask: “what failure is this code
+          trying to survive?”
+        </p>
+      </section>
+
+      <section class="section">
+        <h2>Example 4: lazy module loading in hydration</h2>
+        <p>
+          In <code>apps/extension/hooks/useCurrencyReducer.hydration.ts</code>:
+        </p>
+        <pre><code>if (!readUserSettings || !readRates) {
+  const [{ getUserSettings }, { getCachedRateSnapshot }] = await Promise.all([
+    import("../utils/appStorage"),
+    import("../utils/rates/cache"),
+  ]);
+  readUserSettings = readUserSettings ?? getUserSettings;
+  readRates = readRates ?? getCachedRateSnapshot;
+}</code></pre>
+        <p>
+          There are two important JavaScript ideas here:
+        </p>
+        <ul>
+          <li><code>import(...)</code> is dynamic import. It loads a module at runtime instead of at file parse time.</li>
+          <li>The array destructuring on the left unpacks the resolved modules in order.</li>
+        </ul>
+        <p>
+          Read this as: “if dependencies were not injected, load both modules in parallel,
+          then take the functions I need from each.”
+        </p>
+      </section>
+
+      <section class="section">
+        <h2>Example 5: safe null fallback for UI hydration</h2>
+        <p>
+          The same hydration file ends with:
+        </p>
+        <pre><code>try {
+  const settings = await readUserSettings();
+  const rateSnapshot = await readRates();
+
+  return {
+    preferredCurrency: getPrimaryTargetCurrency(settings.scopes.allUrls),
+    rateSnapshot,
+  };
+} catch {
+  return {
+    preferredCurrency: null,
+    rateSnapshot: null,
+  };
+}</code></pre>
+        <p>
+          This is not just error handling. It defines a UI contract: if hydration fails, the
+          reducer still receives a predictable object shape.
+        </p>
+      </section>
+
+      <section class="section exercise">
+        <h2>Practice: narrate the flow</h2>
+        <p>
+          Pick one of these snippets and explain it out loud or in writing using the words
+          “start”, “wait”, “return”, “fallback”, and “parallel” where appropriate:
+        </p>
+        <ol>
+          <li><code>initializeRateRefresh(...)</code> in <code>background.ts</code></li>
+          <li><code>getRates(...)</code> in <code>apps/extension/utils/rates/index.ts</code></li>
+          <li><code>loadCurrencyReducerHydration(...)</code> in <code>useCurrencyReducer.hydration.ts</code></li>
+        </ol>
+        <p class="prompt">
+          Mini-checkpoint: in <code>getRates(...)</code>, what exact condition causes the
+          function to return cached data without attempting a network fetch?
+        </p>
+      </section>
+
+      <section class="section">
+        <h2>What you should be able to do now</h2>
+        <ul>
+          <li>spot which functions return promises</li>
+          <li>identify where a function pauses on <code>await</code></li>
+          <li>tell when work runs in parallel via <code>Promise.all(...)</code></li>
+          <li>read fallback logic in <code>try/catch</code> blocks</li>
+          <li>recognize lazy module loading with dynamic <code>import(...)</code></li>
+        </ul>
+        <p>
+          If this feels solid, the next high-value lesson is reading TypeScript syntax in this
+          repo without letting the types distract you from the JavaScript underneath.
+        </p>
+      </section>
+
+      <p class="footer-note">
+        Sources: MDN JavaScript Guide, MDN <code>async function</code>,
+        MDN <code>Promise.all()</code>, MDN <code>import()</code>, MDN
+        <code>try...catch</code>, plus the repo files named in the examples.
+      </p>
+    </main>
+  </body>
+</html>
