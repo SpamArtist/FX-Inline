@@ -18,6 +18,7 @@ const DEFAULT_SCAN_TEXT_NODE_LIMIT = 15_000;
 const DEFAULT_SCAN_CHARACTER_LIMIT = 20_000;
 const DEFAULT_MUTATION_SCAN_TEXT_NODE_LIMIT = 1_000;
 const DEFAULT_MUTATION_SCAN_CHARACTER_LIMIT = 20_000;
+const DEFAULT_CHANGED_NODE_FRONTIER_LIMIT = 1_000;
 const CHANGED_TEXT_CONTEXT_SIDE_LIMIT = 4;
 const CHANGED_TEXT_CONTEXT_ANCESTOR_LIMIT = 4;
 const SUPPORTED_CONTENT_PROTOCOLS = new Set(["http:", "https:"]);
@@ -47,6 +48,30 @@ type CharacterDataChangedArea = {
 type MutationActivationChangedArea =
   | AddedChangedArea
   | CharacterDataChangedArea;
+
+type PendingChangedNode = {
+  node: Node;
+  areaType: MutationActivationChangedArea["type"];
+  groupId: number;
+};
+
+type ChangedNodeFrontierDrainResult =
+  | {
+      result: "exhausted";
+      changedAreas: [];
+    }
+  | {
+      result: "clear";
+      changedAreas: MutationActivationChangedArea[];
+    };
+
+type MutationActivationChangedNodeFrontier = {
+  addMutations: (mutations: MutationRecord[]) => void;
+  drain: () => ChangedNodeFrontierDrainResult;
+  clear: () => void;
+  readonly size: number;
+  readonly exhausted: boolean;
+};
 
 type ActivationScanBudget = {
   maxTextNodes: number;
@@ -352,6 +377,156 @@ export function collectMutationActivationChangedAreas(
   return changedAreas;
 }
 
+function nodeContains(ancestor: Node, node: Node): boolean {
+  return ancestor === node || ancestor.contains(node);
+}
+
+function isNodeInsideObservedRoot(node: Node, observedRoot: ParentNode): boolean {
+  const observedNode = observedRoot as Node;
+  return node.isConnected && nodeContains(observedNode, node);
+}
+
+function sortNodesByCurrentDocumentOrder(nodes: Node[]): Node[] {
+  return [...nodes].sort((left, right) => {
+    if (left === right) return 0;
+
+    const position = left.compareDocumentPosition(right);
+    if (position & Node.DOCUMENT_POSITION_PRECEDING) return 1;
+    if (position & Node.DOCUMENT_POSITION_FOLLOWING) return -1;
+
+    return 0;
+  });
+}
+
+export function createMutationActivationChangedNodeFrontier(
+  observedRoot: ParentNode,
+  maxNodes = DEFAULT_CHANGED_NODE_FRONTIER_LIMIT,
+): MutationActivationChangedNodeFrontier {
+  let pendingNodes: PendingChangedNode[] = [];
+  let exhausted = false;
+  let nextGroupId = 0;
+
+  function pruneCoveredNodes(node: Node) {
+    pendingNodes = pendingNodes.filter(
+      (pendingNode) => !nodeContains(node, pendingNode.node),
+    );
+  }
+
+  function addChangedNode(
+    node: Node,
+    areaType: MutationActivationChangedArea["type"],
+    groupId: number,
+  ) {
+    if (exhausted) return;
+
+    for (const pendingNode of pendingNodes) {
+      if (nodeContains(pendingNode.node, node)) return;
+    }
+
+    pruneCoveredNodes(node);
+
+    if (pendingNodes.length >= maxNodes) {
+      exhausted = true;
+      return;
+    }
+
+    pendingNodes.push({ node, areaType, groupId });
+  }
+
+  function addMutations(mutations: MutationRecord[]) {
+    for (const mutation of mutations) {
+      if (exhausted) return;
+
+      if (mutation.type === "characterData") {
+        addChangedNode(mutation.target, "characterData", nextGroupId);
+        nextGroupId += 1;
+        continue;
+      }
+
+      const addedNodes = Array.from(mutation.addedNodes);
+      if (addedNodes.length === 0) continue;
+
+      const groupId = nextGroupId;
+      nextGroupId += 1;
+      for (const node of addedNodes) {
+        addChangedNode(node, "addedNodes", groupId);
+        if (exhausted) return;
+      }
+    }
+  }
+
+  function drain(): ChangedNodeFrontierDrainResult {
+    if (exhausted) {
+      clear();
+      return { result: "exhausted", changedAreas: [] };
+    }
+
+    const connectedNodes = pendingNodes.filter((pendingNode) =>
+      isNodeInsideObservedRoot(pendingNode.node, observedRoot),
+    );
+    clear();
+
+    if (!connectedNodes.length) {
+      return { result: "clear", changedAreas: [] };
+    }
+
+    const groupOrder = new Map<number, number>();
+    const groups = new Map<number, PendingChangedNode[]>();
+    for (const pendingNode of connectedNodes) {
+      if (!groupOrder.has(pendingNode.groupId)) {
+        groupOrder.set(pendingNode.groupId, groupOrder.size);
+      }
+
+      const group = groups.get(pendingNode.groupId) ?? [];
+      group.push(pendingNode);
+      groups.set(pendingNode.groupId, group);
+    }
+
+    const changedAreas: MutationActivationChangedArea[] = [];
+    const orderedGroups = Array.from(groups.entries()).sort(
+      ([leftGroupId], [rightGroupId]) =>
+        groupOrder.get(leftGroupId)! - groupOrder.get(rightGroupId)!,
+    );
+
+    for (const [, group] of orderedGroups) {
+      const [firstNode] = group;
+      if (!firstNode) continue;
+
+      if (firstNode.areaType === "characterData") {
+        changedAreas.push({ type: "characterData", node: firstNode.node });
+        continue;
+      }
+
+      changedAreas.push({
+        type: "addedNodes",
+        nodes: sortNodesByCurrentDocumentOrder(
+          group.map((pendingNode) => pendingNode.node),
+        ),
+      });
+    }
+
+    return { result: "clear", changedAreas };
+  }
+
+  function clear() {
+    pendingNodes = [];
+    exhausted = false;
+    nextGroupId = 0;
+  }
+
+  return {
+    addMutations,
+    drain,
+    clear,
+    get size() {
+      return pendingNodes.length;
+    },
+    get exhausted() {
+      return exhausted;
+    },
+  };
+}
+
 export function scanMutationChangedAreasForCurrencyActivationSignal(
   changedAreas: readonly MutationActivationChangedArea[],
   options: CurrencyActivationScanOptions = {},
@@ -399,7 +574,7 @@ export function createContentActivationController(
 
   let observer: MutationObserver | null = null;
   let mutationScanTimer: ReturnType<Window["setTimeout"]> | null = null;
-  let pendingChangedAreas: MutationActivationChangedArea[] = [];
+  let changedNodeFrontier: MutationActivationChangedNodeFrontier | null = null;
   let pendingWorker: Promise<void> | null = null;
   let isDisposed = false;
   let selectionListenerActive = false;
@@ -414,7 +589,8 @@ export function createContentActivationController(
     clearMutationTimer();
     observer?.disconnect();
     observer = null;
-    pendingChangedAreas = [];
+    changedNodeFrontier?.clear();
+    changedNodeFrontier = null;
 
     if (selectionListenerActive) {
       documentRef.removeEventListener("mouseup", handleSelectionMouseUp);
@@ -454,12 +630,15 @@ export function createContentActivationController(
 
   function flushPendingMutations() {
     mutationScanTimer = null;
-    if (isDisposed || ctx.isInvalid || !pendingChangedAreas.length) return;
+    if (isDisposed || ctx.isInvalid || !changedNodeFrontier) return;
 
-    const changedAreas = pendingChangedAreas;
-    pendingChangedAreas = [];
+    const drainResult = changedNodeFrontier.drain();
     const result =
-      scanMutationChangedAreasForCurrencyActivationSignal(changedAreas);
+      drainResult.result === "exhausted"
+        ? "exhausted"
+        : scanMutationChangedAreasForCurrencyActivationSignal(
+            drainResult.changedAreas,
+          );
 
     if (result === "signal" || result === "exhausted") {
       void loadWorker().catch((error) => {
@@ -479,10 +658,13 @@ export function createContentActivationController(
 
   function handleMutations(mutations: MutationRecord[]) {
     if (isDisposed || ctx.isInvalid) return;
-    const changedAreas = collectMutationActivationChangedAreas(mutations);
-    if (!changedAreas.length) return;
+    if (!changedNodeFrontier) return;
 
-    pendingChangedAreas.push(...changedAreas);
+    const sizeBefore = changedNodeFrontier.size;
+    changedNodeFrontier.addMutations(mutations);
+    if (!changedNodeFrontier.size && !changedNodeFrontier.exhausted && !sizeBefore) {
+      return;
+    }
     scheduleMutationScan();
   }
 
@@ -515,6 +697,7 @@ export function createContentActivationController(
     }
 
     observer = createObserver(handleMutations);
+    changedNodeFrontier = createMutationActivationChangedNodeFrontier(body);
     observer.observe(body, {
       childList: true,
       characterData: true,
