@@ -16,6 +16,8 @@ import { setContentWorkerStartupOptions } from "./contentWorkerStartup";
 const ACTIVATION_MUTATION_DEBOUNCE_MS = 250;
 const DEFAULT_SCAN_TEXT_NODE_LIMIT = 15_000;
 const DEFAULT_SCAN_CHARACTER_LIMIT = 20_000;
+const DEFAULT_MUTATION_SCAN_TEXT_NODE_LIMIT = 1_000;
+const DEFAULT_MUTATION_SCAN_CHARACTER_LIMIT = 20_000;
 const TEXT_CONTEXT_ANCESTOR_LIMIT = 4;
 const SUPPORTED_CONTENT_PROTOCOLS = new Set(["http:", "https:"]);
 const SKIPPED_TEXT_PARENT_TAGS = new Set([
@@ -28,6 +30,27 @@ const SKIPPED_TEXT_PARENT_TAGS = new Set([
   "SVG",
   "CANVAS",
 ]);
+
+type AddedChangedArea = {
+  type: "addedNodes";
+  nodes: Node[];
+};
+
+type CharacterDataChangedArea = {
+  type: "characterData";
+  node: Node;
+};
+
+type MutationActivationChangedArea =
+  | AddedChangedArea
+  | CharacterDataChangedArea;
+
+type ActivationScanBudget = {
+  maxTextNodes: number;
+  maxCharacters: number;
+  scannedTextNodes: number;
+  scannedCharacters: number;
+};
 
 function getDefaultSelectionText(): string {
   return window.getSelection()?.toString() ?? "";
@@ -74,21 +97,91 @@ function getElementTextWithinLimit(
   return text.length > maxCharacters ? text.slice(0, maxCharacters) : text;
 }
 
-function getNodeTextWithinLimit(
-  node: Node,
-  maxCharacters: number,
-): string | null {
-  if (node instanceof Text) {
-    if (isSkippedTextParent(node.parentNode)) return null;
-    return node.data.slice(0, maxCharacters);
+function getOwnerDocument(node: Node): Document | null {
+  if (node instanceof Document) return node;
+  return node.ownerDocument;
+}
+
+function scanTextNodeForCurrencyActivationSignal(
+  node: Text,
+  budget: ActivationScanBudget,
+  rollingText: string,
+): { result: CurrencyActivationScanResult | null; rollingText: string } {
+  if (isSkippedTextParent(node.parentNode)) {
+    return { result: null, rollingText };
   }
 
-  if (node instanceof Element) {
-    if (isSkippedTextParent(node)) return null;
-    return getElementTextWithinLimit(node, maxCharacters);
+  if (
+    budget.scannedTextNodes >= budget.maxTextNodes ||
+    budget.scannedCharacters >= budget.maxCharacters
+  ) {
+    return { result: "exhausted", rollingText };
   }
 
-  return null;
+  budget.scannedTextNodes += 1;
+  const remainingCharacters = budget.maxCharacters - budget.scannedCharacters;
+  const fullText = node.data;
+  const text = fullText.slice(0, remainingCharacters);
+  budget.scannedCharacters += text.length;
+
+  if (hasCurrencyActivationSignal(text)) {
+    return { result: "signal", rollingText };
+  }
+
+  const nextRollingText = appendActivationScanText(rollingText, text);
+  if (hasCurrencyActivationSignal(nextRollingText)) {
+    return { result: "signal", rollingText: nextRollingText };
+  }
+
+  if (fullText.length > remainingCharacters) {
+    return { result: "exhausted", rollingText: nextRollingText };
+  }
+
+  return { result: null, rollingText: nextRollingText };
+}
+
+function scanChangedAreaNodesForCurrencyActivationSignal(
+  nodes: readonly Node[],
+  budget: ActivationScanBudget,
+): CurrencyActivationScanResult {
+  let rollingText = "";
+
+  for (const node of nodes) {
+    if (node instanceof Text) {
+      const scan = scanTextNodeForCurrencyActivationSignal(
+        node,
+        budget,
+        rollingText,
+      );
+      if (scan.result) return scan.result;
+      rollingText = scan.rollingText;
+      continue;
+    }
+
+    if (node instanceof Element && isSkippedTextParent(node)) continue;
+
+    const ownerDocument = getOwnerDocument(node);
+    if (!ownerDocument) continue;
+
+    const walker = ownerDocument.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+    let currentNode = walker.nextNode();
+
+    while (currentNode) {
+      if (currentNode instanceof Text) {
+        const scan = scanTextNodeForCurrencyActivationSignal(
+          currentNode,
+          budget,
+          rollingText,
+        );
+        if (scan.result) return scan.result;
+        rollingText = scan.rollingText;
+      }
+
+      currentNode = walker.nextNode();
+    }
+  }
+
+  return "clear";
 }
 
 function ancestorTextHasCurrencyActivationSignal(
@@ -212,41 +305,72 @@ export function mutationsContainCurrencyActivationSignal(
   mutations: MutationRecord[],
   options: CurrencyActivationScanOptions = {},
 ): boolean {
-  const maxCharacters = options.maxCharacters ?? DEFAULT_SCAN_CHARACTER_LIMIT;
-  let rollingText = "";
+  return (
+    scanMutationChangedAreasForCurrencyActivationSignal(
+      collectMutationActivationChangedAreas(mutations),
+      options,
+    ) === "signal"
+  );
+}
+
+function collectMutationActivationChangedAreas(
+  mutations: MutationRecord[],
+): MutationActivationChangedArea[] {
+  const changedAreas: MutationActivationChangedArea[] = [];
 
   for (const mutation of mutations) {
-    if (
-      mutation.type === "characterData" &&
-      nodeHasCurrencyActivationSignal(mutation.target, options)
-    ) {
-      return true;
+    if (mutation.type === "characterData") {
+      changedAreas.push({ type: "characterData", node: mutation.target });
+      continue;
     }
 
-    const targetText = getNodeTextWithinLimit(mutation.target, maxCharacters);
-    if (targetText) {
-      rollingText = appendActivationScanText(rollingText, targetText);
-      if (hasCurrencyActivationSignal(rollingText)) {
-        return true;
-      }
-    }
+    const addedNodes = Array.from(mutation.addedNodes);
+    if (addedNodes.length === 0) continue;
 
-    for (const node of Array.from(mutation.addedNodes)) {
-      if (nodeHasCurrencyActivationSignal(node, options)) {
-        return true;
-      }
-
-      const nodeText = getNodeTextWithinLimit(node, maxCharacters);
-      if (nodeText) {
-        rollingText = appendActivationScanText(rollingText, nodeText);
-        if (hasCurrencyActivationSignal(rollingText)) {
-          return true;
-        }
-      }
-    }
+    changedAreas.push({
+      type: "addedNodes",
+      nodes: addedNodes,
+    });
   }
 
-  return false;
+  return changedAreas;
+}
+
+export function scanMutationChangedAreasForCurrencyActivationSignal(
+  changedAreas: readonly MutationActivationChangedArea[],
+  options: CurrencyActivationScanOptions = {},
+): CurrencyActivationScanResult {
+  const budget = {
+    maxTextNodes:
+      options.maxTextNodes ?? DEFAULT_MUTATION_SCAN_TEXT_NODE_LIMIT,
+    maxCharacters:
+      options.maxCharacters ?? DEFAULT_MUTATION_SCAN_CHARACTER_LIMIT,
+    scannedTextNodes: 0,
+    scannedCharacters: 0,
+  };
+
+  for (const changedArea of changedAreas) {
+    if (changedArea.type === "characterData") {
+      if (nodeHasCurrencyActivationSignal(changedArea.node, options)) {
+        return "signal";
+      }
+
+      const result = scanChangedAreaNodesForCurrencyActivationSignal(
+        [changedArea.node],
+        budget,
+      );
+      if (result !== "clear") return result;
+      continue;
+    }
+
+    const result = scanChangedAreaNodesForCurrencyActivationSignal(
+      changedArea.nodes,
+      budget,
+    );
+    if (result !== "clear") return result;
+  }
+
+  return "clear";
 }
 
 export function createContentActivationController(
@@ -263,7 +387,7 @@ export function createContentActivationController(
 
   let observer: MutationObserver | null = null;
   let mutationScanTimer: ReturnType<Window["setTimeout"]> | null = null;
-  let pendingMutations: MutationRecord[] = [];
+  let pendingChangedAreas: MutationActivationChangedArea[] = [];
   let pendingWorker: Promise<void> | null = null;
   let isDisposed = false;
   let selectionListenerActive = false;
@@ -278,7 +402,7 @@ export function createContentActivationController(
     clearMutationTimer();
     observer?.disconnect();
     observer = null;
-    pendingMutations = [];
+    pendingChangedAreas = [];
 
     if (selectionListenerActive) {
       documentRef.removeEventListener("mouseup", handleSelectionMouseUp);
@@ -318,12 +442,14 @@ export function createContentActivationController(
 
   function flushPendingMutations() {
     mutationScanTimer = null;
-    if (isDisposed || ctx.isInvalid || !pendingMutations.length) return;
+    if (isDisposed || ctx.isInvalid || !pendingChangedAreas.length) return;
 
-    const mutations = pendingMutations;
-    pendingMutations = [];
+    const changedAreas = pendingChangedAreas;
+    pendingChangedAreas = [];
+    const result =
+      scanMutationChangedAreasForCurrencyActivationSignal(changedAreas);
 
-    if (mutationsContainCurrencyActivationSignal(mutations)) {
+    if (result === "signal" || result === "exhausted") {
       void loadWorker().catch((error) => {
         console.warn("[fx-inline] Failed to start content worker after price detection", error);
       });
@@ -341,7 +467,10 @@ export function createContentActivationController(
 
   function handleMutations(mutations: MutationRecord[]) {
     if (isDisposed || ctx.isInvalid) return;
-    pendingMutations.push(...mutations);
+    const changedAreas = collectMutationActivationChangedAreas(mutations);
+    if (!changedAreas.length) return;
+
+    pendingChangedAreas.push(...changedAreas);
     scheduleMutationScan();
   }
 

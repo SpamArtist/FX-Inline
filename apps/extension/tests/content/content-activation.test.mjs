@@ -3,6 +3,7 @@ import {
   createContentActivationController,
   isSupportedContentScriptUrl,
   mutationsContainCurrencyActivationSignal,
+  scanMutationChangedAreasForCurrencyActivationSignal,
   scanRootForCurrencyActivationSignal,
 } from "../../test-dist/entrypoints/content/contentActivation.js";
 
@@ -215,6 +216,86 @@ test("mutation scan detects split price fragments delivered together", () => {
   ).toBe(true);
 });
 
+test("mutation changed areas use a shared bounded scan budget", () => {
+  const filledAreas = Array.from({ length: 1_000 }, () => ({
+    type: "addedNodes",
+    nodes: [document.createTextNode("x")],
+  }));
+  const priceArea = {
+    type: "addedNodes",
+    nodes: [document.createTextNode("Only USD 25")],
+  };
+
+  expect(
+    scanMutationChangedAreasForCurrencyActivationSignal([
+      {
+        type: "addedNodes",
+        nodes: [document.createTextNode("Only USD 25")],
+      },
+      {
+        type: "addedNodes",
+        nodes: [document.createTextNode("unscanned")],
+      },
+    ]),
+  ).toBe("signal");
+  expect(
+    scanMutationChangedAreasForCurrencyActivationSignal([
+      ...filledAreas,
+      priceArea,
+    ]),
+  ).toBe("exhausted");
+});
+
+test("mutation changed area checks partial boundary text before exhaustion", () => {
+  const boundaryText = document.createTextNode("Only USD 25");
+
+  expect(
+    scanMutationChangedAreasForCurrencyActivationSignal(
+      [{ type: "addedNodes", nodes: [boundaryText] }],
+      { maxCharacters: 11 },
+    ),
+  ).toBe("signal");
+  expect(
+    scanMutationChangedAreasForCurrencyActivationSignal(
+      [{ type: "addedNodes", nodes: [boundaryText] }],
+      { maxCharacters: 9 },
+    ),
+  ).toBe("exhausted");
+});
+
+test("mutation childList scan avoids target and element textContent reads", () => {
+  const container = document.createElement("section");
+  container.textContent = "x".repeat(30_000);
+  const addedNode = document.createElement("span");
+  addedNode.append(document.createTextNode("Now $25"));
+
+  const textContentGet = jest.spyOn(Node.prototype, "textContent", "get");
+
+  expect(
+    mutationsContainCurrencyActivationSignal([
+      { type: "childList", target: container, addedNodes: [addedNode] },
+    ]),
+  ).toBe(true);
+  expect(textContentGet).not.toHaveBeenCalled();
+});
+
+test("mutation changed area stops scanning after first added price", () => {
+  const first = document.createTextNode("Now $25");
+  const later = document.createTextNode("unscanned");
+  Object.defineProperty(later, "data", {
+    get() {
+      throw new Error("later changed area scanned");
+    },
+  });
+
+  expect(
+    scanMutationChangedAreasForCurrencyActivationSignal([
+      { type: "addedNodes", nodes: [first] },
+      { type: "addedNodes", nodes: [later] },
+    ]),
+  ).toBe("signal");
+});
+
 test("activation controller observes child additions and lazy-loads worker after debounce", async () => {
   const { ctx } = createLifecycleContext();
   const importContentWorker = jest.fn().mockResolvedValue(undefined);
@@ -261,6 +342,150 @@ test("activation controller observes child additions and lazy-loads worker after
 
   expect(importContentWorker).toHaveBeenCalledTimes(1);
   expect(importContentWorker).toHaveBeenCalledWith({});
+  expect(observer.disconnect).toHaveBeenCalledTimes(1);
+});
+
+test("activation controller uses one fixed mutation batch window", async () => {
+  const { ctx } = createLifecycleContext();
+  const importContentWorker = jest.fn().mockResolvedValue(undefined);
+  let mutationCallback = null;
+  const observer = {
+    observe: jest.fn(),
+    disconnect: jest.fn(),
+  };
+  const createMutationObserver = jest.fn((callback) => {
+    mutationCallback = callback;
+    return observer;
+  });
+
+  document.body.innerHTML = "<main><p>No price yet</p></main>";
+
+  createContentActivationController(ctx, {
+    document,
+    locationHref: "https://example.com/",
+    importContentWorker,
+    setTimeout: window.setTimeout,
+    clearTimeout: window.clearTimeout,
+    createMutationObserver,
+  }).start();
+
+  mutationCallback([
+    {
+      type: "childList",
+      addedNodes: [document.createTextNode("Loading")],
+    },
+  ]);
+  jest.advanceTimersByTime(200);
+  mutationCallback([
+    {
+      type: "childList",
+      addedNodes: [document.createTextNode("Now $25")],
+    },
+  ]);
+
+  jest.advanceTimersByTime(49);
+  expect(importContentWorker).not.toHaveBeenCalled();
+
+  jest.advanceTimersByTime(1);
+  await Promise.resolve();
+  await Promise.resolve();
+
+  expect(importContentWorker).toHaveBeenCalledTimes(1);
+  expect(observer.disconnect).toHaveBeenCalledTimes(1);
+});
+
+test("activation controller loads worker after exhausted mutation scan", async () => {
+  const { ctx } = createLifecycleContext();
+  const importContentWorker = jest.fn().mockResolvedValue(undefined);
+  let mutationCallback = null;
+  const observer = {
+    observe: jest.fn(),
+    disconnect: jest.fn(),
+  };
+  const createMutationObserver = jest.fn((callback) => {
+    mutationCallback = callback;
+    return observer;
+  });
+
+  document.body.innerHTML = "<main><p>No price yet</p></main>";
+
+  createContentActivationController(ctx, {
+    document,
+    locationHref: "https://example.com/",
+    importContentWorker,
+    setTimeout: window.setTimeout,
+    clearTimeout: window.clearTimeout,
+    createMutationObserver,
+  }).start();
+
+  const largeFragment = document.createDocumentFragment();
+  for (let index = 0; index < 1_001; index += 1) {
+    largeFragment.append(document.createTextNode("x"));
+  }
+
+  mutationCallback([
+    {
+      type: "childList",
+      addedNodes: [largeFragment],
+    },
+  ]);
+
+  jest.advanceTimersByTime(250);
+  await Promise.resolve();
+  await Promise.resolve();
+
+  expect(importContentWorker).toHaveBeenCalledTimes(1);
+  expect(observer.disconnect).toHaveBeenCalledTimes(1);
+});
+
+test("activation controller keeps observing after clear mutation scan", async () => {
+  const { ctx } = createLifecycleContext();
+  const importContentWorker = jest.fn().mockResolvedValue(undefined);
+  let mutationCallback = null;
+  const observer = {
+    observe: jest.fn(),
+    disconnect: jest.fn(),
+  };
+  const createMutationObserver = jest.fn((callback) => {
+    mutationCallback = callback;
+    return observer;
+  });
+
+  document.body.innerHTML = "<main><p>No price yet</p></main>";
+
+  createContentActivationController(ctx, {
+    document,
+    locationHref: "https://example.com/",
+    importContentWorker,
+    setTimeout: window.setTimeout,
+    clearTimeout: window.clearTimeout,
+    createMutationObserver,
+  }).start();
+
+  mutationCallback([
+    {
+      type: "childList",
+      addedNodes: [document.createTextNode("Loading")],
+    },
+  ]);
+  jest.advanceTimersByTime(250);
+  await Promise.resolve();
+  await Promise.resolve();
+
+  expect(importContentWorker).not.toHaveBeenCalled();
+  expect(observer.disconnect).not.toHaveBeenCalled();
+
+  mutationCallback([
+    {
+      type: "childList",
+      addedNodes: [document.createTextNode("Now $25")],
+    },
+  ]);
+  jest.advanceTimersByTime(250);
+  await Promise.resolve();
+  await Promise.resolve();
+
+  expect(importContentWorker).toHaveBeenCalledTimes(1);
   expect(observer.disconnect).toHaveBeenCalledTimes(1);
 });
 
