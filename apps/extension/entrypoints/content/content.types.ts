@@ -81,6 +81,8 @@ export type CurrencyActivationScanOptions = {
   maxCharacters?: number;
 };
 
+export type CurrencyActivationScanResult = "signal" | "clear" | "exhausted";
+
 export type MutationRootBatcherDeps = {
   collectRoots: (mutations: MutationRecord[]) => ParentNode[];
   enqueueRoots: (roots: ParentNode[]) => void;

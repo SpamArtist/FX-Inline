@@ -47,11 +47,11 @@ test("root scan ignores script text and finds page-visible currency text", () =>
     <main><p>No price here</p></main>
   `;
 
-  expect(scanRootForCurrencyActivationSignal(document.body)).toBe(false);
+  expect(scanRootForCurrencyActivationSignal(document.body)).toBe("clear");
 
   document.querySelector("main").append("Plans start at €49");
 
-  expect(scanRootForCurrencyActivationSignal(document.body)).toBe(true);
+  expect(scanRootForCurrencyActivationSignal(document.body)).toBe("signal");
 });
 
 test("root scan detects listing prices split across text nodes", () => {
@@ -74,7 +74,91 @@ test("root scan detects listing prices split across text nodes", () => {
     scanRootForCurrencyActivationSignal(document.body, {
       maxTextNodes: 30,
     }),
-  ).toBe(true);
+  ).toBe("signal");
+});
+
+test("root scan returns only explicit activation results", () => {
+  document.body.textContent = "No price";
+  const clearResult = scanRootForCurrencyActivationSignal(document.body);
+
+  document.body.textContent = "$25";
+  const signalResult = scanRootForCurrencyActivationSignal(document.body);
+
+  document.body.textContent = "x".repeat(4);
+  const exhaustedResult = scanRootForCurrencyActivationSignal(document.body, {
+    maxCharacters: 3,
+  });
+
+  expect(new Set([clearResult, signalResult, exhaustedResult])).toEqual(
+    new Set(["clear", "signal", "exhausted"]),
+  );
+});
+
+test("root scan treats exact final budget use as clear", () => {
+  const first = document.createElement("span");
+  first.textContent = "A";
+  const second = document.createElement("span");
+  second.textContent = "B";
+  document.body.append(first, second);
+
+  expect(
+    scanRootForCurrencyActivationSignal(document.body, {
+      maxTextNodes: 2,
+      maxCharacters: 2,
+    }),
+  ).toBe("clear");
+});
+
+test("root scan does not charge ignored and non-text nodes to budgets", () => {
+  const ignoredScript = document.createElement("script");
+  ignoredScript.textContent = "const ignoredPrice = '$999';";
+  const ignoredSpan = document.createElement("span");
+  ignoredSpan.dataset.fxInlineIgnore = "";
+  ignoredSpan.textContent = "$888";
+  const eligible = document.createElement("span");
+  eligible.textContent = "A";
+  document.body.append(ignoredScript, ignoredSpan, eligible);
+  document.body.prepend(document.createComment("$777"));
+
+  expect(
+    scanRootForCurrencyActivationSignal(document.body, {
+      maxTextNodes: 1,
+      maxCharacters: 1,
+    }),
+  ).toBe("clear");
+});
+
+test("root scan reports exhausted only after finding more eligible text", () => {
+  const first = document.createElement("span");
+  first.textContent = "A";
+  const second = document.createElement("span");
+  second.textContent = "B";
+  document.body.append(first, second);
+
+  expect(
+    scanRootForCurrencyActivationSignal(document.body, {
+      maxTextNodes: 1,
+      maxCharacters: 5,
+    }),
+  ).toBe("exhausted");
+});
+
+test("root scan checks a partial final text node prefix before exhaustion", () => {
+  document.body.textContent = "$25 per night";
+
+  expect(
+    scanRootForCurrencyActivationSignal(document.body, {
+      maxCharacters: 3,
+    }),
+  ).toBe("signal");
+
+  document.body.textContent = "Only USD 25";
+
+  expect(
+    scanRootForCurrencyActivationSignal(document.body, {
+      maxCharacters: 8,
+    }),
+  ).toBe("exhausted");
 });
 
 test("mutation scan checks added nodes and character data updates", () => {
@@ -207,6 +291,35 @@ test("activation controller starts immediately on existing split listing prices"
   expect(importContentWorker).toHaveBeenCalledTimes(1);
   expect(importContentWorker).toHaveBeenCalledWith({});
   expect(createMutationObserver).not.toHaveBeenCalled();
+});
+
+test("activation controller keeps worker lazy after exhausted initial scan", async () => {
+  const { ctx } = createLifecycleContext();
+  const importContentWorker = jest.fn().mockResolvedValue(undefined);
+  const observer = {
+    observe: jest.fn(),
+    disconnect: jest.fn(),
+  };
+  const createMutationObserver = jest.fn(() => observer);
+
+  document.body.textContent = "x".repeat(20_001);
+
+  createContentActivationController(ctx, {
+    document,
+    locationHref: "https://example.com/search",
+    importContentWorker,
+    createMutationObserver,
+  }).start();
+
+  await Promise.resolve();
+  await Promise.resolve();
+
+  expect(importContentWorker).not.toHaveBeenCalled();
+  expect(observer.observe).toHaveBeenCalledWith(document.body, {
+    childList: true,
+    characterData: true,
+    subtree: true,
+  });
 });
 
 test("activation controller lazy-loads worker when a text node becomes a price", async () => {

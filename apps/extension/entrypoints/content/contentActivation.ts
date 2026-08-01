@@ -3,6 +3,7 @@ import type {
   ContentActivationControllerDeps,
   ContentScriptLifecycleContext,
   ContentWorkerStartOptions,
+  CurrencyActivationScanResult,
   CurrencyActivationScanOptions,
   ExtensionRuntimeUrlGlobal,
 } from "./content.types";
@@ -159,12 +160,12 @@ export function nodeHasCurrencyActivationSignal(
 export function scanRootForCurrencyActivationSignal(
   root: ParentNode,
   options: CurrencyActivationScanOptions = {},
-): boolean {
+): CurrencyActivationScanResult {
   const maxTextNodes = options.maxTextNodes ?? DEFAULT_SCAN_TEXT_NODE_LIMIT;
   const maxCharacters = options.maxCharacters ?? DEFAULT_SCAN_CHARACTER_LIMIT;
   const rootNode = root as Node;
   const ownerDocument = root instanceof Document ? root : rootNode.ownerDocument;
-  if (!ownerDocument) return false;
+  if (!ownerDocument) return "clear";
 
   const walker = ownerDocument.createTreeWalker(rootNode, NodeFilter.SHOW_TEXT);
   let scannedTextNodes = 0;
@@ -172,29 +173,39 @@ export function scanRootForCurrencyActivationSignal(
   let rollingText = "";
   let currentNode = walker.nextNode();
 
-  while (currentNode && scannedTextNodes < maxTextNodes) {
+  while (currentNode) {
     if (currentNode instanceof Text && !isSkippedTextParent(currentNode.parentNode)) {
+      if (
+        scannedTextNodes >= maxTextNodes ||
+        scannedCharacters >= maxCharacters
+      ) {
+        return "exhausted";
+      }
+
       scannedTextNodes += 1;
       const remainingCharacters = maxCharacters - scannedCharacters;
-      if (remainingCharacters <= 0) return false;
-
-      const text = currentNode.data.slice(0, remainingCharacters);
+      const fullText = currentNode.data;
+      const text = fullText.slice(0, remainingCharacters);
       scannedCharacters += text.length;
 
       if (hasCurrencyActivationSignal(text)) {
-        return true;
+        return "signal";
       }
 
       rollingText = appendActivationScanText(rollingText, text);
       if (hasCurrencyActivationSignal(rollingText)) {
-        return true;
+        return "signal";
+      }
+
+      if (fullText.length > remainingCharacters) {
+        return "exhausted";
       }
     }
 
     currentNode = walker.nextNode();
   }
 
-  return false;
+  return "clear";
 }
 
 export function mutationsContainCurrencyActivationSignal(
@@ -355,7 +366,7 @@ export function createContentActivationController(
 
     startSelectionListener();
 
-    if (scanRootForCurrencyActivationSignal(body)) {
+    if (scanRootForCurrencyActivationSignal(body) === "signal") {
       void loadWorker().catch((error) => {
         console.warn("[fx-inline] Failed to start content worker after initial price scan", error);
       });
