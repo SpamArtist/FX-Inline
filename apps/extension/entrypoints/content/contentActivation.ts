@@ -31,6 +31,8 @@ const SKIPPED_TEXT_PARENT_TAGS = new Set([
   "SVG",
   "CANVAS",
 ]);
+const SKIPPED_TEXT_PARENT_SELECTOR =
+  ".fx-inline-conversion, .ccx-inline-conversion, [data-fx-inline-ignore]";
 
 type AddedChangedArea = {
   type: "addedNodes";
@@ -87,7 +89,7 @@ function isSkippedTextParent(parent: Node | null): boolean {
   if (!(parent instanceof Element)) return false;
   if (SKIPPED_TEXT_PARENT_TAGS.has(parent.tagName)) return true;
 
-  return Boolean(parent.closest(".ccx-inline-conversion, [data-fx-inline-ignore]"));
+  return Boolean(parent.closest(SKIPPED_TEXT_PARENT_SELECTOR));
 }
 
 function getOwnerDocument(node: Node): Document | null {

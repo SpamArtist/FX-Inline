@@ -1,6 +1,8 @@
 const ELEMENT_NODE = 1;
 const TEXT_NODE = 3;
 const DOCUMENT_FRAGMENT_NODE = 11;
+const EXCLUDED_MUTATION_ROOT_SELECTOR =
+  ".fx-inline-conversion, .ccx-inline-conversion, [data-fx-inline-ignore]";
 
 function getNodeDepth(node: ParentNode): number {
   let depth = 0;
@@ -51,6 +53,18 @@ function toConversionRoot(
   return null;
 }
 
+function shouldExcludeConversionRoot(root: ParentNode, popupRoot: Node | null): boolean {
+  const rootNode = root as Node;
+  if (popupRoot && rootNode === popupRoot) return true;
+
+  if (rootNode.nodeType !== ELEMENT_NODE) return false;
+  if (typeof (rootNode as Element).closest !== "function") return false;
+
+  return Boolean(
+    (rootNode as Element).closest(EXCLUDED_MUTATION_ROOT_SELECTOR),
+  );
+}
+
 export function collectMutationConversionRoots(
   mutations: readonly MutationRecord[],
   popupRoot: Node | null,
@@ -60,7 +74,7 @@ export function collectMutationConversionRoots(
   for (const mutation of mutations) {
     if (mutation.type === "characterData") {
       const root = toConversionRoot(mutation.target, popupRoot);
-      if (root) roots.add(root);
+      if (root && !shouldExcludeConversionRoot(root, popupRoot)) roots.add(root);
       continue;
     }
 
@@ -68,7 +82,7 @@ export function collectMutationConversionRoots(
 
     for (const node of mutation.addedNodes) {
       const root = toConversionRoot(node, popupRoot);
-      if (root) roots.add(root);
+      if (root && !shouldExcludeConversionRoot(root, popupRoot)) roots.add(root);
     }
   }
 

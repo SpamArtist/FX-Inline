@@ -136,6 +136,36 @@ test("root scan does not charge ignored and non-text nodes to budgets", () => {
   ).toBe("clear");
 });
 
+test("root scan excludes page ignore and inline conversion output ancestors", () => {
+  document.body.innerHTML = [
+    '<section data-fx-inline-ignore><p>$111</p></section>',
+    '<section><p data-fx-inline-ignore>$222</p></section>',
+    '<section class="fx-inline-conversion"><span>$333</span></section>',
+    '<section><span class="ccx-inline-conversion">$444</span></section>',
+    "<main><p>No price here</p></main>",
+  ].join("");
+
+  const textContentGet = jest.spyOn(Node.prototype, "textContent", "get");
+  const dataGet = jest.spyOn(Text.prototype, "data", "get");
+
+  expect(scanRootForCurrencyActivationSignal(document.body)).toBe("clear");
+  expect(textContentGet).not.toHaveBeenCalled();
+  expect(dataGet).toHaveBeenCalledTimes(1);
+});
+
+test("root scan keeps non-requested activation exclusions out", () => {
+  for (const fixture of [
+    "<button>Now $25</button>",
+    "<code>Now $25</code>",
+    "<pre>Now $25</pre>",
+    "<div hidden>Now $25</div>",
+    '<div contenteditable="true">Now $25</div>',
+  ]) {
+    document.body.innerHTML = fixture;
+    expect(scanRootForCurrencyActivationSignal(document.body)).toBe("signal");
+  }
+});
+
 test("root scan reports exhausted only after finding more eligible text", () => {
   const first = document.createElement("span");
   first.textContent = "A";
@@ -410,6 +440,65 @@ test("mutation childList scan avoids target and element textContent reads", () =
       { type: "childList", target: container, addedNodes: [addedNode] },
     ]),
   ).toBe("signal");
+  expect(textContentGet).not.toHaveBeenCalled();
+});
+
+test("mutation scan excludes page ignore and inline conversion output ancestors", () => {
+  const ignored = document.createElement("section");
+  ignored.dataset.fxInlineIgnore = "";
+  ignored.append(document.createElement("span"));
+  ignored.firstElementChild.append(document.createTextNode("$111"));
+  const currentOutput = document.createElement("section");
+  currentOutput.className = "fx-inline-conversion";
+  currentOutput.append(document.createElement("span"));
+  currentOutput.firstElementChild.append(document.createTextNode("$222"));
+  const oldOutput = document.createElement("section");
+  oldOutput.className = "ccx-inline-conversion";
+  oldOutput.append(document.createElement("span"));
+  oldOutput.firstElementChild.append(document.createTextNode("$333"));
+  const eligible = document.createElement("section");
+  eligible.append(document.createTextNode("No price"));
+
+  const textContentGet = jest.spyOn(Node.prototype, "textContent", "get");
+  const dataGet = jest.spyOn(Text.prototype, "data", "get");
+
+  expect(
+    scanMutations([
+      { type: "childList", addedNodes: [ignored.firstElementChild] },
+      { type: "childList", addedNodes: [currentOutput.firstElementChild] },
+      { type: "childList", addedNodes: [oldOutput.firstElementChild] },
+      { type: "childList", addedNodes: [eligible] },
+    ]),
+  ).toBe("clear");
+  expect(textContentGet).not.toHaveBeenCalled();
+  expect(dataGet).toHaveBeenCalledTimes(1);
+});
+
+test("mutation scan keeps text node and character work inside configured budgets", () => {
+  const nodes = Array.from({ length: 5 }, () => document.createTextNode("x"));
+  const price = document.createTextNode("USD 25");
+
+  const dataGet = jest.spyOn(Text.prototype, "data", "get");
+  const textContentGet = jest.spyOn(Node.prototype, "textContent", "get");
+
+  expect(
+    scanMutationChangedAreasForCurrencyActivationSignal(
+      [{ type: "addedNodes", nodes }],
+      { maxTextNodes: 3, maxCharacters: 20 },
+    ),
+  ).toBe("exhausted");
+  expect(dataGet).toHaveBeenCalledTimes(3);
+  expect(textContentGet).not.toHaveBeenCalled();
+
+  dataGet.mockClear();
+
+  expect(
+    scanMutationChangedAreasForCurrencyActivationSignal(
+      [{ type: "addedNodes", nodes: [price] }],
+      { maxTextNodes: 10, maxCharacters: 3 },
+    ),
+  ).toBe("exhausted");
+  expect(dataGet).toHaveBeenCalledTimes(1);
   expect(textContentGet).not.toHaveBeenCalled();
 });
 
