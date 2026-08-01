@@ -1,7 +1,6 @@
 import { jest } from "@jest/globals";
 import {
   createContentActivationController,
-  hasCurrencyActivationSignal,
   isSupportedContentScriptUrl,
   mutationsContainCurrencyActivationSignal,
   scanRootForCurrencyActivationSignal,
@@ -32,14 +31,6 @@ afterEach(() => {
   jest.useRealTimers();
   jest.restoreAllMocks();
   document.body.innerHTML = "";
-});
-
-test("currency activation signal detects prices without accepting generic status text", () => {
-  expect(hasCurrencyActivationSignal("$129.99")).toBe(true);
-  expect(hasCurrencyActivationSignal("USD 129.99")).toBe(true);
-  expect(hasCurrencyActivationSignal("129.99 EUR")).toBe(true);
-  expect(hasCurrencyActivationSignal("￥39,000")).toBe(true);
-  expect(hasCurrencyActivationSignal("API 200 OK")).toBe(false);
 });
 
 test("activation URL guard keeps unsupported schemes out of content startup", () => {

@@ -6,12 +6,15 @@ import type {
   CurrencyActivationScanOptions,
   ExtensionRuntimeUrlGlobal,
 } from "./content.types";
+import {
+  appendActivationScanText,
+  hasCurrencyActivationSignal,
+} from "./activationSignal";
 import { setContentWorkerStartupOptions } from "./contentWorkerStartup";
 
 const ACTIVATION_MUTATION_DEBOUNCE_MS = 250;
 const DEFAULT_SCAN_TEXT_NODE_LIMIT = 15_000;
 const DEFAULT_SCAN_CHARACTER_LIMIT = 20_000;
-const ACTIVATION_TEXT_WINDOW_LIMIT = 512;
 const TEXT_CONTEXT_ANCESTOR_LIMIT = 4;
 const SUPPORTED_CONTENT_PROTOCOLS = new Set(["http:", "https:"]);
 const SKIPPED_TEXT_PARENT_TAGS = new Set([
@@ -24,18 +27,6 @@ const SKIPPED_TEXT_PARENT_TAGS = new Set([
   "SVG",
   "CANVAS",
 ]);
-
-const CURRENCY_SYMBOL_PATTERN =
-  "(?:US\\$|AU\\$|CA\\$|NZ\\$|HK\\$|MX\\$|NT\\$|EC\\$|RD\\$|R\\$|[$€£¥₹₩₪₫₱฿₦₲₡₨₭₮₯₰₳₴₵₷₸₺￥＄￡￦￠﹩])";
-const ISO_CODE_PATTERN =
-  "(?:AED|AFN|ALL|AMD|AOA|ARS|AUD|AWG|AZN|BAM|BBD|BDT|BHD|BIF|BMD|BND|BOB|BRL|BSD|BWP|BYN|BZD|CAD|CDF|CHF|CLP|CNY|COP|CRC|CUP|CVE|CZK|DJF|DKK|DOP|DZD|EGP|ERN|ETB|EUR|FJD|FKP|GBP|GEL|GHS|GIP|GMD|GNF|GTQ|GYD|HKD|HNL|HUF|IDR|ILS|INR|IQD|IRR|ISK|JMD|JOD|JPY|KES|KGS|KHR|KMF|KRW|KWD|KYD|KZT|LAK|LBP|LKR|LRD|LYD|MAD|MDL|MGA|MKD|MMK|MNT|MOP|MRU|MUR|MVR|MWK|MXN|MYR|MZN|NGN|NIO|NOK|NPR|NZD|OMR|PEN|PGK|PHP|PKR|PLN|PYG|QAR|RON|RSD|RUB|RWF|SAR|SBD|SCR|SDG|SEK|SGD|SHP|SLE|SOS|SRD|SSP|STN|SYP|SZL|THB|TJS|TMT|TND|TOP|TRY|TTD|TWD|TZS|UAH|UGX|USD|UYU|UZS|VES|VND|VUV|WST|XAF|XCD|XCG|XOF|YER|ZAR|ZMW|ZWL)";
-const NUMBER_PATTERN = "\\d[\\d\\s.,'’]*(?:\\d|[.,]\\d)?";
-const CURRENCY_ACTIVATION_PATTERNS = [
-  new RegExp(`${CURRENCY_SYMBOL_PATTERN}\\s*${NUMBER_PATTERN}`, "u"),
-  new RegExp(`${NUMBER_PATTERN}\\s*${CURRENCY_SYMBOL_PATTERN}`, "u"),
-  new RegExp(`\\b${ISO_CODE_PATTERN}\\b\\s*${NUMBER_PATTERN}`, "u"),
-  new RegExp(`${NUMBER_PATTERN}\\s*\\b${ISO_CODE_PATTERN}\\b`, "u"),
-];
 
 function getDefaultSelectionText(): string {
   return window.getSelection()?.toString() ?? "";
@@ -80,25 +71,6 @@ function getElementTextWithinLimit(
 ): string {
   const text = element.textContent ?? "";
   return text.length > maxCharacters ? text.slice(0, maxCharacters) : text;
-}
-
-function normalizeActivationScanText(text: string): string {
-  return text.replace(/\s+/gu, " ").trim();
-}
-
-function appendActivationScanText(rollingText: string, text: string): string {
-  const normalizedText = normalizeActivationScanText(text);
-  if (!normalizedText) return rollingText;
-
-  const nextText = rollingText
-    ? `${rollingText} ${normalizedText}`
-    : normalizedText;
-
-  if (nextText.length <= ACTIVATION_TEXT_WINDOW_LIMIT) {
-    return nextText;
-  }
-
-  return nextText.slice(nextText.length - ACTIVATION_TEXT_WINDOW_LIMIT);
 }
 
 function getNodeTextWithinLimit(
@@ -151,13 +123,6 @@ export function isSupportedContentScriptUrl(url: string): boolean {
   } catch {
     return false;
   }
-}
-
-export function hasCurrencyActivationSignal(text: string): boolean {
-  if (!text || !/\d/u.test(text)) return false;
-  const normalized = text.normalize("NFKC");
-
-  return CURRENCY_ACTIVATION_PATTERNS.some((pattern) => pattern.test(normalized));
 }
 
 export function nodeHasCurrencyActivationSignal(
