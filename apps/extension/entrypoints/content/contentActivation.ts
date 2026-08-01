@@ -18,7 +18,8 @@ const DEFAULT_SCAN_TEXT_NODE_LIMIT = 15_000;
 const DEFAULT_SCAN_CHARACTER_LIMIT = 20_000;
 const DEFAULT_MUTATION_SCAN_TEXT_NODE_LIMIT = 1_000;
 const DEFAULT_MUTATION_SCAN_CHARACTER_LIMIT = 20_000;
-const TEXT_CONTEXT_ANCESTOR_LIMIT = 4;
+const CHANGED_TEXT_CONTEXT_SIDE_LIMIT = 4;
+const CHANGED_TEXT_CONTEXT_ANCESTOR_LIMIT = 4;
 const SUPPORTED_CONTENT_PROTOCOLS = new Set(["http:", "https:"]);
 const SKIPPED_TEXT_PARENT_TAGS = new Set([
   "SCRIPT",
@@ -89,17 +90,13 @@ function isSkippedTextParent(parent: Node | null): boolean {
   return Boolean(parent.closest(".ccx-inline-conversion, [data-fx-inline-ignore]"));
 }
 
-function getElementTextWithinLimit(
-  element: Element,
-  maxCharacters: number,
-): string {
-  const text = element.textContent ?? "";
-  return text.length > maxCharacters ? text.slice(0, maxCharacters) : text;
-}
-
 function getOwnerDocument(node: Node): Document | null {
   if (node instanceof Document) return node;
   return node.ownerDocument;
+}
+
+function isEligibleActivationTextNode(node: Node): node is Text {
+  return node instanceof Text && !isSkippedTextParent(node.parentNode);
 }
 
 function scanTextNodeForCurrencyActivationSignal(
@@ -140,6 +137,97 @@ function scanTextNodeForCurrencyActivationSignal(
   return { result: null, rollingText: nextRollingText };
 }
 
+function getChangedTextContextRoot(node: Text): Node {
+  let root: Node = node;
+  let climbedAncestors = 0;
+
+  while (
+    root.parentNode &&
+    !(root.parentNode instanceof Document) &&
+    climbedAncestors < CHANGED_TEXT_CONTEXT_ANCESTOR_LIMIT
+  ) {
+    root = root.parentNode;
+    climbedAncestors += 1;
+  }
+
+  return root;
+}
+
+function getPreviousNodeInContext(node: Node, root: Node): Node | null {
+  if (node === root) return null;
+
+  let previous = node.previousSibling;
+  if (previous) {
+    while (previous.lastChild) {
+      previous = previous.lastChild;
+    }
+
+    return previous;
+  }
+
+  const parent = node.parentNode;
+  if (!parent || parent === root) return null;
+
+  return parent;
+}
+
+function getNextNodeInContext(node: Node, root: Node): Node | null {
+  if (node.firstChild) return node.firstChild;
+
+  let current: Node | null = node;
+  while (current && current !== root) {
+    if (current.nextSibling) return current.nextSibling;
+    current = current.parentNode;
+  }
+
+  return null;
+}
+
+function collectChangedTextContextNodes(node: Text): Text[] {
+  if (!isEligibleActivationTextNode(node)) return [];
+
+  const root = getChangedTextContextRoot(node);
+  const before: Text[] = [];
+  let current: Node | null = node;
+
+  while (before.length < CHANGED_TEXT_CONTEXT_SIDE_LIMIT) {
+    current = getPreviousNodeInContext(current, root);
+    if (!current) break;
+    if (isEligibleActivationTextNode(current)) before.push(current);
+  }
+
+  const after: Text[] = [];
+  current = node;
+
+  while (after.length < CHANGED_TEXT_CONTEXT_SIDE_LIMIT) {
+    current = getNextNodeInContext(current, root);
+    if (!current) break;
+    if (isEligibleActivationTextNode(current)) after.push(current);
+  }
+
+  return [...before.reverse(), node, ...after];
+}
+
+function scanChangedTextContextForCurrencyActivationSignal(
+  node: Node,
+  budget: ActivationScanBudget,
+): CurrencyActivationScanResult {
+  if (!(node instanceof Text)) return "clear";
+
+  let rollingText = "";
+  for (const textNode of collectChangedTextContextNodes(node)) {
+    const scan = scanTextNodeForCurrencyActivationSignal(
+      textNode,
+      budget,
+      rollingText,
+    );
+    if (scan.result) return scan.result;
+    rollingText = scan.rollingText;
+  }
+
+  return "clear";
+}
+
 function scanChangedAreaNodesForCurrencyActivationSignal(
   nodes: readonly Node[],
   budget: ActivationScanBudget,
@@ -148,11 +236,7 @@ function scanChangedAreaNodesForCurrencyActivationSignal(
 
   for (const node of nodes) {
     if (node instanceof Text) {
-      const scan = scanTextNodeForCurrencyActivationSignal(
-        node,
-        budget,
-        rollingText,
-      );
+      const scan = scanTextNodeForCurrencyActivationSignal(node, budget, rollingText);
       if (scan.result) return scan.result;
       rollingText = scan.rollingText;
       continue;
@@ -184,70 +268,12 @@ function scanChangedAreaNodesForCurrencyActivationSignal(
   return "clear";
 }
 
-function ancestorTextHasCurrencyActivationSignal(
-  element: Element,
-  maxCharacters: number,
-): boolean {
-  let currentElement: Element | null = element;
-  let checkedAncestors = 0;
-
-  while (
-    currentElement &&
-    checkedAncestors < TEXT_CONTEXT_ANCESTOR_LIMIT &&
-    !isSkippedTextParent(currentElement)
-  ) {
-    if (
-      hasCurrencyActivationSignal(
-        getElementTextWithinLimit(currentElement, maxCharacters),
-      )
-    ) {
-      return true;
-    }
-
-    currentElement = currentElement.parentElement;
-    checkedAncestors += 1;
-  }
-
-  return false;
-}
-
 export function isSupportedContentScriptUrl(url: string): boolean {
   try {
     return SUPPORTED_CONTENT_PROTOCOLS.has(new URL(url).protocol);
   } catch {
     return false;
   }
-}
-
-export function nodeHasCurrencyActivationSignal(
-  node: Node,
-  options: CurrencyActivationScanOptions = {},
-): boolean {
-  const maxCharacters = options.maxCharacters ?? DEFAULT_SCAN_CHARACTER_LIMIT;
-
-  if (node instanceof Text) {
-    if (isSkippedTextParent(node.parentNode)) return false;
-    if (hasCurrencyActivationSignal(node.data.slice(0, maxCharacters))) {
-      return true;
-    }
-
-    return node.parentElement
-      ? ancestorTextHasCurrencyActivationSignal(node.parentElement, maxCharacters)
-      : false;
-  }
-
-  if (node instanceof Element) {
-    if (isSkippedTextParent(node)) return false;
-    if (hasCurrencyActivationSignal(getElementTextWithinLimit(node, maxCharacters))) {
-      return true;
-    }
-
-    return node.parentElement
-      ? ancestorTextHasCurrencyActivationSignal(node.parentElement, maxCharacters)
-      : false;
-  }
-
-  return false;
 }
 
 export function scanRootForCurrencyActivationSignal(
@@ -301,19 +327,7 @@ export function scanRootForCurrencyActivationSignal(
   return "clear";
 }
 
-export function mutationsContainCurrencyActivationSignal(
-  mutations: MutationRecord[],
-  options: CurrencyActivationScanOptions = {},
-): boolean {
-  return (
-    scanMutationChangedAreasForCurrencyActivationSignal(
-      collectMutationActivationChangedAreas(mutations),
-      options,
-    ) === "signal"
-  );
-}
-
-function collectMutationActivationChangedAreas(
+export function collectMutationActivationChangedAreas(
   mutations: MutationRecord[],
 ): MutationActivationChangedArea[] {
   const changedAreas: MutationActivationChangedArea[] = [];
@@ -351,12 +365,8 @@ export function scanMutationChangedAreasForCurrencyActivationSignal(
 
   for (const changedArea of changedAreas) {
     if (changedArea.type === "characterData") {
-      if (nodeHasCurrencyActivationSignal(changedArea.node, options)) {
-        return "signal";
-      }
-
-      const result = scanChangedAreaNodesForCurrencyActivationSignal(
-        [changedArea.node],
+      const result = scanChangedTextContextForCurrencyActivationSignal(
+        changedArea.node,
         budget,
       );
       if (result !== "clear") return result;

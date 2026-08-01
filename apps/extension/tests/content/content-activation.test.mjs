@@ -1,8 +1,8 @@
 import { jest } from "@jest/globals";
 import {
+  collectMutationActivationChangedAreas,
   createContentActivationController,
   isSupportedContentScriptUrl,
-  mutationsContainCurrencyActivationSignal,
   scanMutationChangedAreasForCurrencyActivationSignal,
   scanRootForCurrencyActivationSignal,
 } from "../../test-dist/entrypoints/content/contentActivation.js";
@@ -20,6 +20,13 @@ function createLifecycleContext() {
     },
     invalidationCallbacks,
   };
+}
+
+function scanMutations(mutations, options) {
+  return scanMutationChangedAreasForCurrencyActivationSignal(
+    collectMutationActivationChangedAreas(mutations),
+    options,
+  );
 }
 
 beforeEach(() => {
@@ -170,20 +177,20 @@ test("mutation scan checks added nodes and character data updates", () => {
   const dynamicPriceText = document.createTextNode("Deal price ₹1,299");
 
   expect(
-    mutationsContainCurrencyActivationSignal([
+    scanMutations([
       { addedNodes: [ignoredScript] },
     ]),
-  ).toBe(false);
+  ).toBe("clear");
   expect(
-    mutationsContainCurrencyActivationSignal([
+    scanMutations([
       { addedNodes: [priceNode] },
     ]),
-  ).toBe(true);
+  ).toBe("signal");
   expect(
-    mutationsContainCurrencyActivationSignal([
+    scanMutations([
       { type: "characterData", target: dynamicPriceText, addedNodes: [] },
     ]),
-  ).toBe(true);
+  ).toBe("signal");
 });
 
 test("mutation scan detects added split price containers", () => {
@@ -197,10 +204,10 @@ test("mutation scan detects added split price containers", () => {
   `;
 
   expect(
-    mutationsContainCurrencyActivationSignal([
+    scanMutations([
       { type: "childList", addedNodes: [result] },
     ]),
-  ).toBe(true);
+  ).toBe("signal");
 });
 
 test("mutation scan detects split price fragments delivered together", () => {
@@ -210,10 +217,137 @@ test("mutation scan detects split price fragments delivered together", () => {
   amountNode.textContent = "75";
 
   expect(
-    mutationsContainCurrencyActivationSignal([
+    scanMutations([
       { type: "childList", addedNodes: [symbolNode, amountNode] },
     ]),
-  ).toBe(true);
+  ).toBe("signal");
+});
+
+test("character data scan detects split price in changed text context", () => {
+  const price = document.createElement("div");
+  const symbol = document.createElement("span");
+  const amount = document.createElement("span");
+  const symbolText = document.createTextNode("₹");
+  const amountText = document.createTextNode("Loading");
+  symbol.append(symbolText);
+  amount.append(amountText);
+  price.append(symbol, amount);
+  document.body.append(price);
+
+  amountText.data = "75";
+
+  expect(
+    scanMutations([
+      { type: "characterData", target: amountText, addedNodes: [] },
+    ]),
+  ).toBe("signal");
+});
+
+test("character data context keeps DOM order around changed text", () => {
+  const price = document.createElement("div");
+  const symbol = document.createElement("span");
+  const amount = document.createElement("span");
+  const symbolText = document.createTextNode("Loading");
+  const amountText = document.createTextNode("75");
+  symbol.append(symbolText);
+  amount.append(amountText);
+  price.append(symbol, amount);
+  document.body.append(price);
+
+  symbolText.data = "₹";
+
+  expect(
+    scanMutations([
+      { type: "characterData", target: symbolText, addedNodes: [] },
+    ]),
+  ).toBe("signal");
+});
+
+test("character data context limits neighbor text reads to four per side", () => {
+  const price = document.createElement("div");
+  const beforeNodes = Array.from({ length: 5 }, () =>
+    document.createTextNode("before"),
+  );
+  const changedText = document.createTextNode("changed");
+  const afterNodes = Array.from({ length: 5 }, () =>
+    document.createTextNode("after"),
+  );
+  price.append(...beforeNodes, changedText, ...afterNodes);
+  document.body.append(price);
+  const dataGet = jest.spyOn(Text.prototype, "data", "get");
+  const textContentGet = jest.spyOn(Node.prototype, "textContent", "get");
+
+  expect(
+    scanMutations([
+      { type: "characterData", target: changedText, addedNodes: [] },
+    ]),
+  ).toBe("clear");
+  expect(dataGet).toHaveBeenCalledTimes(9);
+  expect(textContentGet).not.toHaveBeenCalled();
+});
+
+test("character data context uses shared mutation text-node budget", () => {
+  const price = document.createElement("div");
+  const symbol = document.createTextNode("₹");
+  const amount = document.createTextNode("75");
+  price.append(symbol, amount);
+  document.body.append(price);
+
+  expect(
+    scanMutations(
+      [{ type: "characterData", target: amount, addedNodes: [] }],
+      { maxTextNodes: 1 },
+    ),
+  ).toBe("exhausted");
+});
+
+test("character data context keeps the rolling text window bounded", () => {
+  const price = document.createElement("div");
+  const oldNumber = document.createTextNode(`25${",".repeat(520)}`);
+  const changedCode = document.createTextNode("USD");
+  price.append(oldNumber, changedCode);
+  document.body.append(price);
+
+  expect(
+    scanMutations([
+      { type: "characterData", target: changedCode, addedNodes: [] },
+    ]),
+  ).toBe("clear");
+});
+
+test("separate changed areas do not combine split fragments by delivery order", () => {
+  const symbolArea = document.createElement("section");
+  const amountArea = document.createElement("section");
+  const symbolText = document.createTextNode("₹");
+  const amountText = document.createTextNode("75");
+  symbolArea.append(symbolText);
+  amountArea.append(amountText);
+  document.body.append(symbolArea, amountArea);
+
+  expect(
+    scanMutationChangedAreasForCurrencyActivationSignal([
+      { type: "addedNodes", nodes: [symbolArea] },
+      { type: "addedNodes", nodes: [amountArea] },
+    ]),
+  ).toBe("clear");
+});
+
+test("mixed childList and characterData changes use one shared batch budget", () => {
+  const price = document.createElement("div");
+  const symbol = document.createTextNode("₹");
+  const amount = document.createTextNode("75");
+  price.append(symbol, amount);
+  document.body.append(price);
+
+  expect(
+    scanMutationChangedAreasForCurrencyActivationSignal(
+      [
+        { type: "addedNodes", nodes: [document.createTextNode("loading")] },
+        { type: "characterData", node: amount },
+      ],
+      { maxTextNodes: 1 },
+    ),
+  ).toBe("exhausted");
 });
 
 test("mutation changed areas use a shared bounded scan budget", () => {
@@ -272,10 +406,10 @@ test("mutation childList scan avoids target and element textContent reads", () =
   const textContentGet = jest.spyOn(Node.prototype, "textContent", "get");
 
   expect(
-    mutationsContainCurrencyActivationSignal([
+    scanMutations([
       { type: "childList", target: container, addedNodes: [addedNode] },
     ]),
-  ).toBe(true);
+  ).toBe("signal");
   expect(textContentGet).not.toHaveBeenCalled();
 });
 
@@ -392,6 +526,50 @@ test("activation controller uses one fixed mutation batch window", async () => {
 
   expect(importContentWorker).toHaveBeenCalledTimes(1);
   expect(observer.disconnect).toHaveBeenCalledTimes(1);
+});
+
+test("activation controller collects changed areas before mutation timer fires", async () => {
+  const { ctx } = createLifecycleContext();
+  const importContentWorker = jest.fn().mockResolvedValue(undefined);
+  let mutationCallback = null;
+  const observer = {
+    observe: jest.fn(),
+    disconnect: jest.fn(),
+  };
+  const createMutationObserver = jest.fn((callback) => {
+    mutationCallback = callback;
+    return observer;
+  });
+
+  document.body.innerHTML = "<main><p>No price yet</p></main>";
+
+  createContentActivationController(ctx, {
+    document,
+    locationHref: "https://example.com/",
+    importContentWorker,
+    setTimeout: window.setTimeout,
+    clearTimeout: window.clearTimeout,
+    createMutationObserver,
+  }).start();
+
+  let addedNodesReads = 0;
+  const mutation = {
+    type: "childList",
+    get addedNodes() {
+      addedNodesReads += 1;
+      return [document.createTextNode("Loading")];
+    },
+  };
+
+  mutationCallback([mutation]);
+  expect(addedNodesReads).toBe(1);
+
+  jest.advanceTimersByTime(250);
+  await Promise.resolve();
+  await Promise.resolve();
+
+  expect(addedNodesReads).toBe(1);
+  expect(importContentWorker).not.toHaveBeenCalled();
 });
 
 test("activation controller loads worker after exhausted mutation scan", async () => {
