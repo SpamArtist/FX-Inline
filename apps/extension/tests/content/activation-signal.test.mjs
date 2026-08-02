@@ -3,6 +3,7 @@ import {
   hasCurrencyActivationSignal,
   normalizeActivationScanText,
 } from "../../test-dist/entrypoints/content/activationSignal.js";
+import { ACTIVATION_CURRENCY_SYMBOLS } from "../../../../packages/currency-detection/src/activation-data.js";
 import { parseCurrencyValue } from "../../test-dist/utils/utils.js";
 
 const AMBIGUOUS_ISO_CODES = [
@@ -30,6 +31,32 @@ test("currency activation signal keeps parser-only symbols out", () => {
   expect(hasCurrencyActivationSignal("₽ 100")).toBe(false);
   expect(hasCurrencyActivationSignal("₿ 0.25")).toBe(false);
   expect(hasCurrencyActivationSignal("ر.س 50")).toBe(false);
+});
+
+test("symbol activation keeps existing symbol coverage for prefix and suffix forms", () => {
+  for (const symbol of ACTIVATION_CURRENCY_SYMBOLS) {
+    expect(hasCurrencyActivationSignal(`${symbol}123`)).toBe(true);
+    expect(hasCurrencyActivationSignal(`123${symbol}`)).toBe(true);
+  }
+});
+
+test("symbol activation accepts NFKC-compatible symbol forms", () => {
+  expect(hasCurrencyActivationSignal("＄123")).toBe(true);
+  expect(hasCurrencyActivationSignal("123￡")).toBe(true);
+  expect(hasCurrencyActivationSignal("￥123")).toBe(true);
+  expect(hasCurrencyActivationSignal("123￦")).toBe(true);
+  expect(hasCurrencyActivationSignal("﹩123")).toBe(true);
+});
+
+test("symbol activation supports formatted amount text inside token context", () => {
+  expect(hasCurrencyActivationSignal("$ 1 234,56")).toBe(true);
+  expect(hasCurrencyActivationSignal("$\u00a01.234,56")).toBe(true);
+  expect(hasCurrencyActivationSignal("$1'234.56")).toBe(true);
+  expect(hasCurrencyActivationSignal("$1’234.56")).toBe(true);
+  expect(hasCurrencyActivationSignal("1 234,56 €")).toBe(true);
+  expect(hasCurrencyActivationSignal("1.234,56\u00a0€")).toBe(true);
+  expect(hasCurrencyActivationSignal("1'234.56€")).toBe(true);
+  expect(hasCurrencyActivationSignal("1’234.56€")).toBe(true);
 });
 
 test("activation scan text normalization collapses whitespace", () => {
@@ -82,4 +109,11 @@ test("ISO activation inspects only the 64-character token context", () => {
   expect(hasCurrencyActivationSignal(`USD${".".repeat(64)}1`)).toBe(false);
   expect(hasCurrencyActivationSignal(`1${".".repeat(63)}EUR`)).toBe(true);
   expect(hasCurrencyActivationSignal(`1${".".repeat(64)}EUR`)).toBe(false);
+});
+
+test("symbol activation inspects only the 64-character token context", () => {
+  expect(hasCurrencyActivationSignal(`$${".".repeat(63)}1`)).toBe(true);
+  expect(hasCurrencyActivationSignal(`$${".".repeat(64)}1`)).toBe(false);
+  expect(hasCurrencyActivationSignal(`1${".".repeat(63)}€`)).toBe(true);
+  expect(hasCurrencyActivationSignal(`1${".".repeat(64)}€`)).toBe(false);
 });

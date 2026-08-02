@@ -86,6 +86,26 @@ test("root scan detects listing prices split across text nodes", () => {
   ).toBe("signal");
 });
 
+test("root scan detects symbol prices split across token context boundary", () => {
+  document.body.replaceChildren();
+  for (const text of ["$", ".".repeat(61), "1"]) {
+    const span = document.createElement("span");
+    span.textContent = text;
+    document.body.append(span);
+  }
+
+  expect(scanRootForCurrencyActivationSignal(document.body)).toBe("signal");
+
+  document.body.replaceChildren();
+  for (const text of ["1", ".".repeat(62), "€"]) {
+    const span = document.createElement("span");
+    span.textContent = text;
+    document.body.append(span);
+  }
+
+  expect(scanRootForCurrencyActivationSignal(document.body)).toBe("clear");
+});
+
 test("root scan returns only explicit activation results", () => {
   document.body.textContent = "No price";
   const clearResult = scanRootForCurrencyActivationSignal(document.body);

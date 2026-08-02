@@ -5,14 +5,14 @@ import {
 import { ACTIVATION_CURRENCY_SYMBOLS } from "@fx-inline/currency-detection/activation-data";
 
 const ACTIVATION_TEXT_WINDOW_LIMIT = 512;
-const ISO_TOKEN_CONTEXT_LIMIT = 64;
+const TOKEN_CONTEXT_LIMIT = 64;
 
 function escapeRegexLiteral(value: string): string {
   return value.replace(/[\\^$.*+?()[\]{}|]/gu, "\\$&");
 }
 
 const CURRENCY_SYMBOL_PATTERN = `(?:${ACTIVATION_CURRENCY_SYMBOLS.map(
-  escapeRegexLiteral,
+  (symbol) => escapeRegexLiteral(symbol.normalize("NFKC")),
 ).join("|")})`;
 const NUMBER_PATTERN = "\\d[\\d\\s.,'’]*(?:\\d|[.,]\\d)?";
 const AMBIGUOUS_ISO_CODES = new Set(AMBIGUOUS_ISO_CURRENCY_CODES);
@@ -24,11 +24,8 @@ const ISO_TOKEN_PATTERN = new RegExp(
   `(?<!\\p{L})(?:${ACTIVATION_ISO_CODE_PATTERN})(?!\\p{L})`,
   "giu",
 );
+const SYMBOL_TOKEN_PATTERN = new RegExp(CURRENCY_SYMBOL_PATTERN, "gu");
 const TOKEN_CONTEXT_AMOUNT_PATTERN = new RegExp(NUMBER_PATTERN, "u");
-const CURRENCY_ACTIVATION_PATTERNS = [
-  new RegExp(`${CURRENCY_SYMBOL_PATTERN}\\s*${NUMBER_PATTERN}`, "u"),
-  new RegExp(`${NUMBER_PATTERN}\\s*${CURRENCY_SYMBOL_PATTERN}`, "u"),
-];
 
 export function normalizeActivationScanText(text: string): string {
   return text.replace(/\s+/gu, " ").trim();
@@ -56,30 +53,34 @@ export function hasCurrencyActivationSignal(text: string): boolean {
   if (!text || !/\d/u.test(text)) return false;
   const normalized = text.normalize("NFKC");
 
-  if (CURRENCY_ACTIVATION_PATTERNS.some((pattern) => pattern.test(normalized))) {
-    return true;
+  for (const match of normalized.matchAll(SYMBOL_TOKEN_PATTERN)) {
+    const tokenStart = match.index;
+    const tokenEnd = tokenStart + match[0].length;
+    if (hasAmountInTokenContext(normalized, tokenStart, tokenEnd)) return true;
   }
 
-  ISO_TOKEN_PATTERN.lastIndex = 0;
   for (const match of normalized.matchAll(ISO_TOKEN_PATTERN)) {
     const tokenStart = match.index;
     const tokenEnd = tokenStart + match[0].length;
-    const prefixContext = normalized.slice(
-      Math.max(0, tokenStart - ISO_TOKEN_CONTEXT_LIMIT),
-      tokenStart,
-    );
-    const suffixContext = normalized.slice(
-      tokenEnd,
-      tokenEnd + ISO_TOKEN_CONTEXT_LIMIT,
-    );
-
-    if (
-      TOKEN_CONTEXT_AMOUNT_PATTERN.test(prefixContext) ||
-      TOKEN_CONTEXT_AMOUNT_PATTERN.test(suffixContext)
-    ) {
-      return true;
-    }
+    if (hasAmountInTokenContext(normalized, tokenStart, tokenEnd)) return true;
   }
 
   return false;
+}
+
+function hasAmountInTokenContext(
+  text: string,
+  tokenStart: number,
+  tokenEnd: number,
+): boolean {
+  const prefixContext = text.slice(
+    Math.max(0, tokenStart - TOKEN_CONTEXT_LIMIT),
+    tokenStart,
+  );
+  const suffixContext = text.slice(tokenEnd, tokenEnd + TOKEN_CONTEXT_LIMIT);
+
+  return (
+    TOKEN_CONTEXT_AMOUNT_PATTERN.test(prefixContext) ||
+    TOKEN_CONTEXT_AMOUNT_PATTERN.test(suffixContext)
+  );
 }
