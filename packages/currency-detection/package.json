@@ -12,6 +12,11 @@
       "types": "./src/index.d.ts",
       "import": "./src/index.js",
       "default": "./src/index.js"
+    },
+    "./iso-data": {
+      "types": "./src/iso-data.d.ts",
+      "import": "./src/iso-data.js",
+      "default": "./src/iso-data.js"
     }
   },
   "files": [
