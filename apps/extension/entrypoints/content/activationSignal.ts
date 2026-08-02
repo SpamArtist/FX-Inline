@@ -2,12 +2,18 @@ import {
   ALLOWED_ISO_CURRENCY_CODES,
   AMBIGUOUS_ISO_CURRENCY_CODES,
 } from "@fx-inline/currency-detection/iso-data";
+import { ACTIVATION_CURRENCY_SYMBOLS } from "@fx-inline/currency-detection/activation-data";
 
 const ACTIVATION_TEXT_WINDOW_LIMIT = 512;
 const ISO_TOKEN_CONTEXT_LIMIT = 64;
 
-const CURRENCY_SYMBOL_PATTERN =
-  "(?:US\\$|AU\\$|CA\\$|NZ\\$|HK\\$|MX\\$|NT\\$|EC\\$|RD\\$|R\\$|[$€£¥₹₩₪₫₱฿₦₲₡₨₭₮₯₰₳₴₵₷₸₺￥＄￡￦￠﹩])";
+function escapeRegexLiteral(value: string): string {
+  return value.replace(/[\\^$.*+?()[\]{}|]/gu, "\\$&");
+}
+
+const CURRENCY_SYMBOL_PATTERN = `(?:${ACTIVATION_CURRENCY_SYMBOLS.map(
+  escapeRegexLiteral,
+).join("|")})`;
 const NUMBER_PATTERN = "\\d[\\d\\s.,'’]*(?:\\d|[.,]\\d)?";
 const AMBIGUOUS_ISO_CODES = new Set(AMBIGUOUS_ISO_CURRENCY_CODES);
 const ACTIVATION_ISO_CODE_PATTERN = Array.from(ALLOWED_ISO_CURRENCY_CODES)

@@ -26,6 +26,12 @@ test("currency activation signal detects prices without accepting generic status
   expect(hasCurrencyActivationSignal("API 200 OK")).toBe(false);
 });
 
+test("currency activation signal keeps parser-only symbols out", () => {
+  expect(hasCurrencyActivationSignal("₽ 100")).toBe(false);
+  expect(hasCurrencyActivationSignal("₿ 0.25")).toBe(false);
+  expect(hasCurrencyActivationSignal("ر.س 50")).toBe(false);
+});
+
 test("activation scan text normalization collapses whitespace", () => {
   expect(normalizeActivationScanText("  Plans\n\tstart   at  $19  ")).toBe(
     "Plans start at $19",

@@ -17,6 +17,11 @@
       "types": "./src/iso-data.d.ts",
       "import": "./src/iso-data.js",
       "default": "./src/iso-data.js"
+    },
+    "./activation-data": {
+      "types": "./src/activation-data.d.ts",
+      "import": "./src/activation-data.js",
+      "default": "./src/activation-data.js"
     }
   },
   "files": [
