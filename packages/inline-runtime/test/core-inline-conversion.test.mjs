@@ -117,6 +117,41 @@ test("converts text-node prices with expected wrapper shape", () => {
   expect(convertedAmount.textContent).toMatch(/^\(.+\)$/);
 });
 
+test("uses shared price-text classification for direct, amount-only, and unrelated text", () => {
+  document.body.innerHTML = [
+    '<p id="direct-price">Pay $100 now.</p>',
+    '<p id="split-price">',
+    '  <span id="split-token">USD</span>',
+    '  <span id="split-amount">+1,234.50</span>',
+    "</p>",
+    '<p id="unrelated">No price here</p>',
+  ].join("\n");
+
+  const applied = convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
+    clearExisting: false,
+  });
+
+  expect(applied).toBe(2);
+
+  const directWrapper = document.querySelector(
+    `#direct-price span.${INLINE_CONVERSION_CLASS}`,
+  );
+  expect(directWrapper).not.toBeNull();
+  expect(directWrapper.getAttribute("data-original")?.trim()).toBe("$100");
+  expect(directWrapper.textContent).toMatch(/^\$100\s+\(.+\)$/u);
+
+  const amountOnlyAddon = document.querySelector(
+    `#split-amount span.${INLINE_CONVERSION_CLASS}[data-fx-inline-mode="addon"]`,
+  );
+  expect(amountOnlyAddon).not.toBeNull();
+  expect(amountOnlyAddon.getAttribute("data-original")).toBe("USD +1,234.50");
+  expect(amountOnlyAddon.querySelector(".fx-inline-converted-amount").textContent).toMatch(
+    /^\(.+\)$/u,
+  );
+
+  expect(document.querySelector(`#unrelated span.${INLINE_CONVERSION_CLASS}`)).toBeNull();
+});
+
 test("injects style tag with converted amount line-height and width contract", () => {
   document.body.innerHTML = '<p id="price">Pay $100 now.</p>';
 
