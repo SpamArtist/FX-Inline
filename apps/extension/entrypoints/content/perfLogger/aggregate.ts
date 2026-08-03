@@ -9,6 +9,8 @@ export function createInlineConversionPerfAggregate(): InlineConversionPerfAggre
     clearExistingMs: 0,
     scanTextNodesMs: 0,
     decorateNodesMs: 0,
+    visitedTextNodes: 0,
+    acceptedCandidates: 0,
     scannedTextNodes: 0,
     conversionsApplied: 0,
     reachedNodeLimitPasses: 0,
@@ -23,6 +25,8 @@ export function addInlinePerfSample(
   aggregate.clearExistingMs += sample.clearExistingMs;
   aggregate.scanTextNodesMs += sample.scanTextNodesMs;
   aggregate.decorateNodesMs += sample.decorateNodesMs;
+  aggregate.visitedTextNodes += sample.visitedTextNodes;
+  aggregate.acceptedCandidates += sample.acceptedCandidates;
   aggregate.scannedTextNodes += sample.scannedTextNodes;
   aggregate.conversionsApplied += sample.conversionsApplied;
 

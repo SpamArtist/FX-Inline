@@ -16,6 +16,10 @@ import { ensureInlineConversionStyles } from "./styles.js";
 import { decorateStructuredSiblingSymbolPrices } from "./structuredDecorators.js";
 import { decoratePricesInTextNode } from "./textNodeDecorator.js";
 import {
+  PRICE_TEXT_CLASS_UNRELATED,
+  classifyPriceText,
+} from "./priceTextClassification.js";
+import {
   amazonStructuredAddonPlugin,
   amazonStructuredDetectorPrePlugin,
 } from "../plugins/amazon/structuredAddonPlugin.js";
@@ -68,6 +72,7 @@ export function convertVisiblePrices(
 
     const maxNodesPerPass = options?.maxNodesPerPass ?? 15000;
     const lightTextCache = new WeakMap();
+    const parentEligibilityCache = new WeakMap();
     const pluginContext = {
       root,
       preferredCurrency,
@@ -99,23 +104,37 @@ export function convertVisiblePrices(
     const scanStartedAt = capturePerf ? performance.now() : 0;
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
 
-    const textNodes = [];
+    const acceptedTextCandidates = [];
+    let visitedTextNodes = 0;
 
-    while (walker.nextNode() && textNodes.length < maxNodesPerPass) {
+    while (
+      acceptedTextCandidates.length < maxNodesPerPass &&
+      walker.nextNode()
+    ) {
       const textNode = walker.currentNode;
-      if (shouldSkipTextNode(textNode)) continue;
-      textNodes.push(textNode);
+      visitedTextNodes += 1;
+      const classification = classifyPriceText(textNode.nodeValue);
+      if (classification.kind === PRICE_TEXT_CLASS_UNRELATED) continue;
+      if (shouldSkipTextNode(textNode, parentEligibilityCache)) continue;
+      acceptedTextCandidates.push({
+        textNode,
+        kind: classification.kind,
+        text: classification.text,
+      });
     }
     const scanTextNodesMs = capturePerf ? performance.now() - scanStartedAt : 0;
 
-    if (textNodes.length >= maxNodesPerPass && options?.onNodeLimitReached) {
+    if (
+      acceptedTextCandidates.length >= maxNodesPerPass &&
+      options?.onNodeLimitReached
+    ) {
       options.onNodeLimitReached(maxNodesPerPass);
     }
 
     let textNodeConversions = 0;
-    for (const node of textNodes) {
+    for (const candidate of acceptedTextCandidates) {
       textNodeConversions += decoratePricesInTextNode(
-        node,
+        candidate,
         preferredCurrency,
         rateSnapshot,
         localeHint,
@@ -153,9 +172,11 @@ export function convertVisiblePrices(
       textNodeConversions,
       structuredConversions,
       coreConversionsApplied: textNodeConversions + structuredConversions,
-      scannedTextNodes: textNodes.length,
+      visitedTextNodes,
+      acceptedCandidates: acceptedTextCandidates.length,
+      scannedTextNodes: acceptedTextCandidates.length,
       maxNodesPerPass,
-      reachedNodeLimit: textNodes.length >= maxNodesPerPass,
+      reachedNodeLimit: acceptedTextCandidates.length >= maxNodesPerPass,
     });
 
     const postPluginConversions = runInlineConversionPlugins(
@@ -173,9 +194,11 @@ export function convertVisiblePrices(
       structuredConversions,
       postPluginConversions,
       totalConversionsApplied: totalConversions,
-      scannedTextNodes: textNodes.length,
+      visitedTextNodes,
+      acceptedCandidates: acceptedTextCandidates.length,
+      scannedTextNodes: acceptedTextCandidates.length,
       maxNodesPerPass,
-      reachedNodeLimit: textNodes.length >= maxNodesPerPass,
+      reachedNodeLimit: acceptedTextCandidates.length >= maxNodesPerPass,
     });
 
     if (capturePerf && options?.onPerfSample) {
@@ -186,10 +209,12 @@ export function convertVisiblePrices(
         clearExistingMs,
         scanTextNodesMs,
         decorateNodesMs,
-        scannedTextNodes: textNodes.length,
+        visitedTextNodes,
+        acceptedCandidates: acceptedTextCandidates.length,
+        scannedTextNodes: acceptedTextCandidates.length,
         conversionsApplied: totalConversions,
         maxNodesPerPass,
-        reachedNodeLimit: textNodes.length >= maxNodesPerPass,
+        reachedNodeLimit: acceptedTextCandidates.length >= maxNodesPerPass,
       });
     }
 
