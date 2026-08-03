@@ -152,6 +152,64 @@ test("uses shared price-text classification for direct, amount-only, and unrelat
   expect(document.querySelector(`#unrelated span.${INLINE_CONVERSION_CLASS}`)).toBeNull();
 });
 
+test("skips DOM ancestor checks for unrelated text during candidate discovery", () => {
+  document.body.innerHTML = [
+    '<p id="copy">Plain marketing copy without numbers.</p>',
+    '<p id="more-copy">Another sentence with no price token.</p>',
+  ].join("\n");
+
+  const originalClosest = Element.prototype.closest;
+  let ancestorSearches = 0;
+  Element.prototype.closest = function countClosestCalls(selector) {
+    if (
+      selector.includes('[contenteditable]:not([contenteditable="false"])') &&
+      selector.includes('[class*="visually-hidden"]') &&
+      selector.includes(".fx-inline-conversion")
+    ) {
+      ancestorSearches += 1;
+    }
+    return originalClosest.call(this, selector);
+  };
+
+  try {
+    const applied = convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
+      clearExisting: false,
+    });
+
+    expect(applied).toBe(0);
+    expect(ancestorSearches).toBe(0);
+  } finally {
+    Element.prototype.closest = originalClosest;
+  }
+});
+
+test("maxNodesPerPass counts accepted candidates in text-heavy pages", () => {
+  const unrelatedItems = Array.from(
+    { length: 200 },
+    (_, index) => `<p>Editorial paragraph ${index} without price markers.</p>`,
+  );
+  document.body.innerHTML = [
+    ...unrelatedItems,
+    '<p id="price">Pay $100 now.</p>',
+    '<p id="later-price">Pay $200 later.</p>',
+  ].join("\n");
+
+  const samples = [];
+  const applied = convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
+    clearExisting: false,
+    maxNodesPerPass: 1,
+    onPerfSample: (sample) => {
+      samples.push(sample);
+    },
+  });
+
+  expect(applied).toBe(1);
+  expect(document.querySelector(`#price span.${INLINE_CONVERSION_CLASS}`)).not.toBeNull();
+  expect(document.querySelector(`#later-price span.${INLINE_CONVERSION_CLASS}`)).toBeNull();
+  expect(samples[0].scannedTextNodes).toBe(1);
+  expect(samples[0].reachedNodeLimit).toBe(true);
+});
+
 test("injects style tag with converted amount line-height and width contract", () => {
   document.body.innerHTML = '<p id="price">Pay $100 now.</p>';
 
