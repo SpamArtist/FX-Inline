@@ -68,6 +68,7 @@ export function convertVisiblePrices(
 
     const maxNodesPerPass = options?.maxNodesPerPass ?? 15000;
     const lightTextCache = new WeakMap();
+    const parentEligibilityCache = new WeakMap();
     const pluginContext = {
       root,
       preferredCurrency,
@@ -103,7 +104,7 @@ export function convertVisiblePrices(
 
     while (walker.nextNode() && textNodes.length < maxNodesPerPass) {
       const textNode = walker.currentNode;
-      if (shouldSkipTextNode(textNode)) continue;
+      if (shouldSkipTextNode(textNode, parentEligibilityCache)) continue;
       textNodes.push(textNode);
     }
     const scanTextNodesMs = capturePerf ? performance.now() - scanStartedAt : 0;

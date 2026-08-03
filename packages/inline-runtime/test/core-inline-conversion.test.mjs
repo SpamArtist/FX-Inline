@@ -280,8 +280,43 @@ test("skips direct editable, editable ancestors, non-visible ancestors, and exis
   expect(document.querySelector(`#plain span.${INLINE_CONVERSION_CLASS}`)).not.toBeNull();
 });
 
-test("uses one ancestor search for one qualifying text node", () => {
-  document.body.innerHTML = '<p id="plain">$100</p>';
+test("reuses one parent DOM eligibility result for sibling text nodes in one pass", () => {
+  document.body.innerHTML = '<p id="prices">$100<!--split-->$200</p>';
+
+  const originalClosest = Element.prototype.closest;
+  let ancestorSearches = 0;
+  Element.prototype.closest = function countClosest(selector) {
+    if (
+      selector.includes('[contenteditable]:not([contenteditable="false"])') &&
+      selector.includes('[class*="visually-hidden"]') &&
+      selector.includes(".fx-inline-conversion")
+    ) {
+      ancestorSearches += 1;
+    }
+    return originalClosest.call(this, selector);
+  };
+
+  try {
+    const applied = convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
+      clearExisting: false,
+      includeDefaultPostPlugins: false,
+    });
+
+    expect(applied).toBe(2);
+    expect(
+      document.querySelectorAll(`#prices span.${INLINE_CONVERSION_CLASS}`),
+    ).toHaveLength(2);
+    expect(ancestorSearches).toBe(1);
+  } finally {
+    Element.prototype.closest = originalClosest;
+  }
+});
+
+test("keeps separate parent DOM eligibility decisions in one pass", () => {
+  document.body.innerHTML = [
+    '<div id="visible">$100</div>',
+    '<div id="hidden" hidden>$200</div>',
+  ].join("");
 
   const originalClosest = Element.prototype.closest;
   let ancestorSearches = 0;
@@ -303,7 +338,55 @@ test("uses one ancestor search for one qualifying text node", () => {
     });
 
     expect(applied).toBe(1);
-    expect(ancestorSearches).toBeLessThanOrEqual(1);
+    expect(document.querySelector(`#visible span.${INLINE_CONVERSION_CLASS}`)).not.toBeNull();
+    expect(document.querySelector(`#hidden span.${INLINE_CONVERSION_CLASS}`)).toBeNull();
+    expect(ancestorSearches).toBe(2);
+  } finally {
+    Element.prototype.closest = originalClosest;
+  }
+});
+
+test("re-evaluates parent DOM eligibility after DOM changes in a later pass", () => {
+  document.body.innerHTML = '<p id="prices">$100<!--split-->$200</p>';
+  const prices = document.getElementById("prices");
+
+  const originalClosest = Element.prototype.closest;
+  let ancestorSearches = 0;
+  Element.prototype.closest = function countClosest(selector) {
+    if (
+      selector.includes('[contenteditable]:not([contenteditable="false"])') &&
+      selector.includes('[class*="visually-hidden"]') &&
+      selector.includes(".fx-inline-conversion")
+    ) {
+      ancestorSearches += 1;
+    }
+    return originalClosest.call(this, selector);
+  };
+
+  try {
+    const visibleApplied = convertVisiblePrices(
+      "EUR",
+      createRateSnapshot(),
+      document.body,
+      {
+        clearExisting: false,
+        includeDefaultPostPlugins: false,
+      },
+    );
+    expect(visibleApplied).toBe(2);
+    expect(ancestorSearches).toBe(1);
+
+    prices.hidden = true;
+
+    const hiddenApplied = convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
+      includeDefaultPostPlugins: false,
+    });
+
+    expect(hiddenApplied).toBe(0);
+    expect(
+      document.querySelectorAll(`#prices span.${INLINE_CONVERSION_CLASS}`),
+    ).toHaveLength(0);
+    expect(ancestorSearches).toBe(2);
   } finally {
     Element.prototype.closest = originalClosest;
   }
