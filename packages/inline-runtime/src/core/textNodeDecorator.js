@@ -16,7 +16,6 @@ import { pushCoreConversionEvent } from "./conversionMetadata.js";
 import {
   PRICE_TEXT_CLASS_AMOUNT_ONLY,
   PRICE_TEXT_CLASS_DIRECT_CURRENCY,
-  classifyPriceText,
 } from "./priceTextClassification.js";
 import { usesLightTextColor } from "./textColor.js";
 
@@ -188,7 +187,7 @@ function decorateSplitSiblingPriceInTextNode(
 }
 
 export function decoratePricesInTextNode(
-  textNode,
+  acceptedCandidate,
   preferredCurrency,
   rateSnapshot,
   localeHint,
@@ -198,13 +197,13 @@ export function decoratePricesInTextNode(
   baseCurrency,
   renderPreferences,
 ) {
+  const { textNode, kind, text: acceptedText } = acceptedCandidate;
   const text = textNode.nodeValue;
-  const classification = classifyPriceText(text);
 
-  if (classification.kind === PRICE_TEXT_CLASS_AMOUNT_ONLY) {
+  if (kind === PRICE_TEXT_CLASS_AMOUNT_ONLY) {
     return decorateSplitSiblingPriceInTextNode(
       textNode,
-      classification.text,
+      acceptedText,
       preferredCurrency,
       rateSnapshot,
       localeHint,
@@ -216,9 +215,9 @@ export function decoratePricesInTextNode(
     );
   }
 
-  if (classification.kind !== PRICE_TEXT_CLASS_DIRECT_CURRENCY) return 0;
+  if (kind !== PRICE_TEXT_CLASS_DIRECT_CURRENCY) return 0;
 
-  const matches = extractCurrencyTextMatches(classification.text, localeHint);
+  const matches = extractCurrencyTextMatches(acceptedText, localeHint);
   if (!matches.length) return 0;
 
   const lightTextContext = usesLightTextColor(textNode, lightTextCache);

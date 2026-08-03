@@ -53,6 +53,33 @@ test("converts text-node prices with the expected inline wrapper shape", () => {
   expect(convertedAmount.textContent).toMatch(/^\(.+\)$/);
 });
 
+test("maxNodesPerPass skips unrelated text before counting accepted candidates", () => {
+  const unrelatedItems = Array.from(
+    { length: 200 },
+    (_, index) => `<p>Listing copy ${index} without price markers.</p>`,
+  );
+  document.body.innerHTML = [
+    ...unrelatedItems,
+    '<p id="price">Pay $100 now.</p>',
+    '<p id="later-price">Pay $200 later.</p>',
+  ].join("\n");
+
+  const samples = [];
+  const applied = convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
+    clearExisting: false,
+    maxNodesPerPass: 1,
+    onPerfSample: (sample) => {
+      samples.push(sample);
+    },
+  });
+
+  expect(applied).toBe(1);
+  expect(document.querySelector(`#price span.${INLINE_CONVERSION_CLASS}`)).not.toBeNull();
+  expect(document.querySelector(`#later-price span.${INLINE_CONVERSION_CLASS}`)).toBeNull();
+  expect(samples[0].scannedTextNodes).toBe(1);
+  expect(samples[0].reachedNodeLimit).toBe(true);
+});
+
 test("injects converted amount line-height and width styles", () => {
   document.body.innerHTML = '<p id="price">Pay $100 now.</p>';
 
