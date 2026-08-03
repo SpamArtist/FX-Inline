@@ -1,6 +1,5 @@
 import {
   extractCurrencyTextMatches,
-  mayContainCurrencyToken,
   parseCurrencyValue,
 } from "@fx-inline/currency-detection";
 import { getConvertedAmountText } from "./amountFormatting.js";
@@ -14,9 +13,11 @@ import {
   INLINE_CONVERSION_CLASS,
 } from "./constants.js";
 import { pushCoreConversionEvent } from "./conversionMetadata.js";
+import {
+  PRICE_TEXT_CLASS_AMOUNT_ONLY,
+  PRICE_TEXT_CLASS_DIRECT_CURRENCY,
+} from "./priceTextClassification.js";
 import { usesLightTextColor } from "./textColor.js";
-
-const AMOUNT_ONLY_TEXT_REGEX = /^[+-]?\d[\d,.\u00A0\u202F ]*$/u;
 
 function areParsedValuesEqual(left, right) {
   const delta = Math.abs(left - right);
@@ -186,7 +187,7 @@ function decorateSplitSiblingPriceInTextNode(
 }
 
 export function decoratePricesInTextNode(
-  textNode,
+  acceptedCandidate,
   preferredCurrency,
   rateSnapshot,
   localeHint,
@@ -196,18 +197,13 @@ export function decoratePricesInTextNode(
   baseCurrency,
   renderPreferences,
 ) {
+  const { textNode, kind, text: acceptedText } = acceptedCandidate;
   const text = textNode.nodeValue;
-  if (!text?.trim()) return 0;
-  const trimmedText = text.trim();
-  const shouldAttemptDirectParse = mayContainCurrencyToken(text);
-  const matches = shouldAttemptDirectParse
-    ? extractCurrencyTextMatches(text, localeHint)
-    : [];
-  if (!matches.length) {
-    if (!AMOUNT_ONLY_TEXT_REGEX.test(trimmedText)) return 0;
+
+  if (kind === PRICE_TEXT_CLASS_AMOUNT_ONLY) {
     return decorateSplitSiblingPriceInTextNode(
       textNode,
-      trimmedText,
+      acceptedText,
       preferredCurrency,
       rateSnapshot,
       localeHint,
@@ -218,6 +214,11 @@ export function decoratePricesInTextNode(
       renderPreferences,
     );
   }
+
+  if (kind !== PRICE_TEXT_CLASS_DIRECT_CURRENCY) return 0;
+
+  const matches = extractCurrencyTextMatches(acceptedText, localeHint);
+  if (!matches.length) return 0;
 
   const lightTextContext = usesLightTextColor(textNode, lightTextCache);
 

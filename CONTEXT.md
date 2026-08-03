@@ -19,3 +19,23 @@ _Avoid_: Currency marker, currency label
 **Ambiguous ISO Code**:
 An ISO currency code that is also a common word or name. It remains valid for conversion, but it cannot create an Activation Signal by itself.
 _Avoid_: Blocked currency, unsupported code
+
+**Visited Text Node**:
+A text node that the conversion DOM walker reaches during Candidate Discovery.
+_Avoid_: Scanned node, candidate
+
+**Accepted Candidate**:
+A Visited Text Node that passes the cheap price-text check and the DOM eligibility rules. It can enter Generic Conversion.
+_Avoid_: Scanned text node, price match
+
+**Candidate Discovery**:
+The phase that finds Accepted Candidates in a conversion root.
+_Avoid_: Generic Conversion, Activation Scan
+
+**Generic Conversion**:
+The phase that checks Accepted Candidates for supported price forms and converts valid prices.
+_Avoid_: Candidate Discovery, Activation Scan
+
+**Conversion Coverage**:
+The set of valid prices that FX Inline can find and convert. A performance change must not reduce this set.
+_Avoid_: Conversion count, candidate yield
