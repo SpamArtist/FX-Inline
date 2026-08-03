@@ -11,3 +11,4 @@ apps/extension/test-dist
 dist
 .legacy-parser-*
 /apps/extension/generated/*
+/performance-traces
