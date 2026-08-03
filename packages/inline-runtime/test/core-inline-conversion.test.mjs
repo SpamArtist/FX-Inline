@@ -246,6 +246,69 @@ test("suppresses and restores wrappers without replacing converted node", () => 
   expect(convertedNode.style.display).toBe("");
 });
 
+test("skips direct editable, editable ancestors, non-visible ancestors, and existing wrappers", () => {
+  document.body.innerHTML = [
+    '<script id="script-price" type="text/plain">$10</script>',
+    '<button id="button-price">$20</button>',
+    '<div id="direct-editable" contenteditable="true">$30</div>',
+    '<div id="editable-ancestor" contenteditable="true"><span>$40</span></div>',
+    '<div id="hidden-ancestor" hidden><span>$50</span></div>',
+    '<div id="screen-reader-ancestor" class="sr-only"><span>$60</span></div>',
+    '<div id="existing"><span class="fx-inline-conversion" data-original="$70">$70 <span class="fx-inline-converted-amount">€63.00</span></span></div>',
+    '<p id="plain">$80</p>',
+  ].join("");
+
+  const applied = convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
+    clearExisting: false,
+    includeDefaultPostPlugins: false,
+  });
+
+  expect(applied).toBe(1);
+  expect(document.querySelector(`#script-price span.${INLINE_CONVERSION_CLASS}`)).toBeNull();
+  expect(document.querySelector(`#button-price span.${INLINE_CONVERSION_CLASS}`)).toBeNull();
+  expect(document.querySelector(`#direct-editable span.${INLINE_CONVERSION_CLASS}`)).toBeNull();
+  expect(document.querySelector(`#editable-ancestor span.${INLINE_CONVERSION_CLASS}`)).toBeNull();
+  expect(document.querySelector(`#hidden-ancestor span.${INLINE_CONVERSION_CLASS}`)).toBeNull();
+  expect(
+    document.querySelector(`#screen-reader-ancestor span.${INLINE_CONVERSION_CLASS}`),
+  ).toBeNull();
+
+  const existingWrappers = document.querySelectorAll(`#existing span.${INLINE_CONVERSION_CLASS}`);
+  expect(existingWrappers).toHaveLength(1);
+  expect(existingWrappers[0].getAttribute("data-original")).toBe("$70");
+
+  expect(document.querySelector(`#plain span.${INLINE_CONVERSION_CLASS}`)).not.toBeNull();
+});
+
+test("uses one ancestor search for one qualifying text node", () => {
+  document.body.innerHTML = '<p id="plain">$100</p>';
+
+  const originalClosest = Element.prototype.closest;
+  let ancestorSearches = 0;
+  Element.prototype.closest = function countClosest(selector) {
+    if (
+      selector.includes('[contenteditable]:not([contenteditable="false"])') &&
+      selector.includes('[class*="visually-hidden"]') &&
+      selector.includes(".fx-inline-conversion")
+    ) {
+      ancestorSearches += 1;
+    }
+    return originalClosest.call(this, selector);
+  };
+
+  try {
+    const applied = convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
+      clearExisting: false,
+      includeDefaultPostPlugins: false,
+    });
+
+    expect(applied).toBe(1);
+    expect(ancestorSearches).toBeLessThanOrEqual(1);
+  } finally {
+    Element.prototype.closest = originalClosest;
+  }
+});
+
 test("adds structured add-on conversions for amazon-style and sibling-symbol prices", () => {
   document.body.innerHTML = [
     '<span id="amazon-root" aria-hidden="true">',
