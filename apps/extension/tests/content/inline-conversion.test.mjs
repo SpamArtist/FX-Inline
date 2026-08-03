@@ -62,7 +62,7 @@ test("maxNodesPerPass skips unrelated text before counting accepted candidates",
     ...unrelatedItems,
     '<p id="price">Pay $100 now.</p>',
     '<p id="later-price">Pay $200 later.</p>',
-  ].join("\n");
+  ].join("");
 
   const samples = [];
   const applied = convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
@@ -76,6 +76,8 @@ test("maxNodesPerPass skips unrelated text before counting accepted candidates",
   expect(applied).toBe(1);
   expect(document.querySelector(`#price span.${INLINE_CONVERSION_CLASS}`)).not.toBeNull();
   expect(document.querySelector(`#later-price span.${INLINE_CONVERSION_CLASS}`)).toBeNull();
+  expect(samples[0].visitedTextNodes).toBe(201);
+  expect(samples[0].acceptedCandidates).toBe(1);
   expect(samples[0].scannedTextNodes).toBe(1);
   expect(samples[0].reachedNodeLimit).toBe(true);
 });
@@ -453,6 +455,8 @@ test("reports perf sample shape and node-limit metadata", () => {
 
   const sample = samples[0];
   expect(sample.maxNodesPerPass).toBe(1);
+  expect(sample.visitedTextNodes).toBe(1);
+  expect(sample.acceptedCandidates).toBe(1);
   expect(sample.scannedTextNodes).toBe(1);
   expect(sample.reachedNodeLimit).toBe(true);
   expect(sample.conversionsApplied).toBe(applied);

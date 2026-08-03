@@ -105,12 +105,14 @@ export function convertVisiblePrices(
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
 
     const acceptedTextCandidates = [];
+    let visitedTextNodes = 0;
 
     while (
       acceptedTextCandidates.length < maxNodesPerPass &&
       walker.nextNode()
     ) {
       const textNode = walker.currentNode;
+      visitedTextNodes += 1;
       const classification = classifyPriceText(textNode.nodeValue);
       if (classification.kind === PRICE_TEXT_CLASS_UNRELATED) continue;
       if (shouldSkipTextNode(textNode, parentEligibilityCache)) continue;
@@ -170,6 +172,8 @@ export function convertVisiblePrices(
       textNodeConversions,
       structuredConversions,
       coreConversionsApplied: textNodeConversions + structuredConversions,
+      visitedTextNodes,
+      acceptedCandidates: acceptedTextCandidates.length,
       scannedTextNodes: acceptedTextCandidates.length,
       maxNodesPerPass,
       reachedNodeLimit: acceptedTextCandidates.length >= maxNodesPerPass,
@@ -190,6 +194,8 @@ export function convertVisiblePrices(
       structuredConversions,
       postPluginConversions,
       totalConversionsApplied: totalConversions,
+      visitedTextNodes,
+      acceptedCandidates: acceptedTextCandidates.length,
       scannedTextNodes: acceptedTextCandidates.length,
       maxNodesPerPass,
       reachedNodeLimit: acceptedTextCandidates.length >= maxNodesPerPass,
@@ -203,6 +209,8 @@ export function convertVisiblePrices(
         clearExistingMs,
         scanTextNodesMs,
         decorateNodesMs,
+        visitedTextNodes,
+        acceptedCandidates: acceptedTextCandidates.length,
         scannedTextNodes: acceptedTextCandidates.length,
         conversionsApplied: totalConversions,
         maxNodesPerPass,

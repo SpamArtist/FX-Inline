@@ -9,6 +9,8 @@ export type InlinePerfSample = Pick<
   | "clearExistingMs"
   | "scanTextNodesMs"
   | "decorateNodesMs"
+  | "visitedTextNodes"
+  | "acceptedCandidates"
   | "scannedTextNodes"
   | "conversionsApplied"
   | "reachedNodeLimit"
@@ -19,6 +21,9 @@ export type InlineConversionPerfAggregate = {
   clearExistingMs: number;
   scanTextNodesMs: number;
   decorateNodesMs: number;
+  visitedTextNodes: number;
+  acceptedCandidates: number;
+  /** @deprecated Use acceptedCandidates. Kept as a compatibility alias. */
   scannedTextNodes: number;
   conversionsApplied: number;
   reachedNodeLimitPasses: number;
