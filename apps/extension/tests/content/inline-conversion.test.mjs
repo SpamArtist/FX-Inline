@@ -262,6 +262,37 @@ test("skips editable, non-visible, and already-converted wrapper contexts", () =
   expect(document.querySelector(`#plain span.${INLINE_CONVERSION_CLASS}`)).not.toBeNull();
 });
 
+test("reuses one parent DOM eligibility result through the content conversion seam", () => {
+  document.body.innerHTML = '<p id="prices">$100<!--split-->$200</p>';
+
+  const originalClosest = Element.prototype.closest;
+  let ancestorSearches = 0;
+  Element.prototype.closest = function countClosest(selector) {
+    if (
+      selector.includes('[contenteditable]:not([contenteditable="false"])') &&
+      selector.includes('[class*="visually-hidden"]') &&
+      selector.includes(".fx-inline-conversion")
+    ) {
+      ancestorSearches += 1;
+    }
+    return originalClosest.call(this, selector);
+  };
+
+  try {
+    const applied = convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
+      clearExisting: false,
+    });
+
+    expect(applied).toBe(2);
+    expect(
+      document.querySelectorAll(`#prices span.${INLINE_CONVERSION_CLASS}`),
+    ).toHaveLength(2);
+    expect(ancestorSearches).toBe(1);
+  } finally {
+    Element.prototype.closest = originalClosest;
+  }
+});
+
 test("adds structured add-on conversions for Amazon-style and sibling-symbol prices", () => {
   document.body.innerHTML = [
     '<span id="amazon-root" aria-hidden="true">',
