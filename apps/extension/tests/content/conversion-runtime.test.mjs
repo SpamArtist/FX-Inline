@@ -163,6 +163,37 @@ test("initialize hydrates settings/rates, applies runtime state, and starts cont
   expect(controllerStartMock).toHaveBeenCalledTimes(1);
 });
 
+test("content runtime perf logs visited and accepted candidate totals", async () => {
+  window.localStorage.setItem("fx-inline:perf", "1");
+  const infoSpy = jest.spyOn(console, "info").mockImplementation(() => {});
+  const { createContentConversionRuntime } = await importRuntimeModuleWithMocks();
+
+  createContentConversionRuntime();
+  const options = createInlineRuntimeMock.mock.calls[0][0];
+  options.onPerfSample({
+    totalMs: 12.345,
+    clearExistingMs: 1.111,
+    scanTextNodesMs: 2.222,
+    decorateNodesMs: 9.012,
+    visitedTextNodes: 42,
+    acceptedCandidates: 7,
+    scannedTextNodes: 7,
+    conversionsApplied: 5,
+    maxNodesPerPass: 15000,
+    reachedNodeLimit: false,
+  });
+
+  expect(infoSpy).toHaveBeenCalledWith(
+    expect.stringContaining("inlineConversion.full"),
+    expect.objectContaining({
+      visitedTextNodes: 42,
+      acceptedCandidates: 7,
+      scannedTextNodes: 7,
+      conversions: 5,
+    }),
+  );
+});
+
 test("content runtime selects little hotelier plugins only for pricing pages", async () => {
   await importRuntimeModuleWithMocks();
   const {

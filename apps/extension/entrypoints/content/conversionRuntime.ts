@@ -63,6 +63,8 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
           clearExistingMs: roundMs(sample.clearExistingMs),
           scanTextNodesMs: roundMs(sample.scanTextNodesMs),
           decorateNodesMs: roundMs(sample.decorateNodesMs),
+          visitedTextNodes: sample.visitedTextNodes,
+          acceptedCandidates: sample.acceptedCandidates,
           scannedTextNodes: sample.scannedTextNodes,
           conversions: sample.conversionsApplied,
           reachedNodeLimit: sample.reachedNodeLimit,
