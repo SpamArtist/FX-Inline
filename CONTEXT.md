@@ -39,3 +39,27 @@ _Avoid_: Candidate Discovery, Activation Scan
 **Conversion Coverage**:
 The set of valid prices that FX Inline can find and convert. A performance change must not reduce this set.
 _Avoid_: Conversion count, candidate yield
+
+**Full Conversion Task**:
+One complete FX Inline operation from the start of conversion through visible converted output.
+_Avoid_: Parser task, extraction task
+
+**Performance Fixture**:
+A fixed offline webpage, conversion configuration, rate set, and expected output used to compare conversion behavior and CPU time across builds.
+_Avoid_: Benchmark input, generated snapshot
+
+**Setup Phase**:
+The part of a Full Conversion Task that prepares pass state, configuration, caches, styles, and prior conversion output.
+_Avoid_: Discovery Phase, Analysis Phase, Render Phase
+
+**Discovery Phase**:
+The part of a Full Conversion Task that reads the webpage and finds eligible conversion candidates.
+_Avoid_: Setup Phase, Analysis Phase, Render Phase
+
+**Analysis Phase**:
+The part of a Full Conversion Task that parses candidates, resolves currencies, converts values, and formats output text.
+_Avoid_: Setup Phase, Discovery Phase, Render Phase
+
+**Render Phase**:
+The part of a Full Conversion Task that writes converted output to the webpage.
+_Avoid_: Setup Phase, Discovery Phase, Analysis Phase

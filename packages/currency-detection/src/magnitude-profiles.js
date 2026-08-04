@@ -732,7 +732,7 @@ export function createMagnitudeAliasResolver(extraProfilesInput) {
 
   const mergedAliasMapCache = new Map();
 
-  return function getMagnitudeAliasMap(localeHint) {
+  function getMagnitudeAliasMap(localeHint) {
     const cacheKey = getAliasMapCacheKey(localeHint);
     const cached = mergedAliasMapCache.get(cacheKey);
     if (cached) {
@@ -747,5 +747,11 @@ export function createMagnitudeAliasResolver(extraProfilesInput) {
     const aliasMap = mergeProfileAliasMaps(profiles, profileAliasMaps);
     mergedAliasMapCache.set(cacheKey, aliasMap);
     return aliasMap;
+  }
+
+  getMagnitudeAliasMap.clearCache = () => {
+    mergedAliasMapCache.clear();
   };
+
+  return getMagnitudeAliasMap;
 }

@@ -1,10 +1,5 @@
 import { CurrencyCode } from "@/utils/enums";
 import type { RateSnapshot } from "@/utils/rates.types";
-import {
-  addInlinePerfSample,
-  createInlineConversionPerfAggregate,
-} from "../perfLogger";
-import type { InlineConversionPerfAggregate } from "../perfLogger";
 import { convertVisiblePrices } from "../inlineConversion";
 import { PARTIAL_CONVERSION_MAX_NODES_PER_PASS } from "./constants";
 
@@ -12,7 +7,6 @@ export type PartialConversionPassResult = {
   conversions: number;
   connectedRoots: number;
   deferredRoots: number;
-  perfAggregate: InlineConversionPerfAggregate | null;
 };
 
 export function runPartialConversionPass(
@@ -20,16 +14,12 @@ export function runPartialConversionPass(
   pendingMutationRoots: Set<ParentNode>,
   preferredCurrency: CurrencyCode,
   rateSnapshot: RateSnapshot,
-  perfLoggingEnabled: boolean,
   timeBudgetMs: number,
 ): PartialConversionPassResult {
   let conversions = 0;
   let connectedRoots = 0;
   let deferredRoots = 0;
   const passStartedAt = performance.now();
-  const perfAggregate = perfLoggingEnabled
-    ? createInlineConversionPerfAggregate()
-    : null;
 
   for (let index = 0; index < roots.length; index += 1) {
     if (
@@ -51,11 +41,6 @@ export function runPartialConversionPass(
     conversions += convertVisiblePrices(preferredCurrency, rateSnapshot, root, {
       clearExisting: false,
       maxNodesPerPass: PARTIAL_CONVERSION_MAX_NODES_PER_PASS,
-      onPerfSample: perfAggregate
-        ? (sample) => {
-            addInlinePerfSample(perfAggregate, sample);
-          }
-        : undefined,
     });
   }
 
@@ -63,6 +48,5 @@ export function runPartialConversionPass(
     conversions,
     connectedRoots,
     deferredRoots,
-    perfAggregate,
   };
 }

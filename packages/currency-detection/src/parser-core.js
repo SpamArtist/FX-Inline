@@ -555,17 +555,11 @@ function createCompiledConfig(config) {
       `[+-]?\\d[\\d,.\\u00A0\\u202F ]*(?:\\s*${magnitudeTokenPattern})?(?:\\s*\\+)?`;
     const boundedNumberWithOptionalMagnitudePattern =
       `(?<![\\p{N}\\-–—])${numberWithOptionalMagnitudePattern}`;
-    const currencyTokenPattern =
-      `(${isoTokenPattern}|(?:${symbolPattern})|${wordTokenPattern})`;
+    const currencyTokenPatternSource =
+      `${isoTokenPattern}|(?:${symbolPattern})|${wordTokenPattern}`;
     const rangeSeparatorPattern = "(?:-|–|—)";
-
-    const currencySnippetRegex = new RegExp(
-      `(?:${isoTokenPattern}\\s*${numberWithOptionalMagnitudePattern}|${boundedNumberWithOptionalMagnitudePattern}\\s*${isoTokenPattern}|(?:${symbolPattern})\\s*${numberWithOptionalMagnitudePattern}|${boundedNumberWithOptionalMagnitudePattern}\\s*(?:${symbolPattern})|${wordTokenPattern}\\s*${numberWithOptionalMagnitudePattern}|${boundedNumberWithOptionalMagnitudePattern}\\s*${wordTokenPattern})`,
-      "giu",
-    );
-
-    const currencyRangeRegex = new RegExp(
-      `${currencyTokenPattern}\\s*(${numberWithOptionalMagnitudePattern})\\s*${rangeSeparatorPattern}\\s*(${numberWithOptionalMagnitudePattern})`,
+    const orderedCurrencySnippetRegex = new RegExp(
+      `(?:(${currencyTokenPatternSource})\\s*(${numberWithOptionalMagnitudePattern})\\s*${rangeSeparatorPattern}\\s*(${numberWithOptionalMagnitudePattern})|(${currencyTokenPatternSource})\\s*(${numberWithOptionalMagnitudePattern})|(${boundedNumberWithOptionalMagnitudePattern})\\s*(${currencyTokenPatternSource}))`,
       "giu",
     );
 
@@ -574,8 +568,7 @@ function createCompiledConfig(config) {
     return {
       magnitudeMultiplierByAlias,
       magnitudeSuffixRegex,
-      currencySnippetRegex,
-      currencyRangeRegex,
+      orderedCurrencySnippetRegex,
     };
   }
 
@@ -627,160 +620,145 @@ function createCompiledConfig(config) {
     return parseCurrencyValueWithArtifacts(input, artifacts);
   }
 
+  function parseRangeValues(firstValueText, secondValueText, artifacts) {
+    const normalizedFirstValueText = stripTrailingPlus(firstValueText);
+    const normalizedSecondValueText = stripTrailingPlus(secondValueText);
+
+    const firstMagnitude = normalizedFirstValueText.match(
+      artifacts.magnitudeSuffixRegex,
+    );
+    const secondMagnitude = normalizedSecondValueText.match(
+      artifacts.magnitudeSuffixRegex,
+    );
+
+    let firstValue = parseNumberWithOptionalMagnitudeForArtifacts(
+      firstValueText,
+      artifacts,
+    );
+    let secondValue = parseNumberWithOptionalMagnitudeForArtifacts(
+      secondValueText,
+      artifacts,
+    );
+
+    if (firstValue === null || secondValue === null) {
+      return null;
+    }
+
+    if (!firstMagnitude && secondMagnitude) {
+      const alias = normalizeMagnitudeAlias(secondMagnitude[2]);
+      const multiplier = artifacts.magnitudeMultiplierByAlias.get(alias);
+      if (multiplier !== undefined) {
+        const base = parseFlexibleNumber(
+          normalizedFirstValueText,
+          0,
+          normalizedFirstValueText.length,
+        );
+        if (base !== null) {
+          firstValue = base * multiplier;
+        }
+      }
+    } else if (firstMagnitude && !secondMagnitude) {
+      const alias = normalizeMagnitudeAlias(firstMagnitude[2]);
+      const multiplier = artifacts.magnitudeMultiplierByAlias.get(alias);
+      if (multiplier !== undefined) {
+        const base = parseFlexibleNumber(
+          normalizedSecondValueText,
+          0,
+          normalizedSecondValueText.length,
+        );
+        if (base !== null) {
+          secondValue = base * multiplier;
+        }
+      }
+    }
+
+    return {
+      firstValue,
+      secondValue,
+    };
+  }
+
+  function scanOrderedMatches(input, artifacts) {
+    const matches = [];
+    artifacts.orderedCurrencySnippetRegex.lastIndex = 0;
+
+    for (const candidate of input.matchAll(artifacts.orderedCurrencySnippetRegex)) {
+      if (candidate.index === undefined) continue;
+
+      const raw = candidate[0];
+      const rangeCurrencyToken = candidate[1];
+      const rangeFirstValueText = candidate[2];
+      const rangeSecondValueText = candidate[3];
+      const currencyToken = rangeCurrencyToken ?? candidate[4] ?? candidate[7];
+      const valueText = candidate[5] ?? candidate[6];
+      const isRange =
+        Boolean(rangeCurrencyToken) &&
+        Boolean(rangeFirstValueText) &&
+        Boolean(rangeSecondValueText);
+      if (!currencyToken) continue;
+
+      const parsedCurrency = isCurrencyToken(currencyToken);
+      if (!parsedCurrency) continue;
+
+      if (shouldSkipWordLikeCurrencyByCasing(raw, parsedCurrency)) {
+        continue;
+      }
+
+      if (
+        shouldSkipLikelyUsernameCurrencyMatch(
+          input,
+          candidate.index,
+          candidate.index + raw.length,
+        )
+      ) {
+        continue;
+      }
+
+      if (isRange) {
+        const rangeValues = parseRangeValues(
+          rangeFirstValueText,
+          rangeSecondValueText,
+          artifacts,
+        );
+        if (!rangeValues) continue;
+
+        matches.push({
+          raw,
+          start: candidate.index,
+          end: candidate.index + raw.length,
+          value: rangeValues.firstValue,
+          rangeEndValue: rangeValues.secondValue,
+          currency: parsedCurrency,
+        });
+        continue;
+      }
+
+      if (!valueText) continue;
+      const parsedValue = parseNumberWithOptionalMagnitudeForArtifacts(
+        valueText,
+        artifacts,
+      );
+      if (parsedValue === null) continue;
+
+      matches.push({
+        raw,
+        start: candidate.index,
+        end: candidate.index + raw.length,
+        value: parsedValue,
+        currency: parsedCurrency,
+      });
+    }
+
+    return matches;
+  }
+
   function extractMatches(input, options) {
     if (!input?.length) return [];
 
     const localeHint = resolveLocaleHint(options);
     const artifacts = getParserArtifacts(localeHint);
 
-    artifacts.currencySnippetRegex.lastIndex = 0;
-    artifacts.currencyRangeRegex.lastIndex = 0;
-
-    const matches = [];
-
-    for (const candidate of input.matchAll(artifacts.currencySnippetRegex)) {
-      if (candidate.index === undefined) continue;
-
-      const raw = candidate[0];
-      const parsed = parseCurrencyValueWithArtifacts(raw, artifacts);
-
-      if (!parsed.valid || parsed.currency == null || parsed.value === undefined) {
-        continue;
-      }
-
-      if (shouldSkipWordLikeCurrencyByCasing(raw, parsed.currency)) {
-        continue;
-      }
-
-      if (
-        shouldSkipLikelyUsernameCurrencyMatch(
-          input,
-          candidate.index,
-          candidate.index + raw.length,
-        )
-      ) {
-        continue;
-      }
-
-      matches.push({
-        raw,
-        start: candidate.index,
-        end: candidate.index + raw.length,
-        value: parsed.value,
-        currency: parsed.currency,
-      });
-    }
-
-    for (const candidate of input.matchAll(artifacts.currencyRangeRegex)) {
-      if (candidate.index === undefined) continue;
-
-      const raw = candidate[0];
-      if (
-        shouldSkipLikelyUsernameCurrencyMatch(
-          input,
-          candidate.index,
-          candidate.index + raw.length,
-        )
-      ) {
-        continue;
-      }
-
-      const parsedCurrency = isCurrencyToken(candidate[1]);
-      if (!parsedCurrency) continue;
-      if (shouldSkipWordLikeCurrencyByCasing(candidate[1], parsedCurrency)) {
-        continue;
-      }
-
-      const firstValueText = candidate[2];
-      const secondValueText = candidate[3];
-      if (!firstValueText || !secondValueText) continue;
-
-      const normalizedFirstValueText = stripTrailingPlus(firstValueText);
-      const normalizedSecondValueText = stripTrailingPlus(secondValueText);
-
-      const firstHadMagnitude =
-        artifacts.magnitudeSuffixRegex.test(normalizedFirstValueText);
-      const secondHadMagnitude =
-        artifacts.magnitudeSuffixRegex.test(normalizedSecondValueText);
-
-      let firstValue = parseNumberWithOptionalMagnitudeForArtifacts(
-        firstValueText,
-        artifacts,
-      );
-      let secondValue = parseNumberWithOptionalMagnitudeForArtifacts(
-        secondValueText,
-        artifacts,
-      );
-
-      if (firstValue === null || secondValue === null) {
-        continue;
-      }
-
-      if (!firstHadMagnitude && secondHadMagnitude) {
-        const secondMagnitude = normalizedSecondValueText.match(
-          artifacts.magnitudeSuffixRegex,
-        );
-        if (secondMagnitude) {
-          const alias = normalizeMagnitudeAlias(secondMagnitude[2]);
-          const multiplier = artifacts.magnitudeMultiplierByAlias.get(alias);
-          if (multiplier !== undefined) {
-            const base = parseFlexibleNumber(
-              normalizedFirstValueText,
-              0,
-              normalizedFirstValueText.length,
-            );
-            if (base !== null) {
-              firstValue = base * multiplier;
-            }
-          }
-        }
-      } else if (firstHadMagnitude && !secondHadMagnitude) {
-        const firstMagnitude = normalizedFirstValueText.match(
-          artifacts.magnitudeSuffixRegex,
-        );
-        if (firstMagnitude) {
-          const alias = normalizeMagnitudeAlias(firstMagnitude[2]);
-          const multiplier = artifacts.magnitudeMultiplierByAlias.get(alias);
-          if (multiplier !== undefined) {
-            const base = parseFlexibleNumber(
-              normalizedSecondValueText,
-              0,
-              normalizedSecondValueText.length,
-            );
-            if (base !== null) {
-              secondValue = base * multiplier;
-            }
-          }
-        }
-      }
-
-      matches.push({
-        raw,
-        start: candidate.index,
-        end: candidate.index + raw.length,
-        value: firstValue,
-        rangeEndValue: secondValue,
-        currency: parsedCurrency,
-      });
-    }
-
-    const sortedMatches = matches.sort((a, b) => {
-      if (a.start !== b.start) return a.start - b.start;
-      const aLen = a.end - a.start;
-      const bLen = b.end - b.start;
-      return bLen - aLen;
-    });
-
-    const nonOverlappingMatches = [];
-    let latestCoveredEnd = -1;
-
-    for (const match of sortedMatches) {
-      if (match.start < latestCoveredEnd) continue;
-      nonOverlappingMatches.push(match);
-      latestCoveredEnd = match.end;
-    }
-
-    return nonOverlappingMatches;
+    return scanOrderedMatches(input, artifacts);
   }
 
   function mayContainCurrencyToken(input) {
@@ -793,11 +771,18 @@ function createCompiledConfig(config) {
     return Boolean(input?.length) && thousandMagnitudeHintRegex.test(input);
   }
 
+  function clearCachesForTests() {
+    parserArtifactsCache.clear();
+    wordLikeCurrencyTokenRegexCache.clear();
+    getMagnitudeAliasMap.clearCache?.();
+  }
+
   return Object.freeze({
     parseValue,
     extractMatches,
     mayContainCurrencyToken,
     hasThousandMagnitudeHint,
+    __clearCachesForTests: clearCachesForTests,
   });
 }
 

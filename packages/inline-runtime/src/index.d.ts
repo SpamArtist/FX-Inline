@@ -8,22 +8,6 @@ export type RateSnapshotLike = {
   rates: Record<string, number>;
 };
 
-export type InlineConversionPerfSample = {
-  totalMs: number;
-  clearExistingMs: number;
-  scanTextNodesMs: number;
-  decorateNodesMs: number;
-  /** Text nodes reached by Candidate Discovery before the accepted-candidate limit stops the walk. */
-  visitedTextNodes: number;
-  /** Text nodes accepted after price-text classification and DOM eligibility checks. */
-  acceptedCandidates: number;
-  /** @deprecated Use acceptedCandidates. Kept as a compatibility alias. */
-  scannedTextNodes: number;
-  conversionsApplied: number;
-  maxNodesPerPass: number;
-  reachedNodeLimit: boolean;
-};
-
 export type InlineConvertedCurrencyPosition =
   | "top"
   | "bottom"
@@ -114,7 +98,6 @@ export type ConvertVisiblePricesOptions = {
   clearExisting?: boolean;
   refreshExisting?: boolean;
   maxNodesPerPass?: number;
-  onPerfSample?: (sample: InlineConversionPerfSample) => void;
   onNodeLimitReached?: (maxNodesPerPass: number) => void;
   includeDefaultPrePlugins?: boolean;
   prePlugins?: InlineConversionPrePlugin[];
@@ -138,7 +121,6 @@ export type InlineRuntimeOptions = {
   enabled?: boolean;
   observeMutations?: boolean;
   autoFetchRates?: boolean;
-  onPerfSample?: (sample: InlineConversionPerfSample) => void;
   onNodeLimitReached?: (maxNodesPerPass: number) => void;
   includeDefaultPrePlugins?: boolean;
   prePlugins?: InlineConversionPrePlugin[];

@@ -51,7 +51,7 @@
     "test:frontend": "npm run build:unit && npm run jest -- apps/extension/tests/unit",
     "test:content": "npm run build:content-tests && npm run jest -- --config jest.content.config.cjs apps/extension/tests/content",
     "test:unit": "npm run test:frontend",
-    "test:all": "npm run test:frontend && npm run test:content && npm run test:release && npm run test:assets && npm run test:admin && npm run test:build",
+    "test:all": "npm run test:frontend && npm run test:content && npm run currency-detection:test && npm run inline-runtime:test && npm run test:release && npm run test:assets && npm run test:admin && npm run test:build",
     "currency-detection:fixtures": "node packages/currency-detection/scripts/generate-fixtures.mjs",
     "currency-detection:baseline": "npm run build:unit && npm run currency-detection:fixtures && node packages/currency-detection/scripts/generate-legacy-snapshot.mjs",
     "currency-detection:test": "npm run jest -- packages/currency-detection/test",

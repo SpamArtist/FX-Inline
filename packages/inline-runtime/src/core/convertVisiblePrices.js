@@ -37,24 +37,15 @@ export function convertVisiblePrices(
   const passId = passContext.passId;
 
   try {
-    const capturePerf = Boolean(options?.onPerfSample);
-    const totalStartedAt = capturePerf ? performance.now() : 0;
-
     ensureInlineConversionStyles();
     const localeHint = document.documentElement?.lang || null;
     const baseCurrency = options?.baseCurrency ?? null;
     const renderPreferences = options?.clientRenderPreferences?.default ?? null;
-    let clearExistingMs = 0;
     let refreshedConversions = 0;
 
     if (options?.clearExisting !== false) {
-      const clearStartedAt = capturePerf ? performance.now() : 0;
       clearInlineConversions(root);
-      if (capturePerf) {
-        clearExistingMs = performance.now() - clearStartedAt;
-      }
     } else if (options?.refreshExisting) {
-      const refreshStartedAt = capturePerf ? performance.now() : 0;
       refreshedConversions = refreshExistingInlineConversions(
         preferredCurrency,
         rateSnapshot,
@@ -65,9 +56,6 @@ export function convertVisiblePrices(
           renderPreferences,
         },
       );
-      if (capturePerf) {
-        clearExistingMs = performance.now() - refreshStartedAt;
-      }
     }
 
     const maxNodesPerPass = options?.maxNodesPerPass ?? 15000;
@@ -92,7 +80,6 @@ export function convertVisiblePrices(
       : (options?.prePlugins ?? []);
 
     let totalConversions = refreshedConversions;
-    const decorateStartedAt = capturePerf ? performance.now() : 0;
 
     const prePluginConversions = runInlineConversionPlugins(
       prePlugins,
@@ -101,7 +88,6 @@ export function convertVisiblePrices(
     );
     totalConversions += prePluginConversions;
 
-    const scanStartedAt = capturePerf ? performance.now() : 0;
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
 
     const acceptedTextCandidates = [];
@@ -122,8 +108,6 @@ export function convertVisiblePrices(
         text: classification.text,
       });
     }
-    const scanTextNodesMs = capturePerf ? performance.now() - scanStartedAt : 0;
-
     if (
       acceptedTextCandidates.length >= maxNodesPerPass &&
       options?.onNodeLimitReached
@@ -200,23 +184,6 @@ export function convertVisiblePrices(
       maxNodesPerPass,
       reachedNodeLimit: acceptedTextCandidates.length >= maxNodesPerPass,
     });
-
-    if (capturePerf && options?.onPerfSample) {
-      const decorateNodesMs = performance.now() - decorateStartedAt;
-
-      options.onPerfSample({
-        totalMs: performance.now() - totalStartedAt,
-        clearExistingMs,
-        scanTextNodesMs,
-        decorateNodesMs,
-        visitedTextNodes,
-        acceptedCandidates: acceptedTextCandidates.length,
-        scannedTextNodes: acceptedTextCandidates.length,
-        conversionsApplied: totalConversions,
-        maxNodesPerPass,
-        reachedNodeLimit: acceptedTextCandidates.length >= maxNodesPerPass,
-      });
-    }
 
     return totalConversions;
   } finally {
