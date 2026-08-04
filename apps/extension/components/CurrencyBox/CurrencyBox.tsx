@@ -138,7 +138,7 @@ function CurrencyBox({
             type="text"
             inputMode="decimal"
             value={draftAmount}
-            onChange={handleAmountChange}
+            onInput={handleAmountChange}
             onBlur={finalizeAmountEdit}
             onKeyDown={onAmountInputKeyDown}
             aria-label={`${currencyName} amount`}
