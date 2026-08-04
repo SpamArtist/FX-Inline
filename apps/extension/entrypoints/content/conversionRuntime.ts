@@ -59,10 +59,11 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
     onPerfSample: perfLoggingEnabled
       ? (sample) => {
         logPerf("inlineConversion.full", {
+          setupMs: roundMs(sample.setupMs),
+          discoveryMs: roundMs(sample.discoveryMs),
+          analysisMs: roundMs(sample.analysisMs),
+          renderMs: roundMs(sample.renderMs),
           totalMs: roundMs(sample.totalMs),
-          clearExistingMs: roundMs(sample.clearExistingMs),
-          scanTextNodesMs: roundMs(sample.scanTextNodesMs),
-          decorateNodesMs: roundMs(sample.decorateNodesMs),
           visitedTextNodes: sample.visitedTextNodes,
           acceptedCandidates: sample.acceptedCandidates,
           scannedTextNodes: sample.scannedTextNodes,

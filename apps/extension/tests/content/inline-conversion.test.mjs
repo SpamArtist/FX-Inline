@@ -460,8 +460,13 @@ test("reports perf sample shape and node-limit metadata", () => {
   expect(sample.scannedTextNodes).toBe(1);
   expect(sample.reachedNodeLimit).toBe(true);
   expect(sample.conversionsApplied).toBe(applied);
+  expect(sample.setupMs).toBeGreaterThanOrEqual(0);
+  expect(sample.discoveryMs).toBeGreaterThanOrEqual(0);
+  expect(sample.analysisMs).toBeGreaterThanOrEqual(0);
+  expect(sample.renderMs).toBeGreaterThanOrEqual(0);
   expect(sample.totalMs).toBeGreaterThanOrEqual(0);
-  expect(sample.clearExistingMs).toBeGreaterThanOrEqual(0);
-  expect(sample.scanTextNodesMs).toBeGreaterThanOrEqual(0);
-  expect(sample.decorateNodesMs).toBeGreaterThanOrEqual(0);
+  expect(sample.totalMs).toBeCloseTo(
+    sample.setupMs + sample.discoveryMs + sample.analysisMs + sample.renderMs,
+    8,
+  );
 });

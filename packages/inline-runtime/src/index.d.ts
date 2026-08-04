@@ -9,10 +9,11 @@ export type RateSnapshotLike = {
 };
 
 export type InlineConversionPerfSample = {
+  setupMs: number;
+  discoveryMs: number;
+  analysisMs: number;
+  renderMs: number;
   totalMs: number;
-  clearExistingMs: number;
-  scanTextNodesMs: number;
-  decorateNodesMs: number;
   /** Text nodes reached by Candidate Discovery before the accepted-candidate limit stops the walk. */
   visitedTextNodes: number;
   /** Text nodes accepted after price-text classification and DOM eligibility checks. */
@@ -23,6 +24,12 @@ export type InlineConversionPerfSample = {
   maxNodesPerPass: number;
   reachedNodeLimit: boolean;
 };
+
+export type InlineConversionPerfPhase =
+  | "setupMs"
+  | "discoveryMs"
+  | "analysisMs"
+  | "renderMs";
 
 export type InlineConvertedCurrencyPosition =
   | "top"
@@ -74,6 +81,9 @@ export type InlineConversionPluginContext = {
   passId: string;
   passContext: InlinePassContext;
   clientRenderPreferences?: InlineRenderPreferences | null;
+  perfPhases?: {
+    time: <T>(phase: InlineConversionPerfPhase, callback: () => T) => T;
+  };
   onPluginError?: (error: unknown, plugin: InlineConversionPlugin) => void;
 };
 
