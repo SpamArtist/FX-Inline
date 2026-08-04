@@ -2,8 +2,8 @@
 
 ## Scope
 
-Fixture: `apts-jp-first-page-full-conversion`.
-Harness: `packages/inline-runtime/scripts/measure-full-conversion-performance.mjs`.
+Fixture: `apts-jp-first-page-full-conversion` (removed after measurement work).
+Harness: removed after measurement work.
 Runs: 25 measured cold, 1 warmup, 25 measured warm.
 Each run reloads fixed JSDOM input and verifies conversion count plus exact final DOM.
 
