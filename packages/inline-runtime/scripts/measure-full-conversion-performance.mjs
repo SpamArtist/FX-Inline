@@ -8,6 +8,8 @@ import { JSDOM } from "jsdom";
 import { __clearDefaultParserCachesForTests } from "@fx-inline/currency-detection";
 import {
   __clearCurrencyFormatterCacheForTests,
+  __startCurrencyFormatterPerfCaptureForTests,
+  __stopCurrencyFormatterPerfCaptureForTests,
   convertVisiblePrices,
 } from "../src/index.js";
 
@@ -22,6 +24,11 @@ const fixtureDir = path.join(
 );
 const repoRoot = path.resolve(__dirname, "..", "..", "..");
 const phaseNames = ["setupMs", "discoveryMs", "analysisMs", "renderMs"];
+const formatterMetricNames = [
+  "cacheLookupMs",
+  "formatterConstructionMs",
+  "formatCallMs",
+];
 
 function parseArgs(argv) {
   const args = {
@@ -138,29 +145,42 @@ function clearMeasuredCaches() {
 function runConversion(fixture, mode, runIndex, measured) {
   const dom = loadFixtureDocument(fixture.inputHtml);
   const samples = [];
-  const applied = convertVisiblePrices(
-    fixture.metadata.settings.targetCurrency,
-    {
-      base: fixture.metadata.ratesBase,
-      fetchedAt: fixture.metadata.ratesFetchedAt,
-      source: "apts.jp fixture fixed rates",
-      rates: fixture.metadata.rates,
-    },
-    document.body,
-    {
-      clearExisting: fixture.metadata.settings.clearExisting,
-      includeDefaultPrePlugins: fixture.metadata.settings.includeDefaultPrePlugins,
-      includeDefaultPostPlugins: fixture.metadata.settings.includeDefaultPostPlugins,
-      clientRenderPreferences: {
-        default: {
-          convertedCurrencyPosition:
-            fixture.metadata.settings.convertedCurrencyPosition,
-          displayStyle: fixture.metadata.settings.displayStyle,
-        },
+  let formatterPerf = null;
+  let applied = 0;
+
+  if (measured) {
+    __startCurrencyFormatterPerfCaptureForTests();
+  }
+
+  try {
+    applied = convertVisiblePrices(
+      fixture.metadata.settings.targetCurrency,
+      {
+        base: fixture.metadata.ratesBase,
+        fetchedAt: fixture.metadata.ratesFetchedAt,
+        source: "apts.jp fixture fixed rates",
+        rates: fixture.metadata.rates,
       },
-      onPerfSample: (sample) => samples.push(sample),
-    },
-  );
+      document.body,
+      {
+        clearExisting: fixture.metadata.settings.clearExisting,
+        includeDefaultPrePlugins: fixture.metadata.settings.includeDefaultPrePlugins,
+        includeDefaultPostPlugins: fixture.metadata.settings.includeDefaultPostPlugins,
+        clientRenderPreferences: {
+          default: {
+            convertedCurrencyPosition:
+              fixture.metadata.settings.convertedCurrencyPosition,
+            displayStyle: fixture.metadata.settings.displayStyle,
+          },
+        },
+        onPerfSample: (sample) => samples.push(sample),
+      },
+    );
+  } finally {
+    if (measured) {
+      formatterPerf = __stopCurrencyFormatterPerfCaptureForTests();
+    }
+  }
 
   const actualDom = `${document.documentElement.outerHTML}\n`;
   if (applied !== fixture.metadata.expectedConversionCount) {
@@ -181,6 +201,7 @@ function runConversion(fixture, mode, runIndex, measured) {
         mode,
         runIndex,
         ...samples[0],
+        formatterPerf,
       }
     : null;
 }
@@ -193,6 +214,36 @@ function percentile(values, percentileValue) {
     Math.max(0, Math.ceil((percentileValue / 100) * sorted.length) - 1),
   );
   return sorted[index];
+}
+
+function summarizeMetric(samples, metricName) {
+  const values = samples.map((sample) => sample.formatterPerf[metricName]);
+  return {
+    median: percentile(values, 50),
+    p95: percentile(values, 95),
+  };
+}
+
+function summarizeFormatterSamples(samples) {
+  const metricSummary = Object.fromEntries(
+    formatterMetricNames.map((metricName) => [
+      metricName,
+      summarizeMetric(samples, metricName),
+    ]),
+  );
+
+  return {
+    ...metricSummary,
+    counts: {
+      cacheLookupCount: samples[0]?.formatterPerf.cacheLookupCount ?? null,
+      formatterConstructionCount:
+        samples[0]?.formatterPerf.formatterConstructionCount ?? null,
+      formatCallCount: samples[0]?.formatterPerf.formatCallCount ?? null,
+      cacheHits: samples[0]?.formatterPerf.cacheHits ?? null,
+      cacheMisses: samples[0]?.formatterPerf.cacheMisses ?? null,
+      fallbackCount: samples[0]?.formatterPerf.fallbackCount ?? null,
+    },
+  };
 }
 
 function summarizeSamples(samples) {
@@ -217,6 +268,7 @@ function summarizeSamples(samples) {
       p95: percentile(totalValues, 95),
     },
     phases,
+    formatter: summarizeFormatterSamples(samples),
     counters: {
       visitedTextNodes: samples[0]?.visitedTextNodes ?? null,
       acceptedCandidates: samples[0]?.acceptedCandidates ?? null,
@@ -278,6 +330,7 @@ function createReport(args, fixture) {
       cold: "Clear parser and currency formatter caches before each measured run.",
       warm: "Clear caches once, run warmups, then reuse parser and currency formatter caches for measured runs.",
       domReset: "Create a new JSDOM document from fixed input before each warmup and measured run.",
+      formatterBreakdown: "Measured runs separately capture currency formatter cache lookup, Intl.NumberFormat construction, and formatter.format call cost inside conversion.",
       verification: "Each measured run must match expected conversion count and exact expected DOM.",
       timeLimit: "No pass/fail time threshold.",
     },
@@ -314,9 +367,16 @@ function printSummary(report, outputPath) {
   console.log(`Warm total median/p95: ${formatMs(warm.median)} / ${formatMs(warm.p95)}`);
   for (const mode of ["cold", "warm"]) {
     const phases = report.summary[mode].phases;
+    const formatter = report.summary[mode].formatter;
     console.log(
       `${mode} phases median setup/discovery/analysis/render: ` +
         phaseNames.map((phaseName) => formatMs(phases[phaseName].median)).join(" / "),
+    );
+    console.log(
+      `${mode} formatter median lookup/construction/format: ` +
+        formatterMetricNames
+          .map((metricName) => formatMs(formatter[metricName].median))
+          .join(" / "),
     );
   }
   console.log(
