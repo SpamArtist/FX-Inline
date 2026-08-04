@@ -49,9 +49,7 @@
     "currency-detection:bench:compare": "node packages/currency-detection/scripts/compare-benchmarks.mjs",
     "inline-runtime:build": "vite build --config packages/inline-runtime/vite.config.mjs",
     "inline-runtime:test": "npm run jest -- packages/inline-runtime/test",
-    "postinstall": "wxt prepare",
-    "readme:sync": "node scripts/readme-sync.mjs",
-    "readme:sync:check": "node scripts/readme-sync.mjs --check"
+    "postinstall": "wxt prepare"
   },
   "dependencies": {
     "@fx-inline/currency-detection": "file:packages/currency-detection",
