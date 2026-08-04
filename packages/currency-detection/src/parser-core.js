@@ -555,12 +555,17 @@ function createCompiledConfig(config) {
       `[+-]?\\d[\\d,.\\u00A0\\u202F ]*(?:\\s*${magnitudeTokenPattern})?(?:\\s*\\+)?`;
     const boundedNumberWithOptionalMagnitudePattern =
       `(?<![\\p{N}\\-–—])${numberWithOptionalMagnitudePattern}`;
-    const currencyTokenPattern =
-      `(${isoTokenPattern}|(?:${symbolPattern})|${wordTokenPattern})`;
+    const currencyTokenPatternSource =
+      `${isoTokenPattern}|(?:${symbolPattern})|${wordTokenPattern}`;
+    const currencyTokenPattern = `(${currencyTokenPatternSource})`;
     const rangeSeparatorPattern = "(?:-|–|—)";
 
-    const currencySnippetRegex = new RegExp(
-      `(?:${isoTokenPattern}\\s*${numberWithOptionalMagnitudePattern}|${boundedNumberWithOptionalMagnitudePattern}\\s*${isoTokenPattern}|(?:${symbolPattern})\\s*${numberWithOptionalMagnitudePattern}|${boundedNumberWithOptionalMagnitudePattern}\\s*(?:${symbolPattern})|${wordTokenPattern}\\s*${numberWithOptionalMagnitudePattern}|${boundedNumberWithOptionalMagnitudePattern}\\s*${wordTokenPattern})`,
+    const currencySnippetPattern =
+      `(?:${isoTokenPattern}\\s*${numberWithOptionalMagnitudePattern}|${boundedNumberWithOptionalMagnitudePattern}\\s*${isoTokenPattern}|(?:${symbolPattern})\\s*${numberWithOptionalMagnitudePattern}|${boundedNumberWithOptionalMagnitudePattern}\\s*(?:${symbolPattern})|${wordTokenPattern}\\s*${numberWithOptionalMagnitudePattern}|${boundedNumberWithOptionalMagnitudePattern}\\s*${wordTokenPattern})`;
+
+    const currencySnippetRegex = new RegExp(currencySnippetPattern, "giu");
+    const orderedCurrencySnippetRegex = new RegExp(
+      `(?:(${currencyTokenPatternSource})\\s*(${numberWithOptionalMagnitudePattern})|(${boundedNumberWithOptionalMagnitudePattern})\\s*(${currencyTokenPatternSource}))`,
       "giu",
     );
 
@@ -575,6 +580,7 @@ function createCompiledConfig(config) {
       magnitudeMultiplierByAlias,
       magnitudeSuffixRegex,
       currencySnippetRegex,
+      orderedCurrencySnippetRegex,
       currencyRangeRegex,
     };
   }
@@ -627,16 +633,72 @@ function createCompiledConfig(config) {
     return parseCurrencyValueWithArtifacts(input, artifacts);
   }
 
-  function extractMatches(input, options) {
-    if (!input?.length) return [];
-
-    const localeHint = resolveLocaleHint(options);
-    const artifacts = getParserArtifacts(localeHint);
-
-    artifacts.currencySnippetRegex.lastIndex = 0;
-    artifacts.currencyRangeRegex.lastIndex = 0;
-
+  function scanOrderedNonRangeMatches(input, artifacts, detectDualCurrencyRange) {
     const matches = [];
+    let previousMatch = null;
+    let hasDualCurrencyRange = false;
+    artifacts.orderedCurrencySnippetRegex.lastIndex = 0;
+
+    for (const candidate of input.matchAll(artifacts.orderedCurrencySnippetRegex)) {
+      if (candidate.index === undefined) continue;
+
+      const raw = candidate[0];
+      const currencyToken = candidate[1] ?? candidate[4];
+      const valueText = candidate[2] ?? candidate[3];
+      if (!currencyToken || !valueText) continue;
+
+      const parsedCurrency = isCurrencyToken(currencyToken);
+      if (!parsedCurrency) continue;
+
+      const parsedValue = parseNumberWithOptionalMagnitudeForArtifacts(
+        valueText,
+        artifacts,
+      );
+      if (parsedValue === null) continue;
+
+      if (shouldSkipWordLikeCurrencyByCasing(raw, parsedCurrency)) {
+        continue;
+      }
+
+      if (
+        shouldSkipLikelyUsernameCurrencyMatch(
+          input,
+          candidate.index,
+          candidate.index + raw.length,
+        )
+      ) {
+        continue;
+      }
+
+      const match = {
+        raw,
+        start: candidate.index,
+        end: candidate.index + raw.length,
+        value: parsedValue,
+        currency: parsedCurrency,
+      };
+
+      if (
+        detectDualCurrencyRange &&
+        previousMatch &&
+        /^\s*[-–—]\s*$/u.test(input.slice(previousMatch.end, match.start))
+      ) {
+        hasDualCurrencyRange = true;
+      }
+
+      matches.push(match);
+      previousMatch = match;
+    }
+
+    return {
+      matches,
+      hasDualCurrencyRange,
+    };
+  }
+
+  function extractLegacySnippetMatches(input, artifacts) {
+    const matches = [];
+    artifacts.currencySnippetRegex.lastIndex = 0;
 
     for (const candidate of input.matchAll(artifacts.currencySnippetRegex)) {
       if (candidate.index === undefined) continue;
@@ -671,6 +733,13 @@ function createCompiledConfig(config) {
       });
     }
 
+    return matches;
+  }
+
+  function extractLegacyMatches(input, artifacts) {
+    const matches = extractLegacySnippetMatches(input, artifacts);
+
+    artifacts.currencyRangeRegex.lastIndex = 0;
     for (const candidate of input.matchAll(artifacts.currencyRangeRegex)) {
       if (candidate.index === undefined) continue;
 
@@ -781,6 +850,41 @@ function createCompiledConfig(config) {
     }
 
     return nonOverlappingMatches;
+  }
+
+  function containsSingleTokenRangeForm(input, artifacts) {
+    if (!/[-–—]/u.test(input)) return false;
+
+    artifacts.currencyRangeRegex.lastIndex = 0;
+    if (artifacts.currencyRangeRegex.test(input)) {
+      artifacts.currencyRangeRegex.lastIndex = 0;
+      return true;
+    }
+
+    return false;
+  }
+
+  function extractMatches(input, options) {
+    if (!input?.length) return [];
+
+    const localeHint = resolveLocaleHint(options);
+    const artifacts = getParserArtifacts(localeHint);
+
+    const canContainRangeForm = /[-–—]/u.test(input);
+    if (canContainRangeForm && containsSingleTokenRangeForm(input, artifacts)) {
+      return extractLegacyMatches(input, artifacts);
+    }
+
+    const orderedScan = scanOrderedNonRangeMatches(
+      input,
+      artifacts,
+      canContainRangeForm,
+    );
+    if (orderedScan.hasDualCurrencyRange) {
+      return extractLegacyMatches(input, artifacts);
+    }
+
+    return orderedScan.matches;
   }
 
   function mayContainCurrencyToken(input) {
