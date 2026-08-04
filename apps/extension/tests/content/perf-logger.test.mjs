@@ -46,10 +46,11 @@ test("inline perf aggregate accumulates samples and node-limit passes", () => {
   const aggregate = createInlineConversionPerfAggregate();
 
   addInlinePerfSample(aggregate, {
+    setupMs: 1,
+    discoveryMs: 2,
+    analysisMs: 3,
+    renderMs: 4,
     totalMs: 10,
-    clearExistingMs: 1,
-    scanTextNodesMs: 2,
-    decorateNodesMs: 7,
     visitedTextNodes: 80,
     acceptedCandidates: 50,
     scannedTextNodes: 50,
@@ -58,10 +59,11 @@ test("inline perf aggregate accumulates samples and node-limit passes", () => {
   });
 
   addInlinePerfSample(aggregate, {
+    setupMs: 2,
+    discoveryMs: 4,
+    analysisMs: 6,
+    renderMs: 8,
     totalMs: 20,
-    clearExistingMs: 3,
-    scanTextNodesMs: 4,
-    decorateNodesMs: 13,
     visitedTextNodes: 120,
     acceptedCandidates: 70,
     scannedTextNodes: 70,
@@ -70,10 +72,11 @@ test("inline perf aggregate accumulates samples and node-limit passes", () => {
   });
 
   expect(aggregate).toEqual({
+    setupMs: 3,
+    discoveryMs: 6,
+    analysisMs: 9,
+    renderMs: 12,
     totalMs: 30,
-    clearExistingMs: 4,
-    scanTextNodesMs: 6,
-    decorateNodesMs: 20,
     visitedTextNodes: 200,
     acceptedCandidates: 120,
     scannedTextNodes: 120,

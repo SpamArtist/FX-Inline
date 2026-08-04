@@ -155,5 +155,21 @@ test("apts.jp performance fixture matches exact full conversion DOM", () => {
     conversionsApplied: samples[0].conversionsApplied,
     reachedNodeLimit: samples[0].reachedNodeLimit,
   }).toEqual(metadata.expectedPerfCounters);
+  expect(samples[0]).toEqual(
+    expect.objectContaining({
+      setupMs: expect.any(Number),
+      discoveryMs: expect.any(Number),
+      analysisMs: expect.any(Number),
+      renderMs: expect.any(Number),
+      totalMs: expect.any(Number),
+    }),
+  );
+  expect(samples[0].totalMs).toBeCloseTo(
+    samples[0].setupMs +
+      samples[0].discoveryMs +
+      samples[0].analysisMs +
+      samples[0].renderMs,
+    8,
+  );
   expect(`${document.documentElement.outerHTML}\n`).toBe(expectedDom);
 });

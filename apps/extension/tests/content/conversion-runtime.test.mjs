@@ -171,10 +171,11 @@ test("content runtime perf logs visited and accepted candidate totals", async ()
   createContentConversionRuntime();
   const options = createInlineRuntimeMock.mock.calls[0][0];
   options.onPerfSample({
+    setupMs: 1.111,
+    discoveryMs: 2.222,
+    analysisMs: 3.333,
+    renderMs: 5.679,
     totalMs: 12.345,
-    clearExistingMs: 1.111,
-    scanTextNodesMs: 2.222,
-    decorateNodesMs: 9.012,
     visitedTextNodes: 42,
     acceptedCandidates: 7,
     scannedTextNodes: 7,
@@ -186,6 +187,11 @@ test("content runtime perf logs visited and accepted candidate totals", async ()
   expect(infoSpy).toHaveBeenCalledWith(
     expect.stringContaining("inlineConversion.full"),
     expect.objectContaining({
+      setupMs: 1.11,
+      discoveryMs: 2.22,
+      analysisMs: 3.33,
+      renderMs: 5.68,
+      totalMs: 12.35,
       visitedTextNodes: 42,
       acceptedCandidates: 7,
       scannedTextNodes: 7,

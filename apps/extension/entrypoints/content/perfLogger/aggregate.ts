@@ -5,10 +5,11 @@ import type {
 
 export function createInlineConversionPerfAggregate(): InlineConversionPerfAggregate {
   return {
+    setupMs: 0,
+    discoveryMs: 0,
+    analysisMs: 0,
+    renderMs: 0,
     totalMs: 0,
-    clearExistingMs: 0,
-    scanTextNodesMs: 0,
-    decorateNodesMs: 0,
     visitedTextNodes: 0,
     acceptedCandidates: 0,
     scannedTextNodes: 0,
@@ -21,10 +22,11 @@ export function addInlinePerfSample(
   aggregate: InlineConversionPerfAggregate,
   sample: InlinePerfSample,
 ) {
+  aggregate.setupMs += sample.setupMs;
+  aggregate.discoveryMs += sample.discoveryMs;
+  aggregate.analysisMs += sample.analysisMs;
+  aggregate.renderMs += sample.renderMs;
   aggregate.totalMs += sample.totalMs;
-  aggregate.clearExistingMs += sample.clearExistingMs;
-  aggregate.scanTextNodesMs += sample.scanTextNodesMs;
-  aggregate.decorateNodesMs += sample.decorateNodesMs;
   aggregate.visitedTextNodes += sample.visitedTextNodes;
   aggregate.acceptedCandidates += sample.acceptedCandidates;
   aggregate.scannedTextNodes += sample.scannedTextNodes;

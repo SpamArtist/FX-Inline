@@ -2,10 +2,11 @@ import type { UserSettings } from "@/utils/appStorage.types";
 import type { CurrencyCode } from "@/utils/enums";
 
 export type InlineConversionPerfSample = {
+  setupMs: number;
+  discoveryMs: number;
+  analysisMs: number;
+  renderMs: number;
   totalMs: number;
-  clearExistingMs: number;
-  scanTextNodesMs: number;
-  decorateNodesMs: number;
   /** Text nodes reached by Candidate Discovery before the accepted-candidate limit stops the walk. */
   visitedTextNodes: number;
   /** Text nodes accepted after price-text classification and DOM eligibility checks. */

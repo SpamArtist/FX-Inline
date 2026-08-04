@@ -5,10 +5,11 @@ export type PerfPayload = JsonObject;
 
 export type InlinePerfSample = Pick<
   InlineConversionPerfSample,
+  | "setupMs"
+  | "discoveryMs"
+  | "analysisMs"
+  | "renderMs"
   | "totalMs"
-  | "clearExistingMs"
-  | "scanTextNodesMs"
-  | "decorateNodesMs"
   | "visitedTextNodes"
   | "acceptedCandidates"
   | "scannedTextNodes"
@@ -17,10 +18,11 @@ export type InlinePerfSample = Pick<
 >;
 
 export type InlineConversionPerfAggregate = {
+  setupMs: number;
+  discoveryMs: number;
+  analysisMs: number;
+  renderMs: number;
   totalMs: number;
-  clearExistingMs: number;
-  scanTextNodesMs: number;
-  decorateNodesMs: number;
   visitedTextNodes: number;
   acceptedCandidates: number;
   /** @deprecated Use acceptedCandidates. Kept as a compatibility alias. */

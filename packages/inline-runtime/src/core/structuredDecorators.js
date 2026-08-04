@@ -17,6 +17,12 @@ import {
 import { pushCoreConversionEvent } from "./conversionMetadata.js";
 import { usesLightTextColorForElement } from "./textColor.js";
 
+const NOOP_PERF_PHASES = {
+  time(_phase, callback) {
+    return callback();
+  },
+};
+
 function getAriaHiddenRoots(root) {
   if (
     !(
@@ -129,93 +135,129 @@ export function decorateStructuredSiblingSymbolPrices(
   passId,
   baseCurrency,
   renderPreferences,
+  perfPhases = NOOP_PERF_PHASES,
 ) {
-  const ariaHiddenRoots = getAriaHiddenRoots(root);
+  const ariaHiddenRoots = perfPhases.time(
+    "discoveryMs",
+    () => getAriaHiddenRoots(root),
+  );
   if (!ariaHiddenRoots.length) return 0;
 
   let conversionsApplied = 0;
 
   for (const ariaHiddenRoot of ariaHiddenRoots) {
-    if (ariaHiddenRoot.closest(`.${INLINE_CONVERSION_CLASS}`)) continue;
+    if (
+      perfPhases.time(
+        "discoveryMs",
+        () => ariaHiddenRoot.closest(`.${INLINE_CONVERSION_CLASS}`),
+      )
+    ) {
+      continue;
+    }
 
-    const amountText = getSanitizedAmountText(ariaHiddenRoot);
+    const amountText = perfPhases.time(
+      "discoveryMs",
+      () => getSanitizedAmountText(ariaHiddenRoot),
+    );
     if (!amountText) continue;
 
-    const rawPrice = getSiblingCurrencyRawPrice(
-      ariaHiddenRoot,
-      amountText,
-      localeHint,
+    const rawPrice = perfPhases.time(
+      "discoveryMs",
+      () =>
+        getSiblingCurrencyRawPrice(
+          ariaHiddenRoot,
+          amountText,
+          localeHint,
+        ),
     );
 
-    const existingAddon = getInlineAddonNode(ariaHiddenRoot);
+    const existingAddon = perfPhases.time(
+      "discoveryMs",
+      () => getInlineAddonNode(ariaHiddenRoot),
+    );
 
     if (!rawPrice) {
-      existingAddon?.remove();
+      perfPhases.time("renderMs", () => {
+        existingAddon?.remove();
+      });
       continue;
     }
 
-    const parsed = extractCurrencyTextMatches(rawPrice, localeHint);
-    const matched = parsed.find((item) => item.raw === rawPrice) || parsed[0];
+    const matched = perfPhases.time("analysisMs", () => {
+      const parsed = extractCurrencyTextMatches(rawPrice, localeHint);
+      return parsed.find((item) => item.raw === rawPrice) || parsed[0];
+    });
     if (!matched) {
-      existingAddon?.remove();
+      perfPhases.time("renderMs", () => {
+        existingAddon?.remove();
+      });
       continue;
     }
 
-    const convertedAmount = getConvertedAmountText(
-      matched,
-      preferredCurrency,
-      rateSnapshot,
-      localeHint,
-      baseCurrency,
+    const convertedAmount = perfPhases.time(
+      "analysisMs",
+      () =>
+        getConvertedAmountText(
+          matched,
+          preferredCurrency,
+          rateSnapshot,
+          localeHint,
+          baseCurrency,
+        ),
     );
     if (!convertedAmount) {
-      existingAddon?.remove();
+      perfPhases.time("renderMs", () => {
+        existingAddon?.remove();
+      });
       continue;
     }
 
-    const previousOriginal = existingAddon?.getAttribute("data-original") ?? null;
-    const previousConverted =
-      existingAddon?.querySelector(".fx-inline-converted-amount")?.textContent ?? null;
+    conversionsApplied += perfPhases.time("renderMs", () => {
+      const previousOriginal = existingAddon?.getAttribute("data-original") ?? null;
+      const previousConverted =
+        existingAddon?.querySelector(".fx-inline-converted-amount")?.textContent ?? null;
 
-    const wrapper = existingAddon ?? document.createElement("span");
-    wrapper.className = INLINE_CONVERSION_CLASS;
-    wrapper.setAttribute("data-fx-inline-mode", INLINE_CONVERSION_ADDON_MODE);
-    wrapper.setAttribute("data-original", rawPrice);
-    applyConvertedAmountColor(
-      wrapper,
-      usesLightTextColorForElement(ariaHiddenRoot, lightTextCache),
-    );
-    setInlineConversionContent(wrapper, convertedAmount, {
-      renderPreferences,
+      const wrapper = existingAddon ?? document.createElement("span");
+      wrapper.className = INLINE_CONVERSION_CLASS;
+      wrapper.setAttribute("data-fx-inline-mode", INLINE_CONVERSION_ADDON_MODE);
+      wrapper.setAttribute("data-original", rawPrice);
+      applyConvertedAmountColor(
+        wrapper,
+        usesLightTextColorForElement(ariaHiddenRoot, lightTextCache),
+      );
+      setInlineConversionContent(wrapper, convertedAmount, {
+        renderPreferences,
+      });
+
+      if (!existingAddon) {
+        ariaHiddenRoot.appendChild(wrapper);
+        pushCoreConversionEvent(passContext, passId, {
+          source: "structured-sibling",
+          rawPrice,
+          convertedAmount,
+          hostNode: ariaHiddenRoot,
+          wrapperNode: wrapper,
+        });
+        return 1;
+      }
+
+      if (
+        previousOriginal !== rawPrice ||
+        !previousConverted?.includes(convertedAmount)
+      ) {
+        pushCoreConversionEvent(passContext, passId, {
+          source: "structured-sibling",
+          rawPrice,
+          convertedAmount,
+          hostNode: ariaHiddenRoot,
+          wrapperNode: wrapper,
+          refreshed: true,
+        });
+        return 1;
+      }
+
+      return 0;
     });
-
-    if (!existingAddon) {
-      ariaHiddenRoot.appendChild(wrapper);
-      pushCoreConversionEvent(passContext, passId, {
-        source: "structured-sibling",
-        rawPrice,
-        convertedAmount,
-        hostNode: ariaHiddenRoot,
-        wrapperNode: wrapper,
-      });
-      conversionsApplied += 1;
-      continue;
-    }
-
-    if (
-      previousOriginal !== rawPrice ||
-      !previousConverted?.includes(convertedAmount)
-    ) {
-      pushCoreConversionEvent(passContext, passId, {
-        source: "structured-sibling",
-        rawPrice,
-        convertedAmount,
-        hostNode: ariaHiddenRoot,
-        wrapperNode: wrapper,
-        refreshed: true,
-      });
-      conversionsApplied += 1;
-    }
   }
 
   return conversionsApplied;
