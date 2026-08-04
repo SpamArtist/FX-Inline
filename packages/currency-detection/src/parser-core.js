@@ -793,11 +793,18 @@ function createCompiledConfig(config) {
     return Boolean(input?.length) && thousandMagnitudeHintRegex.test(input);
   }
 
+  function clearCachesForTests() {
+    parserArtifactsCache.clear();
+    wordLikeCurrencyTokenRegexCache.clear();
+    getMagnitudeAliasMap.clearCache?.();
+  }
+
   return Object.freeze({
     parseValue,
     extractMatches,
     mayContainCurrencyToken,
     hasThousandMagnitudeHint,
+    __clearCachesForTests: clearCachesForTests,
   });
 }
 
