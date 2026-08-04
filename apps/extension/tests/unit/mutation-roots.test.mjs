@@ -1,11 +1,17 @@
 import { collectMutationConversionRoots } from "../../test-dist/utils/mutationRoots.js";
 
-function createElementNode(id) {
+function createElementNode(id, excluded = false) {
   return {
     nodeType: 1,
     id,
+    excluded,
     parentNode: null,
     parentElement: null,
+    closest() {
+      if (this.excluded) return this;
+      const parent = this.parentElement ?? this.parentNode;
+      return typeof parent?.closest === "function" ? parent.closest() : null;
+    },
   };
 }
 
@@ -77,4 +83,28 @@ test("collectMutationConversionRoots collapses descendant roots under ancestor",
 
   expect(roots).toHaveLength(1);
   expect(roots[0]).toBe(card);
+});
+
+test("collectMutationConversionRoots excludes ignored and converted output roots", () => {
+  const ignoredParent = createElementNode("ignoredParent", true);
+  const currentParent = createElementNode("currentParent", true);
+  const oldParent = createElementNode("oldParent", true);
+  const ignored = linkParent(createElementNode("ignored"), ignoredParent);
+  const current = linkParent(createElementNode("current"), currentParent);
+  const old = linkParent(createElementNode("old"), oldParent);
+  const eligible = createElementNode("eligible");
+  const currentText = createTextNode(current, "currentText");
+
+  const roots = collectMutationConversionRoots(
+    [
+      createMutationRecord({ addedNodes: [ignored, current, old, eligible] }),
+      createMutationRecord({
+        type: "characterData",
+        target: currentText,
+      }),
+    ],
+    null,
+  );
+
+  expect(roots).toEqual([eligible]);
 });

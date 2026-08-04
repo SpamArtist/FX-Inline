@@ -141,3 +141,9 @@ export const NON_VISIBLE_TEXT_CONTEXT_SELECTOR = [
   '[class*="screen-reader"]',
   '[class*="visually-hidden"]',
 ].join(",");
+
+export const TEXT_NODE_ANCESTOR_EXCLUSION_SELECTOR = [
+  EDITABLE_CONTEXT_SELECTOR,
+  NON_VISIBLE_TEXT_CONTEXT_SELECTOR,
+  `.${INLINE_CONVERSION_CLASS}`,
+].join(",");

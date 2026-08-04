@@ -32,7 +32,6 @@ export function runPartialConversionPass(
     conversions += convertVisiblePrices(preferredCurrency, rateSnapshot, root, {
       clearExisting: false,
       maxNodesPerPass: options.maxNodesPerPass,
-      onPerfSample: options.onPerfSample,
       includeDefaultPrePlugins: options.includeDefaultPrePlugins,
       prePlugins: options.prePlugins,
       postPlugins: options.postPlugins,

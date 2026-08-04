@@ -8,17 +8,6 @@ export type RateSnapshotLike = {
   rates: Record<string, number>;
 };
 
-export type InlineConversionPerfSample = {
-  totalMs: number;
-  clearExistingMs: number;
-  scanTextNodesMs: number;
-  decorateNodesMs: number;
-  scannedTextNodes: number;
-  conversionsApplied: number;
-  maxNodesPerPass: number;
-  reachedNodeLimit: boolean;
-};
-
 export type InlineConvertedCurrencyPosition =
   | "top"
   | "bottom"
@@ -109,7 +98,6 @@ export type ConvertVisiblePricesOptions = {
   clearExisting?: boolean;
   refreshExisting?: boolean;
   maxNodesPerPass?: number;
-  onPerfSample?: (sample: InlineConversionPerfSample) => void;
   onNodeLimitReached?: (maxNodesPerPass: number) => void;
   includeDefaultPrePlugins?: boolean;
   prePlugins?: InlineConversionPrePlugin[];
@@ -133,7 +121,6 @@ export type InlineRuntimeOptions = {
   enabled?: boolean;
   observeMutations?: boolean;
   autoFetchRates?: boolean;
-  onPerfSample?: (sample: InlineConversionPerfSample) => void;
   onNodeLimitReached?: (maxNodesPerPass: number) => void;
   includeDefaultPrePlugins?: boolean;
   prePlugins?: InlineConversionPrePlugin[];

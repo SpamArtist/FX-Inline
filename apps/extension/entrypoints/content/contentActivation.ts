@@ -3,16 +3,24 @@ import type {
   ContentActivationControllerDeps,
   ContentScriptLifecycleContext,
   ContentWorkerStartOptions,
+  CurrencyActivationScanResult,
   CurrencyActivationScanOptions,
   ExtensionRuntimeUrlGlobal,
 } from "./content.types";
+import {
+  appendActivationScanText,
+  hasCurrencyActivationSignal,
+} from "./activationSignal";
 import { setContentWorkerStartupOptions } from "./contentWorkerStartup";
 
 const ACTIVATION_MUTATION_DEBOUNCE_MS = 250;
 const DEFAULT_SCAN_TEXT_NODE_LIMIT = 15_000;
 const DEFAULT_SCAN_CHARACTER_LIMIT = 20_000;
-const ACTIVATION_TEXT_WINDOW_LIMIT = 512;
-const TEXT_CONTEXT_ANCESTOR_LIMIT = 4;
+const DEFAULT_MUTATION_SCAN_TEXT_NODE_LIMIT = 1_000;
+const DEFAULT_MUTATION_SCAN_CHARACTER_LIMIT = 20_000;
+const DEFAULT_CHANGED_NODE_FRONTIER_LIMIT = 1_000;
+const CHANGED_TEXT_CONTEXT_SIDE_LIMIT = 4;
+const CHANGED_TEXT_CONTEXT_ANCESTOR_LIMIT = 4;
 const SUPPORTED_CONTENT_PROTOCOLS = new Set(["http:", "https:"]);
 const SKIPPED_TEXT_PARENT_TAGS = new Set([
   "SCRIPT",
@@ -24,18 +32,53 @@ const SKIPPED_TEXT_PARENT_TAGS = new Set([
   "SVG",
   "CANVAS",
 ]);
+const SKIPPED_TEXT_PARENT_SELECTOR =
+  ".fx-inline-conversion, .ccx-inline-conversion, [data-fx-inline-ignore]";
 
-const CURRENCY_SYMBOL_PATTERN =
-  "(?:US\\$|AU\\$|CA\\$|NZ\\$|HK\\$|MX\\$|NT\\$|EC\\$|RD\\$|R\\$|[$€£¥₹₩₪₫₱฿₦₲₡₨₭₮₯₰₳₴₵₷₸₺￥＄￡￦￠﹩])";
-const ISO_CODE_PATTERN =
-  "(?:AED|AFN|ALL|AMD|AOA|ARS|AUD|AWG|AZN|BAM|BBD|BDT|BHD|BIF|BMD|BND|BOB|BRL|BSD|BWP|BYN|BZD|CAD|CDF|CHF|CLP|CNY|COP|CRC|CUP|CVE|CZK|DJF|DKK|DOP|DZD|EGP|ERN|ETB|EUR|FJD|FKP|GBP|GEL|GHS|GIP|GMD|GNF|GTQ|GYD|HKD|HNL|HUF|IDR|ILS|INR|IQD|IRR|ISK|JMD|JOD|JPY|KES|KGS|KHR|KMF|KRW|KWD|KYD|KZT|LAK|LBP|LKR|LRD|LYD|MAD|MDL|MGA|MKD|MMK|MNT|MOP|MRU|MUR|MVR|MWK|MXN|MYR|MZN|NGN|NIO|NOK|NPR|NZD|OMR|PEN|PGK|PHP|PKR|PLN|PYG|QAR|RON|RSD|RUB|RWF|SAR|SBD|SCR|SDG|SEK|SGD|SHP|SLE|SOS|SRD|SSP|STN|SYP|SZL|THB|TJS|TMT|TND|TOP|TRY|TTD|TWD|TZS|UAH|UGX|USD|UYU|UZS|VES|VND|VUV|WST|XAF|XCD|XCG|XOF|YER|ZAR|ZMW|ZWL)";
-const NUMBER_PATTERN = "\\d[\\d\\s.,'’]*(?:\\d|[.,]\\d)?";
-const CURRENCY_ACTIVATION_PATTERNS = [
-  new RegExp(`${CURRENCY_SYMBOL_PATTERN}\\s*${NUMBER_PATTERN}`, "u"),
-  new RegExp(`${NUMBER_PATTERN}\\s*${CURRENCY_SYMBOL_PATTERN}`, "u"),
-  new RegExp(`\\b${ISO_CODE_PATTERN}\\b\\s*${NUMBER_PATTERN}`, "u"),
-  new RegExp(`${NUMBER_PATTERN}\\s*\\b${ISO_CODE_PATTERN}\\b`, "u"),
-];
+type AddedChangedArea = {
+  type: "addedNodes";
+  nodes: Node[];
+};
+
+type CharacterDataChangedArea = {
+  type: "characterData";
+  node: Node;
+};
+
+type MutationActivationChangedArea =
+  | AddedChangedArea
+  | CharacterDataChangedArea;
+
+type PendingChangedNode = {
+  node: Node;
+  areaType: MutationActivationChangedArea["type"];
+  groupId: number;
+};
+
+type ChangedNodeFrontierDrainResult =
+  | {
+      result: "exhausted";
+      changedAreas: [];
+    }
+  | {
+      result: "clear";
+      changedAreas: MutationActivationChangedArea[];
+    };
+
+type MutationActivationChangedNodeFrontier = {
+  addMutations: (mutations: MutationRecord[]) => void;
+  drain: () => ChangedNodeFrontierDrainResult;
+  clear: () => void;
+  readonly size: number;
+  readonly exhausted: boolean;
+};
+
+type ActivationScanBudget = {
+  maxTextNodes: number;
+  maxCharacters: number;
+  scannedTextNodes: number;
+  scannedCharacters: number;
+};
 
 function getDefaultSelectionText(): string {
   return window.getSelection()?.toString() ?? "";
@@ -71,78 +114,185 @@ function isSkippedTextParent(parent: Node | null): boolean {
   if (!(parent instanceof Element)) return false;
   if (SKIPPED_TEXT_PARENT_TAGS.has(parent.tagName)) return true;
 
-  return Boolean(parent.closest(".ccx-inline-conversion, [data-fx-inline-ignore]"));
+  return Boolean(parent.closest(SKIPPED_TEXT_PARENT_SELECTOR));
 }
 
-function getElementTextWithinLimit(
-  element: Element,
-  maxCharacters: number,
-): string {
-  const text = element.textContent ?? "";
-  return text.length > maxCharacters ? text.slice(0, maxCharacters) : text;
+function getOwnerDocument(node: Node): Document | null {
+  if (node instanceof Document) return node;
+  return node.ownerDocument;
 }
 
-function normalizeActivationScanText(text: string): string {
-  return text.replace(/\s+/gu, " ").trim();
+function isEligibleActivationTextNode(node: Node): node is Text {
+  return node instanceof Text && !isSkippedTextParent(node.parentNode);
 }
 
-function appendActivationScanText(rollingText: string, text: string): string {
-  const normalizedText = normalizeActivationScanText(text);
-  if (!normalizedText) return rollingText;
-
-  const nextText = rollingText
-    ? `${rollingText} ${normalizedText}`
-    : normalizedText;
-
-  if (nextText.length <= ACTIVATION_TEXT_WINDOW_LIMIT) {
-    return nextText;
+function scanTextNodeForCurrencyActivationSignal(
+  node: Text,
+  budget: ActivationScanBudget,
+  rollingText: string,
+): { result: CurrencyActivationScanResult | null; rollingText: string } {
+  if (isSkippedTextParent(node.parentNode)) {
+    return { result: null, rollingText };
   }
 
-  return nextText.slice(nextText.length - ACTIVATION_TEXT_WINDOW_LIMIT);
-}
-
-function getNodeTextWithinLimit(
-  node: Node,
-  maxCharacters: number,
-): string | null {
-  if (node instanceof Text) {
-    if (isSkippedTextParent(node.parentNode)) return null;
-    return node.data.slice(0, maxCharacters);
+  if (
+    budget.scannedTextNodes >= budget.maxTextNodes ||
+    budget.scannedCharacters >= budget.maxCharacters
+  ) {
+    return { result: "exhausted", rollingText };
   }
 
-  if (node instanceof Element) {
-    if (isSkippedTextParent(node)) return null;
-    return getElementTextWithinLimit(node, maxCharacters);
+  budget.scannedTextNodes += 1;
+  const remainingCharacters = budget.maxCharacters - budget.scannedCharacters;
+  const fullText = node.data;
+  const text = fullText.slice(0, remainingCharacters);
+  budget.scannedCharacters += text.length;
+
+  if (hasCurrencyActivationSignal(text)) {
+    return { result: "signal", rollingText };
+  }
+
+  const nextRollingText = appendActivationScanText(rollingText, text);
+  if (hasCurrencyActivationSignal(nextRollingText)) {
+    return { result: "signal", rollingText: nextRollingText };
+  }
+
+  if (fullText.length > remainingCharacters) {
+    return { result: "exhausted", rollingText: nextRollingText };
+  }
+
+  return { result: null, rollingText: nextRollingText };
+}
+
+function getChangedTextContextRoot(node: Text): Node {
+  let root: Node = node;
+  let climbedAncestors = 0;
+
+  while (
+    root.parentNode &&
+    !(root.parentNode instanceof Document) &&
+    climbedAncestors < CHANGED_TEXT_CONTEXT_ANCESTOR_LIMIT
+  ) {
+    root = root.parentNode;
+    climbedAncestors += 1;
+  }
+
+  return root;
+}
+
+function getPreviousNodeInContext(node: Node, root: Node): Node | null {
+  if (node === root) return null;
+
+  let previous = node.previousSibling;
+  if (previous) {
+    while (previous.lastChild) {
+      previous = previous.lastChild;
+    }
+
+    return previous;
+  }
+
+  const parent = node.parentNode;
+  if (!parent || parent === root) return null;
+
+  return parent;
+}
+
+function getNextNodeInContext(node: Node, root: Node): Node | null {
+  if (node.firstChild) return node.firstChild;
+
+  let current: Node | null = node;
+  while (current && current !== root) {
+    if (current.nextSibling) return current.nextSibling;
+    current = current.parentNode;
   }
 
   return null;
 }
 
-function ancestorTextHasCurrencyActivationSignal(
-  element: Element,
-  maxCharacters: number,
-): boolean {
-  let currentElement: Element | null = element;
-  let checkedAncestors = 0;
+function collectChangedTextContextNodes(node: Text): Text[] {
+  if (!isEligibleActivationTextNode(node)) return [];
 
-  while (
-    currentElement &&
-    checkedAncestors < TEXT_CONTEXT_ANCESTOR_LIMIT &&
-    !isSkippedTextParent(currentElement)
-  ) {
-    if (
-      hasCurrencyActivationSignal(
-        getElementTextWithinLimit(currentElement, maxCharacters),
-      )
-    ) {
-      return true;
-    }
+  const root = getChangedTextContextRoot(node);
+  const before: Text[] = [];
+  let current: Node | null = node;
 
-    currentElement = currentElement.parentElement;
-    checkedAncestors += 1;
+  while (before.length < CHANGED_TEXT_CONTEXT_SIDE_LIMIT) {
+    current = getPreviousNodeInContext(current, root);
+    if (!current) break;
+    if (isEligibleActivationTextNode(current)) before.push(current);
   }
 
-  return false;
+  const after: Text[] = [];
+  current = node;
+
+  while (after.length < CHANGED_TEXT_CONTEXT_SIDE_LIMIT) {
+    current = getNextNodeInContext(current, root);
+    if (!current) break;
+    if (isEligibleActivationTextNode(current)) after.push(current);
+  }
+
+  return [...before.reverse(), node, ...after];
+}
+
+function scanChangedTextContextForCurrencyActivationSignal(
+  node: Node,
+  budget: ActivationScanBudget,
+): CurrencyActivationScanResult {
+  if (!(node instanceof Text)) return "clear";
+
+  let rollingText = "";
+  for (const textNode of collectChangedTextContextNodes(node)) {
+    const scan = scanTextNodeForCurrencyActivationSignal(
+      textNode,
+      budget,
+      rollingText,
+    );
+    if (scan.result) return scan.result;
+    rollingText = scan.rollingText;
+  }
+
+  return "clear";
+}
+
+function scanChangedAreaNodesForCurrencyActivationSignal(
+  nodes: readonly Node[],
+  budget: ActivationScanBudget,
+): CurrencyActivationScanResult {
+  let rollingText = "";
+
+  for (const node of nodes) {
+    if (node instanceof Text) {
+      const scan = scanTextNodeForCurrencyActivationSignal(node, budget, rollingText);
+      if (scan.result) return scan.result;
+      rollingText = scan.rollingText;
+      continue;
+    }
+
+    if (node instanceof Element && isSkippedTextParent(node)) continue;
+
+    const ownerDocument = getOwnerDocument(node);
+    if (!ownerDocument) continue;
+
+    const walker = ownerDocument.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+    let currentNode = walker.nextNode();
+
+    while (currentNode) {
+      if (currentNode instanceof Text) {
+        const scan = scanTextNodeForCurrencyActivationSignal(
+          currentNode,
+          budget,
+          rollingText,
+        );
+        if (scan.result) return scan.result;
+        rollingText = scan.rollingText;
+      }
+
+      currentNode = walker.nextNode();
+    }
+  }
+
+  return "clear";
 }
 
 export function isSupportedContentScriptUrl(url: string): boolean {
@@ -153,53 +303,15 @@ export function isSupportedContentScriptUrl(url: string): boolean {
   }
 }
 
-export function hasCurrencyActivationSignal(text: string): boolean {
-  if (!text || !/\d/u.test(text)) return false;
-  const normalized = text.normalize("NFKC");
-
-  return CURRENCY_ACTIVATION_PATTERNS.some((pattern) => pattern.test(normalized));
-}
-
-export function nodeHasCurrencyActivationSignal(
-  node: Node,
-  options: CurrencyActivationScanOptions = {},
-): boolean {
-  const maxCharacters = options.maxCharacters ?? DEFAULT_SCAN_CHARACTER_LIMIT;
-
-  if (node instanceof Text) {
-    if (isSkippedTextParent(node.parentNode)) return false;
-    if (hasCurrencyActivationSignal(node.data.slice(0, maxCharacters))) {
-      return true;
-    }
-
-    return node.parentElement
-      ? ancestorTextHasCurrencyActivationSignal(node.parentElement, maxCharacters)
-      : false;
-  }
-
-  if (node instanceof Element) {
-    if (isSkippedTextParent(node)) return false;
-    if (hasCurrencyActivationSignal(getElementTextWithinLimit(node, maxCharacters))) {
-      return true;
-    }
-
-    return node.parentElement
-      ? ancestorTextHasCurrencyActivationSignal(node.parentElement, maxCharacters)
-      : false;
-  }
-
-  return false;
-}
-
 export function scanRootForCurrencyActivationSignal(
   root: ParentNode,
   options: CurrencyActivationScanOptions = {},
-): boolean {
+): CurrencyActivationScanResult {
   const maxTextNodes = options.maxTextNodes ?? DEFAULT_SCAN_TEXT_NODE_LIMIT;
   const maxCharacters = options.maxCharacters ?? DEFAULT_SCAN_CHARACTER_LIMIT;
   const rootNode = root as Node;
   const ownerDocument = root instanceof Document ? root : rootNode.ownerDocument;
-  if (!ownerDocument) return false;
+  if (!ownerDocument) return "clear";
 
   const walker = ownerDocument.createTreeWalker(rootNode, NodeFilter.SHOW_TEXT);
   let scannedTextNodes = 0;
@@ -207,70 +319,245 @@ export function scanRootForCurrencyActivationSignal(
   let rollingText = "";
   let currentNode = walker.nextNode();
 
-  while (currentNode && scannedTextNodes < maxTextNodes) {
+  while (currentNode) {
     if (currentNode instanceof Text && !isSkippedTextParent(currentNode.parentNode)) {
+      if (
+        scannedTextNodes >= maxTextNodes ||
+        scannedCharacters >= maxCharacters
+      ) {
+        return "exhausted";
+      }
+
       scannedTextNodes += 1;
       const remainingCharacters = maxCharacters - scannedCharacters;
-      if (remainingCharacters <= 0) return false;
-
-      const text = currentNode.data.slice(0, remainingCharacters);
+      const fullText = currentNode.data;
+      const text = fullText.slice(0, remainingCharacters);
       scannedCharacters += text.length;
 
       if (hasCurrencyActivationSignal(text)) {
-        return true;
+        return "signal";
       }
 
       rollingText = appendActivationScanText(rollingText, text);
       if (hasCurrencyActivationSignal(rollingText)) {
-        return true;
+        return "signal";
+      }
+
+      if (fullText.length > remainingCharacters) {
+        return "exhausted";
       }
     }
 
     currentNode = walker.nextNode();
   }
 
-  return false;
+  return "clear";
 }
 
-export function mutationsContainCurrencyActivationSignal(
+export function collectMutationActivationChangedAreas(
   mutations: MutationRecord[],
-  options: CurrencyActivationScanOptions = {},
-): boolean {
-  const maxCharacters = options.maxCharacters ?? DEFAULT_SCAN_CHARACTER_LIMIT;
-  let rollingText = "";
+): MutationActivationChangedArea[] {
+  const changedAreas: MutationActivationChangedArea[] = [];
 
   for (const mutation of mutations) {
-    if (
-      mutation.type === "characterData" &&
-      nodeHasCurrencyActivationSignal(mutation.target, options)
-    ) {
-      return true;
+    if (mutation.type === "characterData") {
+      changedAreas.push({ type: "characterData", node: mutation.target });
+      continue;
     }
 
-    const targetText = getNodeTextWithinLimit(mutation.target, maxCharacters);
-    if (targetText) {
-      rollingText = appendActivationScanText(rollingText, targetText);
-      if (hasCurrencyActivationSignal(rollingText)) {
-        return true;
-      }
+    const addedNodes = Array.from(mutation.addedNodes);
+    if (addedNodes.length === 0) continue;
+
+    changedAreas.push({
+      type: "addedNodes",
+      nodes: addedNodes,
+    });
+  }
+
+  return changedAreas;
+}
+
+function nodeContains(ancestor: Node, node: Node): boolean {
+  return ancestor === node || ancestor.contains(node);
+}
+
+function isNodeInsideObservedRoot(node: Node, observedRoot: ParentNode): boolean {
+  const observedNode = observedRoot as Node;
+  return node.isConnected && nodeContains(observedNode, node);
+}
+
+function sortNodesByCurrentDocumentOrder(nodes: Node[]): Node[] {
+  return [...nodes].sort((left, right) => {
+    if (left === right) return 0;
+
+    const position = left.compareDocumentPosition(right);
+    if (position & Node.DOCUMENT_POSITION_PRECEDING) return 1;
+    if (position & Node.DOCUMENT_POSITION_FOLLOWING) return -1;
+
+    return 0;
+  });
+}
+
+export function createMutationActivationChangedNodeFrontier(
+  observedRoot: ParentNode,
+  maxNodes = DEFAULT_CHANGED_NODE_FRONTIER_LIMIT,
+): MutationActivationChangedNodeFrontier {
+  let pendingNodes: PendingChangedNode[] = [];
+  let exhausted = false;
+  let nextGroupId = 0;
+
+  function pruneCoveredNodes(node: Node) {
+    pendingNodes = pendingNodes.filter(
+      (pendingNode) => !nodeContains(node, pendingNode.node),
+    );
+  }
+
+  function addChangedNode(
+    node: Node,
+    areaType: MutationActivationChangedArea["type"],
+    groupId: number,
+  ) {
+    if (exhausted) return;
+
+    for (const pendingNode of pendingNodes) {
+      if (nodeContains(pendingNode.node, node)) return;
     }
 
-    for (const node of Array.from(mutation.addedNodes)) {
-      if (nodeHasCurrencyActivationSignal(node, options)) {
-        return true;
+    pruneCoveredNodes(node);
+
+    if (pendingNodes.length >= maxNodes) {
+      exhausted = true;
+      return;
+    }
+
+    pendingNodes.push({ node, areaType, groupId });
+  }
+
+  function addMutations(mutations: MutationRecord[]) {
+    for (const mutation of mutations) {
+      if (exhausted) return;
+
+      if (mutation.type === "characterData") {
+        addChangedNode(mutation.target, "characterData", nextGroupId);
+        nextGroupId += 1;
+        continue;
       }
 
-      const nodeText = getNodeTextWithinLimit(node, maxCharacters);
-      if (nodeText) {
-        rollingText = appendActivationScanText(rollingText, nodeText);
-        if (hasCurrencyActivationSignal(rollingText)) {
-          return true;
-        }
+      const addedNodes = Array.from(mutation.addedNodes);
+      if (addedNodes.length === 0) continue;
+
+      const groupId = nextGroupId;
+      nextGroupId += 1;
+      for (const node of addedNodes) {
+        addChangedNode(node, "addedNodes", groupId);
+        if (exhausted) return;
       }
     }
   }
 
-  return false;
+  function drain(): ChangedNodeFrontierDrainResult {
+    if (exhausted) {
+      clear();
+      return { result: "exhausted", changedAreas: [] };
+    }
+
+    const connectedNodes = pendingNodes.filter((pendingNode) =>
+      isNodeInsideObservedRoot(pendingNode.node, observedRoot),
+    );
+    clear();
+
+    if (!connectedNodes.length) {
+      return { result: "clear", changedAreas: [] };
+    }
+
+    const groupOrder = new Map<number, number>();
+    const groups = new Map<number, PendingChangedNode[]>();
+    for (const pendingNode of connectedNodes) {
+      if (!groupOrder.has(pendingNode.groupId)) {
+        groupOrder.set(pendingNode.groupId, groupOrder.size);
+      }
+
+      const group = groups.get(pendingNode.groupId) ?? [];
+      group.push(pendingNode);
+      groups.set(pendingNode.groupId, group);
+    }
+
+    const changedAreas: MutationActivationChangedArea[] = [];
+    const orderedGroups = Array.from(groups.entries()).sort(
+      ([leftGroupId], [rightGroupId]) =>
+        groupOrder.get(leftGroupId)! - groupOrder.get(rightGroupId)!,
+    );
+
+    for (const [, group] of orderedGroups) {
+      const [firstNode] = group;
+      if (!firstNode) continue;
+
+      if (firstNode.areaType === "characterData") {
+        changedAreas.push({ type: "characterData", node: firstNode.node });
+        continue;
+      }
+
+      changedAreas.push({
+        type: "addedNodes",
+        nodes: sortNodesByCurrentDocumentOrder(
+          group.map((pendingNode) => pendingNode.node),
+        ),
+      });
+    }
+
+    return { result: "clear", changedAreas };
+  }
+
+  function clear() {
+    pendingNodes = [];
+    exhausted = false;
+    nextGroupId = 0;
+  }
+
+  return {
+    addMutations,
+    drain,
+    clear,
+    get size() {
+      return pendingNodes.length;
+    },
+    get exhausted() {
+      return exhausted;
+    },
+  };
+}
+
+export function scanMutationChangedAreasForCurrencyActivationSignal(
+  changedAreas: readonly MutationActivationChangedArea[],
+  options: CurrencyActivationScanOptions = {},
+): CurrencyActivationScanResult {
+  const budget = {
+    maxTextNodes:
+      options.maxTextNodes ?? DEFAULT_MUTATION_SCAN_TEXT_NODE_LIMIT,
+    maxCharacters:
+      options.maxCharacters ?? DEFAULT_MUTATION_SCAN_CHARACTER_LIMIT,
+    scannedTextNodes: 0,
+    scannedCharacters: 0,
+  };
+
+  for (const changedArea of changedAreas) {
+    if (changedArea.type === "characterData") {
+      const result = scanChangedTextContextForCurrencyActivationSignal(
+        changedArea.node,
+        budget,
+      );
+      if (result !== "clear") return result;
+      continue;
+    }
+
+    const result = scanChangedAreaNodesForCurrencyActivationSignal(
+      changedArea.nodes,
+      budget,
+    );
+    if (result !== "clear") return result;
+  }
+
+  return "clear";
 }
 
 export function createContentActivationController(
@@ -287,7 +574,7 @@ export function createContentActivationController(
 
   let observer: MutationObserver | null = null;
   let mutationScanTimer: ReturnType<Window["setTimeout"]> | null = null;
-  let pendingMutations: MutationRecord[] = [];
+  let changedNodeFrontier: MutationActivationChangedNodeFrontier | null = null;
   let pendingWorker: Promise<void> | null = null;
   let isDisposed = false;
   let selectionListenerActive = false;
@@ -302,7 +589,8 @@ export function createContentActivationController(
     clearMutationTimer();
     observer?.disconnect();
     observer = null;
-    pendingMutations = [];
+    changedNodeFrontier?.clear();
+    changedNodeFrontier = null;
 
     if (selectionListenerActive) {
       documentRef.removeEventListener("mouseup", handleSelectionMouseUp);
@@ -342,12 +630,17 @@ export function createContentActivationController(
 
   function flushPendingMutations() {
     mutationScanTimer = null;
-    if (isDisposed || ctx.isInvalid || !pendingMutations.length) return;
+    if (isDisposed || ctx.isInvalid || !changedNodeFrontier) return;
 
-    const mutations = pendingMutations;
-    pendingMutations = [];
+    const drainResult = changedNodeFrontier.drain();
+    const result =
+      drainResult.result === "exhausted"
+        ? "exhausted"
+        : scanMutationChangedAreasForCurrencyActivationSignal(
+            drainResult.changedAreas,
+          );
 
-    if (mutationsContainCurrencyActivationSignal(mutations)) {
+    if (result === "signal" || result === "exhausted") {
       void loadWorker().catch((error) => {
         console.warn("[fx-inline] Failed to start content worker after price detection", error);
       });
@@ -365,7 +658,13 @@ export function createContentActivationController(
 
   function handleMutations(mutations: MutationRecord[]) {
     if (isDisposed || ctx.isInvalid) return;
-    pendingMutations.push(...mutations);
+    if (!changedNodeFrontier) return;
+
+    const sizeBefore = changedNodeFrontier.size;
+    changedNodeFrontier.addMutations(mutations);
+    if (!changedNodeFrontier.size && !changedNodeFrontier.exhausted && !sizeBefore) {
+      return;
+    }
     scheduleMutationScan();
   }
 
@@ -390,7 +689,7 @@ export function createContentActivationController(
 
     startSelectionListener();
 
-    if (scanRootForCurrencyActivationSignal(body)) {
+    if (scanRootForCurrencyActivationSignal(body) === "signal") {
       void loadWorker().catch((error) => {
         console.warn("[fx-inline] Failed to start content worker after initial price scan", error);
       });
@@ -398,6 +697,7 @@ export function createContentActivationController(
     }
 
     observer = createObserver(handleMutations);
+    changedNodeFrontier = createMutationActivationChangedNodeFrontier(body);
     observer.observe(body, {
       childList: true,
       characterData: true,

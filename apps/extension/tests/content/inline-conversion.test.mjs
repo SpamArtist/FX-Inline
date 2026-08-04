@@ -53,6 +53,27 @@ test("converts text-node prices with the expected inline wrapper shape", () => {
   expect(convertedAmount.textContent).toMatch(/^\(.+\)$/);
 });
 
+test("maxNodesPerPass skips unrelated text before counting accepted candidates", () => {
+  const unrelatedItems = Array.from(
+    { length: 200 },
+    (_, index) => `<p>Listing copy ${index} without price markers.</p>`,
+  );
+  document.body.innerHTML = [
+    ...unrelatedItems,
+    '<p id="price">Pay $100 now.</p>',
+    '<p id="later-price">Pay $200 later.</p>',
+  ].join("");
+
+  const applied = convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
+    clearExisting: false,
+    maxNodesPerPass: 1,
+  });
+
+  expect(applied).toBe(1);
+  expect(document.querySelector(`#price span.${INLINE_CONVERSION_CLASS}`)).not.toBeNull();
+  expect(document.querySelector(`#later-price span.${INLINE_CONVERSION_CLASS}`)).toBeNull();
+});
+
 test("injects converted amount line-height and width styles", () => {
   document.body.innerHTML = '<p id="price">Pay $100 now.</p>';
 
@@ -262,6 +283,37 @@ test("skips editable, non-visible, and already-converted wrapper contexts", () =
   expect(document.querySelector(`#plain span.${INLINE_CONVERSION_CLASS}`)).not.toBeNull();
 });
 
+test("reuses one parent DOM eligibility result through the content conversion seam", () => {
+  document.body.innerHTML = '<p id="prices">$100<!--split-->$200</p>';
+
+  const originalClosest = Element.prototype.closest;
+  let ancestorSearches = 0;
+  Element.prototype.closest = function countClosest(selector) {
+    if (
+      selector.includes('[contenteditable]:not([contenteditable="false"])') &&
+      selector.includes('[class*="visually-hidden"]') &&
+      selector.includes(".fx-inline-conversion")
+    ) {
+      ancestorSearches += 1;
+    }
+    return originalClosest.call(this, selector);
+  };
+
+  try {
+    const applied = convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
+      clearExisting: false,
+    });
+
+    expect(applied).toBe(2);
+    expect(
+      document.querySelectorAll(`#prices span.${INLINE_CONVERSION_CLASS}`),
+    ).toHaveLength(2);
+    expect(ancestorSearches).toBe(1);
+  } finally {
+    Element.prototype.closest = originalClosest;
+  }
+});
+
 test("adds structured add-on conversions for Amazon-style and sibling-symbol prices", () => {
   document.body.innerHTML = [
     '<span id="amazon-root" aria-hidden="true">',
@@ -377,29 +429,4 @@ test("adds conversion when amount and yen/month token are split across sibling n
   expect(addon.querySelector(".fx-inline-converted-amount").textContent).toMatch(
     /^\(.+\)$/,
   );
-});
-
-test("reports perf sample shape and node-limit metadata", () => {
-  document.body.innerHTML = "<p>$100</p><p>$200</p><p>$300</p>";
-
-  const samples = [];
-  const applied = convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
-    clearExisting: false,
-    maxNodesPerPass: 1,
-    onPerfSample: (sample) => {
-      samples.push(sample);
-    },
-  });
-
-  expect(samples).toHaveLength(1);
-
-  const sample = samples[0];
-  expect(sample.maxNodesPerPass).toBe(1);
-  expect(sample.scannedTextNodes).toBe(1);
-  expect(sample.reachedNodeLimit).toBe(true);
-  expect(sample.conversionsApplied).toBe(applied);
-  expect(sample.totalMs).toBeGreaterThanOrEqual(0);
-  expect(sample.clearExistingMs).toBeGreaterThanOrEqual(0);
-  expect(sample.scanTextNodesMs).toBeGreaterThanOrEqual(0);
-  expect(sample.decorateNodesMs).toBeGreaterThanOrEqual(0);
 });

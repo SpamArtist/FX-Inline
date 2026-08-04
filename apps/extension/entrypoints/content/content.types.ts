@@ -1,17 +1,6 @@
 import type { UserSettings } from "@/utils/appStorage.types";
 import type { CurrencyCode } from "@/utils/enums";
 
-export type InlineConversionPerfSample = {
-  totalMs: number;
-  clearExistingMs: number;
-  scanTextNodesMs: number;
-  decorateNodesMs: number;
-  scannedTextNodes: number;
-  conversionsApplied: number;
-  maxNodesPerPass: number;
-  reachedNodeLimit: boolean;
-};
-
 export type ContentConversionRuntime = {
   initialize: () => Promise<void>;
   onSettingsStorageUpdate: (
@@ -80,6 +69,8 @@ export type CurrencyActivationScanOptions = {
   maxTextNodes?: number;
   maxCharacters?: number;
 };
+
+export type CurrencyActivationScanResult = "signal" | "clear" | "exhausted";
 
 export type MutationRootBatcherDeps = {
   collectRoots: (mutations: MutationRecord[]) => ParentNode[];

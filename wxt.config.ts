@@ -9,7 +9,6 @@ import preact from "@preact/preset-vite";
 import vitePluginSvgr from "vite-plugin-svgr";
 import { defineConfig, type Entrypoint, type WxtViteConfig } from "wxt";
 import type { Plugin } from "vite";
-import { resolveReleaseTag } from "./scripts/release/versioning.mjs";
 
 export const EXTENSION_DEV_OPTIMIZE_DEPS_EXCLUDE = [
   "@prefresh/core",
@@ -27,17 +26,6 @@ type OptimizeDepsListConfig = {
   exclude?: string[];
   include?: string[];
 };
-
-const releaseTag = process.env.RELEASE_TAG?.trim();
-const releaseManifestOverrides = releaseTag
-  ? (() => {
-    const release = resolveReleaseTag(releaseTag);
-    return {
-      version: release.manifestVersion,
-      version_name: release.displayVersion,
-    };
-  })()
-  : null;
 
 function hardenFirefoxInnerHtmlAssignments() {
   return {
@@ -258,7 +246,6 @@ export default defineConfig({
         : {};
 
     return {
-      ...(releaseManifestOverrides ?? {}),
       icons: {
         "16": "icon/16.png",
         "32": "icon/32.png",

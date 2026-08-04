@@ -1,10 +1,17 @@
 const currencyFormatterCache = new Map();
+let lastFormatterCacheKey = null;
+let lastFormatterCacheValue;
 
 function getCurrencyFormatter(locale, currency, compact) {
   const localeKey = locale || "__default__";
   const cacheKey = `${localeKey}::${currency}::${compact ? "compact" : "standard"}`;
+  if (cacheKey === lastFormatterCacheKey) {
+    return lastFormatterCacheValue;
+  }
   const cached = currencyFormatterCache.get(cacheKey);
   if (cached !== undefined) {
+    lastFormatterCacheKey = cacheKey;
+    lastFormatterCacheValue = cached;
     return cached;
   }
 
@@ -23,11 +30,14 @@ function getCurrencyFormatter(locale, currency, compact) {
         currency,
         maximumFractionDigits: 2,
       });
-
     currencyFormatterCache.set(cacheKey, formatter);
+    lastFormatterCacheKey = cacheKey;
+    lastFormatterCacheValue = formatter;
     return formatter;
   } catch {
     currencyFormatterCache.set(cacheKey, null);
+    lastFormatterCacheKey = cacheKey;
+    lastFormatterCacheValue = null;
     return null;
   }
 }
@@ -44,4 +54,10 @@ export function formatAmountInCurrency(amount, currency, options) {
   }
 
   return formatter.format(amount);
+}
+
+export function __clearCurrencyFormatterCacheForTests() {
+  currencyFormatterCache.clear();
+  lastFormatterCacheKey = null;
+  lastFormatterCacheValue = undefined;
 }

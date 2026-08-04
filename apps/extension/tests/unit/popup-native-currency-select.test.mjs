@@ -10,6 +10,10 @@ const dropdownSourcePath = path.join(
   extensionRoot,
   "components/Dropdown/Dropdown.tsx",
 );
+const currencyBoxSourcePath = path.join(
+  extensionRoot,
+  "components/CurrencyBox/CurrencyBox.tsx",
+);
 
 function collectExtensionSourceFiles(directory) {
   const entries = fs.readdirSync(directory, { withFileTypes: true });
@@ -46,4 +50,11 @@ test("extension source does not import Radix DropdownMenu", () => {
   });
 
   expect(radixImports).toEqual([]);
+});
+
+test("popup amount input records edits before Enter commits them", () => {
+  const currencyBoxSource = fs.readFileSync(currencyBoxSourcePath, "utf8");
+
+  expect(currencyBoxSource).toContain("onInput={handleAmountChange}");
+  expect(currencyBoxSource).not.toContain("onChange={handleAmountChange}");
 });

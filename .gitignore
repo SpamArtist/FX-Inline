@@ -1,7 +1,6 @@
 node_modules
 .DS_Store
 .output
-.release
 .wxt
 backend/data/db.json
 backend/dist
@@ -11,3 +10,4 @@ apps/extension/test-dist
 dist
 .legacy-parser-*
 /apps/extension/generated/*
+/performance-traces
