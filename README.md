@@ -8,16 +8,6 @@ FX Inline converts prices directly on webpages into your preferred currency so y
 
 This README has an auto-generated repository snapshot that updates via `npm run readme:sync` (run it and commit the result after changes that affect the snapshot).
 
-## Releases
-
-- Releases are tag-driven via `.github/workflows/release.yml` (push a tag matching `v*`).
-- Tag format:
-  - Final: `vMAJOR.MINOR.PATCH`
-  - RC: `vMAJOR.MINOR.PATCH-rc.N`
-- Local dry run / validation:
-  - `RELEASE_TAG=v0.5.0 npm run release:dry-run`
-  - `RELEASE_TAG=v0.5.0 npm run release:validate-tag`
-
 ## Local Admin Settings
 
 - `npm run admin:api` starts the local NestJS admin API on `127.0.0.1:3307`.
@@ -66,12 +56,11 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 - `https://api.exchangerate-api.com/v4/latest/USD`
 
 ### Test Inventory
-- Total test files: `35`
+- Total test files: `32`
 - admin: `2`
 - assets: `1`
 - build: `2`
 - content: `8`
-- release: `3`
 - unit: `19`
 
 ### Scripts
@@ -98,15 +87,6 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run prezip` | `npm run admin:export-settings && npm run build:assets` |
 | `npm run zip` | `wxt zip` |
 | `npm run zip:firefox` | `wxt zip -b firefox` |
-| `npm run release:clean` | `node scripts/release/clean.mjs` |
-| `npm run release:dry-run` | `node scripts/release/describe.mjs` |
-| `npm run release:describe:json` | `node scripts/release/describe.mjs --json` |
-| `npm run release:validate-tag` | `node scripts/release/validate-tag.mjs` |
-| `npm run release:build-artifacts` | `node scripts/release/build-artifacts.mjs` |
-| `npm run release:verify-artifacts` | `node scripts/release/verify-artifacts.mjs` |
-| `npm run release:lint-build-output` | `node scripts/release/lint-build-output.mjs` |
-| `npm run release:publish:chrome` | `node scripts/release/publish-chrome.mjs` |
-| `npm run release:publish:edge` | `node scripts/release/publish-edge.mjs` |
 | `npm run preview:website` | `vite preview --config apps/website/vite.config.mjs` |
 | `npm run precompile` | `npm run admin:export-settings` |
 | `npm run lint` | `eslint .` |
@@ -116,14 +96,13 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run prebuild:content-tests` | `npm run admin:export-settings` |
 | `npm run build:content-tests` | `tsc -p apps/extension/tsconfig.content-tests.json` |
 | `npm run jest` | `node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand` |
-| `npm run test:release` | `node --test test/release/versioning.test.mjs test/release/lint-build-output.test.mjs` |
 | `npm run test:assets` | `node --test test/assets/icon-assets.test.mjs` |
 | `npm run test:admin` | `npm run build:backend && node --test test/admin/export-settings.test.mjs` |
 | `npm run test:build` | `node --test test/build/*.test.mjs` |
 | `npm run test:frontend` | `npm run build:unit && npm run jest -- apps/extension/tests/unit` |
 | `npm run test:content` | `npm run build:content-tests && npm run jest -- --config jest.content.config.cjs apps/extension/tests/content` |
 | `npm run test:unit` | `npm run test:frontend` |
-| `npm run test:all` | `npm run test:frontend && npm run test:content && npm run test:release && npm run test:assets && npm run test:admin && npm run test:build` |
+| `npm run test:all` | `npm run test:frontend && npm run test:content && npm run currency-detection:test && npm run inline-runtime:test && npm run test:assets && npm run test:admin && npm run test:build` |
 | `npm run currency-detection:fixtures` | `node packages/currency-detection/scripts/generate-fixtures.mjs` |
 | `npm run currency-detection:baseline` | `npm run build:unit && npm run currency-detection:fixtures && node packages/currency-detection/scripts/generate-legacy-snapshot.mjs` |
 | `npm run currency-detection:test` | `npm run jest -- packages/currency-detection/test` |
@@ -136,13 +115,13 @@ This README has an auto-generated repository snapshot that updates via `npm run 
 | `npm run readme:sync:check` | `node scripts/readme-sync.mjs --check` |
 
 ### Recent Changes (first-parent, excluding README automation commits)
-- 2026-05-11 `214b141` docs: refresh README history snapshot
-- 2026-05-10 `78651ce` docs: refresh README history snapshot
-- 2026-05-09 `7e4ab13` docs: refresh release examples
-- 2026-05-08 `dbfd9b9` docs: add repository map presentation
-- 2026-05-08 `4a95f43` docs: refresh readme history snapshot
-- 2026-05-07 `fdc16bb` docs: align content activation docs
-- 2026-05-06 `a859146` docs: refresh README history snapshot
-- 2026-05-05 `57edff3` docs: link security review artifacts
+- 2026-08-04 `5ecfa6a` Merge pull request #139 from SpamArtist/LLM/reduce-parser-conversion-runtime
+- 2026-08-03 `ecb53d0` Merge pull request #130 from SpamArtist/LLM/improve-candidate-discovery-performance
+- 2026-08-03 `fc1b8b3` performance traces is ignored
+- 2026-08-02 `ef5b95b` Merge pull request #116 from SpamArtist/LLM/quadratic-regex
+- 2026-08-01 `b1e42f1` fix: bound changed-node frontier
+- 2026-08-01 `5612f67` fix: bound scan exclusions
+- 2026-08-01 `4068cf6` fix: activate from changed text context
+- 2026-08-01 `153c776` fix: bound activation changed areas
 
 <!-- AUTO-GENERATED:END -->
