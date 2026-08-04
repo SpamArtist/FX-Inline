@@ -26,15 +26,6 @@
     "prezip": "npm run admin:export-settings && npm run build:assets",
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
-    "release:clean": "node scripts/release/clean.mjs",
-    "release:dry-run": "node scripts/release/describe.mjs",
-    "release:describe:json": "node scripts/release/describe.mjs --json",
-    "release:validate-tag": "node scripts/release/validate-tag.mjs",
-    "release:build-artifacts": "node scripts/release/build-artifacts.mjs",
-    "release:verify-artifacts": "node scripts/release/verify-artifacts.mjs",
-    "release:lint-build-output": "node scripts/release/lint-build-output.mjs",
-    "release:publish:chrome": "node scripts/release/publish-chrome.mjs",
-    "release:publish:edge": "node scripts/release/publish-edge.mjs",
     "preview:website": "vite preview --config apps/website/vite.config.mjs",
     "precompile": "npm run admin:export-settings",
     "lint": "eslint .",
@@ -44,14 +35,13 @@
     "prebuild:content-tests": "npm run admin:export-settings",
     "build:content-tests": "tsc -p apps/extension/tsconfig.content-tests.json",
     "jest": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand",
-    "test:release": "node --test test/release/versioning.test.mjs test/release/lint-build-output.test.mjs",
     "test:assets": "node --test test/assets/icon-assets.test.mjs",
     "test:admin": "npm run build:backend && node --test test/admin/export-settings.test.mjs",
     "test:build": "node --test test/build/*.test.mjs",
     "test:frontend": "npm run build:unit && npm run jest -- apps/extension/tests/unit",
     "test:content": "npm run build:content-tests && npm run jest -- --config jest.content.config.cjs apps/extension/tests/content",
     "test:unit": "npm run test:frontend",
-    "test:all": "npm run test:frontend && npm run test:content && npm run currency-detection:test && npm run inline-runtime:test && npm run test:release && npm run test:assets && npm run test:admin && npm run test:build",
+    "test:all": "npm run test:frontend && npm run test:content && npm run currency-detection:test && npm run inline-runtime:test && npm run test:assets && npm run test:admin && npm run test:build",
     "currency-detection:fixtures": "node packages/currency-detection/scripts/generate-fixtures.mjs",
     "currency-detection:baseline": "npm run build:unit && npm run currency-detection:fixtures && node packages/currency-detection/scripts/generate-legacy-snapshot.mjs",
     "currency-detection:test": "npm run jest -- packages/currency-detection/test",
@@ -59,9 +49,7 @@
     "currency-detection:bench:compare": "node packages/currency-detection/scripts/compare-benchmarks.mjs",
     "inline-runtime:build": "vite build --config packages/inline-runtime/vite.config.mjs",
     "inline-runtime:test": "npm run jest -- packages/inline-runtime/test",
-    "postinstall": "wxt prepare",
-    "readme:sync": "node scripts/readme-sync.mjs",
-    "readme:sync:check": "node scripts/readme-sync.mjs --check"
+    "postinstall": "wxt prepare"
   },
   "dependencies": {
     "@fx-inline/currency-detection": "file:packages/currency-detection",
@@ -89,7 +77,6 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.4",
     "vite": "^7.3.1",
-    "web-ext": "^10.1.0",
     "wxt": "^0.20.6"
   }
 }
