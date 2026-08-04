@@ -1,0 +1,330 @@
+{
+  "fixtureName": "apts-jp-first-page-full-conversion",
+  "sourceUrl": "https://apts.jp/",
+  "capturedAt": "2026-08-04T00:00:00.000Z",
+  "baselineSourceCommit": "2140309a8f4e86920e29292d92a469b4486ec8df",
+  "inputFile": "input.html",
+  "inputSha256": "641253877efb0b167430fa85ead31735acb09db5acaab7e95a5bbb8a2033f9bb",
+  "expectedDomFile": "expected-dom.html",
+  "expectedDomSha256": "95d241e0b1ed5ed39b7b166c61e01a10866711d22a14b847bf47834c6ec9e702",
+  "locale": "en",
+  "ratesBase": "EUR",
+  "ratesFetchedAt": "2026-08-04T00:00:00.000Z",
+  "rates": {
+    "AUD": 1.6444606016540944,
+    "CAD": 1.6165460555704456,
+    "CNY": 7.77233676975945,
+    "EUR": 1,
+    "GBP": 0.8570481242895036,
+    "HKD": 9.028942115768464,
+    "JPY": 180.94,
+    "KRW": 1644.909090909091,
+    "PHP": 70.13178294573643,
+    "SGD": 1.4759768333469288,
+    "TWD": 37.30721649484536,
+    "USD": 1.1510178117048346,
+    "BTC": 0.000017962871041397794,
+    "ETH": 0.0006110917853512241
+  },
+  "sourceJpyPerUnitRates": {
+    "AUD": 110.03,
+    "CAD": 111.93,
+    "CNY": 23.28,
+    "EUR": 180.94,
+    "GBP": 211.12,
+    "HKD": 20.04,
+    "JPY": 1,
+    "KRW": 0.11,
+    "PHP": 2.58,
+    "SGD": 122.59,
+    "TWD": 4.85,
+    "USD": 157.2,
+    "BTC": 10073000,
+    "ETH": 296093
+  },
+  "settings": {
+    "targetCurrency": "EUR",
+    "convertedCurrencyPosition": "right",
+    "displayStyle": "brackets",
+    "clearExisting": false,
+    "includeDefaultPrePlugins": true,
+    "includeDefaultPostPlugins": true
+  },
+  "expectedConversionCount": 37,
+  "expectedPerfCounters": {
+    "visitedTextNodes": 2928,
+    "acceptedCandidates": 75,
+    "scannedTextNodes": 75,
+    "conversionsApplied": 37,
+    "reachedNodeLimit": false
+  },
+  "expectedConversions": [
+    {
+      "index": 0,
+      "original": "110.03 JPY",
+      "convertedText": "(€0.61)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 1,
+      "original": "111.93 JPY",
+      "convertedText": "(€0.62)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 2,
+      "original": "23.28 JPY",
+      "convertedText": "(€0.13)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 3,
+      "original": "180.94 JPY",
+      "convertedText": "(€1.00)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 4,
+      "original": "211.12 JPY",
+      "convertedText": "(€1.17)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 5,
+      "original": "20.04 JPY",
+      "convertedText": "(€0.11)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 6,
+      "original": "0.11 JPY",
+      "convertedText": "(€0.00)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 7,
+      "original": "2.58 JPY",
+      "convertedText": "(€0.01)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 8,
+      "original": "122.59 JPY",
+      "convertedText": "(€0.68)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 9,
+      "original": "4.85 JPY",
+      "convertedText": "(€0.03)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 10,
+      "original": "157.20 JPY",
+      "convertedText": "(€0.87)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 11,
+      "original": "10073000 JPY",
+      "convertedText": "(€55,670.39)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 12,
+      "original": "296093 JPY",
+      "convertedText": "(€1,636.42)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 13,
+      "original": "240,000 JPY",
+      "convertedText": "(€1,326.41)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 14,
+      "original": "320,000 JPY",
+      "convertedText": "(€1,768.54)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 15,
+      "original": "335,000 JPY",
+      "convertedText": "(€1,851.44)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 16,
+      "original": "256,000 JPY",
+      "convertedText": "(€1,414.83)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 17,
+      "original": "220,000 JPY",
+      "convertedText": "(€1,215.87)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 18,
+      "original": "815,000 JPY",
+      "convertedText": "(€4,504.26)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 19,
+      "original": "490,000 JPY",
+      "convertedText": "(€2,708.08)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 20,
+      "original": "445,000 JPY",
+      "convertedText": "(€2,459.38)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 21,
+      "original": "187,000 JPY",
+      "convertedText": "(€1,033.49)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 22,
+      "original": "160,200 JPY",
+      "convertedText": "(€885.38)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 23,
+      "original": "151,000 JPY",
+      "convertedText": "(€834.53)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 24,
+      "original": "175,000 JPY",
+      "convertedText": "(€967.17)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 25,
+      "original": "448,000,000 JPY",
+      "convertedText": "(~€2.5M)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 26,
+      "original": "769,900,000 JPY",
+      "convertedText": "(~€4.3M)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 27,
+      "original": "339,000,000 JPY",
+      "convertedText": "(~€1.9M)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 28,
+      "original": "129,900,000 JPY",
+      "convertedText": "(~€717.9K)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 29,
+      "original": "249,900,000 JPY",
+      "convertedText": "(~€1.4M)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 30,
+      "original": "398,000,000 JPY",
+      "convertedText": "(~€2.2M)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 31,
+      "original": "122,000,000 JPY",
+      "convertedText": "(~€674.3K)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 32,
+      "original": "639,900,000 JPY",
+      "convertedText": "(~€3.5M)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 33,
+      "original": "250,000 JPY",
+      "convertedText": "(€1,381.67)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 34,
+      "original": "201,600 JPY",
+      "convertedText": "(€1,114.18)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 35,
+      "original": "180,000 JPY",
+      "convertedText": "(€994.80)",
+      "position": "right",
+      "displayStyle": "brackets"
+    },
+    {
+      "index": 36,
+      "original": "202,200 JPY",
+      "convertedText": "(€1,117.50)",
+      "position": "right",
+      "displayStyle": "brackets"
+    }
+  ],
+  "blockedAssetPolicy": {
+    "scriptTagsReplacedWithTemplates": true,
+    "linkAssetHrefsRemoved": true,
+    "mediaSrcAttributesRemoved": true,
+    "lazyBackgroundImagesRemoved": true,
+    "eventHandlerAttributesRemoved": true,
+    "externalCssUrlsRemoved": true
+  }
+}
