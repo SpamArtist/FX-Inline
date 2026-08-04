@@ -1,6 +1,7 @@
 import { expect, test } from "@jest/globals";
 
 import {
+  createCurrencyParser,
   extractCurrencyTextMatches,
   hasThousandMagnitudeHint,
   mayContainCurrencyToken,
@@ -160,6 +161,93 @@ test("extractCurrencyTextMatches supports mixed symbol and ISO snippets", () => 
   expect(matches[0].value).toBe(99.99);
   expect(matches[1].currency).toBe("CAD");
   expect(matches[2].value).toBe(10);
+});
+
+test("extractCurrencyTextMatches keeps ordered non-range match facts", () => {
+  const text = "Deal: USD 12 | €34 | 56 yen | ₹ 7.5 crore";
+  const matches = extractCurrencyTextMatches(text);
+
+  expect(matches).toEqual([
+    {
+      raw: "USD 12 ",
+      start: 6,
+      end: 13,
+      value: 12,
+      currency: "USD",
+    },
+    {
+      raw: "€34 ",
+      start: 15,
+      end: 19,
+      value: 34,
+      currency: "EUR",
+    },
+    {
+      raw: "56 yen",
+      start: 21,
+      end: 27,
+      value: 56,
+      currency: "JPY",
+    },
+    {
+      raw: "₹ 7.5 crore",
+      start: 30,
+      end: 41,
+      value: 75_000_000,
+      currency: "INR",
+    },
+  ]);
+});
+
+test("custom parser config uses ordered non-range extraction", () => {
+  const parser = createCurrencyParser({
+    extraWords: {
+      bucks: "USD",
+    },
+    extraSymbols: {
+      "@@": "AUD",
+    },
+    extraIsoCodes: ["XYZ"],
+    extraMagnitudeProfiles: [
+      {
+        locale: "x-team",
+        entries: [
+          {
+            multiplier: 1_000_000,
+            aliases: ["mega"],
+          },
+        ],
+      },
+    ],
+  });
+
+  const matches = parser.extractMatches("Custom: bucks 2 mega | XYZ 3 | @@4", {
+    localeHint: "x-team",
+  });
+
+  expect(matches).toEqual([
+    {
+      raw: "bucks 2 mega",
+      start: 8,
+      end: 20,
+      value: 2_000_000,
+      currency: "USD",
+    },
+    {
+      raw: "XYZ 3 ",
+      start: 23,
+      end: 29,
+      value: 3,
+      currency: "XYZ",
+    },
+    {
+      raw: "@@4",
+      start: 31,
+      end: 34,
+      value: 4,
+      currency: "AUD",
+    },
+  ]);
 });
 
 test("extractCurrencyTextMatches supports yen word aliases", () => {
@@ -337,6 +425,29 @@ test("extractCurrencyTextMatches parses shared-magnitude ranges with one currenc
   expect(matches[0].currency).toBe("JPY");
   expect(matches[0].value).toBe(6000000);
   expect(matches[0].rangeEndValue).toBe(13000000);
+});
+
+test("extractCurrencyTextMatches preserves dual-token range parity", () => {
+  const matches = extractCurrencyTextMatches(
+    "Salary range: ¥6M–¥13M plus bonus",
+  );
+
+  expect(matches).toEqual([
+    {
+      raw: "¥6M",
+      start: 14,
+      end: 17,
+      value: 6_000_000,
+      currency: "JPY",
+    },
+    {
+      raw: "¥13M",
+      start: 18,
+      end: 22,
+      value: 13_000_000,
+      currency: "JPY",
+    },
+  ]);
 });
 
 test("extractCurrencyTextMatches ignores year-range carryover before real prices", () => {
