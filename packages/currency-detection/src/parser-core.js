@@ -557,20 +557,9 @@ function createCompiledConfig(config) {
       `(?<![\\p{N}\\-–—])${numberWithOptionalMagnitudePattern}`;
     const currencyTokenPatternSource =
       `${isoTokenPattern}|(?:${symbolPattern})|${wordTokenPattern}`;
-    const currencyTokenPattern = `(${currencyTokenPatternSource})`;
     const rangeSeparatorPattern = "(?:-|–|—)";
-
-    const currencySnippetPattern =
-      `(?:${isoTokenPattern}\\s*${numberWithOptionalMagnitudePattern}|${boundedNumberWithOptionalMagnitudePattern}\\s*${isoTokenPattern}|(?:${symbolPattern})\\s*${numberWithOptionalMagnitudePattern}|${boundedNumberWithOptionalMagnitudePattern}\\s*(?:${symbolPattern})|${wordTokenPattern}\\s*${numberWithOptionalMagnitudePattern}|${boundedNumberWithOptionalMagnitudePattern}\\s*${wordTokenPattern})`;
-
-    const currencySnippetRegex = new RegExp(currencySnippetPattern, "giu");
     const orderedCurrencySnippetRegex = new RegExp(
-      `(?:(${currencyTokenPatternSource})\\s*(${numberWithOptionalMagnitudePattern})|(${boundedNumberWithOptionalMagnitudePattern})\\s*(${currencyTokenPatternSource}))`,
-      "giu",
-    );
-
-    const currencyRangeRegex = new RegExp(
-      `${currencyTokenPattern}\\s*(${numberWithOptionalMagnitudePattern})\\s*${rangeSeparatorPattern}\\s*(${numberWithOptionalMagnitudePattern})`,
+      `(?:(${currencyTokenPatternSource})\\s*(${numberWithOptionalMagnitudePattern})\\s*${rangeSeparatorPattern}\\s*(${numberWithOptionalMagnitudePattern})|(${currencyTokenPatternSource})\\s*(${numberWithOptionalMagnitudePattern})|(${boundedNumberWithOptionalMagnitudePattern})\\s*(${currencyTokenPatternSource}))`,
       "giu",
     );
 
@@ -579,9 +568,7 @@ function createCompiledConfig(config) {
     return {
       magnitudeMultiplierByAlias,
       magnitudeSuffixRegex,
-      currencySnippetRegex,
       orderedCurrencySnippetRegex,
-      currencyRangeRegex,
     };
   }
 
@@ -633,28 +620,85 @@ function createCompiledConfig(config) {
     return parseCurrencyValueWithArtifacts(input, artifacts);
   }
 
-  function scanOrderedNonRangeMatches(input, artifacts, detectDualCurrencyRange) {
+  function parseRangeValues(firstValueText, secondValueText, artifacts) {
+    const normalizedFirstValueText = stripTrailingPlus(firstValueText);
+    const normalizedSecondValueText = stripTrailingPlus(secondValueText);
+
+    const firstMagnitude = normalizedFirstValueText.match(
+      artifacts.magnitudeSuffixRegex,
+    );
+    const secondMagnitude = normalizedSecondValueText.match(
+      artifacts.magnitudeSuffixRegex,
+    );
+
+    let firstValue = parseNumberWithOptionalMagnitudeForArtifacts(
+      firstValueText,
+      artifacts,
+    );
+    let secondValue = parseNumberWithOptionalMagnitudeForArtifacts(
+      secondValueText,
+      artifacts,
+    );
+
+    if (firstValue === null || secondValue === null) {
+      return null;
+    }
+
+    if (!firstMagnitude && secondMagnitude) {
+      const alias = normalizeMagnitudeAlias(secondMagnitude[2]);
+      const multiplier = artifacts.magnitudeMultiplierByAlias.get(alias);
+      if (multiplier !== undefined) {
+        const base = parseFlexibleNumber(
+          normalizedFirstValueText,
+          0,
+          normalizedFirstValueText.length,
+        );
+        if (base !== null) {
+          firstValue = base * multiplier;
+        }
+      }
+    } else if (firstMagnitude && !secondMagnitude) {
+      const alias = normalizeMagnitudeAlias(firstMagnitude[2]);
+      const multiplier = artifacts.magnitudeMultiplierByAlias.get(alias);
+      if (multiplier !== undefined) {
+        const base = parseFlexibleNumber(
+          normalizedSecondValueText,
+          0,
+          normalizedSecondValueText.length,
+        );
+        if (base !== null) {
+          secondValue = base * multiplier;
+        }
+      }
+    }
+
+    return {
+      firstValue,
+      secondValue,
+    };
+  }
+
+  function scanOrderedMatches(input, artifacts) {
     const matches = [];
-    let previousMatch = null;
-    let hasDualCurrencyRange = false;
     artifacts.orderedCurrencySnippetRegex.lastIndex = 0;
 
     for (const candidate of input.matchAll(artifacts.orderedCurrencySnippetRegex)) {
       if (candidate.index === undefined) continue;
 
       const raw = candidate[0];
-      const currencyToken = candidate[1] ?? candidate[4];
-      const valueText = candidate[2] ?? candidate[3];
-      if (!currencyToken || !valueText) continue;
+      const rangeCurrencyToken = candidate[1];
+      const rangeFirstValueText = candidate[2];
+      const rangeSecondValueText = candidate[3];
+      const currencyToken = rangeCurrencyToken ?? candidate[4] ?? candidate[7];
+      const valueText = candidate[5] ?? candidate[6];
+      const isRange =
+        Boolean(rangeCurrencyToken) &&
+        Boolean(rangeFirstValueText) &&
+        Boolean(rangeSecondValueText);
+      if (!currencyToken) continue;
 
       const parsedCurrency = isCurrencyToken(currencyToken);
       if (!parsedCurrency) continue;
-
-      const parsedValue = parseNumberWithOptionalMagnitudeForArtifacts(
-        valueText,
-        artifacts,
-      );
-      if (parsedValue === null) continue;
 
       if (shouldSkipWordLikeCurrencyByCasing(raw, parsedCurrency)) {
         continue;
@@ -670,198 +714,42 @@ function createCompiledConfig(config) {
         continue;
       }
 
-      const match = {
+      if (isRange) {
+        const rangeValues = parseRangeValues(
+          rangeFirstValueText,
+          rangeSecondValueText,
+          artifacts,
+        );
+        if (!rangeValues) continue;
+
+        matches.push({
+          raw,
+          start: candidate.index,
+          end: candidate.index + raw.length,
+          value: rangeValues.firstValue,
+          rangeEndValue: rangeValues.secondValue,
+          currency: parsedCurrency,
+        });
+        continue;
+      }
+
+      if (!valueText) continue;
+      const parsedValue = parseNumberWithOptionalMagnitudeForArtifacts(
+        valueText,
+        artifacts,
+      );
+      if (parsedValue === null) continue;
+
+      matches.push({
         raw,
         start: candidate.index,
         end: candidate.index + raw.length,
         value: parsedValue,
         currency: parsedCurrency,
-      };
-
-      if (
-        detectDualCurrencyRange &&
-        previousMatch &&
-        /^\s*[-–—]\s*$/u.test(input.slice(previousMatch.end, match.start))
-      ) {
-        hasDualCurrencyRange = true;
-      }
-
-      matches.push(match);
-      previousMatch = match;
-    }
-
-    return {
-      matches,
-      hasDualCurrencyRange,
-    };
-  }
-
-  function extractLegacySnippetMatches(input, artifacts) {
-    const matches = [];
-    artifacts.currencySnippetRegex.lastIndex = 0;
-
-    for (const candidate of input.matchAll(artifacts.currencySnippetRegex)) {
-      if (candidate.index === undefined) continue;
-
-      const raw = candidate[0];
-      const parsed = parseCurrencyValueWithArtifacts(raw, artifacts);
-
-      if (!parsed.valid || parsed.currency == null || parsed.value === undefined) {
-        continue;
-      }
-
-      if (shouldSkipWordLikeCurrencyByCasing(raw, parsed.currency)) {
-        continue;
-      }
-
-      if (
-        shouldSkipLikelyUsernameCurrencyMatch(
-          input,
-          candidate.index,
-          candidate.index + raw.length,
-        )
-      ) {
-        continue;
-      }
-
-      matches.push({
-        raw,
-        start: candidate.index,
-        end: candidate.index + raw.length,
-        value: parsed.value,
-        currency: parsed.currency,
       });
     }
 
     return matches;
-  }
-
-  function extractLegacyMatches(input, artifacts) {
-    const matches = extractLegacySnippetMatches(input, artifacts);
-
-    artifacts.currencyRangeRegex.lastIndex = 0;
-    for (const candidate of input.matchAll(artifacts.currencyRangeRegex)) {
-      if (candidate.index === undefined) continue;
-
-      const raw = candidate[0];
-      if (
-        shouldSkipLikelyUsernameCurrencyMatch(
-          input,
-          candidate.index,
-          candidate.index + raw.length,
-        )
-      ) {
-        continue;
-      }
-
-      const parsedCurrency = isCurrencyToken(candidate[1]);
-      if (!parsedCurrency) continue;
-      if (shouldSkipWordLikeCurrencyByCasing(candidate[1], parsedCurrency)) {
-        continue;
-      }
-
-      const firstValueText = candidate[2];
-      const secondValueText = candidate[3];
-      if (!firstValueText || !secondValueText) continue;
-
-      const normalizedFirstValueText = stripTrailingPlus(firstValueText);
-      const normalizedSecondValueText = stripTrailingPlus(secondValueText);
-
-      const firstHadMagnitude =
-        artifacts.magnitudeSuffixRegex.test(normalizedFirstValueText);
-      const secondHadMagnitude =
-        artifacts.magnitudeSuffixRegex.test(normalizedSecondValueText);
-
-      let firstValue = parseNumberWithOptionalMagnitudeForArtifacts(
-        firstValueText,
-        artifacts,
-      );
-      let secondValue = parseNumberWithOptionalMagnitudeForArtifacts(
-        secondValueText,
-        artifacts,
-      );
-
-      if (firstValue === null || secondValue === null) {
-        continue;
-      }
-
-      if (!firstHadMagnitude && secondHadMagnitude) {
-        const secondMagnitude = normalizedSecondValueText.match(
-          artifacts.magnitudeSuffixRegex,
-        );
-        if (secondMagnitude) {
-          const alias = normalizeMagnitudeAlias(secondMagnitude[2]);
-          const multiplier = artifacts.magnitudeMultiplierByAlias.get(alias);
-          if (multiplier !== undefined) {
-            const base = parseFlexibleNumber(
-              normalizedFirstValueText,
-              0,
-              normalizedFirstValueText.length,
-            );
-            if (base !== null) {
-              firstValue = base * multiplier;
-            }
-          }
-        }
-      } else if (firstHadMagnitude && !secondHadMagnitude) {
-        const firstMagnitude = normalizedFirstValueText.match(
-          artifacts.magnitudeSuffixRegex,
-        );
-        if (firstMagnitude) {
-          const alias = normalizeMagnitudeAlias(firstMagnitude[2]);
-          const multiplier = artifacts.magnitudeMultiplierByAlias.get(alias);
-          if (multiplier !== undefined) {
-            const base = parseFlexibleNumber(
-              normalizedSecondValueText,
-              0,
-              normalizedSecondValueText.length,
-            );
-            if (base !== null) {
-              secondValue = base * multiplier;
-            }
-          }
-        }
-      }
-
-      matches.push({
-        raw,
-        start: candidate.index,
-        end: candidate.index + raw.length,
-        value: firstValue,
-        rangeEndValue: secondValue,
-        currency: parsedCurrency,
-      });
-    }
-
-    const sortedMatches = matches.sort((a, b) => {
-      if (a.start !== b.start) return a.start - b.start;
-      const aLen = a.end - a.start;
-      const bLen = b.end - b.start;
-      return bLen - aLen;
-    });
-
-    const nonOverlappingMatches = [];
-    let latestCoveredEnd = -1;
-
-    for (const match of sortedMatches) {
-      if (match.start < latestCoveredEnd) continue;
-      nonOverlappingMatches.push(match);
-      latestCoveredEnd = match.end;
-    }
-
-    return nonOverlappingMatches;
-  }
-
-  function containsSingleTokenRangeForm(input, artifacts) {
-    if (!/[-–—]/u.test(input)) return false;
-
-    artifacts.currencyRangeRegex.lastIndex = 0;
-    if (artifacts.currencyRangeRegex.test(input)) {
-      artifacts.currencyRangeRegex.lastIndex = 0;
-      return true;
-    }
-
-    return false;
   }
 
   function extractMatches(input, options) {
@@ -870,21 +758,7 @@ function createCompiledConfig(config) {
     const localeHint = resolveLocaleHint(options);
     const artifacts = getParserArtifacts(localeHint);
 
-    const canContainRangeForm = /[-–—]/u.test(input);
-    if (canContainRangeForm && containsSingleTokenRangeForm(input, artifacts)) {
-      return extractLegacyMatches(input, artifacts);
-    }
-
-    const orderedScan = scanOrderedNonRangeMatches(
-      input,
-      artifacts,
-      canContainRangeForm,
-    );
-    if (orderedScan.hasDualCurrencyRange) {
-      return extractLegacyMatches(input, artifacts);
-    }
-
-    return orderedScan.matches;
+    return scanOrderedMatches(input, artifacts);
   }
 
   function mayContainCurrencyToken(input) {

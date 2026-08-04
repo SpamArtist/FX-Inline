@@ -250,6 +250,47 @@ test("custom parser config uses ordered non-range extraction", () => {
   ]);
 });
 
+test("custom parser config uses ordered range extraction", () => {
+  const parser = createCurrencyParser({
+    extraSymbols: {
+      "@@": "AUD",
+    },
+    extraMagnitudeProfiles: [
+      {
+        locale: "x-team",
+        entries: [
+          {
+            multiplier: 1_000_000,
+            aliases: ["mega"],
+          },
+        ],
+      },
+    ],
+  });
+
+  const matches = parser.extractMatches("Custom: @@ 2 - 4 mega then @@5", {
+    localeHint: "x-team",
+  });
+
+  expect(matches).toEqual([
+    {
+      raw: "@@ 2 - 4 mega",
+      start: 8,
+      end: 21,
+      value: 2_000_000,
+      rangeEndValue: 4_000_000,
+      currency: "AUD",
+    },
+    {
+      raw: "@@5",
+      start: 27,
+      end: 30,
+      value: 5,
+      currency: "AUD",
+    },
+  ]);
+});
+
 test("extractCurrencyTextMatches supports yen word aliases", () => {
   const matches = extractCurrencyTextMatches("Comp: yen 6M and 13,000 yên");
 
@@ -425,6 +466,60 @@ test("extractCurrencyTextMatches parses shared-magnitude ranges with one currenc
   expect(matches[0].currency).toBe("JPY");
   expect(matches[0].value).toBe(6000000);
   expect(matches[0].rangeEndValue).toBe(13000000);
+});
+
+test("extractCurrencyTextMatches emits ordered prefix ranges before shorter prices", () => {
+  const matches = extractCurrencyTextMatches(
+    "Plans: USD 5+ - 10 million+ today | $7 now",
+  );
+
+  expect(matches).toEqual([
+    {
+      raw: "USD 5+ - 10 million+",
+      start: 7,
+      end: 27,
+      value: 5_000_000,
+      rangeEndValue: 10_000_000,
+      currency: "USD",
+    },
+    {
+      raw: "$7 ",
+      start: 36,
+      end: 39,
+      value: 7,
+      currency: "USD",
+    },
+  ]);
+});
+
+test("extractCurrencyTextMatches propagates first endpoint magnitude in ordered ranges", () => {
+  const matches = extractCurrencyTextMatches("Comp: ¥6M - 13 base");
+
+  expect(matches).toEqual([
+    {
+      raw: "¥6M - 13 ",
+      start: 6,
+      end: 15,
+      value: 6_000_000,
+      rangeEndValue: 13_000_000,
+      currency: "JPY",
+    },
+  ]);
+});
+
+test("extractCurrencyTextMatches keeps locale range facts in input order", () => {
+  const matches = extractCurrencyTextMatches("Listing: ₫ 3.65 - 4.2 tỷ now");
+
+  expect(matches).toEqual([
+    {
+      raw: "₫ 3.65 - 4.2 tỷ",
+      start: 9,
+      end: 24,
+      value: 3_650_000_000,
+      rangeEndValue: 4_200_000_000,
+      currency: "VND",
+    },
+  ]);
 });
 
 test("extractCurrencyTextMatches preserves dual-token range parity", () => {
