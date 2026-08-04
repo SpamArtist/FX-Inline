@@ -45,3 +45,7 @@ export function formatAmountInCurrency(amount, currency, options) {
 
   return formatter.format(amount);
 }
+
+export function __clearCurrencyFormatterCacheForTests() {
+  currencyFormatterCache.clear();
+}

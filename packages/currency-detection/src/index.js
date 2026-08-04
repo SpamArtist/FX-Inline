@@ -4,6 +4,10 @@ export { createCurrencyParser };
 
 const defaultParser = createCurrencyParser();
 
+export function __clearDefaultParserCachesForTests() {
+  defaultParser.__clearCachesForTests?.();
+}
+
 export function parseCurrencyValue(input, options) {
   return defaultParser.parseValue(input, options);
 }
