@@ -4,8 +4,6 @@ import { convertVisiblePrices } from "./core/convertVisiblePrices.js";
 import { INLINE_CONVERSION_CLASS } from "./core/constants.js";
 import {
   __clearCurrencyFormatterCacheForTests,
-  __startCurrencyFormatterPerfCaptureForTests,
-  __stopCurrencyFormatterPerfCaptureForTests,
   formatAmountInCurrency,
 } from "./formatting.js";
 import {
@@ -30,8 +28,6 @@ export {
   INLINE_CONVERSION_CLASS,
   formatAmountInCurrency,
   __clearCurrencyFormatterCacheForTests,
-  __startCurrencyFormatterPerfCaptureForTests,
-  __stopCurrencyFormatterPerfCaptureForTests,
   AMAZON_STRUCTURED_DETECTOR_PRE_PLUGIN_NAME,
   AMAZON_STRUCTURED_ADDON_PLUGIN_NAME,
   amazonStructuredDetectorPrePlugin,

@@ -120,7 +120,6 @@ test("apts.jp performance fixture keeps all network assets blocked", () => {
 
 test("apts.jp performance fixture matches exact full conversion DOM", () => {
   const document = loadFixtureDocument();
-  const samples = [];
 
   const applied = convertVisiblePrices(
     metadata.settings.targetCurrency,
@@ -142,34 +141,10 @@ test("apts.jp performance fixture matches exact full conversion DOM", () => {
           displayStyle: metadata.settings.displayStyle,
         },
       },
-      onPerfSample: (sample) => samples.push(sample),
     },
   );
 
   expect(applied).toBe(metadata.expectedConversionCount);
   expect(collectConversions(document)).toEqual(metadata.expectedConversions);
-  expect({
-    visitedTextNodes: samples[0].visitedTextNodes,
-    acceptedCandidates: samples[0].acceptedCandidates,
-    scannedTextNodes: samples[0].scannedTextNodes,
-    conversionsApplied: samples[0].conversionsApplied,
-    reachedNodeLimit: samples[0].reachedNodeLimit,
-  }).toEqual(metadata.expectedPerfCounters);
-  expect(samples[0]).toEqual(
-    expect.objectContaining({
-      setupMs: expect.any(Number),
-      discoveryMs: expect.any(Number),
-      analysisMs: expect.any(Number),
-      renderMs: expect.any(Number),
-      totalMs: expect.any(Number),
-    }),
-  );
-  expect(samples[0].totalMs).toBeCloseTo(
-    samples[0].setupMs +
-      samples[0].discoveryMs +
-      samples[0].analysisMs +
-      samples[0].renderMs,
-    8,
-  );
   expect(`${document.documentElement.outerHTML}\n`).toBe(expectedDom);
 });

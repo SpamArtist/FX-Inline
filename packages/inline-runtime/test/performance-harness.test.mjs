@@ -42,7 +42,7 @@ test("full conversion performance harness writes comparable offline report", () 
 
   expect(report).toEqual(
     expect.objectContaining({
-      schemaVersion: 1,
+      schemaVersion: 2,
       reportType: "full-conversion-performance",
       label: "baseline",
       informationOnly: true,
@@ -53,7 +53,7 @@ test("full conversion performance harness writes comparable offline report", () 
       cold: expect.stringContaining("Clear parser"),
       warm: expect.stringContaining("reuse parser"),
       domReset: expect.stringContaining("fixed input"),
-      formatterBreakdown: expect.stringContaining("currency formatter cache lookup"),
+      measurement: expect.stringContaining("outside production runtime code"),
       verification: expect.stringContaining("exact expected DOM"),
       timeLimit: "No pass/fail time threshold.",
     }),
@@ -71,32 +71,6 @@ test("full conversion performance harness writes comparable offline report", () 
       median: expect.any(Number),
       p95: expect.any(Number),
     });
-    for (const phase of ["setupMs", "discoveryMs", "analysisMs", "renderMs"]) {
-      expect(report.summary[mode].phases[phase]).toEqual({
-        median: expect.any(Number),
-        p95: expect.any(Number),
-      });
-    }
-    for (const metric of [
-      "cacheLookupMs",
-      "formatterConstructionMs",
-      "formatCallMs",
-    ]) {
-      expect(report.summary[mode].formatter[metric]).toEqual({
-        median: expect.any(Number),
-        p95: expect.any(Number),
-      });
-    }
-    expect(report.summary[mode].formatter.counts).toEqual(
-      expect.objectContaining({
-        cacheLookupCount: expect.any(Number),
-        formatterConstructionCount: expect.any(Number),
-        formatCallCount: expect.any(Number),
-        cacheHits: expect.any(Number),
-        cacheMisses: expect.any(Number),
-        fallbackCount: expect.any(Number),
-      }),
-    );
     expect(report.samples[mode]).toHaveLength(2);
   }
   expect(report.fixture.expectedConversionCount).toBe(37);

@@ -3,13 +3,12 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import process from "node:process";
+import { performance } from "node:perf_hooks";
 import { fileURLToPath } from "node:url";
 import { JSDOM } from "jsdom";
 import { __clearDefaultParserCachesForTests } from "@fx-inline/currency-detection";
 import {
   __clearCurrencyFormatterCacheForTests,
-  __startCurrencyFormatterPerfCaptureForTests,
-  __stopCurrencyFormatterPerfCaptureForTests,
   convertVisiblePrices,
 } from "../src/index.js";
 
@@ -23,12 +22,6 @@ const fixtureDir = path.join(
   "apts-jp-first-page",
 );
 const repoRoot = path.resolve(__dirname, "..", "..", "..");
-const phaseNames = ["setupMs", "discoveryMs", "analysisMs", "renderMs"];
-const formatterMetricNames = [
-  "cacheLookupMs",
-  "formatterConstructionMs",
-  "formatCallMs",
-];
 
 function parseArgs(argv) {
   const args = {
@@ -144,43 +137,30 @@ function clearMeasuredCaches() {
 
 function runConversion(fixture, mode, runIndex, measured) {
   const dom = loadFixtureDocument(fixture.inputHtml);
-  const samples = [];
-  let formatterPerf = null;
-  let applied = 0;
-
-  if (measured) {
-    __startCurrencyFormatterPerfCaptureForTests();
-  }
-
-  try {
-    applied = convertVisiblePrices(
-      fixture.metadata.settings.targetCurrency,
-      {
-        base: fixture.metadata.ratesBase,
-        fetchedAt: fixture.metadata.ratesFetchedAt,
-        source: "apts.jp fixture fixed rates",
-        rates: fixture.metadata.rates,
-      },
-      document.body,
-      {
-        clearExisting: fixture.metadata.settings.clearExisting,
-        includeDefaultPrePlugins: fixture.metadata.settings.includeDefaultPrePlugins,
-        includeDefaultPostPlugins: fixture.metadata.settings.includeDefaultPostPlugins,
-        clientRenderPreferences: {
-          default: {
-            convertedCurrencyPosition:
-              fixture.metadata.settings.convertedCurrencyPosition,
-            displayStyle: fixture.metadata.settings.displayStyle,
-          },
+  const startedAt = measured ? performance.now() : 0;
+  const applied = convertVisiblePrices(
+    fixture.metadata.settings.targetCurrency,
+    {
+      base: fixture.metadata.ratesBase,
+      fetchedAt: fixture.metadata.ratesFetchedAt,
+      source: "apts.jp fixture fixed rates",
+      rates: fixture.metadata.rates,
+    },
+    document.body,
+    {
+      clearExisting: fixture.metadata.settings.clearExisting,
+      includeDefaultPrePlugins: fixture.metadata.settings.includeDefaultPrePlugins,
+      includeDefaultPostPlugins: fixture.metadata.settings.includeDefaultPostPlugins,
+      clientRenderPreferences: {
+        default: {
+          convertedCurrencyPosition:
+            fixture.metadata.settings.convertedCurrencyPosition,
+          displayStyle: fixture.metadata.settings.displayStyle,
         },
-        onPerfSample: (sample) => samples.push(sample),
       },
-    );
-  } finally {
-    if (measured) {
-      formatterPerf = __stopCurrencyFormatterPerfCaptureForTests();
-    }
-  }
+    },
+  );
+  const totalMs = measured ? performance.now() - startedAt : 0;
 
   const actualDom = `${document.documentElement.outerHTML}\n`;
   if (applied !== fixture.metadata.expectedConversionCount) {
@@ -191,17 +171,12 @@ function runConversion(fixture, mode, runIndex, measured) {
   if (actualDom !== fixture.expectedDom) {
     throw new Error(`${mode} run ${runIndex} DOM mismatch.`);
   }
-  if (samples.length !== 1) {
-    throw new Error(`${mode} run ${runIndex} captured ${samples.length} perf samples.`);
-  }
-
   dom.window.close();
   return measured
     ? {
         mode,
         runIndex,
-        ...samples[0],
-        formatterPerf,
+        totalMs,
       }
     : null;
 }
@@ -216,65 +191,14 @@ function percentile(values, percentileValue) {
   return sorted[index];
 }
 
-function summarizeMetric(samples, metricName) {
-  const values = samples.map((sample) => sample.formatterPerf[metricName]);
-  return {
-    median: percentile(values, 50),
-    p95: percentile(values, 95),
-  };
-}
-
-function summarizeFormatterSamples(samples) {
-  const metricSummary = Object.fromEntries(
-    formatterMetricNames.map((metricName) => [
-      metricName,
-      summarizeMetric(samples, metricName),
-    ]),
-  );
-
-  return {
-    ...metricSummary,
-    counts: {
-      cacheLookupCount: samples[0]?.formatterPerf.cacheLookupCount ?? null,
-      formatterConstructionCount:
-        samples[0]?.formatterPerf.formatterConstructionCount ?? null,
-      formatCallCount: samples[0]?.formatterPerf.formatCallCount ?? null,
-      cacheHits: samples[0]?.formatterPerf.cacheHits ?? null,
-      cacheMisses: samples[0]?.formatterPerf.cacheMisses ?? null,
-      fallbackCount: samples[0]?.formatterPerf.fallbackCount ?? null,
-    },
-  };
-}
-
 function summarizeSamples(samples) {
   const totalValues = samples.map((sample) => sample.totalMs);
-  const phases = Object.fromEntries(
-    phaseNames.map((phaseName) => {
-      const values = samples.map((sample) => sample[phaseName]);
-      return [
-        phaseName,
-        {
-          median: percentile(values, 50),
-          p95: percentile(values, 95),
-        },
-      ];
-    }),
-  );
 
   return {
     runs: samples.length,
     totalMs: {
       median: percentile(totalValues, 50),
       p95: percentile(totalValues, 95),
-    },
-    phases,
-    formatter: summarizeFormatterSamples(samples),
-    counters: {
-      visitedTextNodes: samples[0]?.visitedTextNodes ?? null,
-      acceptedCandidates: samples[0]?.acceptedCandidates ?? null,
-      scannedTextNodes: samples[0]?.scannedTextNodes ?? null,
-      conversionsApplied: samples[0]?.conversionsApplied ?? null,
-      reachedNodeLimit: samples[0]?.reachedNodeLimit ?? null,
     },
   };
 }
@@ -310,7 +234,7 @@ function createReport(args, fixture) {
   }
 
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     reportType: "full-conversion-performance",
     label: args.label,
     generatedAt: new Date().toISOString(),
@@ -321,7 +245,6 @@ function createReport(args, fixture) {
       inputSha256: fixture.inputSha256,
       expectedDomSha256: fixture.expectedDomSha256,
       expectedConversionCount: fixture.metadata.expectedConversionCount,
-      expectedPerfCounters: fixture.metadata.expectedPerfCounters,
       settings: fixture.metadata.settings,
       ratesBase: fixture.metadata.ratesBase,
       ratesFetchedAt: fixture.metadata.ratesFetchedAt,
@@ -330,7 +253,7 @@ function createReport(args, fixture) {
       cold: "Clear parser and currency formatter caches before each measured run.",
       warm: "Clear caches once, run warmups, then reuse parser and currency formatter caches for measured runs.",
       domReset: "Create a new JSDOM document from fixed input before each warmup and measured run.",
-      formatterBreakdown: "Measured runs separately capture currency formatter cache lookup, Intl.NumberFormat construction, and formatter.format call cost inside conversion.",
+      measurement: "Benchmark code measures total conversion time outside production runtime code.",
       verification: "Each measured run must match expected conversion count and exact expected DOM.",
       timeLimit: "No pass/fail time threshold.",
     },
@@ -365,20 +288,6 @@ function printSummary(report, outputPath) {
   console.log(`Label: ${report.label}`);
   console.log(`Cold total median/p95: ${formatMs(cold.median)} / ${formatMs(cold.p95)}`);
   console.log(`Warm total median/p95: ${formatMs(warm.median)} / ${formatMs(warm.p95)}`);
-  for (const mode of ["cold", "warm"]) {
-    const phases = report.summary[mode].phases;
-    const formatter = report.summary[mode].formatter;
-    console.log(
-      `${mode} phases median setup/discovery/analysis/render: ` +
-        phaseNames.map((phaseName) => formatMs(phases[phaseName].median)).join(" / "),
-    );
-    console.log(
-      `${mode} formatter median lookup/construction/format: ` +
-        formatterMetricNames
-          .map((metricName) => formatMs(formatter[metricName].median))
-          .join(" / "),
-    );
-  }
   console.log(
     `Runtime: ${report.runtime.node} ${report.runtime.platform}/${report.runtime.arch}`,
   );

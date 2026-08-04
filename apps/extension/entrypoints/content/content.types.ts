@@ -1,23 +1,6 @@
 import type { UserSettings } from "@/utils/appStorage.types";
 import type { CurrencyCode } from "@/utils/enums";
 
-export type InlineConversionPerfSample = {
-  setupMs: number;
-  discoveryMs: number;
-  analysisMs: number;
-  renderMs: number;
-  totalMs: number;
-  /** Text nodes reached by Candidate Discovery before the accepted-candidate limit stops the walk. */
-  visitedTextNodes: number;
-  /** Text nodes accepted after price-text classification and DOM eligibility checks. */
-  acceptedCandidates: number;
-  /** @deprecated Use acceptedCandidates. Kept as a compatibility alias. */
-  scannedTextNodes: number;
-  conversionsApplied: number;
-  maxNodesPerPass: number;
-  reachedNodeLimit: boolean;
-};
-
 export type ContentConversionRuntime = {
   initialize: () => Promise<void>;
   onSettingsStorageUpdate: (

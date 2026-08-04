@@ -1,9 +1,5 @@
 export const INLINE_PLUGIN_PHASE_PRE = "pre";
 export const INLINE_PLUGIN_PHASE_POST = "post";
-const INLINE_PLUGIN_DEFAULT_PHASE_BY_PLUGIN_PHASE = {
-  [INLINE_PLUGIN_PHASE_PRE]: "discoveryMs",
-  [INLINE_PLUGIN_PHASE_POST]: "renderMs",
-};
 
 function getPluginExecutor(plugin) {
   if (typeof plugin === "function") {
@@ -63,8 +59,6 @@ export function runInlineConversionPlugins(plugins, context, expectedPhase) {
   }
 
   let conversionsApplied = 0;
-  const defaultPerfPhase =
-    INLINE_PLUGIN_DEFAULT_PHASE_BY_PLUGIN_PHASE[expectedPhase] ?? null;
 
   for (const plugin of plugins) {
     const execute = getPluginExecutor(plugin);
@@ -84,9 +78,7 @@ export function runInlineConversionPlugins(plugins, context, expectedPhase) {
     }
 
     try {
-      const result = context.perfPhases?.time && defaultPerfPhase
-        ? context.perfPhases.time(defaultPerfPhase, () => execute(context))
-        : execute(context);
+      const result = execute(context);
       conversionsApplied += normalizeConversionCount(result);
     } catch (error) {
       context.onPluginError?.(error, plugin);

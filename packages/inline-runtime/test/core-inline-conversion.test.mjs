@@ -194,50 +194,16 @@ test("maxNodesPerPass counts accepted candidates in text-heavy pages", () => {
     '<p id="later-price">Pay $200 later.</p>',
   ].join("");
 
-  const samples = [];
   const applied = convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
     clearExisting: false,
     maxNodesPerPass: 1,
-    onPerfSample: (sample) => {
-      samples.push(sample);
-    },
   });
 
   expect(applied).toBe(1);
   expect(document.querySelector(`#price span.${INLINE_CONVERSION_CLASS}`)).not.toBeNull();
   expect(document.querySelector(`#later-price span.${INLINE_CONVERSION_CLASS}`)).toBeNull();
-  expect(samples[0].visitedTextNodes).toBe(201);
-  expect(samples[0].acceptedCandidates).toBe(1);
-  expect(samples[0].scannedTextNodes).toBe(1);
-  expect(samples[0].reachedNodeLimit).toBe(true);
 });
 
-test("perf sample counts visited nodes separately from accepted candidates", () => {
-  document.body.innerHTML = [
-    '<p id="copy">Plain copy before prices.</p>',
-    '<p id="hidden" hidden>$10 hidden</p>',
-    '<p id="price">Pay $100 now.</p>',
-    '<p id="later-price">Pay $200 later.</p>',
-  ].join("");
-
-  const samples = [];
-  const applied = convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
-    clearExisting: false,
-    maxNodesPerPass: 1,
-    onPerfSample: (sample) => {
-      samples.push(sample);
-    },
-  });
-
-  expect(applied).toBe(1);
-  expect(document.querySelector(`#hidden span.${INLINE_CONVERSION_CLASS}`)).toBeNull();
-  expect(document.querySelector(`#price span.${INLINE_CONVERSION_CLASS}`)).not.toBeNull();
-  expect(document.querySelector(`#later-price span.${INLINE_CONVERSION_CLASS}`)).toBeNull();
-  expect(samples[0].visitedTextNodes).toBe(3);
-  expect(samples[0].acceptedCandidates).toBe(1);
-  expect(samples[0].scannedTextNodes).toBe(samples[0].acceptedCandidates);
-  expect(samples[0].reachedNodeLimit).toBe(true);
-});
 
 test("injects style tag with converted amount line-height and width contract", () => {
   document.body.innerHTML = '<p id="price">Pay $100 now.</p>';
@@ -934,36 +900,4 @@ test("little hotelier pricing renderer ignores non-pricing DOM", () => {
   convertLittleHotelierPricing("EUR", createRateSnapshot());
 
   expect(getLittleHotelierAddons()).toHaveLength(0);
-});
-
-test("reports perf sample shape with reached node limit", () => {
-  document.body.innerHTML = "<p>$100</p><p>$200</p><p>$300</p>";
-
-  const samples = [];
-  const applied = convertVisiblePrices("EUR", createRateSnapshot(), document.body, {
-    clearExisting: false,
-    maxNodesPerPass: 1,
-    onPerfSample: (sample) => {
-      samples.push(sample);
-    },
-  });
-
-  expect(samples).toHaveLength(1);
-
-  const sample = samples[0];
-  expect(sample.maxNodesPerPass).toBe(1);
-  expect(sample.visitedTextNodes).toBe(1);
-  expect(sample.acceptedCandidates).toBe(1);
-  expect(sample.scannedTextNodes).toBe(1);
-  expect(sample.reachedNodeLimit).toBe(true);
-  expect(sample.conversionsApplied).toBe(applied);
-  expect(sample.setupMs).toBeGreaterThanOrEqual(0);
-  expect(sample.discoveryMs).toBeGreaterThanOrEqual(0);
-  expect(sample.analysisMs).toBeGreaterThanOrEqual(0);
-  expect(sample.renderMs).toBeGreaterThanOrEqual(0);
-  expect(sample.totalMs).toBeGreaterThanOrEqual(0);
-  expect(sample.totalMs).toBeCloseTo(
-    sample.setupMs + sample.discoveryMs + sample.analysisMs + sample.renderMs,
-    8,
-  );
 });

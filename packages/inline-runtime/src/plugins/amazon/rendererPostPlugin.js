@@ -25,11 +25,6 @@ export const AMAZON_STRUCTURED_ADDON_PLUGIN_NAME = "amazon-structured-addon";
 const AMAZON_SITE_RENDER_KEY = "amazon";
 const WRAPPER_CLASS_PREF_ATTR = "data-fx-inline-pref-wrapper-classes";
 const CONVERTED_CLASS_PREF_ATTR = "data-fx-inline-pref-converted-classes";
-const NOOP_PERF_PHASES = {
-  time(_phase, callback) {
-    return callback();
-  },
-};
 
 function parseClassNames(classNameText) {
   if (typeof classNameText !== "string") return [];
@@ -137,21 +132,15 @@ export const amazonStructuredRendererPostPlugin = {
     baseCurrency,
     clientRenderPreferences,
     passContext,
-    perfPhases = NOOP_PERF_PHASES,
   }) {
-    const candidates = perfPhases.time(
-      "discoveryMs",
-      () =>
-        getCandidateRoots({
-          root,
-          passContext,
-        }),
-    );
+    const candidates = getCandidateRoots({
+      root,
+      passContext,
+    });
     if (!candidates.length) return 0;
 
-    const renderPreferences = perfPhases.time(
-      "setupMs",
-      () => resolveAmazonRenderPreferences(clientRenderPreferences),
+    const renderPreferences = resolveAmazonRenderPreferences(
+      clientRenderPreferences,
     );
 
     let conversionsApplied = 0;
@@ -159,96 +148,70 @@ export const amazonStructuredRendererPostPlugin = {
     for (const candidate of candidates) {
       const hostNode = candidate?.hostNode;
       if (!(hostNode instanceof Element)) continue;
-      const isEligible = perfPhases.time(
-        "discoveryMs",
-        () =>
-          hostNode.isConnected &&
-          root.contains(hostNode) &&
-          !hostNode.closest(`.${INLINE_CONVERSION_CLASS}`),
-      );
-      if (!isEligible) continue;
+      if (!hostNode.isConnected) continue;
+      if (!root.contains(hostNode)) continue;
+      if (hostNode.closest(`.${INLINE_CONVERSION_CLASS}`)) continue;
 
-      const rawPrice = perfPhases.time(
-        "discoveryMs",
-        () =>
-          getAmazonStructuredRawPrice(hostNode) ??
-          candidate.detectedRawPrice ??
-          null,
-      );
-      const existingAddon = perfPhases.time(
-        "discoveryMs",
-        () => getInlineAddonNode(hostNode),
-      );
+      const rawPrice =
+        getAmazonStructuredRawPrice(hostNode) ??
+        candidate.detectedRawPrice ??
+        null;
+      const existingAddon = getInlineAddonNode(hostNode);
 
       if (!rawPrice || !mayContainCurrencyToken(rawPrice)) {
-        perfPhases.time("renderMs", () => {
-          existingAddon?.remove();
-        });
+        existingAddon?.remove();
         continue;
       }
 
-      const matched = perfPhases.time("analysisMs", () => {
-        const parsed = extractCurrencyTextMatches(rawPrice, localeHint);
-        return parsed.find((item) => item.raw === rawPrice) || parsed[0];
-      });
+      const parsed = extractCurrencyTextMatches(rawPrice, localeHint);
+      const matched = parsed.find((item) => item.raw === rawPrice) || parsed[0];
       if (!matched) {
-        perfPhases.time("renderMs", () => {
-          existingAddon?.remove();
-        });
+        existingAddon?.remove();
         continue;
       }
 
-      const convertedAmount = perfPhases.time(
-        "analysisMs",
-        () =>
-          getConvertedAmountText(
-            matched,
-            preferredCurrency,
-            rateSnapshot,
-            localeHint,
-            baseCurrency,
-          ),
+      const convertedAmount = getConvertedAmountText(
+        matched,
+        preferredCurrency,
+        rateSnapshot,
+        localeHint,
+        baseCurrency,
       );
       if (!convertedAmount) {
-        perfPhases.time("renderMs", () => {
-          existingAddon?.remove();
-        });
+        existingAddon?.remove();
         continue;
       }
 
-      conversionsApplied += perfPhases.time("renderMs", () => {
-        const previousOriginal = existingAddon?.getAttribute("data-original") ?? null;
-        const previousConverted =
-          existingAddon?.querySelector(".fx-inline-converted-amount")?.textContent ?? null;
+      const previousOriginal = existingAddon?.getAttribute("data-original") ?? null;
+      const previousConverted =
+        existingAddon?.querySelector(".fx-inline-converted-amount")?.textContent ?? null;
 
-        const wrapper = existingAddon ?? document.createElement("span");
-        wrapper.className = INLINE_CONVERSION_CLASS;
-        wrapper.setAttribute("data-fx-inline-mode", INLINE_CONVERSION_ADDON_MODE);
-        wrapper.setAttribute("data-original", rawPrice);
-        if (renderPreferences.colorStrategy === "inherit") {
-          wrapper.style.setProperty("--fx-inline-converted-color", "currentColor");
-        } else {
-          applyConvertedAmountColor(
-            wrapper,
-            usesLightTextColorForElement(hostNode, lightTextCache),
-          );
-        }
-        applyRenderPreferences(wrapper, rawPrice, convertedAmount, renderPreferences);
+      const wrapper = existingAddon ?? document.createElement("span");
+      wrapper.className = INLINE_CONVERSION_CLASS;
+      wrapper.setAttribute("data-fx-inline-mode", INLINE_CONVERSION_ADDON_MODE);
+      wrapper.setAttribute("data-original", rawPrice);
+      if (renderPreferences.colorStrategy === "inherit") {
+        wrapper.style.setProperty("--fx-inline-converted-color", "currentColor");
+      } else {
+        applyConvertedAmountColor(
+          wrapper,
+          usesLightTextColorForElement(hostNode, lightTextCache),
+        );
+      }
+      applyRenderPreferences(wrapper, rawPrice, convertedAmount, renderPreferences);
 
-        if (!existingAddon) {
-          hostNode.appendChild(wrapper);
-          return 1;
-        }
+      if (!existingAddon) {
+        hostNode.appendChild(wrapper);
+        conversionsApplied += 1;
+        continue;
+      }
 
-        if (
-          previousOriginal !== rawPrice ||
-          !previousConverted?.includes(convertedAmount)
-        ) {
-          return 1;
-        }
-
-        return 0;
-      });
+      if (
+        previousOriginal !== rawPrice ||
+        !previousConverted?.includes(convertedAmount)
+      ) {
+        conversionsApplied += 1;
+      }
     }
 
     return conversionsApplied;

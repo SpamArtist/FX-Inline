@@ -126,19 +126,13 @@ function withAncestorSearchCount(callback) {
 }
 
 function runCurrentCandidateDiscovery(root) {
-  const samples = [];
   const conversions = convertVisiblePrices("EUR", createRateSnapshot(), root, {
     clearExisting: false,
     includeDefaultPrePlugins: false,
     includeDefaultPostPlugins: false,
-    onPerfSample: (sample) => {
-      samples.push(sample);
-    },
   });
 
   return {
-    visitedTextNodes: samples[0].visitedTextNodes,
-    acceptedCandidates: samples[0].acceptedCandidates,
     conversions,
   };
 }
@@ -225,8 +219,6 @@ test("compares current Candidate Discovery operation counts against legacy order
   );
 
   expect(newResult).toEqual({
-    visitedTextNodes: oldResult.visitedTextNodes,
-    acceptedCandidates: oldResult.acceptedCandidates,
     conversions: oldResult.conversions,
     ancestorSearches: 7,
   });

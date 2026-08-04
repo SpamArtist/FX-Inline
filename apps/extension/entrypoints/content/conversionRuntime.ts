@@ -16,7 +16,6 @@ import {
   hydrateSettingsAndRates,
   refreshSettingsAndRates,
 } from "./conversionRuntime/hydration";
-import { createRuntimePerfContext } from "./conversionRuntime/logging";
 import { clearTimer } from "./conversionRuntime/timers";
 import { getContentRuntimeSitePluginOptions } from "./sitePlugins";
 import { createInlineRuntime } from "@fx-inline/inline-runtime/extension";
@@ -31,12 +30,6 @@ function isExtensionContextInvalidatedError(error: unknown): boolean {
 }
 
 export function createContentConversionRuntime(): ContentConversionRuntime {
-  const {
-    perfLoggingEnabled,
-    logPerf,
-    roundMs,
-    logSettingsStorageUpdate,
-  } = createRuntimePerfContext("fx-inline");
   let settings: UserSettings | null = null;
   let resolvedSettings: ResolvedInlineRuntimeSettings | null = null;
   let rateSnapshot: RateSnapshot | null = null;
@@ -56,22 +49,6 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
     enabled: false,
     autoFetchRates: false,
     ...sitePluginOptions,
-    onPerfSample: perfLoggingEnabled
-      ? (sample) => {
-        logPerf("inlineConversion.full", {
-          setupMs: roundMs(sample.setupMs),
-          discoveryMs: roundMs(sample.discoveryMs),
-          analysisMs: roundMs(sample.analysisMs),
-          renderMs: roundMs(sample.renderMs),
-          totalMs: roundMs(sample.totalMs),
-          visitedTextNodes: sample.visitedTextNodes,
-          acceptedCandidates: sample.acceptedCandidates,
-          scannedTextNodes: sample.scannedTextNodes,
-          conversions: sample.conversionsApplied,
-          reachedNodeLimit: sample.reachedNodeLimit,
-        });
-      }
-      : undefined,
     onError: (error) => {
       if (isExtensionContextInvalidatedError(error)) return;
       console.warn("[fx-inline] Inline runtime error", error);
@@ -129,12 +106,8 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
     }
   }
 
-  async function refreshRuntimeSettingsAndRates(forceRefresh = false) {
+  async function refreshRuntimeSettingsAndRates() {
     await refreshSettingsAndRates({
-      forceRefresh,
-      perfLoggingEnabled,
-      logPerf,
-      roundMs,
       setSettings,
       setRateSnapshot,
     });
@@ -174,7 +147,7 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
       settingsRefreshTimer = null;
       if (isCleanedUp) return;
 
-      void refreshRuntimeSettingsAndRates(false)
+      void refreshRuntimeSettingsAndRates()
         .then(() => {
           if (isCleanedUp) return;
           applyInlineRuntimeState();
@@ -212,8 +185,6 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
     oldSettings?: UserSettings | null,
   ) {
     if (isCleanedUp) return;
-    const startedAt = performance.now();
-
     const nextSettings = isUserSettingsSnapshot(newSettings)
       ? newSettings
       : await getUserSettings();
@@ -229,13 +200,6 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
       JSON.stringify(nextResolved.settings);
 
     if (didResolvedSettingsChange) {
-      logSettingsStorageUpdate(startedAt, {
-        refreshed: true,
-        missingRateSnapshot: rateSnapshot === null,
-        preferredCurrencyChanged:
-          getPrimaryTargetCurrency(previousResolved?.settings ?? nextResolved.settings) !==
-          getPrimaryTargetCurrency(nextResolved.settings),
-      });
       settings = nextSettings;
       resolvedSettings = nextResolved;
       scheduleSettingsRefresh();
@@ -245,12 +209,6 @@ export function createContentConversionRuntime(): ContentConversionRuntime {
     settings = nextSettings;
     resolvedSettings = nextResolved;
     applyInlineRuntimeState();
-
-    logSettingsStorageUpdate(startedAt, {
-      refreshed: false,
-      missingRateSnapshot: rateSnapshot === null,
-      preferredCurrencyChanged: false,
-    });
   }
 
   function enqueueMutationRoots(roots: ParentNode[]) {

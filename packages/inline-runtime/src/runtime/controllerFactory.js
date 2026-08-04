@@ -105,7 +105,6 @@ export function createInlineRuntimeController(options = {}, loadRates) {
       convertVisiblePrices(preferredCurrency, snapshot, root, {
         clearExisting: false,
         refreshExisting: true,
-        onPerfSample: options.onPerfSample,
         onNodeLimitReached: options.onNodeLimitReached,
         includeDefaultPrePlugins: options.includeDefaultPrePlugins,
         prePlugins: options.prePlugins,
@@ -170,7 +169,6 @@ export function createInlineRuntimeController(options = {}, loadRates) {
           {
             timeBudgetMs: PARTIAL_CONVERSION_TIME_BUDGET_MS,
             maxNodesPerPass: PARTIAL_CONVERSION_MAX_NODES_PER_PASS,
-            onPerfSample: options.onPerfSample,
             includeDefaultPrePlugins: options.includeDefaultPrePlugins,
             prePlugins: options.prePlugins,
             postPlugins: options.postPlugins,

@@ -19,12 +19,6 @@ import {
 } from "./priceTextClassification.js";
 import { usesLightTextColor } from "./textColor.js";
 
-const NOOP_PERF_PHASES = {
-  time(_phase, callback) {
-    return callback();
-  },
-};
-
 function areParsedValuesEqual(left, right) {
   const delta = Math.abs(left - right);
   const tolerance = Number.EPSILON * Math.max(1, Math.abs(left), Math.abs(right)) * 4;
@@ -115,108 +109,81 @@ function decorateSplitSiblingPriceInTextNode(
   passId,
   baseCurrency,
   renderPreferences,
-  perfPhases = NOOP_PERF_PHASES,
 ) {
-  const amountRoot = perfPhases.time("discoveryMs", () => textNode.parentElement);
-  if (!amountRoot) return 0;
-  const shouldSkip = perfPhases.time(
-    "discoveryMs",
-    () =>
-      Boolean(amountRoot.closest(`.${INLINE_CONVERSION_CLASS}`)) ||
-      Boolean(amountRoot.closest('[aria-hidden="true"]')),
-  );
-  if (shouldSkip) return 0;
+  const amountRoot = textNode.parentElement;
+  if (!amountRoot || amountRoot.closest(`.${INLINE_CONVERSION_CLASS}`)) return 0;
+  if (amountRoot.closest('[aria-hidden="true"]')) return 0;
 
-  const rawPrice = perfPhases.time(
-    "discoveryMs",
-    () => getSplitSiblingRawPrice(textNode, amountText, localeHint),
-  );
-  const existingAddon = perfPhases.time(
-    "discoveryMs",
-    () => getInlineAddonNode(amountRoot),
-  );
+  const rawPrice = getSplitSiblingRawPrice(textNode, amountText, localeHint);
+  const existingAddon = getInlineAddonNode(amountRoot);
   if (!rawPrice) {
-    perfPhases.time("renderMs", () => {
-      existingAddon?.remove();
-    });
+    existingAddon?.remove();
     return 0;
   }
 
-  const matched = perfPhases.time("analysisMs", () => {
-    const parsed = extractCurrencyTextMatches(rawPrice, localeHint);
-    return parsed.find((item) => item.raw === rawPrice) || parsed[0];
-  });
+  const parsed = extractCurrencyTextMatches(rawPrice, localeHint);
+  const matched = parsed.find((item) => item.raw === rawPrice) || parsed[0];
   if (!matched) {
-    perfPhases.time("renderMs", () => {
-      existingAddon?.remove();
-    });
+    existingAddon?.remove();
     return 0;
   }
 
-  const convertedAmount = perfPhases.time(
-    "analysisMs",
-    () =>
-      getConvertedAmountText(
-        matched,
-        preferredCurrency,
-        rateSnapshot,
-        localeHint,
-        baseCurrency,
-      ),
+  const convertedAmount = getConvertedAmountText(
+    matched,
+    preferredCurrency,
+    rateSnapshot,
+    localeHint,
+    baseCurrency,
   );
   if (!convertedAmount) {
-    perfPhases.time("renderMs", () => {
-      existingAddon?.remove();
-    });
+    existingAddon?.remove();
     return 0;
   }
 
-  return perfPhases.time("renderMs", () => {
-    const previousOriginal = existingAddon?.getAttribute("data-original") ?? null;
-    const previousConverted =
-      existingAddon?.querySelector(".fx-inline-converted-amount")?.textContent ?? null;
+  const previousOriginal = existingAddon?.getAttribute("data-original") ?? null;
+  const previousConverted =
+    existingAddon?.querySelector(".fx-inline-converted-amount")?.textContent ?? null;
 
-    const wrapper = existingAddon ?? document.createElement("span");
-    wrapper.className = INLINE_CONVERSION_CLASS;
-    wrapper.setAttribute("data-fx-inline-mode", INLINE_CONVERSION_ADDON_MODE);
-    wrapper.setAttribute("data-original", rawPrice);
-    applyConvertedAmountColor(
-      wrapper,
-      usesLightTextColor(textNode, lightTextCache),
-    );
-    setInlineConversionContent(wrapper, convertedAmount, {
-      renderPreferences,
-    });
-
-    if (!existingAddon) {
-      amountRoot.appendChild(wrapper);
-      pushCoreConversionEvent(passContext, passId, {
-        source: "split-sibling",
-        rawPrice,
-        convertedAmount,
-        hostNode: amountRoot,
-        wrapperNode: wrapper,
-      });
-      return 1;
-    }
-
-    if (
-      previousOriginal !== rawPrice ||
-      !previousConverted?.includes(convertedAmount)
-    ) {
-      pushCoreConversionEvent(passContext, passId, {
-        source: "split-sibling",
-        rawPrice,
-        convertedAmount,
-        hostNode: amountRoot,
-        wrapperNode: wrapper,
-        refreshed: true,
-      });
-      return 1;
-    }
-
-    return 0;
+  const wrapper = existingAddon ?? document.createElement("span");
+  wrapper.className = INLINE_CONVERSION_CLASS;
+  wrapper.setAttribute("data-fx-inline-mode", INLINE_CONVERSION_ADDON_MODE);
+  wrapper.setAttribute("data-original", rawPrice);
+  applyConvertedAmountColor(
+    wrapper,
+    usesLightTextColor(textNode, lightTextCache),
+  );
+  setInlineConversionContent(wrapper, convertedAmount, {
+    renderPreferences,
   });
+
+  if (!existingAddon) {
+    amountRoot.appendChild(wrapper);
+    pushCoreConversionEvent(passContext, passId, {
+      source: "split-sibling",
+      rawPrice,
+      convertedAmount,
+      hostNode: amountRoot,
+      wrapperNode: wrapper,
+    });
+    return 1;
+  }
+
+  if (
+    previousOriginal !== rawPrice ||
+    !previousConverted?.includes(convertedAmount)
+  ) {
+    pushCoreConversionEvent(passContext, passId, {
+      source: "split-sibling",
+      rawPrice,
+      convertedAmount,
+      hostNode: amountRoot,
+      wrapperNode: wrapper,
+      refreshed: true,
+    });
+    return 1;
+  }
+
+  return 0;
 }
 
 export function decoratePricesInTextNode(
@@ -229,10 +196,9 @@ export function decoratePricesInTextNode(
   passId,
   baseCurrency,
   renderPreferences,
-  perfPhases = NOOP_PERF_PHASES,
 ) {
   const { textNode, kind, text: acceptedText } = acceptedCandidate;
-  const text = perfPhases.time("discoveryMs", () => textNode.nodeValue);
+  const text = textNode.nodeValue;
 
   if (kind === PRICE_TEXT_CLASS_AMOUNT_ONLY) {
     return decorateSplitSiblingPriceInTextNode(
@@ -246,79 +212,59 @@ export function decoratePricesInTextNode(
       passId,
       baseCurrency,
       renderPreferences,
-      perfPhases,
     );
   }
 
   if (kind !== PRICE_TEXT_CLASS_DIRECT_CURRENCY) return 0;
 
-  const matches = perfPhases.time(
-    "analysisMs",
-    () => extractCurrencyTextMatches(acceptedText, localeHint),
-  );
+  const matches = extractCurrencyTextMatches(acceptedText, localeHint);
   if (!matches.length) return 0;
 
-  const lightTextContext = perfPhases.time(
-    "analysisMs",
-    () => usesLightTextColor(textNode, lightTextCache),
-  );
+  const lightTextContext = usesLightTextColor(textNode, lightTextCache);
 
   let cursor = 0;
   let conversionsApplied = 0;
-  const fragment = perfPhases.time(
-    "renderMs",
-    () => document.createDocumentFragment(),
-  );
+  const fragment = document.createDocumentFragment();
 
   for (const match of matches) {
     if (match.start < cursor) continue;
 
-    perfPhases.time("renderMs", () => {
-      fragment.append(text.slice(cursor, match.start));
-    });
+    fragment.append(text.slice(cursor, match.start));
 
-    const convertedAmount = perfPhases.time(
-      "analysisMs",
-      () =>
-        getConvertedAmountText(
-          match,
-          preferredCurrency,
-          rateSnapshot,
-          localeHint,
-          baseCurrency,
-        ),
+    const convertedAmount = getConvertedAmountText(
+      match,
+      preferredCurrency,
+      rateSnapshot,
+      localeHint,
+      baseCurrency,
     );
     if (!convertedAmount) {
-      perfPhases.time("renderMs", () => {
-        fragment.append(match.raw);
-      });
+      fragment.append(match.raw);
       cursor = match.end;
       continue;
     }
 
-    perfPhases.time("renderMs", () => {
-      const wrapper = document.createElement("span");
-      wrapper.className = INLINE_CONVERSION_CLASS;
-      wrapper.setAttribute("data-original", match.raw);
-      applyConvertedAmountColor(wrapper, lightTextContext);
+    const wrapper = document.createElement("span");
+    wrapper.className = INLINE_CONVERSION_CLASS;
+    wrapper.setAttribute("data-original", match.raw);
+    applyConvertedAmountColor(wrapper, lightTextContext);
 
-      setInlineConversionContent(wrapper, convertedAmount, {
-        originalText: match.raw,
-        renderPreferences,
-      });
+    setInlineConversionContent(wrapper, convertedAmount, {
+      originalText: match.raw,
+      renderPreferences,
+    });
 
-      fragment.append(wrapper);
-      pushCoreConversionEvent(passContext, passId, {
-        source: "text-node",
-        rawPrice: match.raw,
-        convertedAmount,
-        hostNode: textNode.parentElement,
-        wrapperNode: wrapper,
-        textRange: {
-          start: match.start,
-          end: match.end,
-        },
-      });
+    fragment.append(wrapper);
+    pushCoreConversionEvent(passContext, passId, {
+      source: "text-node",
+      rawPrice: match.raw,
+      convertedAmount,
+      hostNode: textNode.parentElement,
+      wrapperNode: wrapper,
+      textRange: {
+        start: match.start,
+        end: match.end,
+      },
     });
     cursor = match.end;
     conversionsApplied += 1;
@@ -326,10 +272,8 @@ export function decoratePricesInTextNode(
 
   if (conversionsApplied === 0) return 0;
 
-  perfPhases.time("renderMs", () => {
-    fragment.append(text.slice(cursor));
-    textNode.replaceWith(fragment);
-  });
+  fragment.append(text.slice(cursor));
+  textNode.replaceWith(fragment);
 
   return conversionsApplied;
 }

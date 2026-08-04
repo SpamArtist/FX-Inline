@@ -8,29 +8,6 @@ export type RateSnapshotLike = {
   rates: Record<string, number>;
 };
 
-export type InlineConversionPerfSample = {
-  setupMs: number;
-  discoveryMs: number;
-  analysisMs: number;
-  renderMs: number;
-  totalMs: number;
-  /** Text nodes reached by Candidate Discovery before the accepted-candidate limit stops the walk. */
-  visitedTextNodes: number;
-  /** Text nodes accepted after price-text classification and DOM eligibility checks. */
-  acceptedCandidates: number;
-  /** @deprecated Use acceptedCandidates. Kept as a compatibility alias. */
-  scannedTextNodes: number;
-  conversionsApplied: number;
-  maxNodesPerPass: number;
-  reachedNodeLimit: boolean;
-};
-
-export type InlineConversionPerfPhase =
-  | "setupMs"
-  | "discoveryMs"
-  | "analysisMs"
-  | "renderMs";
-
 export type InlineConvertedCurrencyPosition =
   | "top"
   | "bottom"
@@ -81,9 +58,6 @@ export type InlineConversionPluginContext = {
   passId: string;
   passContext: InlinePassContext;
   clientRenderPreferences?: InlineRenderPreferences | null;
-  perfPhases?: {
-    time: <T>(phase: InlineConversionPerfPhase, callback: () => T) => T;
-  };
   onPluginError?: (error: unknown, plugin: InlineConversionPlugin) => void;
 };
 
@@ -124,7 +98,6 @@ export type ConvertVisiblePricesOptions = {
   clearExisting?: boolean;
   refreshExisting?: boolean;
   maxNodesPerPass?: number;
-  onPerfSample?: (sample: InlineConversionPerfSample) => void;
   onNodeLimitReached?: (maxNodesPerPass: number) => void;
   includeDefaultPrePlugins?: boolean;
   prePlugins?: InlineConversionPrePlugin[];
@@ -148,7 +121,6 @@ export type InlineRuntimeOptions = {
   enabled?: boolean;
   observeMutations?: boolean;
   autoFetchRates?: boolean;
-  onPerfSample?: (sample: InlineConversionPerfSample) => void;
   onNodeLimitReached?: (maxNodesPerPass: number) => void;
   includeDefaultPrePlugins?: boolean;
   prePlugins?: InlineConversionPrePlugin[];
