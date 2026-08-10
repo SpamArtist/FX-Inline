@@ -1,0 +1,16 @@
+name: DocX Pull Request Audit Maintenance
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * *"
+
+permissions: {}
+
+jobs:
+  docx-audit-maintenance:
+    name: Refresh Pull Request Audit Artifacts
+    permissions:
+      actions: write
+      pull-requests: write
+    uses: SpamArtist/docx-integration/.github/workflows/reusable-docx-audit-maintenance.yml@31a58b64f62dd3a10be54189af8b3ce798c86685

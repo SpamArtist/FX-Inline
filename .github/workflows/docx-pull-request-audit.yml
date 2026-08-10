@@ -1,0 +1,74 @@
+name: DocX Pull Request Audit
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+    branches:
+      - main
+
+permissions: {}
+
+jobs:
+  build-extension:
+    name: Build Extension Bundle Artifact
+    runs-on: ubuntu-24.04
+    if: >-
+      ${{
+        !github.event.pull_request.draft &&
+        github.event.pull_request.head.repo.full_name == github.event.pull_request.base.repo.full_name &&
+        github.actor != 'dependabot[bot]' &&
+        github.event.pull_request.user.login != 'dependabot[bot]'
+      }}
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout pull request head
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+
+      - name: Build extension
+        shell: bash
+        run: |
+          npm ci
+          npm run build
+
+      - name: Prepare Extension Bundle Artifact
+        shell: bash
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          mkdir -p docx-extension-bundle/.docx
+          printf '%s' "$HEAD_SHA" > docx-extension-bundle/.docx/head-sha
+          cp -R dist/extension docx-extension-bundle/extension
+
+      - name: Upload Extension Bundle Artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: docx-extension-bundle
+          path: docx-extension-bundle
+          retention-days: 1
+          if-no-files-found: error
+
+  docx-audit:
+    name: Run DocX Pull Request Audit
+    needs:
+      - build-extension
+    if: needs.build-extension.result == 'success'
+    permissions:
+      contents: read
+      actions: write
+      pull-requests: write
+    uses: SpamArtist/docx-integration/.github/workflows/reusable-docx-audit.yml@31a58b64f62dd3a10be54189af8b3ce798c86685
+    with:
+      docx_version: 1.2.3
+      bundle_path: extension
+      report_format: ${{ vars.DOCX_PULL_REQUEST_AUDIT_FORMAT || 'html' }}
+    secrets:
+      binary_download_token: ${{ secrets.DOCX_BINARY_DOWNLOAD_TOKEN }}
