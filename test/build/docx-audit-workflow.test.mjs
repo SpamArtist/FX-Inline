@@ -10,7 +10,7 @@ const workflow = readFileSync(
 
 test("DocX bundle upload includes its hidden head marker", () => {
   const uploadStep = workflow.match(
-    /- name: Upload Extension Bundle Artifact[\s\S]*?(?=\n  \w|$)/,
+    /- name: Upload Extension Bundle Artifact[\s\S]*?(?=\n {2}\w|$)/,
   )?.[0];
 
   assert.ok(uploadStep, "expected Extension Bundle Artifact upload step");
