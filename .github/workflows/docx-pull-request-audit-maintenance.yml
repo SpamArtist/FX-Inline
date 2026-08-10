@@ -13,4 +13,4 @@ jobs:
     permissions:
       actions: write
       pull-requests: write
-    uses: SpamArtist/docx-integration/.github/workflows/reusable-docx-audit-maintenance.yml@31a58b64f62dd3a10be54189af8b3ce798c86685
+    uses: SpamArtist/docx-integration/.github/workflows/reusable-docx-audit-maintenance.yml@568e4a03aa7b8a76d1915b4b67fdbea606ec4f73
