@@ -25,7 +25,7 @@ The extension includes a toolbar popup, a popup for selected webpage text, Setti
 
 ## Implementation
 
-The extension uses the native browser message API with English as `default_locale`. The English catalog contains all 35 worksheet entries and the unchanged product name. The Swedish catalog contains only the unchanged product name until the user supplies translations. Missing Swedish entries use English.
+The extension uses the native browser message API with English as `default_locale`. The English catalog contains all 35 worksheet entries and the unchanged product name. The Swedish catalog contains all 35 translations supplied by the user and the unchanged product name. Missing Swedish entries use English.
 
 The language helper reads the browser UI language. Extension page titles and language tags use this language. The selected-text popup sets its own language without changing the webpage language. Currency names use built-in translations for the Extension Language. Amount input, amount formats, and webpage price detection keep their previous behavior.
 
@@ -38,7 +38,19 @@ The language helper reads the browser UI language. Extension page titles and lan
 5. Run the frontend and content tests, type checks, lint, and production builds for Chrome and Firefox.
 6. Check the completed Swedish text and English fallback visually in Chrome and Firefox before release. Check the toolbar popup, selected-text popup, Settings, welcome page, long text, tooltips, and screen reader labels.
 
-The Swedish text and the visual checks with that text remain pending. No Swedish translation has been generated for the user.
+All 35 translations supplied by the user are now in the catalog. The user approved the S02 correction from `Önskad valut` to `Önskad valuta`. Duplicate empty worksheet rows and surrounding quotation marks were removed. All other supplied wording was preserved.
+
+## Verification
+
+- The Swedish release check passes: 34 of 34 active translations are present. The optional translation is also present.
+- Frontend tests: 157 passed. Content tests: 94 passed.
+- Type checks, lint, and Chrome and Firefox production builds passed.
+- A native Chrome extension check passed in isolated English and Swedish browser profiles. The toolbar popup, Settings, welcome page, and selected-text popup showed the expected language with no text overflow found. Currency swapping, amount editing, and the Settings save message were checked. The selected-text popup did not change the webpage language.
+- Firefox rendering checks passed in English and Swedish for the toolbar popup, Settings, welcome page, and selected-text popup. The built files ran with a browser API test replacement because the automation tool could not control native extension pages. Native Firefox language selection remains unverified.
+- A narrow-window Firefox check found that long currency names made the Settings selector overflow. The selector now uses `width: 100%` and `min-width: 0`. English and Swedish checks passed at 375 pixels in both Chrome and Firefox after the fix.
+- The worksheet, Swedish catalog, and both browser build catalogs contain matching text for all 35 entries.
+
+Before publication, perform a final check in an installed Firefox extension with the browser interface set to Swedish.
 
 ## References
 

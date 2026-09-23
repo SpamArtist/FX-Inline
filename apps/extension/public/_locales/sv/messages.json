@@ -2,5 +2,163 @@
   "extensionName": {
     "message": "FX Inline",
     "description": "Product name. Keep unchanged in every language."
+  },
+  "localAutoConversionOnLabel": {
+    "message": "Lokal automatisk konvertering på",
+    "description": "P01: Local switch: screen reader label, on state. Source A."
+  },
+  "localAutoConversionOffLabel": {
+    "message": "Lokal automatisk konvertering av",
+    "description": "P02: Local switch: screen reader label, off state. Source A."
+  },
+  "localAutoConversionOnTitle": {
+    "message": "Lokal automatisk konvertering på denna sida: På",
+    "description": "P03: Local switch: tooltip, on state. Source A."
+  },
+  "localAutoConversionOffTitle": {
+    "message": "Lokal automatisk konvertering på denna sida: Av",
+    "description": "P04: Local switch: tooltip, off state. Source A."
+  },
+  "localAutoConversionUnavailable": {
+    "message": "Lokal automatisk konvertering är inte tillgänglig på denna sida",
+    "description": "P05: Local switch: tooltip on a page that does not support this control. Source A."
+  },
+  "globalAutoConversionOnLabel": {
+    "message": "Global automatisk konvertering på",
+    "description": "P06: Global switch: screen reader label, on state. Source A."
+  },
+  "globalAutoConversionOffLabel": {
+    "message": "Global automatisk konvertering av",
+    "description": "P07: Global switch: screen reader label, off state. Source A."
+  },
+  "globalAutoConversionOnTitle": {
+    "message": "Global automatisk konvertering: På",
+    "description": "P08: Global switch: tooltip, on state. Source A."
+  },
+  "globalAutoConversionOffTitle": {
+    "message": "Global automatisk konvertering: Av",
+    "description": "P09: Global switch: tooltip, off state. Source A."
+  },
+  "openExtensionOptions": {
+    "message": "Öppna tilläggsalternativ",
+    "description": "P10: Settings button: tooltip and screen reader label. Source A."
+  },
+  "swapCurrencies": {
+    "message": "Växla valutor",
+    "description": "P11: Swap button: tooltip and screen reader label. Source A."
+  },
+  "shareFeedback": {
+    "message": "Lämna feedback (öppnas i en ny flik)",
+    "description": "P12: Feedback button: tooltip and screen reader label. Source A."
+  },
+  "feedback": {
+    "message": "Feedback ↗",
+    "description": "P13: Feedback button: visible text. Source A."
+  },
+  "currency": {
+    "message": "Valuta",
+    "description": "P14: Currency selector: screen reader label. Source B."
+  },
+  "currencyAmount": {
+    "message": "$CURRENCY_NAME$-belopp",
+    "description": "P15: Amount input: screen reader label in both popups. Sources C and D.",
+    "placeholders": {
+      "currency_name": {
+        "content": "$1",
+        "example": "Swedish krona"
+      }
+    }
+  },
+  "editCurrencyAmount": {
+    "message": "Redigera $CURRENCY_NAME$-belopp",
+    "description": "P16: Amount button: screen reader label in both popups. Sources C and D.",
+    "placeholders": {
+      "currency_name": {
+        "content": "$1",
+        "example": "Swedish krona"
+      }
+    }
+  },
+  "clickAmountToEdit": {
+    "message": "Klicka på beloppet för att redigera",
+    "description": "P17: Instruction under each amount in both popups. Sources C and D."
+  },
+  "amountUpdatesInstantly": {
+    "message": "Beloppet uppdateras omedelbart",
+    "description": "P18: Instruction for direct input mode. No current extension caller uses this mode. Source C."
+  },
+  "settingsTitle": {
+    "message": "FX Inline-inställningar",
+    "description": "S01: Browser tab title. Source E."
+  },
+  "preferredCurrency": {
+    "message": "Önskad valuta",
+    "description": "S02: Currency selector label. Source F."
+  },
+  "loadPreferredCurrencyError": {
+    "message": "Kunde inte läsa in önskad valuta.",
+    "description": "S03: Error when loading the saved setting. Source F."
+  },
+  "preferredCurrencyUpdated": {
+    "message": "Önskad valuta har uppdaterats till $CURRENCY_CODE$",
+    "description": "S04: Confirmation after saving. Example placeholder value: SEK. Source F.",
+    "placeholders": {
+      "currency_code": {
+        "content": "$1",
+        "example": "SEK"
+      }
+    }
+  },
+  "updatePreferredCurrencyError": {
+    "message": "Kunde inte uppdatera önskad valuta.",
+    "description": "S05: Error when saving the setting. Source F."
+  },
+  "welcomeTitle": {
+    "message": "Välkommen till FX Inline",
+    "description": "W01: Page heading and browser tab title. Sources G and H."
+  },
+  "welcomeIntroduction": {
+    "message": "Tack för att du installerade FX Inline. Vi konverterar priser direkt på sidorna du besöker så att du snabbt och säkert kan bedöma kostnader i din önskade valuta.",
+    "description": "W02: Introduction. Source G."
+  },
+  "welcomeGuideTitle": {
+    "message": "Kom igång på under en minut",
+    "description": "W03: Setup guide heading. Source G."
+  },
+  "welcomeChooseCurrency": {
+    "message": "Välj önskad valuta under Inställningar.",
+    "description": "W04: First setup instruction. Source G."
+  },
+  "welcomeOpenPage": {
+    "message": "Öppna valfri sida för shopping, resor eller marknadsplatser som visar priser.",
+    "description": "W05: Second setup instruction. Source G."
+  },
+  "welcomeOpenPopup": {
+    "message": "Använd FX Inline-ikonen när som helst för att öppna konverteringsfönstret.",
+    "description": "W06: Third setup instruction. Source G."
+  },
+  "openSettings": {
+    "message": "Öppna inställningar",
+    "description": "W07: Button text before and after opening Settings. Source G."
+  },
+  "welcomeRevisit": {
+    "message": "Du kan när som helst återvända till denna sida via tilläggets filer.",
+    "description": "W08: Note below the button. Source G."
+  },
+  "openingSettings": {
+    "message": "Öppnar inställningar...",
+    "description": "W09: Button text while Settings opens. Source G."
+  },
+  "settingsOpened": {
+    "message": "Inställningarna öppnades på en ny flik.",
+    "description": "W10: Success message. Source G."
+  },
+  "openSettingsError": {
+    "message": "Kunde inte öppna inställningarna automatiskt. Öppna FX Inline-inställningarna från tilläggsmenyn.",
+    "description": "W11: Error message. Source G."
+  },
+  "extensionDescription": {
+    "message": "FX Inline konverterar priser direkt på webbsidor till din föredragna valuta, så att du kan jämföra kostnader utan att lämna sidan.",
+    "description": "M01: Extension description from package metadata. Source I."
   }
 }
