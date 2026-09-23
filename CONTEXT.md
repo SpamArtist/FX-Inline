@@ -4,6 +4,10 @@ FX Inline identifies prices on webpages and presents conversions in a preferred 
 
 ## Language
 
+**Extension Language**:
+The language of FX Inline screens, messages, and accessibility labels. It is separate from the language of webpage prices and the rules for number formats.
+_Avoid_: Currency language, price language
+
 **Activation Scan**:
 The lightweight pre-worker search for evidence that a webpage contains a currency token paired with an amount. It determines whether FX Inline should load its full conversion worker.
 _Avoid_: Currency scan, initial scan, price scan
