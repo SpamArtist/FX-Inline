@@ -1,8 +1,10 @@
+import { localizeDocument } from "@/utils/i18n";
 import { attachSharedThemeStylesheet } from "@/utils/sharedThemeStylesheet";
 import { mountOptionsPage } from "./optionsPage";
 import "./style.css";
 
 attachSharedThemeStylesheet();
+localizeDocument(document, "settingsTitle");
 
 void mountOptionsPage(document.getElementById("root"), {
   readUserSettings: async () => {

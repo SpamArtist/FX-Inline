@@ -1,3 +1,4 @@
+import { getExtensionLanguage, getMessage } from "../../utils/i18n";
 import currencies from "../../assets/currency.json";
 import type { UserSettings } from "../../utils/appStorage.types";
 import type { CurrencyListEntry } from "../../utils/currencyPresentation.types";
@@ -20,7 +21,7 @@ function isCurrencyCode(value: string): value is CurrencyCode {
 function getDisplayNames(): Pick<Intl.DisplayNames, "of"> | null {
   try {
     return typeof Intl.DisplayNames === "function"
-      ? new Intl.DisplayNames(["en"], { type: "currency" })
+      ? new Intl.DisplayNames([getExtensionLanguage()], { type: "currency" })
       : null;
   } catch {
     return null;
@@ -113,7 +114,7 @@ export function mountOptionsPage(
   const label = ownerDocument.createElement("label");
   label.className = "fx-inline-options-label";
   label.htmlFor = "preferred-currency";
-  label.textContent = "Preferred Currency";
+  label.textContent = getMessage("preferredCurrency");
 
   const select = ownerDocument.createElement("select");
   select.className = "fx-inline-options-select";
@@ -148,7 +149,7 @@ export function mountOptionsPage(
       setStatus(status, "");
     } catch {
       if (!destroyed) {
-        setStatus(status, "Unable to load preferred currency.");
+        setStatus(status, getMessage("loadPreferredCurrencyError"));
       }
     } finally {
       if (!destroyed) {
@@ -178,11 +179,11 @@ export function mountOptionsPage(
       currentSettings = persistedSettings;
       currentCurrency = getPrimaryTargetCurrency(persistedSettings);
       select.value = currentCurrency;
-      setStatus(status, `Preferred currency updated to ${currentCurrency}.`);
+      setStatus(status, getMessage("preferredCurrencyUpdated", currentCurrency));
     } catch {
       if (!destroyed) {
         select.value = currentCurrency;
-        setStatus(status, "Unable to update preferred currency.");
+        setStatus(status, getMessage("updatePreferredCurrencyError"));
       }
     } finally {
       if (!destroyed) {

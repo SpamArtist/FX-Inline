@@ -5,6 +5,7 @@ import {
   getCurrencyDisplayName,
   getNextAmountDraft,
 } from "@/utils/currencyPresentation";
+import { getExtensionLanguage, getMessage } from "@/utils/i18n";
 import type { CurrencyCode } from "@/utils/enums";
 import type { CurrencyState } from "@/utils/types";
 import type { SelectionPopupController } from "./content.types";
@@ -25,8 +26,6 @@ type AmountRowView = {
   draftAmount: string;
   skipBlurCommit: boolean;
 };
-
-const SELECTION_META_TEXT = "Click amount to edit";
 
 function resolveLocale(localeHint?: string | null): string {
   if (localeHint && localeHint.trim().length > 0) {
@@ -71,7 +70,7 @@ function createAmountRowView(): AmountRowView {
 
   const meta = document.createElement("p");
   meta.className = "fx-inline-currency-box__amount-meta";
-  meta.textContent = SELECTION_META_TEXT;
+  meta.textContent = getMessage("clickAmountToEdit");
 
   rowRoot.append(top, amountArea, meta);
 
@@ -93,6 +92,7 @@ function createSelectionPopupView(
 ): PopupView {
   const root = document.createElement("section");
   root.className = "fx-inline-theme fx-inline-shell fx-inline-shell--selection";
+  root.lang = getExtensionLanguage();
 
   const shellInner = document.createElement("div");
   shellInner.className = "fx-inline-shell__inner";
@@ -133,7 +133,10 @@ function createSelectionPopupView(
       row.draftAmount = currencyState.amount;
     }
 
-    row.nameLabel.textContent = getCurrencyDisplayName(currencyState.code, locale);
+    row.nameLabel.textContent = getCurrencyDisplayName(
+      currencyState.code,
+      getExtensionLanguage(),
+    );
     row.currencyLabel.textContent = currencyState.code;
     row.currencyIcon.textContent = currencyState.icon || "$";
 
@@ -145,7 +148,10 @@ function createSelectionPopupView(
       input.type = "text";
       input.inputMode = "decimal";
       input.value = row.draftAmount;
-      input.setAttribute("aria-label", `${row.nameLabel.textContent || currencyState.code} amount`);
+      input.setAttribute(
+        "aria-label",
+        getMessage("currencyAmount", row.nameLabel.textContent || currencyState.code),
+      );
 
       input.addEventListener("input", () => {
         const nextDraft = getNextAmountDraft(row.draftAmount, input.value);
@@ -212,7 +218,7 @@ function createSelectionPopupView(
     );
     amountButton.setAttribute(
       "aria-label",
-      `Edit ${row.nameLabel.textContent || currencyState.code} amount`,
+      getMessage("editCurrencyAmount", row.nameLabel.textContent || currencyState.code),
     );
 
     amountButton.addEventListener("click", () => {

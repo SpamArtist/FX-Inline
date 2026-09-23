@@ -2,10 +2,12 @@
 
 This list contains 35 distinct English text entries from the extension source. Of these, 34 are used by the current interface or extension metadata. One is in an unused component mode and is marked below. The Swedish fields are empty for manual translation.
 
+The translation system is ready. You only need to fill in this worksheet; the completed text can then be transferred to the Swedish catalog. See [the handoff steps](swedish-language-plan.md#translation-handoff).
+
 ## Instructions
 
 - Write each Swedish translation in the last column.
-- Keep the IDs unchanged. They identify worksheet rows, not existing message keys.
+- Keep the IDs unchanged. Each row maps to a message key in the English catalog through its description.
 - Keep `{currencyName}` and `{currencyCode}` unchanged. These placeholders receive a currency name or code at runtime. You can move them within a sentence.
 - Keep the product name `FX Inline` unchanged. Keep the arrow in `Feedback ↗`.
 - Translate full messages. The on and off states have separate rows to allow natural Swedish grammar.
@@ -16,7 +18,7 @@ This list contains 35 distinct English text entries from the extension source. O
 
 | ID | English | Context | Swedish |
 | --- | --- | --- | --- |
-| P01 | Local auto conversion on | Local switch: screen reader label, on state. Source A. | |
+| P01 | Local auto conversion on | Local switch: screen reader label, on state. Source A. |
 | P02 | Local auto conversion off | Local switch: screen reader label, off state. Source A. | |
 | P03 | Local auto conversion on this page: On | Local switch: tooltip, on state. Source A. | |
 | P04 | Local auto conversion on this page: Off | Local switch: tooltip, off state. Source A. | |
@@ -69,7 +71,7 @@ This list contains 35 distinct English text entries from the extension source. O
 
 ## Currency names
 
-Currency names are generated from browser language data. Settings currently requests English names. The agreed approach is to use built-in Swedish currency names for Swedish support, so they do not need manual translation. Currency codes stay unchanged.
+Currency names are generated from browser language data. Settings and both popups now request names in the Extension Language. Built-in Swedish currency names do not need manual translation. Currency codes stay unchanged.
 
 ## Other text and values
 

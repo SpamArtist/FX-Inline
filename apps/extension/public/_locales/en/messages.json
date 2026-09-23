@@ -1,0 +1,164 @@
+{
+  "extensionName": {
+    "message": "FX Inline",
+    "description": "Product name. Keep unchanged in every language."
+  },
+  "localAutoConversionOnLabel": {
+    "message": "Local auto conversion on",
+    "description": "P01: Local switch: screen reader label, on state. Source A."
+  },
+  "localAutoConversionOffLabel": {
+    "message": "Local auto conversion off",
+    "description": "P02: Local switch: screen reader label, off state. Source A."
+  },
+  "localAutoConversionOnTitle": {
+    "message": "Local auto conversion on this page: On",
+    "description": "P03: Local switch: tooltip, on state. Source A."
+  },
+  "localAutoConversionOffTitle": {
+    "message": "Local auto conversion on this page: Off",
+    "description": "P04: Local switch: tooltip, off state. Source A."
+  },
+  "localAutoConversionUnavailable": {
+    "message": "Local auto conversion is unavailable on this page",
+    "description": "P05: Local switch: tooltip on a page that does not support this control. Source A."
+  },
+  "globalAutoConversionOnLabel": {
+    "message": "Global auto conversion on",
+    "description": "P06: Global switch: screen reader label, on state. Source A."
+  },
+  "globalAutoConversionOffLabel": {
+    "message": "Global auto conversion off",
+    "description": "P07: Global switch: screen reader label, off state. Source A."
+  },
+  "globalAutoConversionOnTitle": {
+    "message": "Global auto conversion: On",
+    "description": "P08: Global switch: tooltip, on state. Source A."
+  },
+  "globalAutoConversionOffTitle": {
+    "message": "Global auto conversion: Off",
+    "description": "P09: Global switch: tooltip, off state. Source A."
+  },
+  "openExtensionOptions": {
+    "message": "Open extension options",
+    "description": "P10: Settings button: tooltip and screen reader label. Source A."
+  },
+  "swapCurrencies": {
+    "message": "Swap currencies",
+    "description": "P11: Swap button: tooltip and screen reader label. Source A."
+  },
+  "shareFeedback": {
+    "message": "Share feedback (opens in a new tab)",
+    "description": "P12: Feedback button: tooltip and screen reader label. Source A."
+  },
+  "feedback": {
+    "message": "Feedback ↗",
+    "description": "P13: Feedback button: visible text. Source A."
+  },
+  "currency": {
+    "message": "Currency",
+    "description": "P14: Currency selector: screen reader label. Source B."
+  },
+  "currencyAmount": {
+    "message": "$CURRENCY_NAME$ amount",
+    "description": "P15: Amount input: screen reader label in both popups. Sources C and D.",
+    "placeholders": {
+      "currency_name": {
+        "content": "$1",
+        "example": "Swedish krona"
+      }
+    }
+  },
+  "editCurrencyAmount": {
+    "message": "Edit $CURRENCY_NAME$ amount",
+    "description": "P16: Amount button: screen reader label in both popups. Sources C and D.",
+    "placeholders": {
+      "currency_name": {
+        "content": "$1",
+        "example": "Swedish krona"
+      }
+    }
+  },
+  "clickAmountToEdit": {
+    "message": "Click amount to edit",
+    "description": "P17: Instruction under each amount in both popups. Sources C and D."
+  },
+  "amountUpdatesInstantly": {
+    "message": "Amount updates instantly",
+    "description": "P18: Instruction for direct input mode. No current extension caller uses this mode. Source C."
+  },
+  "settingsTitle": {
+    "message": "FX Inline Settings",
+    "description": "S01: Browser tab title. Source E."
+  },
+  "preferredCurrency": {
+    "message": "Preferred Currency",
+    "description": "S02: Currency selector label. Source F."
+  },
+  "loadPreferredCurrencyError": {
+    "message": "Unable to load preferred currency.",
+    "description": "S03: Error when loading the saved setting. Source F."
+  },
+  "preferredCurrencyUpdated": {
+    "message": "Preferred currency updated to $CURRENCY_CODE$.",
+    "description": "S04: Confirmation after saving. Example placeholder value: SEK. Source F.",
+    "placeholders": {
+      "currency_code": {
+        "content": "$1",
+        "example": "SEK"
+      }
+    }
+  },
+  "updatePreferredCurrencyError": {
+    "message": "Unable to update preferred currency.",
+    "description": "S05: Error when saving the setting. Source F."
+  },
+  "welcomeTitle": {
+    "message": "Welcome to FX Inline",
+    "description": "W01: Page heading and browser tab title. Sources G and H."
+  },
+  "welcomeIntroduction": {
+    "message": "Thank you for installing FX Inline. We convert prices directly on the pages you visit so you can evaluate costs quickly and confidently in your preferred currency.",
+    "description": "W02: Introduction. Source G."
+  },
+  "welcomeGuideTitle": {
+    "message": "Get started in under a minute",
+    "description": "W03: Setup guide heading. Source G."
+  },
+  "welcomeChooseCurrency": {
+    "message": "Choose your preferred currency in Settings.",
+    "description": "W04: First setup instruction. Source G."
+  },
+  "welcomeOpenPage": {
+    "message": "Open any shopping, travel, or marketplace page with prices.",
+    "description": "W05: Second setup instruction. Source G."
+  },
+  "welcomeOpenPopup": {
+    "message": "Use the FX Inline icon anytime to open the converter popup.",
+    "description": "W06: Third setup instruction. Source G."
+  },
+  "openSettings": {
+    "message": "Open Settings",
+    "description": "W07: Button text before and after opening Settings. Source G."
+  },
+  "welcomeRevisit": {
+    "message": "You can revisit this page anytime from the extension files.",
+    "description": "W08: Note below the button. Source G."
+  },
+  "openingSettings": {
+    "message": "Opening Settings...",
+    "description": "W09: Button text while Settings opens. Source G."
+  },
+  "settingsOpened": {
+    "message": "Settings opened in a new tab.",
+    "description": "W10: Success message. Source G."
+  },
+  "openSettingsError": {
+    "message": "Could not open settings automatically. Open FX Inline Settings from the extension menu.",
+    "description": "W11: Error message. Source G."
+  },
+  "extensionDescription": {
+    "message": "FX Inline converts prices directly on webpages into your preferred currency, so you can compare costs without leaving the page.",
+    "description": "M01: Extension description from package metadata. Source I."
+  }
+}

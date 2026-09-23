@@ -1,8 +1,10 @@
+import { getMessage, localizeDocument } from "@/utils/i18n";
 import { attachSharedThemeStylesheet } from "@/utils/sharedThemeStylesheet";
 import { browser } from "wxt/browser";
 import "./style.css";
 
 attachSharedThemeStylesheet();
+localizeDocument(document, "welcomeTitle");
 
 const root = document.getElementById("root");
 
@@ -28,12 +30,11 @@ brand.textContent = "FX Inline";
 
 const heading = document.createElement("h1");
 heading.className = "fx-inline-welcome-heading";
-heading.textContent = "Welcome to FX Inline";
+heading.textContent = getMessage("welcomeTitle");
 
 const copy = document.createElement("p");
 copy.className = "fx-inline-welcome-copy";
-copy.textContent =
-  "Thank you for installing FX Inline. We convert prices directly on the pages you visit so you can evaluate costs quickly and confidently in your preferred currency.";
+copy.textContent = getMessage("welcomeIntroduction");
 
 header.append(brand, heading, copy);
 
@@ -42,17 +43,17 @@ guide.className = "fx-inline-welcome-guide";
 
 const guideTitle = document.createElement("h2");
 guideTitle.className = "fx-inline-welcome-guide-title";
-guideTitle.textContent = "Get started in under a minute";
+guideTitle.textContent = getMessage("welcomeGuideTitle");
 
 const guideList = document.createElement("ul");
 guideList.className = "fx-inline-welcome-guide-list";
 
 const firstGuideItem = document.createElement("li");
-firstGuideItem.textContent = "Choose your preferred currency in Settings.";
+firstGuideItem.textContent = getMessage("welcomeChooseCurrency");
 const secondGuideItem = document.createElement("li");
-secondGuideItem.textContent = "Open any shopping, travel, or marketplace page with prices.";
+secondGuideItem.textContent = getMessage("welcomeOpenPage");
 const thirdGuideItem = document.createElement("li");
-thirdGuideItem.textContent = "Use the FX Inline icon anytime to open the converter popup.";
+thirdGuideItem.textContent = getMessage("welcomeOpenPopup");
 
 guideList.append(firstGuideItem, secondGuideItem, thirdGuideItem);
 guide.append(guideTitle, guideList);
@@ -64,11 +65,11 @@ const settingsButton = document.createElement("button");
 settingsButton.className = "fx-inline-welcome-primary-button";
 settingsButton.id = "fx-inline-welcome-open-settings";
 settingsButton.type = "button";
-settingsButton.textContent = "Open Settings";
+settingsButton.textContent = getMessage("openSettings");
 
 const note = document.createElement("p");
 note.className = "fx-inline-welcome-note";
-note.textContent = "You can revisit this page anytime from the extension files.";
+note.textContent = getMessage("welcomeRevisit");
 
 const statusText = document.createElement("p");
 statusText.className = "fx-inline-welcome-status";
@@ -92,7 +93,7 @@ function setStatus(message: string) {
 async function openSettingsPage() {
   setStatus("");
   settingsButton.disabled = true;
-  settingsButton.textContent = "Opening Settings...";
+  settingsButton.textContent = getMessage("openingSettings");
 
   try {
     try {
@@ -103,15 +104,13 @@ async function openSettingsPage() {
       });
     }
 
-    setStatus("Settings opened in a new tab.");
+    setStatus(getMessage("settingsOpened"));
   } catch (error) {
     console.warn("[fx-inline] Failed to open options page from welcome page", error);
-    setStatus(
-      "Could not open settings automatically. Open FX Inline Settings from the extension menu.",
-    );
+    setStatus(getMessage("openSettingsError"));
   } finally {
     settingsButton.disabled = false;
-    settingsButton.textContent = "Open Settings";
+    settingsButton.textContent = getMessage("openSettings");
   }
 }
 

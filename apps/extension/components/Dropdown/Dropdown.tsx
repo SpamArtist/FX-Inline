@@ -1,17 +1,17 @@
+import { getMessage } from "@/utils/i18n";
 import type { JSX } from "preact";
 import { ChevronDownIcon } from "../icons/NativeIcons";
 import type { DropdownProps } from "./Dropdown.types";
 export type { DropdownOption } from "./Dropdown.types";
 
 const CURRENCY_ICON_FALLBACK = "$";
-const DEFAULT_SELECT_ARIA_LABEL = "Currency";
 
 export default function Dropdown<TValue extends string>({
   isDisabled = false,
   displayOption,
   options,
   onSelect,
-  selectAriaLabel = DEFAULT_SELECT_ARIA_LABEL,
+  selectAriaLabel = getMessage("currency"),
 }: DropdownProps<TValue>) {
   function onCurrencyChange(event: JSX.TargetedEvent<HTMLSelectElement>) {
     onSelect(event.currentTarget.value as TValue);

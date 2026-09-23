@@ -5,6 +5,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "check:locales": "node scripts/i18n/check-locales.mjs",
+    "check:locales:sv": "node scripts/i18n/check-locales.mjs --require-complete",
     "dev": "wxt",
     "dev:firefox": "wxt -b firefox",
     "dev:website": "vite --config apps/website/vite.config.mjs",
