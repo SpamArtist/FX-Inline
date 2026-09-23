@@ -46,11 +46,11 @@ All 35 translations supplied by the user are now in the catalog. The user approv
 - Frontend tests: 157 passed. Content tests: 94 passed.
 - Type checks, lint, and Chrome and Firefox production builds passed.
 - A native Chrome extension check passed in isolated English and Swedish browser profiles. The toolbar popup, Settings, welcome page, and selected-text popup showed the expected language with no text overflow found. Currency swapping, amount editing, and the Settings save message were checked. The selected-text popup did not change the webpage language.
-- Firefox rendering checks passed in English and Swedish for the toolbar popup, Settings, welcome page, and selected-text popup. The built files ran with a browser API test replacement because the automation tool could not control native extension pages. Native Firefox language selection remains unverified.
+- Firefox rendering checks passed in English and Swedish for the toolbar popup, Settings, welcome page, and selected-text popup. The built files ran with a browser API test replacement because the automation tool could not control native extension pages. A subsequent native Firefox check passed in an isolated profile with the official Swedish language pack. The extension was reloaded through the native debugger. Its native API reported `sv-SE`, and all 36 catalog entries matched the Swedish source after placeholder substitution. The real popup, Settings, and welcome page text, titles, and accessibility labels were checked. Settings saved SEK and showed the supplied Swedish message. This final check used native extension APIs without the test replacement. The native popup was inspected as a browser tab; its actual 520-pixel layout was covered by the earlier rendering check.
 - A narrow-window Firefox check found that long currency names made the Settings selector overflow. The selector now uses `width: 100%` and `min-width: 0`. English and Swedish checks passed at 375 pixels in both Chrome and Firefox after the fix.
 - The worksheet, Swedish catalog, and both browser build catalogs contain matching text for all 35 entries.
 
-Before publication, perform a final check in an installed Firefox extension with the browser interface set to Swedish.
+The final Chrome check reloaded the extension by restarting its isolated Swedish browser profile. All 36 native catalog entries (35 translations and the product name) matched the catalog. The toolbar popup, Settings, welcome page, and selected-text popup passed again with no text overflow or page errors. Native Swedish language selection has now been checked in both browsers.
 
 ## References
 
