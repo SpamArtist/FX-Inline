@@ -177,6 +177,14 @@ Known built-in locale families for magnitude profiles:
 - `zh`, `ja`, `ko`, `th`, `ru`, `sw`
 - `de`, `fr`, `it`, `es`, `pt-br`, `pt-pt`
 
+The English magnitude profile recognizes `lakh crore` as one trillion (10¹²),
+including combinations of `lakh`/`lac`/`lakhs`/`lacs` with `crore`/`crores`/`cr`.
+These aliases are case-insensitive and accept whitespace between the words.
+For example, `₹7.5 lakh crore` parses as `7_500_000_000_000` INR, and
+`₹7–8 lakh crore` produces one complete match with endpoints
+`7_000_000_000_000` and `8_000_000_000_000` INR. Other compound magnitudes and
+hyphenated `lakh-crore` are outside this supported set.
+
 `ParseResult` allowed values:
 - `valid`: `true` or `false`
 - when `valid === true`: `value` is finite number and `currency` is recognized uppercase ISO-like code

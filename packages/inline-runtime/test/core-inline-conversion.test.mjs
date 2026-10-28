@@ -117,6 +117,27 @@ test("converts text-node prices with expected wrapper shape", () => {
   expect(convertedAmount.textContent).toMatch(/^\(.+\)$/);
 });
 
+test("converts lakh crore ranges after the complete magnitude phrase", () => {
+  document.body.innerHTML = '<p id="price">Budget: ₹7–8 lakh crore today.</p>';
+
+  const applied = convertVisiblePrices(
+    "EUR",
+    createRateSnapshot({ rates: { INR: 100, EUR: 1 } }),
+    document.body,
+    { clearExisting: false },
+  );
+
+  expect(applied).toBe(1);
+  const wrapper = document.querySelector(`#price span.${INLINE_CONVERSION_CLASS}`);
+  expect(wrapper.getAttribute("data-original")).toBe("₹7–8 lakh crore");
+  expect(wrapper.querySelector(".fx-inline-converted-amount").textContent).toBe(
+    "(~€70B–€80B)",
+  );
+  expect(document.getElementById("price").textContent).toBe(
+    "Budget: ₹7–8 lakh crore (~€70B–€80B) today.",
+  );
+});
+
 test("uses shared price-text classification for direct, amount-only, and unrelated text", () => {
   document.body.innerHTML = [
     '<p id="direct-price">Pay $100 now.</p>',
