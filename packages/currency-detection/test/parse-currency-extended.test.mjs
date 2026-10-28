@@ -103,6 +103,68 @@ test("parseCurrencyValue supports lakh/lac/crore/cr with currency prefix and suf
   }
 });
 
+test.each([
+  "lakh crore", "lakh crores", "lakh cr",
+  "lac crore", "lac crores", "lac cr",
+  "lakhs crore", "lakhs crores", "lakhs cr",
+  "lacs crore", "lacs crores", "lacs cr",
+])("parses lakh crore alias %s in single amounts and ranges", (magnitude) => {
+  for (const input of [`₹7.5 ${magnitude}`, `7.5 ${magnitude} INR`]) {
+    expect(parseCurrencyValue(input)).toEqual({
+      valid: true,
+      value: 7_500_000_000_000,
+      currency: "INR",
+    });
+    expect(extractCurrencyTextMatches(input)).toEqual([
+      { raw: input, start: 0, end: input.length, value: 7_500_000_000_000, currency: "INR" },
+    ]);
+  }
+
+  const input = `₹7–8 ${magnitude}`;
+  const text = `Budget: ${input} today.`;
+  expect(extractCurrencyTextMatches(text)).toEqual([
+    {
+      raw: input,
+      start: 8,
+      end: 8 + input.length,
+      value: 7_000_000_000_000,
+      rangeEndValue: 8_000_000_000_000,
+      currency: "INR",
+    },
+  ]);
+});
+
+test.each(["LAKH CRORE", "lakh  crore", "lakh\u00a0crore", "lakh\u202fcrore"])(
+  "normalizes lakh crore case and whitespace: %s",
+  (magnitude) => {
+    const input = `₹7–8 ${magnitude}`;
+    expect(extractCurrencyTextMatches(input)).toEqual([
+      {
+        raw: input,
+        start: 0,
+        end: input.length,
+        value: 7_000_000_000_000,
+        rangeEndValue: 8_000_000_000_000,
+        currency: "INR",
+      },
+    ]);
+  },
+);
+
+test("lakh crore support preserves explicit mixed range magnitudes", () => {
+  const input = "₹7 lakh–8 crore";
+  expect(extractCurrencyTextMatches(input)).toEqual([
+    {
+      raw: input,
+      start: 0,
+      end: input.length,
+      value: 700_000,
+      rangeEndValue: 80_000_000,
+      currency: "INR",
+    },
+  ]);
+});
+
 test("parseCurrencyValue rejects malformed or incomplete values", () => {
   const invalids = ["USD", "and 100", "100..50", "foo bar", "12.3.4 USD"];
 

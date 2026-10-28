@@ -41,7 +41,13 @@ const PROFILE_EN = {
     },
     {
       multiplier: 1_000_000_000_000,
-      aliases: ["trillion", "trillions"],
+      aliases: [
+        "trillion", "trillions",
+        "lakh crore", "lakh crores", "lakh cr",
+        "lac crore", "lac crores", "lac cr",
+        "lakhs crore", "lakhs crores", "lakhs cr",
+        "lacs crore", "lacs crores", "lacs cr",
+      ],
     },
   ],
 };

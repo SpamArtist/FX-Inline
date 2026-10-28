@@ -16,6 +16,10 @@ _Avoid_: Price match, parsed price
 A supported ISO currency code or currency symbol that can identify a currency when it is near a numeric amount.
 _Avoid_: Currency marker, currency label
 
+**Compound Magnitude**:
+A phrase whose magnitude terms multiply together to scale a monetary amount. “Lakh crore” means one trillion (10¹²); when shared by a range such as “₹7–8 lakh crore,” it scales both endpoints.
+_Avoid_: Combined currency, currency multiplier
+
 **Ambiguous ISO Code**:
 An ISO currency code that is also a common word or name. It remains valid for conversion, but it cannot create an Activation Signal by itself.
 _Avoid_: Blocked currency, unsupported code
