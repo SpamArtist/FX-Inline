@@ -2,6 +2,8 @@ import { jest } from "@jest/globals";
 
 const getUserSettingsMock = jest.fn();
 const getCachedRateSnapshotMock = jest.fn();
+const getUILanguageMock = jest.fn();
+const getMessageMock = jest.fn();
 
 function createRateSnapshot(overrides = {}) {
   const base = {
@@ -47,6 +49,15 @@ function createUserSettings(targetCurrency) {
 
 async function importSelectionPopupModuleWithMocks() {
   jest.resetModules();
+
+  await jest.unstable_mockModule("wxt/browser", () => ({
+    browser: {
+      i18n: {
+        getUILanguage: getUILanguageMock,
+        getMessage: getMessageMock,
+      },
+    },
+  }));
 
   await jest.unstable_mockModule("../../test-dist/utils/appStorage.js", () => ({
     getUserSettings: getUserSettingsMock,
@@ -121,12 +132,16 @@ beforeEach(() => {
 
   getUserSettingsMock.mockResolvedValue(createUserSettings("EUR"));
   getCachedRateSnapshotMock.mockResolvedValue(createRateSnapshot());
+  getUILanguageMock.mockReturnValue("en-US");
+  getMessageMock.mockReturnValue("");
 
   document.body.innerHTML = "";
+  document.documentElement.lang = "en";
 });
 
 afterEach(() => {
   document.body.innerHTML = "";
+  document.documentElement.lang = "en";
 });
 
 test("showPopup renders popup shell, styles, and placement", async () => {
@@ -181,6 +196,32 @@ test("removePopup and destroy are idempotent and clean up the DOM", async () => 
   controller.destroy();
   expect(controller.getRoot()).toBeNull();
   expect(document.querySelectorAll("#popup-root")).toHaveLength(0);
+});
+
+test("Swedish popup language does not change host language or amount format", async () => {
+  document.documentElement.lang = "de-DE";
+  const { createSelectionPopupController } = await importSelectionPopupModuleWithMocks();
+  const controller = createController(createSelectionPopupController);
+
+  controller.showPopup(10, 20, "1234.5", "SEK");
+  await waitForPopupContent(controller);
+  const englishAmount = getShadowRoot(controller)
+    .querySelector(".fx-inline-currency-box__amount-display").textContent;
+  controller.removePopup();
+
+  getUILanguageMock.mockReturnValue("sv-FI");
+  controller.showPopup(10, 20, "1234.5", "SEK");
+  await waitForPopupContent(controller);
+
+  const shadowRoot = getShadowRoot(controller);
+  expect(shadowRoot.querySelector(".fx-inline-shell").lang).toBe("sv");
+  expect(document.documentElement.lang).toBe("de-DE");
+  const amount = shadowRoot.querySelector(".fx-inline-currency-box__amount-display");
+  expect(amount.textContent).toBe(englishAmount);
+  const expectedName = new Intl.DisplayNames(["sv"], { type: "currency" }).of("SEK");
+  expect(amount.getAttribute("aria-label")).toBe(`Edit ${expectedName} amount`);
+
+  controller.destroy();
 });
 
 test("containsTarget and repeated showPopup replace the popup root", async () => {

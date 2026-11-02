@@ -1,0 +1,182 @@
+{
+  "text_20ebf3a5": {
+    "message": "Betrag wird sofort aktualisiert",
+    "description": "Amount updates instantly"
+  },
+  "text_4aef048d": {
+    "message": "Wählen Sie Ihre bevorzugte Währung in den Einstellungen.",
+    "description": "Choose your preferred currency in Settings."
+  },
+  "text_2f321046": {
+    "message": "Zum Bearbeiten auf den Betrag klicken",
+    "description": "Click amount to edit"
+  },
+  "text_567e8008": {
+    "message": "Einstellungen konnten nicht automatisch geöffnet werden. Öffnen Sie die FX Inline-Einstellungen im Erweiterungsmenü.",
+    "description": "Could not open settings automatically. Open FX Inline Settings from the extension menu."
+  },
+  "text_146f2256": {
+    "message": "Währung",
+    "description": "Currency"
+  },
+  "text_ce6abb7e": {
+    "message": "Betrag in $currency_name$ bearbeiten",
+    "description": "Edit {currency_name} amount",
+    "placeholders": {
+      "currency_name": {
+        "content": "$1"
+      }
+    }
+  },
+  "text_ffeee0c8": {
+    "message": "FX INLINE",
+    "description": "FX INLINE"
+  },
+  "text_f68e4728": {
+    "message": "FX Inline",
+    "description": "FX Inline"
+  },
+  "text_b23df7c5": {
+    "message": "FX Inline – Einstellungen",
+    "description": "FX Inline Settings"
+  },
+  "text_07a1f646": {
+    "message": "FX Inline rechnet Preise auf Webseiten in Ihre bevorzugte Währung um. Vergleichen Sie Kosten, ohne die Seite zu verlassen.",
+    "description": "FX Inline converts prices directly on webpages into your preferred currency, so you can compare costs without leaving the page."
+  },
+  "text_a187caa3": {
+    "message": "Feedback ↗",
+    "description": "Feedback ↗"
+  },
+  "text_51f61eb8": {
+    "message": "In weniger als einer Minute startklar",
+    "description": "Get started in under a minute"
+  },
+  "text_787b32e2": {
+    "message": "Automatische Umrechnung für alle Seiten aus",
+    "description": "Global auto conversion off"
+  },
+  "text_7fd3e348": {
+    "message": "Automatische Umrechnung für alle Seiten an",
+    "description": "Global auto conversion on"
+  },
+  "text_1aea5822": {
+    "message": "Automatische Umrechnung für alle Seiten: Aus",
+    "description": "Global auto conversion: Off"
+  },
+  "text_52047188": {
+    "message": "Automatische Umrechnung für alle Seiten: An",
+    "description": "Global auto conversion: On"
+  },
+  "text_3ab87a71": {
+    "message": "Automatische Umrechnung ist auf dieser Seite nicht verfügbar",
+    "description": "Local auto conversion is unavailable on this page"
+  },
+  "text_33a6dd64": {
+    "message": "Automatische Umrechnung auf dieser Seite aus",
+    "description": "Local auto conversion off"
+  },
+  "text_2dc68f52": {
+    "message": "Automatische Umrechnung auf dieser Seite an",
+    "description": "Local auto conversion on"
+  },
+  "text_f54c31f0": {
+    "message": "Automatische Umrechnung auf dieser Seite: Aus",
+    "description": "Local auto conversion on this page: Off"
+  },
+  "text_e8a608ce": {
+    "message": "Automatische Umrechnung auf dieser Seite: An",
+    "description": "Local auto conversion on this page: On"
+  },
+  "text_45de88b6": {
+    "message": "Einstellungen öffnen",
+    "description": "Open Settings"
+  },
+  "text_890e2b8a": {
+    "message": "Öffnen Sie eine Einkaufs-, Reise- oder Marktplatzseite mit Preisen.",
+    "description": "Open any shopping, travel, or marketplace page with prices."
+  },
+  "text_4ca886ba": {
+    "message": "Erweiterungseinstellungen öffnen",
+    "description": "Open extension options"
+  },
+  "text_f992bb1e": {
+    "message": "Einstellungen werden geöffnet…",
+    "description": "Opening Settings..."
+  },
+  "text_38ff82c9": {
+    "message": "Bevorzugte Währung",
+    "description": "Preferred Currency"
+  },
+  "text_56d0bf94": {
+    "message": "Bevorzugte Währung auf $currency_code$ geändert.",
+    "description": "Preferred currency updated to {currency_code}.",
+    "placeholders": {
+      "currency_code": {
+        "content": "$1"
+      }
+    }
+  },
+  "text_87691c58": {
+    "message": "Einstellungen in einem neuen Tab geöffnet.",
+    "description": "Settings opened in a new tab."
+  },
+  "text_c4102f5c": {
+    "message": "Feedback geben (öffnet einen neuen Tab)",
+    "description": "Share feedback (opens in a new tab)"
+  },
+  "text_e9b65b75": {
+    "message": "Währungen tauschen",
+    "description": "Swap currencies"
+  },
+  "text_9049d6de": {
+    "message": "Danke, dass Sie FX Inline installiert haben. Wir rechnen Preise direkt auf den besuchten Seiten um, damit Sie Kosten schnell und sicher in Ihrer bevorzugten Währung einschätzen können.",
+    "description": "Thank you for installing FX Inline. We convert prices directly on the pages you visit so you can evaluate costs quickly and confidently in your preferred currency."
+  },
+  "text_71efd3a7": {
+    "message": "Bevorzugte Währung konnte nicht geladen werden.",
+    "description": "Unable to load preferred currency."
+  },
+  "text_36427242": {
+    "message": "Bevorzugte Währung konnte nicht geändert werden.",
+    "description": "Unable to update preferred currency."
+  },
+  "text_89595d96": {
+    "message": "Öffnen Sie den Währungsrechner jederzeit über das FX Inline-Symbol.",
+    "description": "Use the FX Inline icon anytime to open the converter popup."
+  },
+  "text_3a51b61f": {
+    "message": "Willkommen bei FX Inline",
+    "description": "Welcome to FX Inline"
+  },
+  "text_6717953b": {
+    "message": "Sie können diese Seite jederzeit über die Erweiterungsdateien erneut öffnen.",
+    "description": "You can revisit this page anytime from the extension files."
+  },
+  "text_b243a1d8": {
+    "message": "Betrag in $currency_name$",
+    "description": "{currency_name} amount",
+    "placeholders": {
+      "currency_name": {
+        "content": "$1"
+      }
+    }
+  },
+  "text_18add3dc": {
+    "message": "© $year$ FX Inline",
+    "description": "© {year} FX Inline",
+    "placeholders": {
+      "year": {
+        "content": "$1"
+      }
+    }
+  },
+  "extensionName": {
+    "message": "FX Inline",
+    "description": "FX Inline"
+  },
+  "extensionDescription": {
+    "message": "FX Inline rechnet Preise auf Webseiten in Ihre bevorzugte Währung um. Vergleichen Sie Kosten, ohne die Seite zu verlassen.",
+    "description": "FX Inline converts prices directly on webpages into your preferred currency, so you can compare costs without leaving the page."
+  }
+}

@@ -1,0 +1,18 @@
+FX Inline hjælper dig med at forstå priser på nettet med et enkelt blik. Når du besøger en webside, kan udvidelsen vise priser i din foretrukne valuta direkte ved siden af det oprindelige beløb. Det gør det nemmere at sammenligne produkter, abonnementer, rejseomkostninger og internationale priser uden at åbne en separat valutaomregner. Du kan vælge valuta, slå automatisk omregning til eller fra og bestemme, om omregningen skal køre overalt eller kun på den aktuelle side.
+
+FX Inline er designet til ikke at være i vejen: udvidelsen arbejder kun, når den finder prisoplysninger, og lader den oprindelige pris være synlig, så du altid kan sammenligne begge beløb.
+
+Nyheder:
+
+v1.0.0:
+Hurtigere omregning på sider, der opdateres ofte.
+Bedre understøttelse af priser og prisintervaller.
+Færre fejl i genkendelsen af valutaer.
+Generelle forbedringer af hastighed og pålidelighed.
+
+v0.5.0:
+Denne opdatering gør FX Inline hurtigere, mere overskuelig og mere pålidelig.
+Sider indlæses mere jævnt, fordi udvidelsen venter, til den finder en pris, før den udfører ekstra arbejde.
+Popupvinduet og indstillingssiden har nu et mere ensartet udseende.
+Det er nemmere at styre valutaomregningen på alle sider eller kun den aktuelle side.
+Udvidelsespakken er blevet ryddet op, så fremtidige opdateringer er mere pålidelige.

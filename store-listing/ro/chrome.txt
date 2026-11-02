@@ -1,0 +1,18 @@
+FX Inline te ajută să înțelegi dintr-o privire prețurile online. Când vizitezi o pagină web, poate afișa prețurile în moneda preferată chiar lângă suma originală. Astfel, poți compara mai ușor produse, abonamente, costuri de călătorie și prețuri internaționale, fără să deschizi un convertor separat. Poți alege moneda, activa sau dezactiva conversia automată și stabili dacă aceasta se aplică peste tot sau doar pe pagina curentă.
+
+FX Inline este conceput să nu te încurce: funcționează numai când găsește informații despre prețuri și păstrează prețul original vizibil, ca să poți compara oricând ambele sume.
+
+Noutăți:
+
+v1.0.0:
+Conversie mai rapidă pe paginile care se actualizează des.
+Suport îmbunătățit pentru prețuri și intervale de preț.
+Mai puține identificări greșite ale monedelor.
+Îmbunătățiri generale ale vitezei și fiabilității.
+
+v0.5.0:
+Această actualizare face FX Inline mai rapid, mai simplu și mai fiabil.
+Paginile se încarcă mai fluent, deoarece extensia așteaptă să găsească un preț înainte de a face operații suplimentare.
+Fereastra convertorului și ecranul de setări au acum un aspect mai unitar.
+Controalele de conversie valutară sunt mai ușor de gestionat pentru toate paginile sau doar pentru pagina curentă.
+Pachetul extensiei a fost reorganizat pentru ca actualizările viitoare să fie mai fiabile.

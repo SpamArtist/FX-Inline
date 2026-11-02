@@ -13,6 +13,7 @@
     "resolveJsonModule": true
   },
   "include": [
+    "../../.wxt/types/i18n.d.ts",
     "utils/utils.ts",
     "utils/constants.ts",
     "utils/currencyPresentation.ts",

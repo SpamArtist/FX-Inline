@@ -1,0 +1,182 @@
+{
+  "text_20ebf3a5": {
+    "message": "Το ποσό ενημερώνεται αμέσως",
+    "description": "Amount updates instantly"
+  },
+  "text_4aef048d": {
+    "message": "Επιλέξτε το νόμισμα που προτιμάτε στις Ρυθμίσεις.",
+    "description": "Choose your preferred currency in Settings."
+  },
+  "text_2f321046": {
+    "message": "Κάντε κλικ στο ποσό για επεξεργασία",
+    "description": "Click amount to edit"
+  },
+  "text_567e8008": {
+    "message": "Δεν ήταν δυνατό το αυτόματο άνοιγμα των ρυθμίσεων. Ανοίξτε τις Ρυθμίσεις FX Inline από το μενού της επέκτασης.",
+    "description": "Could not open settings automatically. Open FX Inline Settings from the extension menu."
+  },
+  "text_146f2256": {
+    "message": "Νόμισμα",
+    "description": "Currency"
+  },
+  "text_ce6abb7e": {
+    "message": "Επεξεργασία ποσού σε $currency_name$",
+    "description": "Edit {currency_name} amount",
+    "placeholders": {
+      "currency_name": {
+        "content": "$1"
+      }
+    }
+  },
+  "text_ffeee0c8": {
+    "message": "FX INLINE",
+    "description": "FX INLINE"
+  },
+  "text_f68e4728": {
+    "message": "FX Inline",
+    "description": "FX Inline"
+  },
+  "text_b23df7c5": {
+    "message": "Ρυθμίσεις FX Inline",
+    "description": "FX Inline Settings"
+  },
+  "text_07a1f646": {
+    "message": "Το FX Inline μετατρέπει τιμές απευθείας στις ιστοσελίδες στο νόμισμα που προτιμάτε, για εύκολη σύγκριση κόστους.",
+    "description": "FX Inline converts prices directly on webpages into your preferred currency, so you can compare costs without leaving the page."
+  },
+  "text_a187caa3": {
+    "message": "Σχόλια ↗",
+    "description": "Feedback ↗"
+  },
+  "text_51f61eb8": {
+    "message": "Ξεκινήστε σε λιγότερο από ένα λεπτό",
+    "description": "Get started in under a minute"
+  },
+  "text_787b32e2": {
+    "message": "Καθολική αυτόματη μετατροπή ανενεργή",
+    "description": "Global auto conversion off"
+  },
+  "text_7fd3e348": {
+    "message": "Καθολική αυτόματη μετατροπή ενεργή",
+    "description": "Global auto conversion on"
+  },
+  "text_1aea5822": {
+    "message": "Καθολική αυτόματη μετατροπή: ανενεργή",
+    "description": "Global auto conversion: Off"
+  },
+  "text_52047188": {
+    "message": "Καθολική αυτόματη μετατροπή: ενεργή",
+    "description": "Global auto conversion: On"
+  },
+  "text_3ab87a71": {
+    "message": "Η αυτόματη μετατροπή δεν είναι διαθέσιμη σε αυτή τη σελίδα",
+    "description": "Local auto conversion is unavailable on this page"
+  },
+  "text_33a6dd64": {
+    "message": "Αυτόματη μετατροπή στη σελίδα ανενεργή",
+    "description": "Local auto conversion off"
+  },
+  "text_2dc68f52": {
+    "message": "Αυτόματη μετατροπή στη σελίδα ενεργή",
+    "description": "Local auto conversion on"
+  },
+  "text_f54c31f0": {
+    "message": "Αυτόματη μετατροπή σε αυτή τη σελίδα: ανενεργή",
+    "description": "Local auto conversion on this page: Off"
+  },
+  "text_e8a608ce": {
+    "message": "Αυτόματη μετατροπή σε αυτή τη σελίδα: ενεργή",
+    "description": "Local auto conversion on this page: On"
+  },
+  "text_45de88b6": {
+    "message": "Άνοιγμα ρυθμίσεων",
+    "description": "Open Settings"
+  },
+  "text_890e2b8a": {
+    "message": "Ανοίξτε οποιαδήποτε σελίδα αγορών, ταξιδιών ή ηλεκτρονικής αγοράς με τιμές.",
+    "description": "Open any shopping, travel, or marketplace page with prices."
+  },
+  "text_4ca886ba": {
+    "message": "Άνοιγμα επιλογών επέκτασης",
+    "description": "Open extension options"
+  },
+  "text_f992bb1e": {
+    "message": "Άνοιγμα ρυθμίσεων…",
+    "description": "Opening Settings..."
+  },
+  "text_38ff82c9": {
+    "message": "Προτιμώμενο νόμισμα",
+    "description": "Preferred Currency"
+  },
+  "text_56d0bf94": {
+    "message": "Το προτιμώμενο νόμισμα άλλαξε σε $currency_code$.",
+    "description": "Preferred currency updated to {currency_code}.",
+    "placeholders": {
+      "currency_code": {
+        "content": "$1"
+      }
+    }
+  },
+  "text_87691c58": {
+    "message": "Οι ρυθμίσεις άνοιξαν σε νέα καρτέλα.",
+    "description": "Settings opened in a new tab."
+  },
+  "text_c4102f5c": {
+    "message": "Αποστολή σχολίων (ανοίγει σε νέα καρτέλα)",
+    "description": "Share feedback (opens in a new tab)"
+  },
+  "text_e9b65b75": {
+    "message": "Ανταλλαγή νομισμάτων",
+    "description": "Swap currencies"
+  },
+  "text_9049d6de": {
+    "message": "Σας ευχαριστούμε που εγκαταστήσατε το FX Inline. Μετατρέπουμε τις τιμές απευθείας στις σελίδες που επισκέπτεστε, ώστε να υπολογίζετε το κόστος γρήγορα και με σιγουριά στο νόμισμα που προτιμάτε.",
+    "description": "Thank you for installing FX Inline. We convert prices directly on the pages you visit so you can evaluate costs quickly and confidently in your preferred currency."
+  },
+  "text_71efd3a7": {
+    "message": "Δεν ήταν δυνατή η φόρτωση του προτιμώμενου νομίσματος.",
+    "description": "Unable to load preferred currency."
+  },
+  "text_36427242": {
+    "message": "Δεν ήταν δυνατή η ενημέρωση του προτιμώμενου νομίσματος.",
+    "description": "Unable to update preferred currency."
+  },
+  "text_89595d96": {
+    "message": "Χρησιμοποιήστε το εικονίδιο FX Inline όποτε θέλετε για να ανοίξετε το παράθυρο μετατροπής.",
+    "description": "Use the FX Inline icon anytime to open the converter popup."
+  },
+  "text_3a51b61f": {
+    "message": "Καλώς ήρθατε στο FX Inline",
+    "description": "Welcome to FX Inline"
+  },
+  "text_6717953b": {
+    "message": "Μπορείτε να επιστρέψετε σε αυτή τη σελίδα όποτε θέλετε από τα αρχεία της επέκτασης.",
+    "description": "You can revisit this page anytime from the extension files."
+  },
+  "text_b243a1d8": {
+    "message": "Ποσό σε $currency_name$",
+    "description": "{currency_name} amount",
+    "placeholders": {
+      "currency_name": {
+        "content": "$1"
+      }
+    }
+  },
+  "text_18add3dc": {
+    "message": "© $year$ FX Inline",
+    "description": "© {year} FX Inline",
+    "placeholders": {
+      "year": {
+        "content": "$1"
+      }
+    }
+  },
+  "extensionName": {
+    "message": "FX Inline",
+    "description": "FX Inline"
+  },
+  "extensionDescription": {
+    "message": "Το FX Inline μετατρέπει τιμές απευθείας στις ιστοσελίδες στο νόμισμα που προτιμάτε, για εύκολη σύγκριση κόστους.",
+    "description": "FX Inline converts prices directly on webpages into your preferred currency, so you can compare costs without leaving the page."
+  }
+}

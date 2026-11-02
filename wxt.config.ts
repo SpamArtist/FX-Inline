@@ -246,6 +246,9 @@ export default defineConfig({
         : {};
 
     return {
+      name: "__MSG_extensionName__",
+      description: "__MSG_extensionDescription__",
+      default_locale: "en",
       icons: {
         "16": "icon/16.png",
         "32": "icon/32.png",
@@ -253,7 +256,7 @@ export default defineConfig({
         "128": "icon/128.png",
       },
       action: {
-        default_title: "FX Inline",
+        default_title: "__MSG_extensionName__",
         default_icon: {
           "16": "icon/16.png",
           "32": "icon/32.png",

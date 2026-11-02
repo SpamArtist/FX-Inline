@@ -1,0 +1,18 @@
+FX Inline hilft Ihnen, Onlinepreise auf einen Blick zu verstehen. Wenn Sie eine Webseite besuchen, kann die Erweiterung Preise in Ihrer bevorzugten Währung direkt neben dem Originalbetrag anzeigen. So lassen sich Produkte, Abonnements, Reisekosten und internationale Preise leichter vergleichen, ohne einen separaten Währungsrechner zu öffnen. Sie können Ihre Währung auswählen, die automatische Umrechnung ein- oder ausschalten und festlegen, ob Preise überall oder nur auf der aktuellen Seite umgerechnet werden.
+
+FX Inline hält sich im Hintergrund: Die Erweiterung arbeitet nur, wenn sie Preisinformationen findet, und lässt den Originalpreis sichtbar, damit Sie beide Beträge jederzeit vergleichen können.
+
+Neuigkeiten:
+
+v1.0.0:
+Schnellere Umrechnung auf häufig aktualisierten Seiten.
+Bessere Unterstützung für Preise und Preisspannen.
+Weniger falsch erkannte Währungen.
+Allgemeine Verbesserungen bei Geschwindigkeit und Zuverlässigkeit.
+
+v0.5.0:
+Dieses Update macht FX Inline schneller, übersichtlicher und zuverlässiger.
+Seiten laden flüssiger, weil die Erweiterung zusätzliche Arbeit erst ausführt, wenn sie einen Preis erkennt.
+Das Popup und die Einstellungen haben jetzt ein einheitlicheres Design.
+Die Währungsumrechnung lässt sich leichter für alle Seiten oder nur für die aktuelle Seite steuern.
+Das Erweiterungspaket wurde bereinigt, damit künftige Updates zuverlässiger sind.

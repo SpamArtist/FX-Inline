@@ -1,0 +1,18 @@
+O FX Inline ajuda-o a compreender os preços online num relance. Quando visita uma página web, a extensão pode mostrar os preços na sua moeda preferida junto ao montante original, facilitando a comparação de produtos, subscrições, despesas de viagem e preços internacionais sem abrir um conversor separado. Pode escolher a moeda, ativar ou desativar a conversão automática e decidir se a conversão funciona em todas as páginas ou apenas na página atual.
+
+O FX Inline foi concebido para ser discreto: só funciona quando encontra informações de preços e mantém o preço original visível para que possa sempre comparar ambos os montantes.
+
+Novidades:
+
+v1.0.0:
+Conversão mais rápida em páginas que são atualizadas frequentemente.
+Melhor suporte para preços e intervalos de preços.
+Menos erros na identificação de moedas.
+Melhorias gerais de velocidade e fiabilidade.
+
+v0.5.0:
+Esta atualização torna o FX Inline mais rápido, mais simples e mais fiável.
+As páginas carregam de forma mais fluida porque a extensão espera até detetar um preço antes de realizar trabalho adicional.
+A janela do conversor e os ecrãs de definições têm agora um aspeto mais consistente.
+Os controlos de conversão de moedas são mais fáceis de gerir para todas as páginas ou apenas para a página atual.
+O pacote da extensão foi limpo para tornar as atualizações futuras mais fiáveis.

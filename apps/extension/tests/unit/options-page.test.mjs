@@ -1,9 +1,23 @@
 /** @jest-environment jsdom */
 
-import {
+import { jest } from "@jest/globals";
+
+const getUILanguage = jest.fn(() => "en-US");
+const getMessage = jest.fn(() => "");
+
+jest.unstable_mockModule("wxt/browser", () => ({
+  browser: { i18n: { getUILanguage, getMessage } },
+}));
+
+const {
   createCurrencyOptions,
   mountOptionsPage,
-} from "../../test-dist/entrypoints/options/optionsPage.js";
+} = await import("../../test-dist/entrypoints/options/optionsPage.js");
+
+beforeEach(() => {
+  getUILanguage.mockReturnValue("en-US");
+  getMessage.mockReturnValue("");
+});
 
 function createSettings(targetCurrency = "EUR") {
   return {
@@ -74,6 +88,23 @@ test("mountOptionsPage loads persisted settings and writes preferred currency ch
   expect(
     document.querySelector(".fx-inline-options-status")?.textContent,
   ).toBe("Preferred currency updated to GBP.");
+
+  mountedPage.destroy();
+});
+
+test("Swedish browser language selects built-in currency names with English message fallback", async () => {
+  getUILanguage.mockReturnValue("sv-FI");
+  document.body.innerHTML = "<div id=\"root\"></div>";
+  const mountedPage = mountOptionsPage(document.getElementById("root"), {
+    readUserSettings: async () => createSettings("SEK"),
+    writeUserSettings: async (settings) => settings,
+  });
+  await flushAsyncWork();
+
+  const sekOption = document.querySelector("option[value=SEK]");
+  const expectedName = new Intl.DisplayNames(["sv"], { type: "currency" }).of("SEK");
+  expect(sekOption.textContent).toContain(expectedName);
+  expect(document.querySelector("label").textContent).toBe("Preferred Currency");
 
   mountedPage.destroy();
 });

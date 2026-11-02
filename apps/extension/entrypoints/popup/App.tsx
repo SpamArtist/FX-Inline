@@ -12,6 +12,7 @@ import {
   normalizeDomainScope,
   resolveInlineRuntimeSettingsForUrl,
 } from "@/utils/inlineRuntimeSettings";
+import { t } from "@/utils/i18n";
 import { DEFAULT_STARTING_CURRENCY } from "@/utils/constants";
 import { ActionType, type CurrencyCode } from "@/utils/enums";
 import SwitchIcon from "@/assets/switch.svg?component";
@@ -208,13 +209,11 @@ function App() {
               }`}
               onClick={onToggleLocalAutoConversion}
               disabled={!currentTabOrigin || isLocalTogglePending}
-              aria-label={`Local auto conversion ${localAutoConversionEnabled ? "on" : "off"}`}
+              aria-label={localAutoConversionEnabled ? t("Local auto conversion on") : t("Local auto conversion off")}
               title={
                 currentTabOrigin
-                  ? `Local auto conversion on this page: ${
-                    localAutoConversionEnabled ? "On" : "Off"
-                  }`
-                  : "Local auto conversion is unavailable on this page"
+                  ? localAutoConversionEnabled ? t("Local auto conversion on this page: On") : t("Local auto conversion on this page: Off")
+                  : t("Local auto conversion is unavailable on this page")
               }
             >
               <LocalToggleIcon aria-hidden />
@@ -227,8 +226,8 @@ function App() {
               }`}
               onClick={onToggleGlobalAutoConversion}
               disabled={isGlobalTogglePending}
-              aria-label={`Global auto conversion ${globalAutoConversionEnabled ? "on" : "off"}`}
-              title={`Global auto conversion: ${globalAutoConversionEnabled ? "On" : "Off"}`}
+              aria-label={globalAutoConversionEnabled ? t("Global auto conversion on") : t("Global auto conversion off")}
+              title={globalAutoConversionEnabled ? t("Global auto conversion: On") : t("Global auto conversion: Off")}
             >
               <SwitchIcon aria-hidden />
             </button>
@@ -237,8 +236,8 @@ function App() {
               type="button"
               className="fx-inline-settings-button"
               onClick={onOpenSettings}
-              aria-label="Open extension options"
-              title="Open extension options"
+              aria-label={t("Open extension options")}
+              title={t("Open extension options")}
             >
               <CogIcon size={16} aria-hidden />
             </button>
@@ -251,8 +250,8 @@ function App() {
               type="button"
               className="fx-inline-converter-swap"
               onClick={onSwapCurrencies}
-              aria-label="Swap currencies"
-              title="Swap currencies"
+              aria-label={t("Swap currencies")}
+              title={t("Swap currencies")}
             >
               <ArrowLeftRightIcon size={16} aria-hidden />
             </button>
@@ -287,12 +286,12 @@ function App() {
             type="button"
             className="fx-inline-popup-feedback-button"
             onClick={onOpenFeedback}
-            aria-label="Share feedback (opens in a new tab)"
-            title="Share feedback (opens in a new tab)"
+            aria-label={t("Share feedback (opens in a new tab)")}
+            title={t("Share feedback (opens in a new tab)")}
           >
-            Feedback ↗
+            {t("Feedback ↗")}
           </button>
-          <p className="fx-inline-popup-meta">© {currentYear} FX Inline</p>
+          <p className="fx-inline-popup-meta">{t("© {year} FX Inline", { year: currentYear })}</p>
         </div>
       </ConvertorHOD>
     </main>

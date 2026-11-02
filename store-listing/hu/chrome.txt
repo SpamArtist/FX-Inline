@@ -1,0 +1,18 @@
+Az FX Inline segítségével egy pillantással átláthatod az online árakat. Amikor meglátogatsz egy weboldalt, az eredeti összeg mellett közvetlenül megjelenítheti az árakat az általad választott pénznemben. Így könnyebben összehasonlíthatod a termékeket, előfizetéseket, utazási költségeket és nemzetközi árakat, külön átváltó megnyitása nélkül. Kiválaszthatod a pénznemet, be- vagy kikapcsolhatod az automatikus átváltást, és megadhatod, hogy mindenhol vagy csak az aktuális oldalon működjön.
+
+Az FX Inline észrevétlenül segít: csak akkor dolgozik, ha áradatokat talál, és az eredeti árat is láthatóan hagyja, így bármikor összehasonlíthatod a két összeget.
+
+Újdonságok:
+
+v1.0.0:
+Gyorsabb átváltás a gyakran frissülő oldalakon.
+Az árak és ártartományok jobb kezelése.
+Kevesebb téves pénznemfelismerés.
+Általános sebesség- és megbízhatósági fejlesztések.
+
+v0.5.0:
+Ezzel a frissítéssel az FX Inline gyorsabb, letisztultabb és megbízhatóbb lett.
+Az oldalak gördülékenyebben töltődnek be, mert a bővítmény csak akkor kezd további munkába, ha árat talál.
+Az átváltó ablaka és a beállítási képernyők most egységesebb megjelenésűek.
+A pénznemátváltás könnyebben szabályozható az összes oldalra vagy csak az aktuális oldalra.
+A bővítménycsomagot átrendeztük, hogy a jövőbeli frissítések megbízhatóbbak legyenek.
