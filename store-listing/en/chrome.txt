@@ -1,0 +1,18 @@
+FX Inline helps you understand prices online at a glance. When you visit a webpage, it can show prices in your preferred currency directly beside the original amount, making it easier to compare products, subscriptions, travel costs, and international prices without opening a separate converter. You can choose your currency, turn automatic conversion on or off, and control whether conversion runs everywhere or only on the current page.
+
+FX Inline is designed to stay out of the way: it only works when it finds price information and keeps the original price visible so you can always compare both amounts.
+
+What’s new:
+
+v1.0.0:
+Faster conversion on pages that update often.
+Better support for prices and price ranges.
+Fewer incorrect currency matches.
+General speed and reliability improvements.
+
+v0.5.0:
+This update makes FX Inline feel faster, cleaner, and more reliable.
+Pages load more smoothly because the extension waits until it sees a price before doing extra work.
+The popup and settings screens now have a more consistent look.
+Currency conversion controls are easier to manage for all pages or just the current page.
+The extension package has been cleaned up so future updates are more reliable.

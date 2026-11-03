@@ -1,0 +1,18 @@
+FX Inline, çevrimiçi fiyatları bir bakışta anlamanıza yardımcı olur. Bir web sayfasını ziyaret ettiğinizde, fiyatları tercih ettiğiniz para biriminde asıl tutarın hemen yanında gösterebilir. Böylece ayrı bir dönüştürücü açmadan ürünleri, abonelikleri, seyahat maliyetlerini ve uluslararası fiyatları daha kolay karşılaştırabilirsiniz. Para biriminizi seçebilir, otomatik dönüştürmeyi açıp kapatabilir ve dönüştürmenin her yerde mi yoksa yalnızca geçerli sayfada mı çalışacağını belirleyebilirsiniz.
+
+FX Inline, işinizi bölmeden çalışacak şekilde tasarlanmıştır: yalnızca fiyat bilgisi bulduğunda çalışır ve asıl fiyatı görünür tutar. Böylece her iki tutarı da her zaman karşılaştırabilirsiniz.
+
+Yenilikler:
+
+v1.0.0:
+Sık güncellenen sayfalarda daha hızlı dönüştürme.
+Fiyatlar ve fiyat aralıkları için daha iyi destek.
+Daha az hatalı para birimi eşleşmesi.
+Genel hız ve güvenilirlik iyileştirmeleri.
+
+v0.5.0:
+Bu güncellemeyle FX Inline daha hızlı, daha sade ve daha güvenilir hale geldi.
+Uzantı, ek işlemler yapmadan önce bir fiyat bulmayı beklediği için sayfalar daha akıcı yüklenir.
+Dönüştürücü penceresi ve ayar ekranları artık daha tutarlı bir görünüme sahip.
+Para birimi dönüştürme kontrollerini tüm sayfalar veya yalnızca geçerli sayfa için yönetmek daha kolay.
+Gelecekteki güncellemelerin daha güvenilir olması için uzantı paketi düzenlendi.

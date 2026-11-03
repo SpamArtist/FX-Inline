@@ -1,0 +1,18 @@
+FX Inline auttaa hahmottamaan verkkohinnat yhdellä silmäyksellä. Kun vierailet verkkosivulla, laajennus voi näyttää hinnat ensisijaisessa valuutassasi suoraan alkuperäisen summan vieressä. Näin tuotteiden, tilausten, matkakulujen ja kansainvälisten hintojen vertailu helpottuu ilman erillisen valuuttamuuntimen avaamista. Voit valita valuutan, ottaa automaattisen muunnoksen käyttöön tai poistaa sen käytöstä ja päättää, toimiiko muunnos kaikkialla vai vain nykyisellä sivulla.
+
+FX Inline on suunniteltu toimimaan huomaamattomasti: se toimii vain löytäessään hintatietoja ja pitää alkuperäisen hinnan näkyvissä, jotta voit aina vertailla molempia summia.
+
+Uutta:
+
+v1.0.0:
+Nopeampi muunnos usein päivittyvillä sivuilla.
+Parempi tuki hinnoille ja hintahaarukoille.
+Vähemmän virheellisiä valuuttatunnistuksia.
+Yleisiä nopeuden ja luotettavuuden parannuksia.
+
+v0.5.0:
+Tämä päivitys tekee FX Inline -laajennuksesta nopeamman, selkeämmän ja luotettavamman.
+Sivut latautuvat sujuvammin, koska laajennus odottaa hinnan löytymistä ennen lisätyön tekemistä.
+Ponnahdusikkunan ja asetussivun ulkoasu on nyt yhtenäisempi.
+Valuuttamuunnosta on helpompi hallita kaikilla sivuilla tai vain nykyisellä sivulla.
+Laajennuspakettia on siistitty, jotta tulevat päivitykset olisivat luotettavampia.

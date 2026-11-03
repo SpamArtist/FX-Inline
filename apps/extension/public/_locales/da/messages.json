@@ -1,0 +1,182 @@
+{
+  "text_20ebf3a5": {
+    "message": "Beløbet opdateres med det samme",
+    "description": "Amount updates instantly"
+  },
+  "text_4aef048d": {
+    "message": "Vælg din foretrukne valuta i Indstillinger.",
+    "description": "Choose your preferred currency in Settings."
+  },
+  "text_2f321046": {
+    "message": "Klik på beløbet for at redigere",
+    "description": "Click amount to edit"
+  },
+  "text_567e8008": {
+    "message": "Kunne ikke åbne indstillingerne automatisk. Åbn indstillingerne for FX Inline fra udvidelsens menu.",
+    "description": "Could not open settings automatically. Open FX Inline Settings from the extension menu."
+  },
+  "text_146f2256": {
+    "message": "Valuta",
+    "description": "Currency"
+  },
+  "text_ce6abb7e": {
+    "message": "Rediger beløb i $currency_name$",
+    "description": "Edit {currency_name} amount",
+    "placeholders": {
+      "currency_name": {
+        "content": "$1"
+      }
+    }
+  },
+  "text_ffeee0c8": {
+    "message": "FX INLINE",
+    "description": "FX INLINE"
+  },
+  "text_f68e4728": {
+    "message": "FX Inline",
+    "description": "FX Inline"
+  },
+  "text_b23df7c5": {
+    "message": "Indstillinger for FX Inline",
+    "description": "FX Inline Settings"
+  },
+  "text_07a1f646": {
+    "message": "FX Inline omregner priser på websider til din foretrukne valuta, så du kan sammenligne omkostninger uden at forlade siden.",
+    "description": "FX Inline converts prices directly on webpages into your preferred currency, so you can compare costs without leaving the page."
+  },
+  "text_a187caa3": {
+    "message": "Din mening ↗",
+    "description": "Feedback ↗"
+  },
+  "text_51f61eb8": {
+    "message": "Kom i gang på under et minut",
+    "description": "Get started in under a minute"
+  },
+  "text_787b32e2": {
+    "message": "Automatisk omregning på alle sider er slået fra",
+    "description": "Global auto conversion off"
+  },
+  "text_7fd3e348": {
+    "message": "Automatisk omregning på alle sider er slået til",
+    "description": "Global auto conversion on"
+  },
+  "text_1aea5822": {
+    "message": "Automatisk omregning på alle sider: Fra",
+    "description": "Global auto conversion: Off"
+  },
+  "text_52047188": {
+    "message": "Automatisk omregning på alle sider: Til",
+    "description": "Global auto conversion: On"
+  },
+  "text_3ab87a71": {
+    "message": "Automatisk omregning er ikke tilgængelig på denne side",
+    "description": "Local auto conversion is unavailable on this page"
+  },
+  "text_33a6dd64": {
+    "message": "Automatisk omregning på denne side er slået fra",
+    "description": "Local auto conversion off"
+  },
+  "text_2dc68f52": {
+    "message": "Automatisk omregning på denne side er slået til",
+    "description": "Local auto conversion on"
+  },
+  "text_f54c31f0": {
+    "message": "Automatisk omregning på denne side: Fra",
+    "description": "Local auto conversion on this page: Off"
+  },
+  "text_e8a608ce": {
+    "message": "Automatisk omregning på denne side: Til",
+    "description": "Local auto conversion on this page: On"
+  },
+  "text_45de88b6": {
+    "message": "Indstillinger",
+    "description": "Open Settings"
+  },
+  "text_890e2b8a": {
+    "message": "Åbn en netbutik, rejseside eller markedsplads med priser.",
+    "description": "Open any shopping, travel, or marketplace page with prices."
+  },
+  "text_4ca886ba": {
+    "message": "Åbn udvidelsens indstillinger",
+    "description": "Open extension options"
+  },
+  "text_f992bb1e": {
+    "message": "Åbner indstillinger…",
+    "description": "Opening Settings..."
+  },
+  "text_38ff82c9": {
+    "message": "Foretrukken valuta",
+    "description": "Preferred Currency"
+  },
+  "text_56d0bf94": {
+    "message": "Den foretrukne valuta er ændret til $currency_code$.",
+    "description": "Preferred currency updated to {currency_code}.",
+    "placeholders": {
+      "currency_code": {
+        "content": "$1"
+      }
+    }
+  },
+  "text_87691c58": {
+    "message": "Indstillingerne er åbnet i en ny fane.",
+    "description": "Settings opened in a new tab."
+  },
+  "text_c4102f5c": {
+    "message": "Giv din mening (åbner i en ny fane)",
+    "description": "Share feedback (opens in a new tab)"
+  },
+  "text_e9b65b75": {
+    "message": "Byt valutaer",
+    "description": "Swap currencies"
+  },
+  "text_9049d6de": {
+    "message": "Tak, fordi du installerede FX Inline. Vi omregner priser direkte på de sider, du besøger, så du hurtigt og sikkert kan vurdere omkostninger i din foretrukne valuta.",
+    "description": "Thank you for installing FX Inline. We convert prices directly on the pages you visit so you can evaluate costs quickly and confidently in your preferred currency."
+  },
+  "text_71efd3a7": {
+    "message": "Kunne ikke indlæse den foretrukne valuta.",
+    "description": "Unable to load preferred currency."
+  },
+  "text_36427242": {
+    "message": "Kunne ikke ændre den foretrukne valuta.",
+    "description": "Unable to update preferred currency."
+  },
+  "text_89595d96": {
+    "message": "Klik på FX Inline-ikonet når som helst for at åbne valutaomregneren.",
+    "description": "Use the FX Inline icon anytime to open the converter popup."
+  },
+  "text_3a51b61f": {
+    "message": "Velkommen til FX Inline",
+    "description": "Welcome to FX Inline"
+  },
+  "text_6717953b": {
+    "message": "Du kan altid åbne denne side igen via udvidelsens filer.",
+    "description": "You can revisit this page anytime from the extension files."
+  },
+  "text_b243a1d8": {
+    "message": "Beløb i $currency_name$",
+    "description": "{currency_name} amount",
+    "placeholders": {
+      "currency_name": {
+        "content": "$1"
+      }
+    }
+  },
+  "text_18add3dc": {
+    "message": "© $year$ FX Inline",
+    "description": "© {year} FX Inline",
+    "placeholders": {
+      "year": {
+        "content": "$1"
+      }
+    }
+  },
+  "extensionName": {
+    "message": "FX Inline",
+    "description": "FX Inline"
+  },
+  "extensionDescription": {
+    "message": "FX Inline omregner priser på websider til din foretrukne valuta, så du kan sammenligne omkostninger uden at forlade siden.",
+    "description": "FX Inline converts prices directly on webpages into your preferred currency, so you can compare costs without leaving the page."
+  }
+}

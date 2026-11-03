@@ -5,6 +5,7 @@ import {
   getCurrencyDisplayName,
   getNextAmountDraft,
 } from "@/utils/currencyPresentation";
+import { getExtensionLanguage, t } from "@/utils/i18n";
 import type { JSX } from "preact";
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 import CurrencyDropdown from "../CurrencyDropdown/CurrencyDropdown";
@@ -57,8 +58,8 @@ function CurrencyBox({
   );
 
   const currencyName = useMemo(
-    () => getCurrencyDisplayName(data.code, resolvedLocale),
-    [data.code, resolvedLocale],
+    () => getCurrencyDisplayName(data.code, getExtensionLanguage()),
+    [data.code],
   );
 
   const shouldDisplayInput = isDirectInput || isEditingAmount;
@@ -141,14 +142,14 @@ function CurrencyBox({
             onInput={handleAmountChange}
             onBlur={finalizeAmountEdit}
             onKeyDown={onAmountInputKeyDown}
-            aria-label={`${currencyName} amount`}
+            aria-label={t("{currency_name} amount", { currency_name: currencyName })}
           />
         ) : (
           <button
             type="button"
             className="fx-inline-currency-box__amount-display"
             onClick={beginAmountEdit}
-            aria-label={`Edit ${currencyName} amount`}
+            aria-label={t("Edit {currency_name} amount", { currency_name: currencyName })}
           >
             {displayAmount}
           </button>
@@ -157,8 +158,8 @@ function CurrencyBox({
 
       <p className="fx-inline-currency-box__amount-meta">
         {amountPresentationMode === "displayThenEdit"
-          ? "Click amount to edit"
-          : "Amount updates instantly"}
+          ? t("Click amount to edit")
+          : t("Amount updates instantly")}
       </p>
     </section>
   );

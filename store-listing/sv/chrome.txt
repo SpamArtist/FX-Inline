@@ -1,0 +1,18 @@
+FX Inline hjälper dig att förstå priser på nätet med en blick. När du besöker en webbsida kan tillägget visa priser i din önskade valuta direkt bredvid det ursprungliga beloppet. Det gör det enklare att jämföra produkter, abonnemang, resekostnader och internationella priser utan att öppna en separat valutaomvandlare. Du kan välja valuta, slå på eller av automatisk omräkning och bestämma om omräkningen ska ske överallt eller bara på den aktuella sidan.
+
+FX Inline är utformat för att inte vara i vägen: det arbetar bara när det hittar prisinformation och låter det ursprungliga priset vara synligt så att du alltid kan jämföra båda beloppen.
+
+Nyheter:
+
+v1.0.0:
+Snabbare omräkning på sidor som uppdateras ofta.
+Bättre stöd för priser och prisintervall.
+Färre felaktiga valutaidentifieringar.
+Allmänna förbättringar av hastighet och tillförlitlighet.
+
+v0.5.0:
+Den här uppdateringen gör FX Inline snabbare, tydligare och mer tillförlitligt.
+Sidor laddas smidigare eftersom tillägget väntar tills det hittar ett pris innan det gör extra arbete.
+Omvandlarfönstret och inställningssidan har nu ett mer enhetligt utseende.
+Det är enklare att styra valutaomräkningen för alla sidor eller bara den aktuella sidan.
+Tilläggspaketet har städats upp för att göra framtida uppdateringar mer tillförlitliga.

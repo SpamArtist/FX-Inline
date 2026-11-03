@@ -1,0 +1,18 @@
+FX Inline vám pomůže rychle se zorientovat v cenách na internetu. Při návštěvě webové stránky může zobrazit ceny ve vaší preferované měně přímo vedle původní částky. Snáze tak porovnáte produkty, předplatná, cestovní náklady i zahraniční ceny, aniž byste museli otevírat samostatný převodník. Můžete si vybrat měnu, zapnout nebo vypnout automatický převod a určit, zda má převod fungovat všude, nebo jen na aktuální stránce.
+
+FX Inline je navržen tak, aby nepřekážel: pracuje pouze tehdy, když najde údaje o cenách, a ponechává původní cenu viditelnou, takže můžete obě částky vždy porovnat.
+
+Co je nového:
+
+v1.0.0:
+Rychlejší převod na stránkách, které se často aktualizují.
+Lepší podpora cen a cenových rozpětí.
+Méně chyb při rozpoznávání měn.
+Celkové zlepšení rychlosti a spolehlivosti.
+
+v0.5.0:
+Díky této aktualizaci je FX Inline rychlejší, přehlednější a spolehlivější.
+Stránky se načítají plynuleji, protože rozšíření se pustí do další práce, až když najde cenu.
+Okno převodníku a nastavení nyní mají jednotnější vzhled.
+Ovládání převodu měn pro všechny stránky nebo jen aktuální stránku je jednodušší.
+Balíček rozšíření byl upraven tak, aby budoucí aktualizace byly spolehlivější.

@@ -16,7 +16,7 @@ FX Inline is a browser extension that converts prices on webpages into your pref
 
 ## Setup
 
-Use Node.js 22 and npm.
+Use Node.js 22.18 or newer and npm.
 
 ```sh
 git clone https://github.com/SpamArtist/FX-Inline.git
@@ -121,3 +121,25 @@ It gets rates from:
 - [Inline runtime](packages/inline-runtime/README.md)
 - [Architecture decisions](docs/adr)
 - [Performance notes](docs/performance)
+
+## Localization
+
+Extension UI strings use `t("English text", { name: value })` from `utils/i18n.ts`.
+Keep complete sentences in literal calls and put dynamic values in `{name}` placeholders.
+The helper hashes English text into Chrome message keys and falls back to that English text.
+Currency names use `Intl.DisplayNames`; currency codes and stored values stay unchanged.
+
+Translate new or changed English text in every `scripts/i18n/translations/<locale>.json`.
+Run `npm run build:locales` to collect calls and write `apps/extension/public/_locales/*/messages.json`.
+Build, development, and archive commands run this step automatically. Missing translations,
+changed placeholders, straight double quotes, and overlong manifest metadata fail the build.
+`npm run check:locales` also detects stale output. Do not edit generated catalogs by hand.
+
+Chrome selects the UI language from its browser language. Supported locales are en, de, fr,
+es, it, pt_PT, pt_BR, nl, pl, sv, da, no, fi, cs, ro, hu, el, tr, and uk. Unsupported locales
+fall back to English. Portuguese uses the regional Chrome locales. Norwegian catalogs ship as
+both `no` and `nb`, because Chrome on macOS requests `nb` for Bokmål; both use the `no` translation source.
+
+Store descriptions live in `store-listing/<locale>/chrome.txt`. The English source was taken
+from the [current Chrome Web Store listing](https://chromewebstore.google.com/detail/fx-inline/cicoldboionelecmpjpkkdhicjbpfefj)
+on 2026-11-02. No keyword lists were present; the description and release notes are preserved.

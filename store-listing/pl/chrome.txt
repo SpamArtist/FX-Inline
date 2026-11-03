@@ -1,0 +1,18 @@
+FX Inline pomaga błyskawicznie zrozumieć ceny w internecie. Podczas przeglądania strony rozszerzenie może wyświetlać ceny w preferowanej walucie tuż obok oryginalnej kwoty. Ułatwia to porównywanie produktów, subskrypcji, kosztów podróży i cen zagranicznych bez otwierania osobnego przelicznika. Możesz wybrać walutę, włączyć lub wyłączyć automatyczne przeliczanie oraz zdecydować, czy ma ono działać wszędzie, czy tylko na bieżącej stronie.
+
+FX Inline działa dyskretnie: uruchamia się tylko po znalezieniu informacji o cenie i pozostawia oryginalną cenę widoczną, aby zawsze można było porównać obie kwoty.
+
+Co nowego:
+
+v1.0.0:
+Szybsze przeliczanie na często aktualizowanych stronach.
+Lepsza obsługa cen i przedziałów cenowych.
+Mniej błędów w rozpoznawaniu walut.
+Ogólne usprawnienia szybkości i niezawodności.
+
+v0.5.0:
+Ta aktualizacja sprawia, że FX Inline działa szybciej, wygląda przejrzyściej i jest bardziej niezawodne.
+Strony ładują się płynniej, ponieważ rozszerzenie wykonuje dodatkowe zadania dopiero po wykryciu ceny.
+Okno przelicznika i ekran ustawień mają teraz bardziej spójny wygląd.
+Łatwiej zarządzać przeliczaniem walut na wszystkich stronach lub tylko na bieżącej stronie.
+Pakiet rozszerzenia został uporządkowany, aby przyszłe aktualizacje były bardziej niezawodne.

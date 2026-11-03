@@ -1,8 +1,10 @@
+import { t, localizeDocument } from "@/utils/i18n";
 import { attachSharedThemeStylesheet } from "@/utils/sharedThemeStylesheet";
 import { browser } from "wxt/browser";
 import "./style.css";
 
 attachSharedThemeStylesheet();
+localizeDocument(document, t("Welcome to FX Inline"));
 
 const root = document.getElementById("root");
 
@@ -24,16 +26,15 @@ header.className = "fx-inline-welcome-header";
 
 const brand = document.createElement("p");
 brand.className = "fx-inline-shell__title fx-inline-welcome-brand";
-brand.textContent = "FX Inline";
+brand.textContent = t("FX Inline");
 
 const heading = document.createElement("h1");
 heading.className = "fx-inline-welcome-heading";
-heading.textContent = "Welcome to FX Inline";
+heading.textContent = t("Welcome to FX Inline");
 
 const copy = document.createElement("p");
 copy.className = "fx-inline-welcome-copy";
-copy.textContent =
-  "Thank you for installing FX Inline. We convert prices directly on the pages you visit so you can evaluate costs quickly and confidently in your preferred currency.";
+copy.textContent = t("Thank you for installing FX Inline. We convert prices directly on the pages you visit so you can evaluate costs quickly and confidently in your preferred currency.");
 
 header.append(brand, heading, copy);
 
@@ -42,17 +43,17 @@ guide.className = "fx-inline-welcome-guide";
 
 const guideTitle = document.createElement("h2");
 guideTitle.className = "fx-inline-welcome-guide-title";
-guideTitle.textContent = "Get started in under a minute";
+guideTitle.textContent = t("Get started in under a minute");
 
 const guideList = document.createElement("ul");
 guideList.className = "fx-inline-welcome-guide-list";
 
 const firstGuideItem = document.createElement("li");
-firstGuideItem.textContent = "Choose your preferred currency in Settings.";
+firstGuideItem.textContent = t("Choose your preferred currency in Settings.");
 const secondGuideItem = document.createElement("li");
-secondGuideItem.textContent = "Open any shopping, travel, or marketplace page with prices.";
+secondGuideItem.textContent = t("Open any shopping, travel, or marketplace page with prices.");
 const thirdGuideItem = document.createElement("li");
-thirdGuideItem.textContent = "Use the FX Inline icon anytime to open the converter popup.";
+thirdGuideItem.textContent = t("Use the FX Inline icon anytime to open the converter popup.");
 
 guideList.append(firstGuideItem, secondGuideItem, thirdGuideItem);
 guide.append(guideTitle, guideList);
@@ -64,11 +65,11 @@ const settingsButton = document.createElement("button");
 settingsButton.className = "fx-inline-welcome-primary-button";
 settingsButton.id = "fx-inline-welcome-open-settings";
 settingsButton.type = "button";
-settingsButton.textContent = "Open Settings";
+settingsButton.textContent = t("Open Settings");
 
 const note = document.createElement("p");
 note.className = "fx-inline-welcome-note";
-note.textContent = "You can revisit this page anytime from the extension files.";
+note.textContent = t("You can revisit this page anytime from the extension files.");
 
 const statusText = document.createElement("p");
 statusText.className = "fx-inline-welcome-status";
@@ -92,7 +93,7 @@ function setStatus(message: string) {
 async function openSettingsPage() {
   setStatus("");
   settingsButton.disabled = true;
-  settingsButton.textContent = "Opening Settings...";
+  settingsButton.textContent = t("Opening Settings...");
 
   try {
     try {
@@ -103,15 +104,13 @@ async function openSettingsPage() {
       });
     }
 
-    setStatus("Settings opened in a new tab.");
+    setStatus(t("Settings opened in a new tab."));
   } catch (error) {
     console.warn("[fx-inline] Failed to open options page from welcome page", error);
-    setStatus(
-      "Could not open settings automatically. Open FX Inline Settings from the extension menu.",
-    );
+    setStatus(t("Could not open settings automatically. Open FX Inline Settings from the extension menu."));
   } finally {
     settingsButton.disabled = false;
-    settingsButton.textContent = "Open Settings";
+    settingsButton.textContent = t("Open Settings");
   }
 }
 

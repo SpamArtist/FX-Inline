@@ -1,0 +1,182 @@
+{
+  "text_20ebf3a5": {
+    "message": "Сума оновлюється миттєво",
+    "description": "Amount updates instantly"
+  },
+  "text_4aef048d": {
+    "message": "Виберіть бажану валюту в Налаштуваннях.",
+    "description": "Choose your preferred currency in Settings."
+  },
+  "text_2f321046": {
+    "message": "Натисніть суму, щоб змінити її",
+    "description": "Click amount to edit"
+  },
+  "text_567e8008": {
+    "message": "Не вдалося автоматично відкрити налаштування. Відкрийте Налаштування FX Inline в меню розширення.",
+    "description": "Could not open settings automatically. Open FX Inline Settings from the extension menu."
+  },
+  "text_146f2256": {
+    "message": "Валюта",
+    "description": "Currency"
+  },
+  "text_ce6abb7e": {
+    "message": "Змінити суму у валюті $currency_name$",
+    "description": "Edit {currency_name} amount",
+    "placeholders": {
+      "currency_name": {
+        "content": "$1"
+      }
+    }
+  },
+  "text_ffeee0c8": {
+    "message": "FX INLINE",
+    "description": "FX INLINE"
+  },
+  "text_f68e4728": {
+    "message": "FX Inline",
+    "description": "FX Inline"
+  },
+  "text_b23df7c5": {
+    "message": "Налаштування FX Inline",
+    "description": "FX Inline Settings"
+  },
+  "text_07a1f646": {
+    "message": "FX Inline конвертує ціни на вебсторінках у бажану валюту, щоб ви могли порівнювати витрати, не залишаючи сторінку.",
+    "description": "FX Inline converts prices directly on webpages into your preferred currency, so you can compare costs without leaving the page."
+  },
+  "text_a187caa3": {
+    "message": "Відгук ↗",
+    "description": "Feedback ↗"
+  },
+  "text_51f61eb8": {
+    "message": "Почніть менш ніж за хвилину",
+    "description": "Get started in under a minute"
+  },
+  "text_787b32e2": {
+    "message": "Глобальну автоконвертацію вимкнено",
+    "description": "Global auto conversion off"
+  },
+  "text_7fd3e348": {
+    "message": "Глобальну автоконвертацію ввімкнено",
+    "description": "Global auto conversion on"
+  },
+  "text_1aea5822": {
+    "message": "Глобальна автоконвертація: вимкнено",
+    "description": "Global auto conversion: Off"
+  },
+  "text_52047188": {
+    "message": "Глобальна автоконвертація: увімкнено",
+    "description": "Global auto conversion: On"
+  },
+  "text_3ab87a71": {
+    "message": "Автоконвертація недоступна на цій сторінці",
+    "description": "Local auto conversion is unavailable on this page"
+  },
+  "text_33a6dd64": {
+    "message": "Автоконвертацію на сторінці вимкнено",
+    "description": "Local auto conversion off"
+  },
+  "text_2dc68f52": {
+    "message": "Автоконвертацію на сторінці ввімкнено",
+    "description": "Local auto conversion on"
+  },
+  "text_f54c31f0": {
+    "message": "Автоконвертація на цій сторінці: вимкнено",
+    "description": "Local auto conversion on this page: Off"
+  },
+  "text_e8a608ce": {
+    "message": "Автоконвертація на цій сторінці: увімкнено",
+    "description": "Local auto conversion on this page: On"
+  },
+  "text_45de88b6": {
+    "message": "Налаштування",
+    "description": "Open Settings"
+  },
+  "text_890e2b8a": {
+    "message": "Відкрийте будь-яку сторінку магазину, туристичного сайту чи торговельного майданчика з цінами.",
+    "description": "Open any shopping, travel, or marketplace page with prices."
+  },
+  "text_4ca886ba": {
+    "message": "Відкрити налаштування розширення",
+    "description": "Open extension options"
+  },
+  "text_f992bb1e": {
+    "message": "Відкриття налаштувань…",
+    "description": "Opening Settings..."
+  },
+  "text_38ff82c9": {
+    "message": "Бажана валюта",
+    "description": "Preferred Currency"
+  },
+  "text_56d0bf94": {
+    "message": "Бажану валюту змінено на $currency_code$.",
+    "description": "Preferred currency updated to {currency_code}.",
+    "placeholders": {
+      "currency_code": {
+        "content": "$1"
+      }
+    }
+  },
+  "text_87691c58": {
+    "message": "Налаштування відкрито в новій вкладці.",
+    "description": "Settings opened in a new tab."
+  },
+  "text_c4102f5c": {
+    "message": "Надіслати відгук (відкриється в новій вкладці)",
+    "description": "Share feedback (opens in a new tab)"
+  },
+  "text_e9b65b75": {
+    "message": "Поміняти валюти місцями",
+    "description": "Swap currencies"
+  },
+  "text_9049d6de": {
+    "message": "Дякуємо за встановлення FX Inline. Ми конвертуємо ціни безпосередньо на сторінках, які ви відвідуєте, щоб ви могли швидко й упевнено оцінювати витрати в бажаній валюті.",
+    "description": "Thank you for installing FX Inline. We convert prices directly on the pages you visit so you can evaluate costs quickly and confidently in your preferred currency."
+  },
+  "text_71efd3a7": {
+    "message": "Не вдалося завантажити бажану валюту.",
+    "description": "Unable to load preferred currency."
+  },
+  "text_36427242": {
+    "message": "Не вдалося оновити бажану валюту.",
+    "description": "Unable to update preferred currency."
+  },
+  "text_89595d96": {
+    "message": "Натискайте значок FX Inline будь-коли, щоб відкрити вікно конвертера.",
+    "description": "Use the FX Inline icon anytime to open the converter popup."
+  },
+  "text_3a51b61f": {
+    "message": "Вітаємо у FX Inline",
+    "description": "Welcome to FX Inline"
+  },
+  "text_6717953b": {
+    "message": "Ви можете будь-коли повернутися на цю сторінку з файлів розширення.",
+    "description": "You can revisit this page anytime from the extension files."
+  },
+  "text_b243a1d8": {
+    "message": "Сума у валюті $currency_name$",
+    "description": "{currency_name} amount",
+    "placeholders": {
+      "currency_name": {
+        "content": "$1"
+      }
+    }
+  },
+  "text_18add3dc": {
+    "message": "© $year$ FX Inline",
+    "description": "© {year} FX Inline",
+    "placeholders": {
+      "year": {
+        "content": "$1"
+      }
+    }
+  },
+  "extensionName": {
+    "message": "FX Inline",
+    "description": "FX Inline"
+  },
+  "extensionDescription": {
+    "message": "FX Inline конвертує ціни на вебсторінках у бажану валюту, щоб ви могли порівнювати витрати, не залишаючи сторінку.",
+    "description": "FX Inline converts prices directly on webpages into your preferred currency, so you can compare costs without leaving the page."
+  }
+}

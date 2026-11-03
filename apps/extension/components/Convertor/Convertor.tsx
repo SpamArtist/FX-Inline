@@ -1,10 +1,11 @@
+import { t } from "@/utils/i18n";
 import type { ConvertorHodProps } from "./Convertor.types";
 
 export type { ConverterShellVariant } from "./Convertor.types";
 
 export const ConvertorHOD = ({
   variant,
-  title = "FX INLINE",
+  title = t("FX INLINE"),
   headerActions,
   children,
 }: ConvertorHodProps) => {
