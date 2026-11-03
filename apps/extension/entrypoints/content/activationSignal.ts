@@ -2,7 +2,10 @@ import {
   ALLOWED_ISO_CURRENCY_CODES,
   AMBIGUOUS_ISO_CURRENCY_CODES,
 } from "@fx-inline/currency-detection/iso-data";
-import { ACTIVATION_CURRENCY_SYMBOLS } from "@fx-inline/currency-detection/activation-data";
+import {
+  ACTIVATION_CURRENCY_SYMBOLS,
+  ACTIVATION_CURRENCY_WORDS,
+} from "@fx-inline/currency-detection/activation-data";
 
 const ACTIVATION_TEXT_WINDOW_LIMIT = 512;
 const TOKEN_CONTEXT_LIMIT = 64;
@@ -16,12 +19,17 @@ const CURRENCY_SYMBOL_PATTERN = `(?:${ACTIVATION_CURRENCY_SYMBOLS.map(
 ).join("|")})`;
 const NUMBER_PATTERN = "\\d[\\d\\s.,'’]*(?:\\d|[.,]\\d)?";
 const AMBIGUOUS_ISO_CODES = new Set(AMBIGUOUS_ISO_CURRENCY_CODES);
-const ACTIVATION_ISO_CODE_PATTERN = Array.from(ALLOWED_ISO_CURRENCY_CODES)
-  .filter((code) => !AMBIGUOUS_ISO_CODES.has(code))
+const ACTIVATION_WORD_PATTERN = [
+  ...Array.from(ALLOWED_ISO_CURRENCY_CODES).filter(
+    (code) => !AMBIGUOUS_ISO_CODES.has(code),
+  ),
+  ...ACTIVATION_CURRENCY_WORDS,
+]
   .sort((a, b) => b.length - a.length)
+  .map(escapeRegexLiteral)
   .join("|");
-const ISO_TOKEN_PATTERN = new RegExp(
-  `(?<!\\p{L})(?:${ACTIVATION_ISO_CODE_PATTERN})(?!\\p{L})`,
+const WORD_TOKEN_PATTERN = new RegExp(
+  `(?<!\\p{L})(?:${ACTIVATION_WORD_PATTERN})(?!\\p{L})`,
   "giu",
 );
 const SYMBOL_TOKEN_PATTERN = new RegExp(CURRENCY_SYMBOL_PATTERN, "gu");
@@ -59,7 +67,7 @@ export function hasCurrencyActivationSignal(text: string): boolean {
     if (hasAmountInTokenContext(normalized, tokenStart, tokenEnd)) return true;
   }
 
-  for (const match of normalized.matchAll(ISO_TOKEN_PATTERN)) {
+  for (const match of normalized.matchAll(WORD_TOKEN_PATTERN)) {
     const tokenStart = match.index;
     const tokenEnd = tokenStart + match[0].length;
     if (hasAmountInTokenContext(normalized, tokenStart, tokenEnd)) return true;

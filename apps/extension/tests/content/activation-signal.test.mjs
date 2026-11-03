@@ -33,6 +33,19 @@ test("currency activation signal keeps parser-only symbols out", () => {
   expect(hasCurrencyActivationSignal("ر.س 50")).toBe(false);
 });
 
+test.each(["RMB 100", "100 RMB", "rmb100", "100rmb", "CN¥100", "100元"])(
+  "explicit Chinese price %s activates conversion",
+  (price) => {
+    expect(hasCurrencyActivationSignal(price)).toBe(true);
+  },
+);
+
+test("RMB activation keeps word boundaries and requires an amount", () => {
+  expect(hasCurrencyActivationSignal("RMB")).toBe(false);
+  expect(hasCurrencyActivationSignal("planRMB 100")).toBe(false);
+  expect(hasCurrencyActivationSignal("RMBplan 100")).toBe(false);
+});
+
 test("symbol activation keeps existing symbol coverage for prefix and suffix forms", () => {
   for (const symbol of ACTIVATION_CURRENCY_SYMBOLS) {
     expect(hasCurrencyActivationSignal(`${symbol}123`)).toBe(true);

@@ -13,12 +13,24 @@ Evidence that page text can contain a supported currency token near a numeric am
 _Avoid_: Price match, parsed price
 
 **Currency Token**:
-A supported ISO currency code or currency symbol that can identify a currency when it is near a numeric amount.
+A supported ISO currency code, currency alias, or currency symbol that can identify a currency when it is near a numeric amount.
 _Avoid_: Currency marker, currency label
 
 **Compound Magnitude**:
 A phrase whose magnitude terms multiply together to scale a monetary amount. “Lakh crore” means one trillion (10¹²); when shared by a range such as “₹7–8 lakh crore,” it scales both endpoints.
 _Avoid_: Combined currency, currency multiplier
+
+**Source Currency**:
+The currency in which an original price is expressed.
+_Avoid_: Input currency
+
+**Target Currency**:
+The user's selected currency in which a converted price is expressed.
+_Avoid_: Correct currency, output currency
+
+**Renminbi (RMB)**:
+The Chinese currency represented by CNY for conversions. Explicit Chinese price forms include `RMB 100`, `100 RMB`, `CN¥100`, and `100元`; a plain `¥` token identifies Japanese yen in FX Inline.
+_Avoid_: RMB currency code
 
 **Ambiguous ISO Code**:
 An ISO currency code that is also a common word or name. It remains valid for conversion, but it cannot create an Activation Signal by itself.
