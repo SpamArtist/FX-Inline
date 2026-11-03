@@ -13,6 +13,8 @@ export const ACTIVATION_CURRENCY_SYMBOLS = Object.freeze([
   "€",
   "£",
   "¥",
+  "CN¥",
+  "元",
   "₹",
   "₩",
   "₪",
@@ -40,3 +42,5 @@ export const ACTIVATION_CURRENCY_SYMBOLS = Object.freeze([
   "￠",
   "﹩",
 ]);
+
+export const ACTIVATION_CURRENCY_WORDS = Object.freeze(["RMB"]);

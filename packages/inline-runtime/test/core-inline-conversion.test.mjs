@@ -138,6 +138,28 @@ test("converts lakh crore ranges after the complete magnitude phrase", () => {
   );
 });
 
+test.each([
+  ["EUR", 9],
+  ["INR", 830],
+])("converts explicit Chinese prices to selected %s while preserving plain yen", (target, expected) => {
+  const prices = ["RMB 100", "100 RMB", "CN¥100", "100元", "¥100"];
+  document.body.innerHTML = prices.map((price) => `<p>${price}</p>`).join("");
+  const snapshot = createRateSnapshot({ rates: { CNY: 10, JPY: 100 } });
+
+  expect(convertVisiblePrices(target, snapshot, document.body)).toBe(5);
+
+  const wrappers = [...document.querySelectorAll(`span.${INLINE_CONVERSION_CLASS}`)];
+  expect(wrappers.map((wrapper) => wrapper.getAttribute("data-original").trim())).toEqual(prices);
+  for (const wrapper of wrappers.slice(0, 4)) {
+    expect(wrapper.querySelector(".fx-inline-converted-amount").textContent).toContain(
+      expected.toFixed(2),
+    );
+  }
+  expect(wrappers[4].querySelector(".fx-inline-converted-amount").textContent).toContain(
+    (expected / 10).toFixed(2),
+  );
+});
+
 test("uses shared price-text classification for direct, amount-only, and unrelated text", () => {
   document.body.innerHTML = [
     '<p id="direct-price">Pay $100 now.</p>',
