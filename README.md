@@ -61,6 +61,12 @@ npm run dev:firefox
 | `npm run zip:firefox` | Create Firefox archives |
 | `npm run build:website` | Build website |
 
+Icon optimization uses the npm-installed WebAssembly Oxipng codec on all platforms,
+including Apple Silicon. No system optimizer or Rosetta is required. Source and
+build icons use level 6 optimization with alpha optimization and no interlacing;
+the old native-only Zopfli mode is no longer used. Files are replaced only when
+smaller, and the existing icon dimensions and byte budgets remain enforced.
+
 ## Admin Settings
 
 Start the API:

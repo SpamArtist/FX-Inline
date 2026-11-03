@@ -178,6 +178,8 @@ export const DEFAULT_CURRENCY_SYMBOLS = new Set([
   "€",
   "£",
   "¥",
+  "CN¥",
+  "元",
   "₹",
   "₩",
   "₪",
@@ -229,6 +231,8 @@ export const DEFAULT_SYMBOL_TO_CODE = new Map([
   ["€", "EUR"],
   ["£", "GBP"],
   ["¥", "JPY"],
+  ["CN¥", "CNY"],
+  ["元", "CNY"],
   ["₹", "INR"],
   ["₩", "KRW"],
   ["₪", "ILS"],
@@ -252,6 +256,7 @@ export const DEFAULT_SYMBOL_TO_CODE = new Map([
 ]);
 
 export const DEFAULT_WORD_TO_CODE = new Map([
+  ["rmb", "CNY"],
   ["yen", "JPY"],
   ["yên", "JPY"],
 ]);

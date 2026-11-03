@@ -8,7 +8,10 @@ import {
   ALLOWED_ISO_CURRENCY_CODES,
   AMBIGUOUS_ISO_CURRENCY_CODES,
 } from "../src/iso-data.js";
-import { ACTIVATION_CURRENCY_SYMBOLS } from "../src/activation-data.js";
+import {
+  ACTIVATION_CURRENCY_SYMBOLS,
+  ACTIVATION_CURRENCY_WORDS,
+} from "../src/activation-data.js";
 import {
   DEFAULT_ALLOWED_CURRENCY_CODES,
   DEFAULT_CURRENCY_SYMBOLS,
@@ -64,6 +67,8 @@ test("token-only activation data exports current activation symbol coverage", ()
     "€",
     "£",
     "¥",
+    "CN¥",
+    "元",
     "₹",
     "₩",
     "₪",
@@ -99,6 +104,10 @@ test("token-only activation data exports current activation symbol coverage", ()
 test("package exposes token-only activation data submodule", () => {
   expect(packageActivationData.ACTIVATION_CURRENCY_SYMBOLS).toBe(
     ACTIVATION_CURRENCY_SYMBOLS,
+  );
+  expect(ACTIVATION_CURRENCY_WORDS).toEqual(["RMB"]);
+  expect(packageActivationData.ACTIVATION_CURRENCY_WORDS).toBe(
+    ACTIVATION_CURRENCY_WORDS,
   );
 });
 
