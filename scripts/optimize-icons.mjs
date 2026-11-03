@@ -1,7 +1,7 @@
-import { spawnSync } from "node:child_process";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import initOxipng, { optimise } from "@jsquash/oxipng/codec/pkg/squoosh_oxipng.js";
 
 export const extensionIconDirectory = path.join("apps", "extension", "public", "icon");
 export const storeListingIconPath = path.join(
@@ -25,10 +25,6 @@ export const storeListingIcon = {
 };
 
 const pngSignature = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
-
-function getNpmCommand() {
-  return process.platform === "win32" ? "npm.cmd" : "npm";
-}
 
 async function pathExists(filePath) {
   try {
@@ -71,31 +67,22 @@ async function listPngFiles(directory) {
     .sort();
 }
 
-function runOxipng(files, { useZopfli }) {
+async function runOxipng(files) {
   if (files.length === 0) return;
 
-  const compressionArgs = useZopfli ? ["--zopfli"] : [];
-  const result = spawnSync(
-    getNpmCommand(),
-    [
-      "exec",
-      "--",
-      "oxipng",
-      "--opt",
-      "max",
-      ...compressionArgs,
-      "--strip",
-      "all",
-      "--alpha",
-      "--interlace",
-      "0",
-      ...files,
-    ],
-    { stdio: "inherit" },
+  // Load the bundled single-threaded codec directly: Node has no ImageData or
+  // file: fetch support required by the browser wrapper's automatic loading.
+  const wasmBytes = await fs.readFile(
+    new URL(import.meta.resolve("@jsquash/oxipng/codec/pkg/squoosh_oxipng_bg.wasm")),
   );
+  await initOxipng(wasmBytes);
 
-  if (result.status !== 0) {
-    throw new Error(`oxipng failed with exit code ${result.status}.`);
+  for (const file of files) {
+    const source = await fs.readFile(file);
+    const optimized = optimise(source, 6, false, true);
+    if (optimized.byteLength < source.byteLength) {
+      await fs.writeFile(file, optimized);
+    }
   }
 }
 
@@ -176,9 +163,7 @@ export async function assertIconAssets() {
 }
 
 async function optimizeSourceIcons() {
-  runOxipng([...extensionIcons.map((icon) => icon.path), storeListingIcon.path], {
-    useZopfli: true,
-  });
+  await runOxipng([...extensionIcons.map((icon) => icon.path), storeListingIcon.path]);
 }
 
 async function optimizeBuildOutputIcons() {
@@ -189,7 +174,7 @@ async function optimizeBuildOutputIcons() {
     buildIconFiles.push(...(await listPngFiles(directory)));
   }
 
-  runOxipng(buildIconFiles, { useZopfli: false });
+  await runOxipng(buildIconFiles);
 }
 
 function parseArgs(args) {
