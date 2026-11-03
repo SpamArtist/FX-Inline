@@ -20,6 +20,10 @@ const single = parser.parseValue("USD 1.2M", { localeHint: "en-US" });
 const matches = extractCurrencyTextMatches("Deal: $100 and €220");
 ```
 
+Explicit Chinese prices such as `RMB 100`, `100 RMB`, `CN¥100`, and `100元`
+resolve to `CNY`. Plain `¥` and `￥` continue to resolve to Japanese yen (`JPY`),
+including on Chinese-language pages. Conversion uses the user's selected target currency.
+
 ## API
 
 ### `createCurrencyParser(config?)`
