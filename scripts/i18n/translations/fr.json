@@ -34,7 +34,7 @@
   "Opening Settings...": "Ouverture des paramètres…",
   "Settings opened in a new tab.": "Les paramètres sont ouverts dans un nouvel onglet.",
   "Could not open settings automatically. Open FX Inline Settings from the extension menu.": "Impossible d’ouvrir les paramètres automatiquement. Ouvrez les paramètres de FX Inline depuis le menu des extensions.",
-  "FX Inline converts prices directly on webpages into your preferred currency, so you can compare costs without leaving the page.": "FX Inline convertit les prix des pages web dans votre devise préférée pour comparer les coûts sans quitter la page.",
+  "FX Inline converts prices directly on webpages into your preferred currency, so you can compare costs without leaving the page.": "FX Inline convertit les prix des pages Internet dans votre devise préférée pour comparer les coûts sans quitter la page.",
   "FX INLINE": "FX INLINE",
   "© {year} FX Inline": "© {year} FX Inline"
 }

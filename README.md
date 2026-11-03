@@ -137,7 +137,8 @@ changed placeholders, straight double quotes, and overlong manifest metadata fai
 
 Chrome selects the UI language from its browser language. Supported locales are en, de, fr,
 es, it, pt_PT, pt_BR, nl, pl, sv, da, no, fi, cs, ro, hu, el, tr, and uk. Unsupported locales
-fall back to English. Portuguese uses the regional Chrome locales; Norwegian Bokmål maps to no.
+fall back to English. Portuguese uses the regional Chrome locales. Norwegian catalogs ship as
+both `no` and `nb`, because Chrome on macOS requests `nb` for Bokmål; both use the `no` translation source.
 
 Store descriptions live in `store-listing/<locale>/chrome.txt`. The English source was taken
 from the [current Chrome Web Store listing](https://chromewebstore.google.com/detail/fx-inline/cicoldboionelecmpjpkkdhicjbpfefj)

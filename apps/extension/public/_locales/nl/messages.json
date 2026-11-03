@@ -45,7 +45,7 @@
     "description": "FX Inline converts prices directly on webpages into your preferred currency, so you can compare costs without leaving the page."
   },
   "text_a187caa3": {
-    "message": "Feedback ↗",
+    "message": "Reactie ↗",
     "description": "Feedback ↗"
   },
   "text_51f61eb8": {
@@ -122,7 +122,7 @@
     "description": "Settings opened in a new tab."
   },
   "text_c4102f5c": {
-    "message": "Feedback geven (opent in een nieuw tabblad)",
+    "message": "Reactie geven (opent in een nieuw tabblad)",
     "description": "Share feedback (opens in a new tab)"
   },
   "text_e9b65b75": {
@@ -142,7 +142,7 @@
     "description": "Unable to update preferred currency."
   },
   "text_89595d96": {
-    "message": "Klik op het FX Inline-pictogram om de omrekentool te openen.",
+    "message": "Klik op het FX Inline-pictogram om het omrekenvenster te openen.",
     "description": "Use the FX Inline icon anytime to open the converter popup."
   },
   "text_3a51b61f": {

@@ -1,4 +1,4 @@
-FX Inline helpt je online prijzen in één oogopslag te begrijpen. Wanneer je een webpagina bezoekt, kan de extensie prijzen in je voorkeursvaluta direct naast het oorspronkelijke bedrag tonen. Zo kun je producten, abonnementen, reiskosten en internationale prijzen gemakkelijker vergelijken zonder een aparte omrekentool te openen. Je kunt je valuta kiezen, automatisch omrekenen in- of uitschakelen en bepalen of prijzen overal of alleen op de huidige pagina worden omgerekend.
+FX Inline helpt je prijzen op internet in één oogopslag te begrijpen. Wanneer je een webpagina bezoekt, kan de extensie prijzen in je voorkeursvaluta direct naast het oorspronkelijke bedrag tonen. Zo kun je producten, abonnementen, reiskosten en internationale prijzen gemakkelijker vergelijken zonder een aparte valutaomrekenaar te openen. Je kunt je valuta kiezen, automatisch omrekenen in- of uitschakelen en bepalen of prijzen overal of alleen op de huidige pagina worden omgerekend.
 
 FX Inline is ontworpen om op de achtergrond te blijven: de extensie werkt alleen als er prijsinformatie wordt gevonden en houdt de oorspronkelijke prijs zichtbaar, zodat je beide bedragen altijd kunt vergelijken.
 
@@ -11,8 +11,8 @@ Minder onjuiste valutaherkenningen.
 Algemene verbeteringen in snelheid en betrouwbaarheid.
 
 v0.5.0:
-Deze update maakt FX Inline sneller, overzichtelijker en betrouwbaarder.
+Deze versie maakt FX Inline sneller, overzichtelijker en betrouwbaarder.
 Pagina’s laden soepeler doordat de extensie wacht tot er een prijs wordt gevonden voordat extra werk wordt uitgevoerd.
-Het pop-upvenster en de instellingen hebben nu een consistentere vormgeving.
+Het omrekenvenster en de instellingen hebben nu een consistentere vormgeving.
 De bediening voor valutaomrekening is eenvoudiger te beheren voor alle pagina’s of alleen de huidige pagina.
-Het extensiepakket is opgeschoond om toekomstige updates betrouwbaarder te maken.
+Het extensiepakket is opgeschoond om toekomstige versies betrouwbaarder te maken.

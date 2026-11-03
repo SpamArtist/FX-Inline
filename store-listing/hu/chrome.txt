@@ -1,4 +1,4 @@
-Az FX Inline segítségével egy pillantással átláthatod az online árakat. Amikor meglátogatsz egy weboldalt, az eredeti összeg mellett közvetlenül megjelenítheti az árakat az általad választott pénznemben. Így könnyebben összehasonlíthatod a termékeket, előfizetéseket, utazási költségeket és nemzetközi árakat, külön átváltó megnyitása nélkül. Kiválaszthatod a pénznemet, be- vagy kikapcsolhatod az automatikus átváltást, és megadhatod, hogy mindenhol vagy csak az aktuális oldalon működjön.
+Az FX Inline segítségével egy pillantással átláthatod az internetes árakat. Amikor meglátogatsz egy weboldalt, az eredeti összeg mellett közvetlenül megjelenítheti az árakat az általad választott pénznemben. Így könnyebben összehasonlíthatod a termékeket, előfizetéseket, utazási költségeket és nemzetközi árakat, külön átváltó megnyitása nélkül. Kiválaszthatod a pénznemet, be- vagy kikapcsolhatod az automatikus átváltást, és megadhatod, hogy mindenhol vagy csak az aktuális oldalon működjön.
 
 Az FX Inline észrevétlenül segít: csak akkor dolgozik, ha áradatokat talál, és az eredeti árat is láthatóan hagyja, így bármikor összehasonlíthatod a két összeget.
 

@@ -87,7 +87,11 @@ export async function buildLocales({ check = false } = {}) {
     const translations = locale === "en" ? {} : JSON.parse(await fs.readFile(
       path.join(root, `scripts/i18n/translations/${locale}.json`), "utf8"));
     const catalog = createCatalog(strings, translations, locale);
-    outputs.push([path.join(extension, `public/_locales/${locale}/messages.json`), JSON.stringify(catalog, null, 2) + "\n"]);
+    // Chrome on macOS uses nb; keep no for Chrome Web Store locale coverage.
+    const browserLocales = locale === "no" ? ["no", "nb"] : [locale];
+    for (const browserLocale of browserLocales) {
+      outputs.push([path.join(extension, `public/_locales/${browserLocale}/messages.json`), JSON.stringify(catalog, null, 2) + "\n"]);
+    }
     const listing = await fs.readFile(path.join(root, `store-listing/${locale}/chrome.txt`), "utf8");
     if (!listing.trim() || listing.includes('"')) throw new Error(`${locale}: missing listing or straight double quotes`);
   }
@@ -100,7 +104,7 @@ export async function buildLocales({ check = false } = {}) {
       await fs.writeFile(filename, content);
     }
   }
-  console.log(`${check ? "Checked" : "Built"} ${LOCALES.length} locales; ${new Set(strings).size} English strings; store listings complete.`);
+  console.log(`${check ? "Checked" : "Built"} ${LOCALES.length} locales (${outputs.length} browser catalogs); ${new Set(strings).size} English strings; store listings complete.`);
 }
 
 if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) {

@@ -13,6 +13,6 @@ Generelle forbedringer av hastighet og pålitelighet.
 v0.5.0:
 Denne oppdateringen gjør FX Inline raskere, ryddigere og mer pålitelig.
 Sider lastes jevnere fordi utvidelsen venter til den finner en pris før den utfører ekstra arbeid.
-Popupvinduet og innstillingssiden har nå et mer enhetlig utseende.
+Omregningsvinduet og innstillingssiden har nå et mer enhetlig utseende.
 Det er enklere å styre valutaomregningen for alle sider eller bare den gjeldende siden.
 Utvidelsespakken er ryddet opp slik at fremtidige oppdateringer blir mer pålitelige.

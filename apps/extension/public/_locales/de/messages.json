@@ -45,7 +45,7 @@
     "description": "FX Inline converts prices directly on webpages into your preferred currency, so you can compare costs without leaving the page."
   },
   "text_a187caa3": {
-    "message": "Feedback ↗",
+    "message": "Meinung ↗",
     "description": "Feedback ↗"
   },
   "text_51f61eb8": {
@@ -118,11 +118,11 @@
     }
   },
   "text_87691c58": {
-    "message": "Einstellungen in einem neuen Tab geöffnet.",
+    "message": "Einstellungen in einer neuen Registerkarte geöffnet.",
     "description": "Settings opened in a new tab."
   },
   "text_c4102f5c": {
-    "message": "Feedback geben (öffnet einen neuen Tab)",
+    "message": "Rückmeldung geben (öffnet eine neue Registerkarte)",
     "description": "Share feedback (opens in a new tab)"
   },
   "text_e9b65b75": {

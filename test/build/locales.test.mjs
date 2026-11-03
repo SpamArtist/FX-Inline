@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import fs from "node:fs/promises";
 import { buildLocales, collectStrings, createCatalog } from "../../scripts/i18n/build-locales.mjs";
 import { messageKey } from "../../apps/extension/utils/messageKey.ts";
 
@@ -37,4 +38,14 @@ test("manifest text must remain below each character limit", () => {
 
 test("all shipped catalogs match extracted source and complete translations", async () => {
   await buildLocales({ check: true });
+});
+
+// Chrome on macOS requests nb even though the store locale is no.
+test("Norwegian Bokmål browser alias ships the complete Norwegian catalog", async () => {
+  const readCatalog = async (locale) => JSON.parse(await fs.readFile(new URL(
+    `../../apps/extension/public/_locales/${locale}/messages.json`, import.meta.url,
+  ), "utf8"));
+  const [norwegian, bokmal] = await Promise.all([readCatalog("no"), readCatalog("nb")]);
+  assert.deepEqual(bokmal, norwegian);
+  assert.notEqual(bokmal[messageKey("Feedback ↗")].message, "Feedback ↗");
 });

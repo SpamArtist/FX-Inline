@@ -16,7 +16,7 @@
   "Currency": "Νόμισμα",
   "{currency_name} amount": "Ποσό σε {currency_name}",
   "Edit {currency_name} amount": "Επεξεργασία ποσού σε {currency_name}",
-  "Click amount to edit": "Κάντε κλικ στο ποσό για επεξεργασία",
+  "Click amount to edit": "Πατήστε το ποσό για επεξεργασία",
   "Amount updates instantly": "Το ποσό ενημερώνεται αμέσως",
   "FX Inline Settings": "Ρυθμίσεις FX Inline",
   "Preferred Currency": "Προτιμώμενο νόμισμα",

@@ -41,7 +41,7 @@
     "description": "FX Inline Settings"
   },
   "text_07a1f646": {
-    "message": "O FX Inline converte os preços das páginas web na sua moeda preferida para comparar custos sem sair da página.",
+    "message": "O FX Inline converte os preços das páginas da Internet na sua moeda preferida para comparar custos sem sair da página.",
     "description": "FX Inline converts prices directly on webpages into your preferred currency, so you can compare costs without leaving the page."
   },
   "text_a187caa3": {
@@ -176,7 +176,7 @@
     "description": "FX Inline"
   },
   "extensionDescription": {
-    "message": "O FX Inline converte os preços das páginas web na sua moeda preferida para comparar custos sem sair da página.",
+    "message": "O FX Inline converte os preços das páginas da Internet na sua moeda preferida para comparar custos sem sair da página.",
     "description": "FX Inline converts prices directly on webpages into your preferred currency, so you can compare costs without leaving the page."
   }
 }

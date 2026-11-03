@@ -1,4 +1,4 @@
-FX Inline te ajută să înțelegi dintr-o privire prețurile online. Când vizitezi o pagină web, poate afișa prețurile în moneda preferată chiar lângă suma originală. Astfel, poți compara mai ușor produse, abonamente, costuri de călătorie și prețuri internaționale, fără să deschizi un convertor separat. Poți alege moneda, activa sau dezactiva conversia automată și stabili dacă aceasta se aplică peste tot sau doar pe pagina curentă.
+FX Inline te ajută să înțelegi dintr-o privire prețurile de pe internet. Când vizitezi o pagină web, poate afișa prețurile în moneda preferată chiar lângă suma originală. Astfel, poți compara mai ușor produse, abonamente, costuri de călătorie și prețuri internaționale, fără să deschizi un convertor separat. Poți alege moneda, activa sau dezactiva conversia automată și stabili dacă aceasta se aplică peste tot sau doar pe pagina curentă.
 
 FX Inline este conceput să nu te încurce: funcționează numai când găsește informații despre prețuri și păstrează prețul original vizibil, ca să poți compara oricând ambele sume.
 

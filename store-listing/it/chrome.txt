@@ -1,4 +1,4 @@
-FX Inline ti aiuta a capire i prezzi online a colpo d’occhio. Quando visiti una pagina web, può mostrare i prezzi nella tua valuta preferita accanto all’importo originale. In questo modo è più facile confrontare prodotti, abbonamenti, spese di viaggio e prezzi internazionali senza aprire un convertitore separato. Puoi scegliere la valuta, attivare o disattivare la conversione automatica e decidere se applicarla ovunque o solo sulla pagina attuale.
+FX Inline ti aiuta a capire i prezzi in rete a colpo d’occhio. Quando visiti una pagina Internet, può mostrare i prezzi nella tua valuta preferita accanto all’importo originale. In questo modo è più facile confrontare prodotti, abbonamenti, spese di viaggio e prezzi internazionali senza aprire un convertitore separato. Puoi scegliere la valuta, attivare o disattivare la conversione automatica e decidere se applicarla ovunque o solo sulla pagina attuale.
 
 FX Inline è progettato per essere discreto: funziona solo quando trova informazioni sui prezzi e lascia visibile il prezzo originale, così puoi sempre confrontare entrambi gli importi.
 
